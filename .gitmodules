@@ -14,3 +14,6 @@
 [submodule "scripts/uberenv"]
 	path = scripts/uberenv
 	url = https://github.com/LLNL/uberenv
+[submodule "src/tpl/umpire/fuzztest"]
+	path = src/tpl/umpire/fuzztest
+	url = https://github.com/google/fuzztest.git
