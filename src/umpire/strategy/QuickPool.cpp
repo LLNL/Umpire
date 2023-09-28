@@ -313,7 +313,11 @@ void QuickPool::coalesce() noexcept
     event.name("coalesce").category(event::category::operation).tag("allocator_name", getName()).tag("replay", "true");
   });
 
-  do_coalesce(getActualSize());
+  std::size_t suggested_size{m_should_coalesce(*this)};
+  if (0 != suggested_size) {
+    UMPIRE_LOG(Debug, "coalesce heuristic true, performing coalesce, suggested size is " << suggested_size);
+    do_coalesce(suggested_size);
+  }
 }
 
 void QuickPool::do_coalesce(std::size_t suggested_size) noexcept
@@ -335,15 +339,15 @@ void QuickPool::do_coalesce(std::size_t suggested_size) noexcept
 
 PoolCoalesceHeuristic<QuickPool> QuickPool::blocks_releasable(std::size_t nblocks)
 {
-  return [=](const strategy::QuickPool& pool) {
-    return pool.getReleasableBlocks() > nblocks ? pool.getHighWatermark() : 0;
-  };
+  return
+      [=](const strategy::QuickPool& pool) { return pool.getReleasableBlocks() >= nblocks ? pool.getActualSize() : 0; };
 }
 
 PoolCoalesceHeuristic<QuickPool> QuickPool::blocks_releasable_hwm(std::size_t nblocks)
 {
-  return
-      [=](const strategy::QuickPool& pool) { return pool.getReleasableBlocks() > nblocks ? pool.getActualSize() : 0; };
+  return [=](const strategy::QuickPool& pool) {
+    return pool.getReleasableBlocks() >= nblocks ? pool.getHighWatermark() : 0;
+  };
 }
 
 PoolCoalesceHeuristic<QuickPool> QuickPool::percent_releasable(int percentage)
