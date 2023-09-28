@@ -50,7 +50,7 @@ gcc_10_3_1_tpls:
 gcc_10_3_1_ipc_no_mpi:
   variables:
     SPEC: "~shared +ipc_shmem tests=basic %gcc@10.3.1"
-  extends: .build_and_test_on_ruby
+  extends: .job_on_ruby
 
 # Oneapi is not available on ruby@toss4 (rhel8)
 ## We deactivate this job as it is known to fail with Umpire: needs gcc toolchain.
