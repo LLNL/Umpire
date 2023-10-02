@@ -16,10 +16,13 @@
 # repo, opt-in and out optional features. The project can then extend it with
 # additional stages.
 #
-# Instead, each project should provide:
+# In addition, each project should copy over and complete:
 # - .gitlab/custom-jobs-and-variables.yml
 # - .gitlab/subscribed-pipelines.yml
-# - .gitlab/${MACHINE}-build-and-test-extra.yml
+#
+# The jobs should be specified in a file local to the project,
+# - .gitlab/jobs/${CI_MACHINE}.yml
+# or generated (see LLNL/Umpire for an example).
 ###############################################################################
 
 # We define the following GitLab pipeline variables:
@@ -42,7 +45,7 @@ variables:
 
 ##### SHARED_CI CONFIGURATION
 # Shared CI reference to use
-  SHARED_CI_REF: "woptim/isolate-jobs"
+  SHARED_CI_REF: "v2023.09.0"
 # Required information about GitHub repository
   GITHUB_PROJECT_NAME: "Umpire"
   GITHUB_PROJECT_ORG: "LLNL"
@@ -53,7 +56,7 @@ variables:
 # preliminary-ignore-draft-pr.yml.
 #  ALWAYS_RUN_PATTERN: ""
 
-# We organize the build-and-test stage in sub-pipelines. Each sub-pipeline
+# We organize the build-and-test stage with sub-pipelines. Each sub-pipeline
 # corresponds to a test batch on a given machine.
 
 # High level stages
@@ -63,7 +66,7 @@ stages:
   - multi-project #TODO unused so far
   - radiuss-spack-testing #TODO unused so far
 
-# Template for jobs triggering a build-and-test sub-pipelines:
+# Template for jobs triggering a build-and-test sub-pipeline:
 .build-and-test:
   stage: build-and-test
   trigger:
