@@ -49,7 +49,7 @@ subroutine allocator_allocate_{name}_array_{dim}d(this, array, dims)
       class(UmpireAllocator) :: this
       {c_type}, intent(inout), pointer, dimension({dim_string}) :: array
 
-      integer, dimension(:) :: dims
+      integer(C_SIZE_T), dimension(:) :: dims
 
       type(C_PTR) :: data_ptr
 
