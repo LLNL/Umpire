@@ -1055,7 +1055,7 @@ contains
           class(UmpireAllocator) :: this
           integer(C_INT), intent(inout), pointer, dimension(:) :: array
 
-          integer, dimension(:) :: dims
+          integer(C_SIZE_T), dimension(:) :: dims
 
           type(C_PTR) :: data_ptr
 
@@ -1092,7 +1092,7 @@ contains
           class(UmpireAllocator) :: this
           integer(C_INT), intent(inout), pointer, dimension(:, :) :: array
 
-          integer, dimension(:) :: dims
+          integer(C_SIZE_T), dimension(:) :: dims
 
           type(C_PTR) :: data_ptr
 
@@ -1129,7 +1129,7 @@ contains
           class(UmpireAllocator) :: this
           integer(C_INT), intent(inout), pointer, dimension(:, :, :) :: array
 
-          integer, dimension(:) :: dims
+          integer(C_SIZE_T), dimension(:) :: dims
 
           type(C_PTR) :: data_ptr
 
@@ -1166,7 +1166,7 @@ contains
           class(UmpireAllocator) :: this
           integer(C_INT), intent(inout), pointer, dimension(:, :, :, :) :: array
 
-          integer, dimension(:) :: dims
+          integer(C_SIZE_T), dimension(:) :: dims
 
           type(C_PTR) :: data_ptr
 
@@ -1203,7 +1203,7 @@ contains
           class(UmpireAllocator) :: this
           integer(C_LONG), intent(inout), pointer, dimension(:) :: array
 
-          integer, dimension(:) :: dims
+          integer(C_SIZE_T), dimension(:) :: dims
 
           type(C_PTR) :: data_ptr
 
@@ -1240,7 +1240,7 @@ contains
           class(UmpireAllocator) :: this
           integer(C_LONG), intent(inout), pointer, dimension(:, :) :: array
 
-          integer, dimension(:) :: dims
+          integer(C_SIZE_T), dimension(:) :: dims
 
           type(C_PTR) :: data_ptr
 
@@ -1277,7 +1277,7 @@ contains
           class(UmpireAllocator) :: this
           integer(C_LONG), intent(inout), pointer, dimension(:, :, :) :: array
 
-          integer, dimension(:) :: dims
+          integer(C_SIZE_T), dimension(:) :: dims
 
           type(C_PTR) :: data_ptr
 
@@ -1314,7 +1314,7 @@ contains
           class(UmpireAllocator) :: this
           integer(C_LONG), intent(inout), pointer, dimension(:, :, :, :) :: array
 
-          integer, dimension(:) :: dims
+          integer(C_SIZE_T), dimension(:) :: dims
 
           type(C_PTR) :: data_ptr
 
@@ -1351,7 +1351,7 @@ contains
           class(UmpireAllocator) :: this
           real(C_FLOAT), intent(inout), pointer, dimension(:) :: array
 
-          integer, dimension(:) :: dims
+          integer(C_SIZE_T), dimension(:) :: dims
 
           type(C_PTR) :: data_ptr
 
@@ -1388,7 +1388,7 @@ contains
           class(UmpireAllocator) :: this
           real(C_FLOAT), intent(inout), pointer, dimension(:, :) :: array
 
-          integer, dimension(:) :: dims
+          integer(C_SIZE_T), dimension(:) :: dims
 
           type(C_PTR) :: data_ptr
 
@@ -1425,7 +1425,7 @@ contains
           class(UmpireAllocator) :: this
           real(C_FLOAT), intent(inout), pointer, dimension(:, :, :) :: array
 
-          integer, dimension(:) :: dims
+          integer(C_SIZE_T), dimension(:) :: dims
 
           type(C_PTR) :: data_ptr
 
@@ -1462,7 +1462,7 @@ contains
           class(UmpireAllocator) :: this
           real(C_FLOAT), intent(inout), pointer, dimension(:, :, :, :) :: array
 
-          integer, dimension(:) :: dims
+          integer(C_SIZE_T), dimension(:) :: dims
 
           type(C_PTR) :: data_ptr
 
@@ -1499,7 +1499,7 @@ contains
           class(UmpireAllocator) :: this
           real(C_DOUBLE), intent(inout), pointer, dimension(:) :: array
 
-          integer, dimension(:) :: dims
+          integer(C_SIZE_T), dimension(:) :: dims
 
           type(C_PTR) :: data_ptr
 
@@ -1536,7 +1536,7 @@ contains
           class(UmpireAllocator) :: this
           real(C_DOUBLE), intent(inout), pointer, dimension(:, :) :: array
 
-          integer, dimension(:) :: dims
+          integer(C_SIZE_T), dimension(:) :: dims
 
           type(C_PTR) :: data_ptr
 
@@ -1573,7 +1573,7 @@ contains
           class(UmpireAllocator) :: this
           real(C_DOUBLE), intent(inout), pointer, dimension(:, :, :) :: array
 
-          integer, dimension(:) :: dims
+          integer(C_SIZE_T), dimension(:) :: dims
 
           type(C_PTR) :: data_ptr
 
@@ -1610,7 +1610,7 @@ contains
           class(UmpireAllocator) :: this
           real(C_DOUBLE), intent(inout), pointer, dimension(:, :, :, :) :: array
 
-          integer, dimension(:) :: dims
+          integer(C_SIZE_T), dimension(:) :: dims
 
           type(C_PTR) :: data_ptr
 
