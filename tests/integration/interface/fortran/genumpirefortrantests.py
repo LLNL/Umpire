@@ -47,7 +47,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         {c_type}, pointer, dimension({dim_string}) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension({dim}) :: sizes 
         sizes = [ {sizes} ]
 
         rm = rm%get_instance()

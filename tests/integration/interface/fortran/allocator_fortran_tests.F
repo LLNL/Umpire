@@ -20,7 +20,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         integer(C_INT), pointer, dimension(:) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(1) :: sizes 
         sizes = [ 10 ]
 
         rm = rm%get_instance()
@@ -45,7 +45,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         integer(C_INT), pointer, dimension(:, :) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(2) :: sizes 
         sizes = [ 10, 10 ]
 
         rm = rm%get_instance()
@@ -70,7 +70,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         integer(C_INT), pointer, dimension(:, :, :) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(3) :: sizes 
         sizes = [ 10, 10, 10 ]
 
         rm = rm%get_instance()
@@ -95,7 +95,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         integer(C_INT), pointer, dimension(:, :, :, :) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(4) :: sizes 
         sizes = [ 10, 10, 10, 10 ]
 
         rm = rm%get_instance()
@@ -120,7 +120,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         integer(C_LONG), pointer, dimension(:) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(1) :: sizes 
         sizes = [ 10 ]
 
         rm = rm%get_instance()
@@ -145,7 +145,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         integer(C_LONG), pointer, dimension(:, :) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(2) :: sizes 
         sizes = [ 10, 10 ]
 
         rm = rm%get_instance()
@@ -170,7 +170,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         integer(C_LONG), pointer, dimension(:, :, :) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(3) :: sizes 
         sizes = [ 10, 10, 10 ]
 
         rm = rm%get_instance()
@@ -195,7 +195,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         integer(C_LONG), pointer, dimension(:, :, :, :) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(4) :: sizes 
         sizes = [ 10, 10, 10, 10 ]
 
         rm = rm%get_instance()
@@ -220,7 +220,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         real(C_FLOAT), pointer, dimension(:) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(1) :: sizes 
         sizes = [ 10 ]
 
         rm = rm%get_instance()
@@ -245,7 +245,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         real(C_FLOAT), pointer, dimension(:, :) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(2) :: sizes 
         sizes = [ 10, 10 ]
 
         rm = rm%get_instance()
@@ -270,7 +270,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         real(C_FLOAT), pointer, dimension(:, :, :) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(3) :: sizes 
         sizes = [ 10, 10, 10 ]
 
         rm = rm%get_instance()
@@ -295,7 +295,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         real(C_FLOAT), pointer, dimension(:, :, :, :) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(4) :: sizes 
         sizes = [ 10, 10, 10, 10 ]
 
         rm = rm%get_instance()
@@ -320,7 +320,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         real(C_DOUBLE), pointer, dimension(:) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(1) :: sizes 
         sizes = [ 10 ]
 
         rm = rm%get_instance()
@@ -345,7 +345,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         real(C_DOUBLE), pointer, dimension(:, :) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(2) :: sizes 
         sizes = [ 10, 10 ]
 
         rm = rm%get_instance()
@@ -370,7 +370,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         real(C_DOUBLE), pointer, dimension(:, :, :) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(3) :: sizes 
         sizes = [ 10, 10, 10 ]
 
         rm = rm%get_instance()
@@ -395,7 +395,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         real(C_DOUBLE), pointer, dimension(:, :, :, :) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(4) :: sizes 
         sizes = [ 10, 10, 10, 10 ]
 
         rm = rm%get_instance()
@@ -421,7 +421,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         integer(C_INT), pointer, dimension(:) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(1) :: sizes 
         sizes = [ 10 ]
 
         rm = rm%get_instance()
@@ -446,7 +446,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         integer(C_INT), pointer, dimension(:, :) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(2) :: sizes 
         sizes = [ 10, 10 ]
 
         rm = rm%get_instance()
@@ -471,7 +471,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         integer(C_INT), pointer, dimension(:, :, :) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(3) :: sizes 
         sizes = [ 10, 10, 10 ]
 
         rm = rm%get_instance()
@@ -496,7 +496,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         integer(C_INT), pointer, dimension(:, :, :, :) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(4) :: sizes 
         sizes = [ 10, 10, 10, 10 ]
 
         rm = rm%get_instance()
@@ -521,7 +521,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         integer(C_LONG), pointer, dimension(:) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(1) :: sizes 
         sizes = [ 10 ]
 
         rm = rm%get_instance()
@@ -546,7 +546,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         integer(C_LONG), pointer, dimension(:, :) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(2) :: sizes 
         sizes = [ 10, 10 ]
 
         rm = rm%get_instance()
@@ -571,7 +571,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         integer(C_LONG), pointer, dimension(:, :, :) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(3) :: sizes 
         sizes = [ 10, 10, 10 ]
 
         rm = rm%get_instance()
@@ -596,7 +596,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         integer(C_LONG), pointer, dimension(:, :, :, :) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(4) :: sizes 
         sizes = [ 10, 10, 10, 10 ]
 
         rm = rm%get_instance()
@@ -621,7 +621,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         real(C_FLOAT), pointer, dimension(:) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(1) :: sizes 
         sizes = [ 10 ]
 
         rm = rm%get_instance()
@@ -646,7 +646,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         real(C_FLOAT), pointer, dimension(:, :) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(2) :: sizes 
         sizes = [ 10, 10 ]
 
         rm = rm%get_instance()
@@ -671,7 +671,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         real(C_FLOAT), pointer, dimension(:, :, :) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(3) :: sizes 
         sizes = [ 10, 10, 10 ]
 
         rm = rm%get_instance()
@@ -696,7 +696,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         real(C_FLOAT), pointer, dimension(:, :, :, :) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(4) :: sizes 
         sizes = [ 10, 10, 10, 10 ]
 
         rm = rm%get_instance()
@@ -721,7 +721,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         real(C_DOUBLE), pointer, dimension(:) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(1) :: sizes 
         sizes = [ 10 ]
 
         rm = rm%get_instance()
@@ -746,7 +746,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         real(C_DOUBLE), pointer, dimension(:, :) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(2) :: sizes 
         sizes = [ 10, 10 ]
 
         rm = rm%get_instance()
@@ -771,7 +771,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         real(C_DOUBLE), pointer, dimension(:, :, :) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(3) :: sizes 
         sizes = [ 10, 10, 10 ]
 
         rm = rm%get_instance()
@@ -796,7 +796,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         real(C_DOUBLE), pointer, dimension(:, :, :, :) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(4) :: sizes 
         sizes = [ 10, 10, 10, 10 ]
 
         rm = rm%get_instance()
@@ -821,7 +821,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         integer(C_INT), pointer, dimension(:) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(1) :: sizes 
         sizes = [ 10 ]
 
         rm = rm%get_instance()
@@ -846,7 +846,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         integer(C_INT), pointer, dimension(:, :) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(2) :: sizes 
         sizes = [ 10, 10 ]
 
         rm = rm%get_instance()
@@ -871,7 +871,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         integer(C_INT), pointer, dimension(:, :, :) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(3) :: sizes 
         sizes = [ 10, 10, 10 ]
 
         rm = rm%get_instance()
@@ -896,7 +896,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         integer(C_INT), pointer, dimension(:, :, :, :) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(4) :: sizes 
         sizes = [ 10, 10, 10, 10 ]
 
         rm = rm%get_instance()
@@ -921,7 +921,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         integer(C_LONG), pointer, dimension(:) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(1) :: sizes 
         sizes = [ 10 ]
 
         rm = rm%get_instance()
@@ -946,7 +946,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         integer(C_LONG), pointer, dimension(:, :) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(2) :: sizes 
         sizes = [ 10, 10 ]
 
         rm = rm%get_instance()
@@ -971,7 +971,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         integer(C_LONG), pointer, dimension(:, :, :) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(3) :: sizes 
         sizes = [ 10, 10, 10 ]
 
         rm = rm%get_instance()
@@ -996,7 +996,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         integer(C_LONG), pointer, dimension(:, :, :, :) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(4) :: sizes 
         sizes = [ 10, 10, 10, 10 ]
 
         rm = rm%get_instance()
@@ -1021,7 +1021,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         real(C_FLOAT), pointer, dimension(:) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(1) :: sizes 
         sizes = [ 10 ]
 
         rm = rm%get_instance()
@@ -1046,7 +1046,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         real(C_FLOAT), pointer, dimension(:, :) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(2) :: sizes 
         sizes = [ 10, 10 ]
 
         rm = rm%get_instance()
@@ -1071,7 +1071,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         real(C_FLOAT), pointer, dimension(:, :, :) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(3) :: sizes 
         sizes = [ 10, 10, 10 ]
 
         rm = rm%get_instance()
@@ -1096,7 +1096,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         real(C_FLOAT), pointer, dimension(:, :, :, :) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(4) :: sizes 
         sizes = [ 10, 10, 10, 10 ]
 
         rm = rm%get_instance()
@@ -1121,7 +1121,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         real(C_DOUBLE), pointer, dimension(:) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(1) :: sizes 
         sizes = [ 10 ]
 
         rm = rm%get_instance()
@@ -1146,7 +1146,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         real(C_DOUBLE), pointer, dimension(:, :) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(2) :: sizes 
         sizes = [ 10, 10 ]
 
         rm = rm%get_instance()
@@ -1171,7 +1171,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         real(C_DOUBLE), pointer, dimension(:, :, :) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(3) :: sizes 
         sizes = [ 10, 10, 10 ]
 
         rm = rm%get_instance()
@@ -1196,7 +1196,7 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         real(C_DOUBLE), pointer, dimension(:, :, :, :) :: array
-        integer(C_SIZE_T), dimension(:) :: sizes 
+        integer(C_SIZE_T), dimension(4) :: sizes 
         sizes = [ 10, 10, 10, 10 ]
 
         rm = rm%get_instance()
