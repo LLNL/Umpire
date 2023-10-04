@@ -21,10 +21,12 @@ module umpire_fortran_introspection_tests
           type(UmpireAllocator) allocator
 
           integer(C_INT), pointer, dimension(:) :: array
+          integer(C_SIZE_T), dimension(1) :: size
           integer(C_SIZE_T) :: memory_usage, memory_hwm, allocation_count
           integer(C_SIZE_T) :: zero
 
           zero = 0
+          size = [ 10 ] 
 
           rm = rm%get_instance()
           allocator = rm%get_allocator_by_name("HOST")
@@ -35,7 +37,7 @@ module umpire_fortran_introspection_tests
           memory_hwm = get_process_memory_usage_hwm()
           call assert_true(memory_hwm .ge. zero)
 
-          call allocator%allocate(array, [10])
+          call allocator%allocate(array, size)
 
           allocation_count = allocator%get_allocation_count()
           call assert_true(allocation_count .eq. 1)
