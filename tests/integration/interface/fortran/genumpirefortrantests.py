@@ -47,12 +47,14 @@ module umpire_fortran_generated_tests
         type(UmpireAllocator) allocator
 
         {c_type}, pointer, dimension({dim_string}) :: array
+        integer(C_SIZE_T), dimension(:) :: sizes 
+        sizes = [ {sizes} ]
 
         rm = rm%get_instance()
         allocator = rm%get_allocator_by_name("{alloc}")
 
 
-        call allocator%allocate(array, [{sizes}])
+        call allocator%allocate(array, sizes)
         call assert_true(associated(array))
 
         call allocator%deallocate(array)
