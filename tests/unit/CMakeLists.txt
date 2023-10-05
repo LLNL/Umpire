@@ -15,11 +15,6 @@ blt_add_executable(
   SOURCES resource_manager_tests.cpp
   DEPENDS_ON ${unit_depends})
 
-blt_add_executable(
-  NAME fuzz_tests
-  SOURCES fuzz_tests.cpp
-  DEPENDS_ON ${unit_depends})
-
 blt_add_test(
   NAME resource_manager_tests
   COMMAND resource_manager_tests)
