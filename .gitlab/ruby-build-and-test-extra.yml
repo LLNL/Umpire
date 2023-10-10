@@ -42,6 +42,11 @@ clang_14_0_6_gcc_10_3_1_tpls:
     SPEC: "~shared +fortran +tools tests=basic %clang@14.0.6.gcc.10.3.1"
   extends: .build_and_test_on_ruby
 
+clang_14_0_6_magic:
+  variables:
+    SPEC: "~shared ~fortran +tools tests=basic cppflags='-g -fsanitize=address,fuzzer' %clang@14.0.6-magic"
+  extends: .build_and_test_on_ruby
+
 gcc_10_3_1_tpls:
   variables:
     SPEC: "~shared +fortran +tools tests=basic %gcc@10.3.1"
