@@ -1,5 +1,5 @@
 ###############################################################################
-# Copyright (c) 2022, Lawrence Livermore National Security, LLC and RADIUSS
+# Copyright (c) 2022-23, Lawrence Livermore National Security, LLC and RADIUSS
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -16,17 +16,18 @@
 # repo, opt-in and out optional features. The project can then extend it with
 # additional stages.
 #
-# Instead, each project should provide:
+# In addition, each project should copy over and complete:
 # - .gitlab/custom-jobs-and-variables.yml
 # - .gitlab/subscribed-pipelines.yml
-# - .gitlab/${MACHINE}-build-and-test-extra.yml
+#
+# The jobs should be specified in a file local to the project,
+# - .gitlab/jobs/${CI_MACHINE}.yml
+# or generated (see LLNL/Umpire for an example).
 ###############################################################################
 
 # We define the following GitLab pipeline variables:
 variables:
-# Required information about GitHub repository
-  GITHUB_PROJECT_NAME: "Umpire"
-  GITHUB_PROJECT_ORG: "LLNL"
+##### LC GITLAB CONFIGURATION
 # Use the umdev LLNL service user to run CI. This prevents from running
 # pipelines as an actual user.
   LLNL_SERVICE_USER: umdev
@@ -35,35 +36,45 @@ variables:
   CUSTOM_CI_BUILDS_DIR: /usr/workspace/umdev/gitlab-runner
 # Tells Gitlab to recursively update the submodules when cloning the project.
   GIT_SUBMODULE_STRATEGY: recursive
-# We build the projects in the CI clone directory.
-# TODO: add a clean-up mechanism
-  BUILD_ROOT: ${CI_PROJECT_DIR}
-# Set the build-and-test command.
-  BUILD_AND_TEST_CMD: "./scripts/gitlab/build_and_test.sh"
-# Override the list of branch that will skip the "draft PR test".
-# Add protected branches here. Defaults to "develop main master".
-#  ALWAYS_RUN_LIST: ""
 
-# We organize the build-and-test stage in sub-pipelines. Each sub-pipeline
+##### PROJECT VARIABLES
+# We build the projects in the CI clone directory.
+# Used in script/gitlab/build_and_test.sh script.
+# TODO: add a clean-up mechanism.
+  BUILD_ROOT: ${CI_PROJECT_DIR}
+
+##### SHARED_CI CONFIGURATION
+# Required information about GitHub repository
+  GITHUB_PROJECT_NAME: "Umpire"
+  GITHUB_PROJECT_ORG: "LLNL"
+# Set the build-and-test command.
+  JOB_CMD: "./scripts/gitlab/build_and_test.sh"
+# Override the pattern describing branches that will skip the "draft PR filter
+# test".  Add protected branches here. See default value in
+# preliminary-ignore-draft-pr.yml.
+#  ALWAYS_RUN_PATTERN: ""
+
+# We organize the build-and-test stage with sub-pipelines. Each sub-pipeline
 # corresponds to a test batch on a given machine.
 
 # High level stages
 stages:
-  - machine-checks
+  - prerequisites
   - build-and-test
   - multi-project #TODO unused so far
   - radiuss-spack-testing #TODO unused so far
 
-# Template for jobs triggering a build-and-test sub-pipelines:
+# Template for jobs triggering a build-and-test sub-pipeline:
 .build-and-test:
   stage: build-and-test
   trigger:
     include:
       - local: '.gitlab/custom-jobs-and-variables.yml'
       - project: 'radiuss/radiuss-shared-ci'
-        ref: v2023.08.0
-        file: '${CI_MACHINE}-build-and-test.yml'
-      - local: '.gitlab/${CI_MACHINE}-build-and-test-extra.yml'
+        ref: 'v2023.09.0'
+        file: 'pipelines/${CI_MACHINE}.yml'
+      - artifact: '${CI_MACHINE}-jobs.yml'
+        job: 'generate-job-lists'
     strategy: depend
     forward:
       pipeline_variables: true
@@ -71,7 +82,7 @@ stages:
 include:
   # [Optional] checks preliminary to running the actual CI test
   #- project: 'radiuss/radiuss-shared-ci'
-  #  ref: v2023.08.0
+  #  ref: 'v2023.09.0'
   #  file: 'preliminary-ignore-draft-pr.yml'
   # pipelines subscribed by the project
-  - local: .gitlab/subscribed-pipelines.yml
+  - local: '.gitlab/subscribed-pipelines.yml'
