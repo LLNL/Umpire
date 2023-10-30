@@ -34,7 +34,7 @@ variables:
 
 # Tioga
 # Arguments for top level allocation
-  TIOGA_SHARED_ALLOC: "--exclusive --time-limit=20m --nodes=1"
+  TIOGA_SHARED_ALLOC: "--exclusive --time-limit=25m --nodes=1"
 # Arguments for job level allocation
   TIOGA_JOB_ALLOC: "--time-limit=15m --nodes=1 --begin-time=+5s"
 # Project specific variants for tioga
