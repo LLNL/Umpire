@@ -57,22 +57,22 @@ target_include_directories(
   PUBLIC
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_FULL_INCLUDEDIR}>)
 
 install(FILES
   ${umpire_interface_c_fortran_headers}
-  DESTINATION include/umpire/interface/c_fortran)
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/umpire/interface/c_fortran)
 
 if(UMPIRE_ENABLE_FORTRAN)
   target_include_directories(
     umpire_interface
     PUBLIC
     $<BUILD_INTERFACE:${CMAKE_Fortran_MODULE_DIRECTORY}>
-    $<INSTALL_INTERFACE:include/umpire>)
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_FULL_INCLUDEDIR}/umpire>)
 
   install(DIRECTORY
     ${CMAKE_Fortran_MODULE_DIRECTORY}/
-    DESTINATION include/umpire
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/umpire
     FILES_MATCHING PATTERN "*.mod")
 endif()
 

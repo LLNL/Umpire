@@ -37,11 +37,11 @@ target_include_directories(
   PUBLIC
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/tpl>
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_FULL_INCLUDEDIR}>)
 
 blt_patch_target(NAME umpire_tpl_CLI11
                  TREAT_INCLUDES_AS_SYSTEM ON)
 
 install(FILES
   ${judy_headers}
-  DESTINATION include/umpire/judy)
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/umpire/judy)

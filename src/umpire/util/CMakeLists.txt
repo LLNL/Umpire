@@ -108,10 +108,10 @@ target_include_directories(
   PUBLIC
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_FULL_INCLUDEDIR}>)
 
 install(FILES
   ${umpire_util_headers}
-  DESTINATION include/umpire/util)
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/umpire/util)
 
 umpire_add_code_checks(PREFIX util)
