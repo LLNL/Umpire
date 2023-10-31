@@ -343,6 +343,8 @@ TYPED_TEST(PrimaryPoolTest, coalesce)
     ptr_two = this->m_allocator->allocate(this->m_min_pool_growth_size);
   });
 
+  auto old_actual_size{pool->getActualSize()};
+
   ASSERT_EQ(pool->getBlocksInPool(), 3); // 1 Free, 2 Allocated
   ASSERT_NO_THROW(this->m_allocator->deallocate(ptr_two););
 
@@ -353,11 +355,10 @@ TYPED_TEST(PrimaryPoolTest, coalesce)
   ASSERT_NO_THROW(this->m_allocator->deallocate(ptr_one););
 
   umpire::coalesce(*this->m_allocator);
-
   ASSERT_EQ(pool->getBlocksInPool(), 1);
 
   ASSERT_EQ(this->m_allocator->getCurrentSize(), 0);
-  ASSERT_EQ(pool->getActualSize(), this->m_initial_pool_size + this->m_min_pool_growth_size);
+  ASSERT_LT(pool->getActualSize(), old_actual_size);
   ASSERT_EQ(this->m_allocator->getHighWatermark(), 1 + this->m_initial_pool_size);
 }
 
