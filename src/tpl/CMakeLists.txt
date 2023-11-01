@@ -57,7 +57,7 @@ blt_convert_to_system_includes(TARGET umpire_tpl_json)
 target_include_directories(
   umpire_tpl_json
   INTERFACE
-  $<INSTALL_INTERFACE:${CMAKE_INSTALL_FULL_INCLUDEDIR}>)
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 install(FILES
   ${json_headers}
@@ -92,7 +92,7 @@ blt_convert_to_system_includes(TARGET umpire_tpl_CLI11)
 target_include_directories(
   umpire_tpl_CLI11
   INTERFACE
-  $<INSTALL_INTERFACE:${CMAKE_INSTALL_FULL_INCLUDEDIR}>)
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 install(FILES
   ${CLI11_headers}
@@ -166,7 +166,7 @@ blt_convert_to_system_includes(TARGET umpire_tpl_fmt)
 target_include_directories(
   umpire_tpl_fmt
   INTERFACE
-  $<INSTALL_INTERFACE:${CMAKE_INSTALL_FULL_INCLUDEDIR}>)
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 if (C_COMPILER_FAMILY_IS_XL)
   set(_fmt_warning_disable_flag
