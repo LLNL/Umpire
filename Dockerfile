@@ -105,7 +105,7 @@ RUN . /opt/spack/share/spack/setup-env.sh && spack load cuda && \
     cmake -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DCMAKE_CXX_COMPILER=g++ -DENABLE_CUDA=On .. && \
     make -j 16
 
-FROM ghcr.io/rse-ops/hip-ubuntu-22.04:hip-4.3.1 AS hip
+FROM ghcr.io/rse-ops/hip-ubuntu-20.04:hip-5.1.3 AS hip
 ENV GTEST_COLOR=1
 ENV HCC_AMDGPU_TARGET=gfx900
 COPY . /home/umpire/workspace
@@ -114,7 +114,7 @@ RUN . /opt/spack/share/spack/setup-env.sh && spack load hip llvm-amdgpu && \
     cmake -DENABLE_WARNINGS_AS_ERRORS=Off -DCMAKE_CXX_COMPILER=amdclang++ -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DENABLE_HIP=On .. && \
     make -j 16 VERBOSE=1
 
-FROM ghcr.io/rse-ops/hip-ubuntu-22.04:hip-4.3.1 AS hip.debug
+FROM ghcr.io/rse-ops/hip-ubuntu-20.04:hip-5.1.3 AS hip.debug
 ENV GTEST_COLOR=1
 ENV HCC_AMDGPU_TARGET=gfx900
 COPY . /home/umpire/workspace
