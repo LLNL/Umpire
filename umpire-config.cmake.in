@@ -21,6 +21,10 @@ if (NOT TARGET camp)
     @PACKAGE_CMAKE_INSTALL_PREFIX@/lib/cmake/camp)
 endif ()
 
+if (@UMPIRE_ENABLE_IPC_SHARED_MEMORY@)
+  find_dependency(Threads)
+endif ()
+
 if (@UMPIRE_ENABLE_SQLITE_EXPERIMENTAL@)
   find_package(SQLite3 REQUIRED)
 endif()
