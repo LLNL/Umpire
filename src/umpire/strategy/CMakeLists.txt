@@ -18,6 +18,7 @@ set (umpire_strategy_headers
   NamedAllocationStrategy.hpp
   PoolCoalesceHeuristic.hpp
   QuickPool.hpp
+  StreamAwareQuickPool.hpp
   SizeLimiter.hpp
   SlotPool.hpp
   StdAllocator.hpp
@@ -49,6 +50,7 @@ set (umpire_strategy_sources
   MonotonicAllocationStrategy.cpp
   NamedAllocationStrategy.cpp
   QuickPool.cpp
+  StreamAwareQuickPool.cpp
   SizeLimiter.cpp
   SlotPool.cpp
   ThreadSafeAllocator.cpp)
