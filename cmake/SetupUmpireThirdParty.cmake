@@ -92,7 +92,7 @@ if (UMPIRE_ENABLE_MPI OR UMPIRE_ENABLE_HIP OR UMPIRE_ENABLE_OPENMP OR UMPIRE_ENA
       EXPORT               bltTargets)
     blt_export_tpl_targets(EXPORT bltTargets NAMESPACE blt)
     install(EXPORT bltTargets
-      DESTINATION  lib/cmake/umpire)
+      DESTINATION  ${CMAKE_INSTALL_LIBDIR}/cmake/umpire)
   elseif (UMPIRE_ENABLE_MPI)
     # If the target is EXPORTABLE, add it to the export set
     get_target_property(_is_imported mpi IMPORTED)
@@ -102,7 +102,7 @@ if (UMPIRE_ENABLE_MPI OR UMPIRE_ENABLE_HIP OR UMPIRE_ENABLE_OPENMP OR UMPIRE_ENA
       # Namespace target to avoid conflicts
       set_target_properties(mpi PROPERTIES EXPORT_NAME blt::mpi)
       install(EXPORT bltTargets
-        DESTINATION  lib/cmake/umpire)
+        DESTINATION  ${CMAKE_INSTALL_LIBDIR}/cmake/umpire)
     endif()
   endif()
 endif()
