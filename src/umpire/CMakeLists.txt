@@ -204,8 +204,8 @@ install(FILES
   ${umpire_headers}
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/umpire)
 
-install(DIRECTORY
-  ${CMAKE_BINARY_DIR}/include
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(FILES
+  ${CMAKE_BINARY_DIR}/include/umpire/config.hpp
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/umpire)
 
 umpire_add_code_checks(PREFIX umpire)
