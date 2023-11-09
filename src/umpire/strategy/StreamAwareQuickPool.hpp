@@ -4,8 +4,8 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_QuickPool_HPP
-#define UMPIRE_QuickPool_HPP
+#ifndef UMPIRE_StreamAwareQuickPool_HPP
+#define UMPIRE_StreamAwareQuickPool_HPP
 
 #include <functional>
 #include <map>
@@ -14,6 +14,7 @@
 #include <unordered_map>
 
 #include "camp/camp.hpp"
+#include "camp/resource.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/PoolCoalesceHeuristic.hpp"
 #include "umpire/strategy/mixins/AlignedAllocation.hpp"
@@ -26,7 +27,7 @@ class Allocator;
 
 namespace strategy {
 
-class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
+class StreamAwareQuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
  public:
   using Pointer = void*;
 
@@ -35,19 +36,19 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
    * the option to reallocate to High Watermark instead of actual size of the pool (actual size is
    * currently the default).
    */
-  static PoolCoalesceHeuristic<QuickPool> percent_releasable(int percentage);
-  static PoolCoalesceHeuristic<QuickPool> percent_releasable_hwm(int percentage);
-  static PoolCoalesceHeuristic<QuickPool> blocks_releasable(std::size_t nblocks);
-  static PoolCoalesceHeuristic<QuickPool> blocks_releasable_hwm(std::size_t nblocks);
+  static PoolCoalesceHeuristic<StreamAwareQuickPool> percent_releasable(int percentage);
+  static PoolCoalesceHeuristic<StreamAwareQuickPool> percent_releasable_hwm(int percentage);
+  static PoolCoalesceHeuristic<StreamAwareQuickPool> blocks_releasable(std::size_t nblocks);
+  static PoolCoalesceHeuristic<StreamAwareQuickPool> blocks_releasable_hwm(std::size_t nblocks);
 
   static constexpr std::size_t s_default_first_block_size{512 * 1024 * 1024};
   static constexpr std::size_t s_default_next_block_size{1 * 1024 * 1024};
   static constexpr std::size_t s_default_alignment{16};
 
   /*!
-   * \brief Construct a new QuickPool.
+   * \brief Construct a new StreamAwareQuickPool.
    *
-   * \param name Name of this instance of the QuickPool
+   * \param name Name of this instance of the StreamAwareQuickPool
    * \param id Unique identifier for this instance
    * \param allocator Allocation resource that pool uses
    * \param first_minimum_pool_allocation_size Size the pool initially allocates
@@ -57,19 +58,19 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
    * pool allocator (Host, Cuda, etc.) \param should_coalesce Heuristic for when
    * to perform coalesce operation
    */
-  QuickPool(const std::string& name, int id, Allocator allocator,
+  StreamAwareQuickPool(const std::string& name, int id, Allocator allocator,
             const std::size_t first_minimum_pool_allocation_size = s_default_first_block_size,
             const std::size_t next_minimum_pool_allocation_size = s_default_next_block_size,
             const std::size_t alignment = s_default_alignment,
-            camp::resources::Resource pool_resource = camp::resources::host,
-            PoolCoalesceHeuristic<QuickPool> should_coalesce = percent_releasable_hwm(100)) noexcept;
+            camp::resources::Resource pool_resource = camp::resources::Host(),
+            PoolCoalesceHeuristic<StreamAwareQuickPool> should_coalesce = percent_releasable_hwm(100)) noexcept;
 
-  ~QuickPool();
+  ~StreamAwareQuickPool();
 
-  QuickPool(const QuickPool&) = delete;
+  StreamAwareQuickPool(const StreamAwareQuickPool&) = delete;
 
-  void* allocate(std::size_t bytes, camp::resources::Resource resource) override;
-  void deallocate(void* ptr, std::size_t size, camp::resources::Resource resource) override;
+  void* allocate(std::size_t bytes, camp::resources::Resource resource);
+  void deallocate(void* ptr, std::size_t size, camp::resources::Resource resource);
   void release() override;
 
   std::size_t getActualSize() const noexcept override;
@@ -159,7 +160,7 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
 
   util::FixedMallocPool m_chunk_pool{sizeof(Chunk)};
 
-  PoolCoalesceHeuristic<QuickPool> m_should_coalesce;
+  PoolCoalesceHeuristic<StreamAwareQuickPool> m_should_coalesce;
 
   const std::size_t m_first_minimum_pool_allocation_size;
   const std::size_t m_next_minimum_pool_allocation_size;
@@ -171,16 +172,17 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
   std::size_t m_releasable_bytes{0};
   std::size_t m_actual_highwatermark{0};
   bool m_is_destructing{false};
+  camp::resources::Resource m_pool_resource{camp::resources::Host()};
 };
 
-std::ostream& operator<<(std::ostream& out, umpire::strategy::PoolCoalesceHeuristic<QuickPool>&);
+std::ostream& operator<<(std::ostream& out, umpire::strategy::PoolCoalesceHeuristic<StreamAwareQuickPool>&);
 
-inline std::string to_string(PoolCoalesceHeuristic<QuickPool>&)
+inline std::string to_string(PoolCoalesceHeuristic<StreamAwareQuickPool>&)
 {
-  return "PoolCoalesceHeuristic<QuickPool>";
+  return "PoolCoalesceHeuristic<StreamAwareQuickPool>";
 }
 
 } // end of namespace strategy
 } // end namespace umpire
 
-#endif // UMPIRE_QuickPool_HPP
+#endif // UMPIRE_StreamAwareQuickPool_HPP

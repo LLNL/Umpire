@@ -4,7 +4,7 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 
-#include "umpire/strategy/QuickPool.hpp"
+#include "umpire/strategy/StreamAwareQuickPool.hpp"
 
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/PoolCoalesceHeuristic.hpp"
@@ -15,15 +15,17 @@
 namespace umpire {
 namespace strategy {
 
-QuickPool::QuickPool(const std::string& name, int id, Allocator allocator,
+StreamAwareQuickPool::StreamAwareQuickPool(const std::string& name, int id, Allocator allocator,
                      const std::size_t first_minimum_pool_allocation_size,
                      const std::size_t next_minimum_pool_allocation_size, std::size_t alignment,
-                     PoolCoalesceHeuristic<QuickPool> should_coalesce) noexcept
-    : AllocationStrategy{name, id, allocator.getAllocationStrategy(), "QuickPool"},
+                     camp::resources::Resource pool_resource,
+                     PoolCoalesceHeuristic<StreamAwareQuickPool> should_coalesce) noexcept
+    : AllocationStrategy{name, id, allocator.getAllocationStrategy(), "StreamAwareQuickPool"},
       mixins::AlignedAllocation{alignment, allocator.getAllocationStrategy()},
       m_should_coalesce{should_coalesce},
       m_first_minimum_pool_allocation_size{first_minimum_pool_allocation_size},
-      m_next_minimum_pool_allocation_size{next_minimum_pool_allocation_size}
+      m_next_minimum_pool_allocation_size{next_minimum_pool_allocation_size},
+      m_pool_resource{pool_resource}
 {
   UMPIRE_LOG(Debug, " ( "
                         << "name=\"" << name << "\""
@@ -33,14 +35,14 @@ QuickPool::QuickPool(const std::string& name, int id, Allocator allocator,
                         << ", alignment=" << alignment << " )");
 }
 
-QuickPool::~QuickPool()
+StreamAwareQuickPool::~StreamAwareQuickPool()
 {
   UMPIRE_LOG(Debug, "Releasing free blocks to device");
   m_is_destructing = true;
   release();
 }
 
-void* QuickPool::allocate(std::size_t bytes)
+void* StreamAwareQuickPool::allocate(std::size_t bytes, camp::resources::Resource resource)
 {
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ")");
   const std::size_t rounded_bytes{aligned_round_up(bytes)};
@@ -66,14 +68,20 @@ void* QuickPool::allocate(std::size_t bytes)
                                         << umpire::util::backtracer<>::print(bt));
       }
 #endif
-      ret = aligned_allocate(size); // Will Poison
+      if(resource.get<camp::resources::Host>().get_platform() == camp::resources::Platform::host)
+         ret = aligned_allocate(size); // Will Poison
+      else
+	 UMPIRE_LOG(Debug, "camp resource types do not match");
     } catch (...) {
       UMPIRE_LOG(Error,
                  "Caught error allocating new chunk, giving up free chunks and "
                  "retrying...");
       release();
       try {
-        ret = aligned_allocate(size); // Will Poison
+        if(resource.get<camp::resources::Host>().get_platform() == camp::resources::Platform::host)
+          ret = aligned_allocate(size); // Will Poison
+        else
+	  UMPIRE_LOG(Debug, "camp resource types do not match");
         UMPIRE_LOG(Debug, "memory reclaimed, chunk successfully allocated.");
       } catch (...) {
         UMPIRE_LOG(Error, "recovery failed.");
@@ -133,8 +141,10 @@ void* QuickPool::allocate(std::size_t bytes)
   return ret;
 }
 
-void QuickPool::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
+void StreamAwareQuickPool::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size), 
+                                      camp::resources::Resource UMPIRE_UNUSED_ARG(resource))
 {
+  // may not need resource for deallocate
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   auto chunk = (*m_pointer_map.find(ptr)).second;
   chunk->free = true;
@@ -198,8 +208,9 @@ void QuickPool::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
   }
 }
 
-void QuickPool::release()
+void StreamAwareQuickPool::release()
 {
+  camp::resources::Resource resource = camp::resources::Host();
   UMPIRE_LOG(Debug, "() " << m_size_map.size() << " chunks in free map, m_is_destructing set to " << m_is_destructing);
 
 #if defined(UMPIRE_ENABLE_BACKTRACE)
@@ -218,7 +229,10 @@ void QuickPool::release()
       m_total_blocks--;
 
       try {
-        aligned_deallocate(chunk->data);
+        if(resource.get<camp::resources::Host>().get_platform() == camp::resources::Platform::host)
+           aligned_deallocate(chunk->data);
+        else
+           UMPIRE_LOG(Debug, "camp resource types do not match");
       } catch (...) {
         if (m_is_destructing) {
           //
@@ -247,57 +261,57 @@ void QuickPool::release()
 #endif
 }
 
-std::size_t QuickPool::getReleasableBlocks() const noexcept
+std::size_t StreamAwareQuickPool::getReleasableBlocks() const noexcept
 {
   return m_releasable_blocks;
 }
 
-std::size_t QuickPool::getTotalBlocks() const noexcept
+std::size_t StreamAwareQuickPool::getTotalBlocks() const noexcept
 {
   return m_total_blocks;
 }
 
-std::size_t QuickPool::getActualSize() const noexcept
+std::size_t StreamAwareQuickPool::getActualSize() const noexcept
 {
   return m_actual_bytes;
 }
 
-std::size_t QuickPool::getCurrentSize() const noexcept
+std::size_t StreamAwareQuickPool::getCurrentSize() const noexcept
 {
   return m_current_bytes;
 }
 
-std::size_t QuickPool::getReleasableSize() const noexcept
+std::size_t StreamAwareQuickPool::getReleasableSize() const noexcept
 {
   return m_releasable_bytes;
 }
 
-std::size_t QuickPool::getActualHighwaterMark() const noexcept
+std::size_t StreamAwareQuickPool::getActualHighwaterMark() const noexcept
 {
   return m_actual_highwatermark;
 }
 
-Platform QuickPool::getPlatform() noexcept
+Platform StreamAwareQuickPool::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
 }
 
-MemoryResourceTraits QuickPool::getTraits() const noexcept
+MemoryResourceTraits StreamAwareQuickPool::getTraits() const noexcept
 {
   return m_allocator->getTraits();
 }
 
-bool QuickPool::tracksMemoryUse() const noexcept
+bool StreamAwareQuickPool::tracksMemoryUse() const noexcept
 {
   return false;
 }
 
-std::size_t QuickPool::getBlocksInPool() const noexcept
+std::size_t StreamAwareQuickPool::getBlocksInPool() const noexcept
 {
   return m_pointer_map.size() + m_size_map.size();
 }
 
-std::size_t QuickPool::getLargestAvailableBlock() noexcept
+std::size_t StreamAwareQuickPool::getLargestAvailableBlock() noexcept
 {
   if (!m_size_map.size()) {
     return 0;
@@ -305,7 +319,7 @@ std::size_t QuickPool::getLargestAvailableBlock() noexcept
   return m_size_map.rbegin()->first;
 }
 
-void QuickPool::coalesce() noexcept
+void StreamAwareQuickPool::coalesce() noexcept
 {
   UMPIRE_LOG(Debug, "()");
 
@@ -320,8 +334,9 @@ void QuickPool::coalesce() noexcept
   }
 }
 
-void QuickPool::do_coalesce(std::size_t suggested_size) noexcept
+void StreamAwareQuickPool::do_coalesce(std::size_t suggested_size) noexcept
 {
+  camp::resources::Resource resource = camp::resources::Host();
   if (m_size_map.size() > 1) {
     UMPIRE_LOG(Debug, "()");
     release();
@@ -331,26 +346,26 @@ void QuickPool::do_coalesce(std::size_t suggested_size) noexcept
       std::size_t alloc_size{suggested_size - size_post};
 
       UMPIRE_LOG(Debug, "coalescing " << alloc_size << " bytes.");
-      auto ptr = allocate(alloc_size);
-      deallocate(ptr, alloc_size);
+      auto ptr = allocate(alloc_size, resource);
+      deallocate(ptr, alloc_size, resource);
     }
   }
 }
 
-PoolCoalesceHeuristic<QuickPool> QuickPool::blocks_releasable(std::size_t nblocks)
+PoolCoalesceHeuristic<StreamAwareQuickPool> StreamAwareQuickPool::blocks_releasable(std::size_t nblocks)
 {
   return
-      [=](const strategy::QuickPool& pool) { return pool.getReleasableBlocks() >= nblocks ? pool.getActualSize() : 0; };
+      [=](const strategy::StreamAwareQuickPool& pool) { return pool.getReleasableBlocks() >= nblocks ? pool.getActualSize() : 0; };
 }
 
-PoolCoalesceHeuristic<QuickPool> QuickPool::blocks_releasable_hwm(std::size_t nblocks)
+PoolCoalesceHeuristic<StreamAwareQuickPool> StreamAwareQuickPool::blocks_releasable_hwm(std::size_t nblocks)
 {
-  return [=](const strategy::QuickPool& pool) {
+  return [=](const strategy::StreamAwareQuickPool& pool) {
     return pool.getReleasableBlocks() >= nblocks ? pool.getHighWatermark() : 0;
   };
 }
 
-PoolCoalesceHeuristic<QuickPool> QuickPool::percent_releasable(int percentage)
+PoolCoalesceHeuristic<StreamAwareQuickPool> StreamAwareQuickPool::percent_releasable(int percentage)
 {
   if (percentage < 0 || percentage > 100) {
     UMPIRE_ERROR(
@@ -358,14 +373,14 @@ PoolCoalesceHeuristic<QuickPool> QuickPool::percent_releasable(int percentage)
         umpire::fmt::format("Invalid percentage: {}, percentage must be an integer between 0 and 100", percentage));
   }
   if (percentage == 0) {
-    return [=](const QuickPool& UMPIRE_UNUSED_ARG(pool)) { return 0; };
+    return [=](const StreamAwareQuickPool& UMPIRE_UNUSED_ARG(pool)) { return 0; };
   } else if (percentage == 100) {
-    return [=](const strategy::QuickPool& pool) {
+    return [=](const strategy::StreamAwareQuickPool& pool) {
       return pool.getActualSize() == pool.getReleasableSize() ? pool.getActualSize() : 0;
     };
   } else {
     float f = (float)((float)percentage / (float)100.0);
-    return [=](const strategy::QuickPool& pool) {
+    return [=](const strategy::StreamAwareQuickPool& pool) {
       // Calculate threshold in bytes from the percentage
       const std::size_t threshold = static_cast<std::size_t>(f * pool.getActualSize());
       return pool.getReleasableSize() >= threshold ? pool.getActualSize() : 0;
@@ -373,7 +388,7 @@ PoolCoalesceHeuristic<QuickPool> QuickPool::percent_releasable(int percentage)
   }
 }
 
-PoolCoalesceHeuristic<QuickPool> QuickPool::percent_releasable_hwm(int percentage)
+PoolCoalesceHeuristic<StreamAwareQuickPool> StreamAwareQuickPool::percent_releasable_hwm(int percentage)
 {
   if (percentage < 0 || percentage > 100) {
     UMPIRE_ERROR(
@@ -381,14 +396,14 @@ PoolCoalesceHeuristic<QuickPool> QuickPool::percent_releasable_hwm(int percentag
         umpire::fmt::format("Invalid percentage: {}, percentage must be an integer between 0 and 100", percentage));
   }
   if (percentage == 0) {
-    return [=](const QuickPool& UMPIRE_UNUSED_ARG(pool)) { return 0; };
+    return [=](const StreamAwareQuickPool& UMPIRE_UNUSED_ARG(pool)) { return 0; };
   } else if (percentage == 100) {
-    return [=](const strategy::QuickPool& pool) {
+    return [=](const strategy::StreamAwareQuickPool& pool) {
       return pool.getActualSize() == pool.getReleasableSize() ? pool.getHighWatermark() : 0;
     };
   } else {
     float f = (float)((float)percentage / (float)100.0);
-    return [=](const strategy::QuickPool& pool) {
+    return [=](const strategy::StreamAwareQuickPool& pool) {
       // Calculate threshold in bytes from the percentage
       const std::size_t threshold = static_cast<std::size_t>(f * pool.getActualSize());
       return pool.getReleasableSize() >= threshold ? pool.getHighWatermark() : 0;
@@ -396,7 +411,7 @@ PoolCoalesceHeuristic<QuickPool> QuickPool::percent_releasable_hwm(int percentag
   }
 }
 
-std::ostream& operator<<(std::ostream& out, umpire::strategy::PoolCoalesceHeuristic<QuickPool>&)
+std::ostream& operator<<(std::ostream& out, umpire::strategy::PoolCoalesceHeuristic<StreamAwareQuickPool>&)
 {
   return out;
 }
