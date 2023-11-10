@@ -97,14 +97,6 @@ RUN . /opt/spack/share/spack/setup-env.sh && spack load cuda && \
     cmake -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DCMAKE_CXX_COMPILER=g++ -DENABLE_CUDA=On .. && \
     make -j 16
 
-FROM ghcr.io/rse-ops/cuda-ubuntu-20.04:cuda-11.1.1 AS nvcc11
-ENV GTEST_COLOR=1
-COPY . /home/umpire/workspace
-WORKDIR /home/umpire/workspace/build
-RUN . /opt/spack/share/spack/setup-env.sh && spack load cuda && \
-    cmake -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DCMAKE_CXX_COMPILER=g++ -DENABLE_CUDA=On .. && \
-    make -j 16
-
 FROM ghcr.io/rse-ops/hip-ubuntu-22.04:hip-4.3.1 AS hip
 ENV GTEST_COLOR=1
 ENV HCC_AMDGPU_TARGET=gfx900
