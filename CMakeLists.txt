@@ -24,6 +24,8 @@ set(UMPIRE_VERSION_RC "")
 ###Adding cifuzz stuff###
 find_package(cifuzz NO_SYSTEM_ENVIRONMENT_PATH)
 enable_fuzz_testing()
+add_fuzz_test(my_fuzz_test_1 tests/unit/my_fuzz_test_1.cpp)
+add_fuzz_test(umpire_fuzz_test tests/unit/umpire_fuzz_test.cpp)
 ######
 
 include(cmake/SetupUmpireOptions.cmake)

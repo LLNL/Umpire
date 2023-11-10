@@ -19,8 +19,8 @@ blt_add_test(
   NAME resource_manager_tests
   COMMAND resource_manager_tests)
 
-add_fuzz_test(my_fuzz_test_1 my_fuzz_test_1.cpp)
 target_link_libraries(my_fuzz_test_1 umpire)
+target_link_libraries(umpire_fuzz_test umpire)
 
 blt_add_executable(
   NAME version_tests

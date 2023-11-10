@@ -8,13 +8,17 @@
 size_t random_size_name(int size, std::string str)
 {
   auto& rm = umpire::ResourceManager::getInstance();
-  auto alloc = rm.getAllocator("HOST");
-  void* data{nullptr};
 
-  if(str.length() > 1) {
-    data = alloc.allocate(str, size);
-    alloc.deallocate(data);
-  }
+  auto alloc = rm.getAllocator("HOST");
+  rm.addAlias(str, alloc);
+
+  auto alloc_alias = rm.getAllocator(str);
+  assert(alloc_alias.getId() == alloc.getId());
+  assert(alloc_alias.getName() == alloc.getName());
+  assert(alloc_alias.getName() != str);
+
+  void* data = alloc_alias.allocate(size);
+  alloc_alias.deallocate(data);
 
   return 0;
 }
@@ -28,10 +32,8 @@ FUZZ_TEST(const uint8_t *data, size_t size) {
   int my_int = fuzzed_data.ConsumeIntegral<int8_t>();
   std::string my_string = fuzzed_data.ConsumeRandomLengthString();
 
-  random_size_name(my_int, my_string);
-
-  // assert(res != -1);
-  // If you want to know more about writing fuzz tests you can check out the
-  // example projects at https://github.com/CodeIntelligenceTesting/cifuzz/tree/main/examples
-  // or have a look at our docs at https://docs.code-intelligence.com/
+  int res{0};
+  if (my_string.length() > 0)
+    res = random_size_name(std::abs(my_int % 1024), my_string);
+  assert(res == 0);
 }
