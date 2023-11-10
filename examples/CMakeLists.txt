@@ -44,7 +44,7 @@ if (UMPIRE_ENABLE_HIP)
     blt_add_executable(
       NAME device_allocator_example
       SOURCES device-allocator.cpp
-      DEPENDS_ON umpire blt::hip)
+      DEPENDS_ON umpire_device umpire blt::hip)
     list(APPEND umpire_examples device_allocator_example)
 
     target_compile_options(device_allocator_example PUBLIC -fgpu-rdc)
@@ -118,7 +118,7 @@ if (UMPIRE_ENABLE_CUDA)
     blt_add_executable(
       NAME device_allocator_example
       SOURCES device-allocator.cpp
-      DEPENDS_ON umpire cuda
+      DEPENDS_ON umpire_device umpire cuda
     )
 
     set_source_files_properties(
