@@ -269,10 +269,7 @@ std::size_t QuickPool::getCurrentSize() const noexcept
 
 std::size_t QuickPool::getReleasableSize() const noexcept
 {
-  if (m_size_map.size() > 1)
-    return m_releasable_bytes;
-  else
-    return 0;
+  return m_releasable_bytes;
 }
 
 std::size_t QuickPool::getActualHighwaterMark() const noexcept
@@ -316,35 +313,41 @@ void QuickPool::coalesce() noexcept
     event.name("coalesce").category(event::category::operation).tag("allocator_name", getName()).tag("replay", "true");
   });
 
-  do_coalesce(getActualSize());
+  std::size_t suggested_size{m_should_coalesce(*this)};
+  if (0 != suggested_size) {
+    UMPIRE_LOG(Debug, "coalesce heuristic true, performing coalesce, suggested size is " << suggested_size);
+    do_coalesce(suggested_size);
+  }
 }
 
 void QuickPool::do_coalesce(std::size_t suggested_size) noexcept
 {
-  UMPIRE_LOG(Debug, "()");
-  release();
-  std::size_t size_post{getActualSize()};
+  if (m_size_map.size() > 1) {
+    UMPIRE_LOG(Debug, "()");
+    release();
+    std::size_t size_post{getActualSize()};
 
-  if (size_post < suggested_size) {
-    std::size_t alloc_size{suggested_size - size_post};
+    if (size_post < suggested_size) {
+      std::size_t alloc_size{suggested_size - size_post};
 
-    UMPIRE_LOG(Debug, "coalescing " << alloc_size << " bytes.");
-    auto ptr = allocate(alloc_size);
-    deallocate(ptr, alloc_size);
+      UMPIRE_LOG(Debug, "coalescing " << alloc_size << " bytes.");
+      auto ptr = allocate(alloc_size);
+      deallocate(ptr, alloc_size);
+    }
   }
 }
 
 PoolCoalesceHeuristic<QuickPool> QuickPool::blocks_releasable(std::size_t nblocks)
 {
-  return [=](const strategy::QuickPool& pool) {
-    return pool.getReleasableBlocks() > nblocks ? pool.getHighWatermark() : 0;
-  };
+  return
+      [=](const strategy::QuickPool& pool) { return pool.getReleasableBlocks() >= nblocks ? pool.getActualSize() : 0; };
 }
 
 PoolCoalesceHeuristic<QuickPool> QuickPool::blocks_releasable_hwm(std::size_t nblocks)
 {
-  return
-      [=](const strategy::QuickPool& pool) { return pool.getReleasableBlocks() > nblocks ? pool.getActualSize() : 0; };
+  return [=](const strategy::QuickPool& pool) {
+    return pool.getReleasableBlocks() >= nblocks ? pool.getHighWatermark() : 0;
+  };
 }
 
 PoolCoalesceHeuristic<QuickPool> QuickPool::percent_releasable(int percentage)

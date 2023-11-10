@@ -56,8 +56,6 @@ jobs:
         docker_target: clang12
       nvcc10:
         docker_target: nvcc10
-      nvcc11:
-        docker_target: nvcc11
       sycl:
         docker_target: sycl
       hip:
