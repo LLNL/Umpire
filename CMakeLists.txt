@@ -17,9 +17,14 @@ project(Umpire
   LANGUAGES CXX C
   VERSION 2023.06.0)
 
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.16)
 
 set(UMPIRE_VERSION_RC "")
+
+###Adding cifuzz stuff###
+find_package(cifuzz NO_SYSTEM_ENVIRONMENT_PATH)
+enable_fuzz_testing()
+######
 
 include(cmake/SetupUmpireOptions.cmake)
 
