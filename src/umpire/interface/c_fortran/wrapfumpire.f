@@ -1060,9 +1060,13 @@ contains
           type(C_PTR) :: data_ptr
 
           integer(C_INT) :: size_type
-          integer(C_SIZE_T) :: num_bytes
+          integer(C_SIZE_T) :: num_bytes, p, i
 
-          num_bytes = product(dims) * sizeof(size_type)
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
           data_ptr = this%allocate_pointer(num_bytes)
 
           call c_f_pointer(data_ptr, array, dims)
@@ -1097,9 +1101,13 @@ contains
           type(C_PTR) :: data_ptr
 
           integer(C_INT) :: size_type
-          integer(C_SIZE_T) :: num_bytes
+          integer(C_SIZE_T) :: num_bytes, p, i
 
-          num_bytes = product(dims) * sizeof(size_type)
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
           data_ptr = this%allocate_pointer(num_bytes)
 
           call c_f_pointer(data_ptr, array, dims)
@@ -1134,9 +1142,13 @@ contains
           type(C_PTR) :: data_ptr
 
           integer(C_INT) :: size_type
-          integer(C_SIZE_T) :: num_bytes
+          integer(C_SIZE_T) :: num_bytes, p, i
 
-          num_bytes = product(dims) * sizeof(size_type)
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
           data_ptr = this%allocate_pointer(num_bytes)
 
           call c_f_pointer(data_ptr, array, dims)
@@ -1171,9 +1183,13 @@ contains
           type(C_PTR) :: data_ptr
 
           integer(C_INT) :: size_type
-          integer(C_SIZE_T) :: num_bytes
+          integer(C_SIZE_T) :: num_bytes, p, i
 
-          num_bytes = product(dims) * sizeof(size_type)
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
           data_ptr = this%allocate_pointer(num_bytes)
 
           call c_f_pointer(data_ptr, array, dims)
@@ -1208,9 +1224,13 @@ contains
           type(C_PTR) :: data_ptr
 
           integer(C_LONG) :: size_type
-          integer(C_SIZE_T) :: num_bytes
+          integer(C_SIZE_T) :: num_bytes, p, i
 
-          num_bytes = product(dims) * sizeof(size_type)
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
           data_ptr = this%allocate_pointer(num_bytes)
 
           call c_f_pointer(data_ptr, array, dims)
@@ -1245,9 +1265,13 @@ contains
           type(C_PTR) :: data_ptr
 
           integer(C_LONG) :: size_type
-          integer(C_SIZE_T) :: num_bytes
+          integer(C_SIZE_T) :: num_bytes, p, i
 
-          num_bytes = product(dims) * sizeof(size_type)
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
           data_ptr = this%allocate_pointer(num_bytes)
 
           call c_f_pointer(data_ptr, array, dims)
@@ -1282,9 +1306,13 @@ contains
           type(C_PTR) :: data_ptr
 
           integer(C_LONG) :: size_type
-          integer(C_SIZE_T) :: num_bytes
+          integer(C_SIZE_T) :: num_bytes, p, i
 
-          num_bytes = product(dims) * sizeof(size_type)
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
           data_ptr = this%allocate_pointer(num_bytes)
 
           call c_f_pointer(data_ptr, array, dims)
@@ -1319,9 +1347,13 @@ contains
           type(C_PTR) :: data_ptr
 
           integer(C_LONG) :: size_type
-          integer(C_SIZE_T) :: num_bytes
+          integer(C_SIZE_T) :: num_bytes, p, i
 
-          num_bytes = product(dims) * sizeof(size_type)
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
           data_ptr = this%allocate_pointer(num_bytes)
 
           call c_f_pointer(data_ptr, array, dims)
@@ -1356,9 +1388,13 @@ contains
           type(C_PTR) :: data_ptr
 
           real(C_FLOAT) :: size_type
-          integer(C_SIZE_T) :: num_bytes
+          integer(C_SIZE_T) :: num_bytes, p, i
 
-          num_bytes = product(dims) * sizeof(size_type)
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
           data_ptr = this%allocate_pointer(num_bytes)
 
           call c_f_pointer(data_ptr, array, dims)
@@ -1393,9 +1429,13 @@ contains
           type(C_PTR) :: data_ptr
 
           real(C_FLOAT) :: size_type
-          integer(C_SIZE_T) :: num_bytes
+          integer(C_SIZE_T) :: num_bytes, p, i
 
-          num_bytes = product(dims) * sizeof(size_type)
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
           data_ptr = this%allocate_pointer(num_bytes)
 
           call c_f_pointer(data_ptr, array, dims)
@@ -1430,9 +1470,13 @@ contains
           type(C_PTR) :: data_ptr
 
           real(C_FLOAT) :: size_type
-          integer(C_SIZE_T) :: num_bytes
+          integer(C_SIZE_T) :: num_bytes, p, i
 
-          num_bytes = product(dims) * sizeof(size_type)
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
           data_ptr = this%allocate_pointer(num_bytes)
 
           call c_f_pointer(data_ptr, array, dims)
@@ -1467,9 +1511,13 @@ contains
           type(C_PTR) :: data_ptr
 
           real(C_FLOAT) :: size_type
-          integer(C_SIZE_T) :: num_bytes
+          integer(C_SIZE_T) :: num_bytes, p, i
 
-          num_bytes = product(dims) * sizeof(size_type)
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
           data_ptr = this%allocate_pointer(num_bytes)
 
           call c_f_pointer(data_ptr, array, dims)
@@ -1504,9 +1552,13 @@ contains
           type(C_PTR) :: data_ptr
 
           real(C_DOUBLE) :: size_type
-          integer(C_SIZE_T) :: num_bytes
+          integer(C_SIZE_T) :: num_bytes, p, i
 
-          num_bytes = product(dims) * sizeof(size_type)
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
           data_ptr = this%allocate_pointer(num_bytes)
 
           call c_f_pointer(data_ptr, array, dims)
@@ -1541,9 +1593,13 @@ contains
           type(C_PTR) :: data_ptr
 
           real(C_DOUBLE) :: size_type
-          integer(C_SIZE_T) :: num_bytes
+          integer(C_SIZE_T) :: num_bytes, p, i
 
-          num_bytes = product(dims) * sizeof(size_type)
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
           data_ptr = this%allocate_pointer(num_bytes)
 
           call c_f_pointer(data_ptr, array, dims)
@@ -1578,9 +1634,13 @@ contains
           type(C_PTR) :: data_ptr
 
           real(C_DOUBLE) :: size_type
-          integer(C_SIZE_T) :: num_bytes
+          integer(C_SIZE_T) :: num_bytes, p, i
 
-          num_bytes = product(dims) * sizeof(size_type)
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
           data_ptr = this%allocate_pointer(num_bytes)
 
           call c_f_pointer(data_ptr, array, dims)
@@ -1615,9 +1675,13 @@ contains
           type(C_PTR) :: data_ptr
 
           real(C_DOUBLE) :: size_type
-          integer(C_SIZE_T) :: num_bytes
+          integer(C_SIZE_T) :: num_bytes, p, i
 
-          num_bytes = product(dims) * sizeof(size_type)
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
           data_ptr = this%allocate_pointer(num_bytes)
 
           call c_f_pointer(data_ptr, array, dims)
