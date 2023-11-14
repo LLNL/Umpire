@@ -86,6 +86,6 @@ if (UMPIRE_ENABLE_FORTRAN)
   add_subdirectory(fortran)
 endif ()
 
-install(TARGETS ${umpire_tutorials} RUNTIME DESTINATION bin)
+install(TARGETS ${umpire_tutorials} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 umpire_add_code_checks(PREFIX tutorial)

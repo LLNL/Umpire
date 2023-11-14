@@ -138,7 +138,7 @@ if (UMPIRE_ENABLE_CUDA)
   list(APPEND umpire_examples multi_device)
 endif()
 
-install(TARGETS ${umpire_examples} RUNTIME DESTINATION bin)
+install(TARGETS ${umpire_examples} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 add_subdirectory(tutorial)
 
