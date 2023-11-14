@@ -7,6 +7,6 @@
 
 install(
   FILES analysis/plot_allocations analysis/plot_allocator_traces
-  DESTINATION bin)
+  DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 add_subdirectory(replay)
