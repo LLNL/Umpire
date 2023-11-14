@@ -80,4 +80,4 @@ if (UMPIRE_ENABLE_SQLITE_EXPERIMENTAL)
   find_package(SQLite3 REQUIRED)
 endif()
 
-blt_install_tpl_setups(DESTINATION lib/cmake/umpire)
+blt_install_tpl_setups(DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/umpire)
