@@ -52,17 +52,16 @@ target_include_directories(
   INTERFACE
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 install(TARGETS
   umpire_alloc
   EXPORT umpire-targets
-  RUNTIME DESTINATION lib
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 install(FILES
   ${umpire_alloc_headers}
-  DESTINATION include/umpire/alloc)
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/umpire/alloc)
 
 umpire_add_code_checks(PREFIX alloc)
