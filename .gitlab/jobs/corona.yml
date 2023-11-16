@@ -9,13 +9,13 @@
 # we cannot share a top level allocation.
 allocate_resources:
   variables:
-    ON_TIOGA: "OFF"
+    ON_CORONA: "OFF"
 
 # We need a way to run MPI test in a nested flux allocations. Until we find it,
 # we cannot share a top level allocation.
 release_resources:
   variables:
-    ON_TIOGA: "OFF"
+    ON_CORONA: "OFF"
 
 ########################
 # Overridden shared jobs
