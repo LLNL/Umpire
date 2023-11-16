@@ -41,6 +41,11 @@ cce_16_0_0:
 # This job intentionally tests our umpire package.py because although this job does not
 # explicitly have the ~tools, the package.py should still disable tools from being built.
 ###
+cce_16_0_0_mpi:
+  variables:
+    SPEC: "${PROJECT_TIOGA_VARIANTS} +mpi %cce@16.0.0 ${PROJECT_TIOGA_DEPS}"
+  extends: .job_on_tioga
+
 rocmcc_5_6_0_hip_openmp_device_alloc:
   variables:
     SPEC: "~shared +fortran +openmp +rocm +device_alloc tests=basic amdgpu_target=gfx90a %rocmcc@5.6.0 ^hip@5.6.0"
