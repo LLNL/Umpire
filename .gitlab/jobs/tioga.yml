@@ -41,7 +41,7 @@ cce_16_0_0:
 # This job intentionally tests our umpire package.py because although this job does not
 # explicitly have the ~tools, the package.py should still disable tools from being built.
 ###
-cce_16_0_0:
+cce_16_0_0_mpi:
   variables:
     SPEC: "~shared +fortran tests=basic +mpi %cce@16.0.0"
   extends: .job_on_tioga
