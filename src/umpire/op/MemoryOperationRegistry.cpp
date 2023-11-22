@@ -24,8 +24,6 @@
 #endif
 
 #if defined(UMPIRE_ENABLE_HIP)
-#include <hip/hip_runtime.h>
-
 #include "umpire/op/HipAdviseOperation.hpp"
 #include "umpire/op/HipCopyOperation.hpp"
 #include "umpire/op/HipMemsetOperation.hpp"

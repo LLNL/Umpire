@@ -7,8 +7,6 @@
 #ifndef UMPIRE_HipConstantMemoryResource_HPP
 #define UMPIRE_HipConstantMemoryResource_HPP
 
-#include <hip/hip_runtime.h>
-
 #include <mutex>
 
 #include "umpire/resource/MemoryResource.hpp"

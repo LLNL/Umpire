@@ -34,6 +34,42 @@ endif ()
 
 if (ENABLE_HIP)
   set(HIP_HIPCC_FLAGS "${HIP_HIPCC_FLAGS} -Wno-inconsistent-missing-override")
+
+  blt_check_code_compiles(CODE_COMPILES UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY
+                          VERBOSE_OUTPUT OFF
+                          DEPENDS_ON hip::host
+                          SOURCE_STRING
+    [=[
+    #include <hip/hip_runtime.h>
+    #include <hip/hip_runtime_api.h>
+
+    int main(int, char**)
+    {
+      const std::size_t bytes{1024};
+      void* ptr1{nullptr};
+
+      ::hipHostMalloc(&ptr1, bytes, hipHostMallocDefault);
+
+      if (ptr1 != nullptr) {
+        void* ptr2{nullptr};
+        ::hipHostMalloc(&ptr2, bytes, hipHostMallocNonCoherent);
+
+        if (ptr2 != nullptr) {
+          int device;
+          ::hipGetDevice(&device);
+          ::hipMemAdvise(ptr1, bytes, hipMemAdviseSetCoarseGrain, device);
+        }
+      }
+
+      return 0;
+    }
+    ]=])
+
+  if (UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY)
+    message(STATUS "HIP memory coherence granularity: Enabled")
+  else ()
+    message(STATUS "HIP memory coherence granularity: Disabled, not supported")
+  endif ()
 endif()
 
 if (ENABLE_PEDANTIC_WARNINGS)

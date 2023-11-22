@@ -7,8 +7,7 @@
 #include "umpire/resource/HipUnifiedMemoryResourceFactory.hpp"
 
 #include "hip/hip_runtime_api.h"
-#include "umpire/alloc/HipMallocManagedAllocator.hpp"
-#include "umpire/resource/DefaultMemoryResource.hpp"
+#include "umpire/resource/HipUnifiedMemoryResource.hpp"
 #include "umpire/util/make_unique.hpp"
 
 namespace umpire {
@@ -31,8 +30,7 @@ std::unique_ptr<resource::MemoryResource> HipUnifiedMemoryResourceFactory::creat
 std::unique_ptr<resource::MemoryResource> HipUnifiedMemoryResourceFactory::create(const std::string& name, int id,
                                                                                   MemoryResourceTraits traits)
 {
-  return util::make_unique<resource::DefaultMemoryResource<alloc::HipMallocManagedAllocator>>(Platform::hip, name, id,
-                                                                                              traits);
+  return util::make_unique<resource::HipUnifiedMemoryResource>(Platform::hip, name, id, traits);
 }
 
 MemoryResourceTraits HipUnifiedMemoryResourceFactory::getDefaultTraits()

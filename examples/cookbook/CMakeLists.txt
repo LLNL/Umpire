@@ -114,6 +114,14 @@ if (UMPIRE_ENABLE_CUDA)
 endif ()
 
 if (UMPIRE_ENABLE_HIP)
+  if (UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY)
+    blt_add_executable(
+      NAME recipe_control_granularity
+      SOURCES recipe_control_granularity.cpp
+      DEPENDS_ON ${cookbook_depends})
+    list(APPEND umpire_cookbooks recipe_control_granularity)
+  endif ()
+
   blt_add_executable(
     NAME recipe_shrink
     SOURCES recipe_shrink.cpp
@@ -138,12 +146,12 @@ if (UMPIRE_ENABLE_HIP)
         recipe_pinned_pool.F
         PROPERTIES
         COMPILE_FLAGS -Mfree)
-    else()
+    else ()
       set_source_files_properties(
         recipe_pinned_pool.F
         PROPERTIES
         Fortran_FORMAT FREE)
-    endif()
+    endif ()
   endif ()
 endif ()
 
