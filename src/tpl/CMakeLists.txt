@@ -57,18 +57,17 @@ blt_convert_to_system_includes(TARGET umpire_tpl_json)
 target_include_directories(
   umpire_tpl_json
   INTERFACE
-  $<INSTALL_INTERFACE:include>)
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 install(FILES
   ${json_headers}
-  DESTINATION include/umpire/json)
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/umpire/json)
 
 install(TARGETS
   umpire_tpl_json
   EXPORT umpire-targets
-  RUNTIME DESTINATION lib
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 
 #
@@ -93,18 +92,17 @@ blt_convert_to_system_includes(TARGET umpire_tpl_CLI11)
 target_include_directories(
   umpire_tpl_CLI11
   INTERFACE
-  $<INSTALL_INTERFACE:include>)
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 install(FILES
   ${CLI11_headers}
-  DESTINATION include/umpire/CLI11)
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/umpire/CLI11)
 
 install(TARGETS
   umpire_tpl_CLI11
   EXPORT umpire-targets
-  RUNTIME DESTINATION lib
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 add_subdirectory(umpire/judy)
 
@@ -168,7 +166,7 @@ blt_convert_to_system_includes(TARGET umpire_tpl_fmt)
 target_include_directories(
   umpire_tpl_fmt
   INTERFACE
-  $<INSTALL_INTERFACE:include>)
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 if (C_COMPILER_FAMILY_IS_XL)
   set(_fmt_warning_disable_flag
@@ -196,13 +194,12 @@ endif ()
 install(TARGETS
   umpire_tpl_fmt
   EXPORT umpire-targets
-  RUNTIME DESTINATION lib
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 install(FILES
   ${fmt_headers}
-  DESTINATION include/umpire/fmt)
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/umpire/fmt)
 
 set(UMPIRE_ENABLE_TESTS ${OLD_ENABLE_TESTS})
 set(UMPIRE_ENABLE_FORTRAN ${OLD_ENABLE_FORTRAN})

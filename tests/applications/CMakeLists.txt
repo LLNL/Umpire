@@ -43,4 +43,4 @@ blt_add_target_compile_flags(
   TO poison_memory_checks 
   FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
 
-install(TARGETS ${umpire_test_applications} RUNTIME DESTINATION bin)
+install(TARGETS ${umpire_test_applications} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
