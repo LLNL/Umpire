@@ -21,6 +21,8 @@
 #include "umpire/util/FixedMallocPool.hpp"
 #include "umpire/util/MemoryResourceTraits.hpp"
 
+using resource_type = camp::resources::Host;
+
 namespace umpire {
 
 class Allocator;
@@ -62,15 +64,18 @@ class StreamAwareQuickPool : public AllocationStrategy, private mixins::AlignedA
             const std::size_t first_minimum_pool_allocation_size = s_default_first_block_size,
             const std::size_t next_minimum_pool_allocation_size = s_default_next_block_size,
             const std::size_t alignment = s_default_alignment,
-            camp::resources::Resource pool_resource = camp::resources::Host(),
             PoolCoalesceHeuristic<StreamAwareQuickPool> should_coalesce = percent_releasable_hwm(100)) noexcept;
 
   ~StreamAwareQuickPool();
 
   StreamAwareQuickPool(const StreamAwareQuickPool&) = delete;
 
-  void* allocate(std::size_t bytes, camp::resources::Resource resource);
-  void deallocate(void* ptr, std::size_t size, camp::resources::Resource resource);
+ private:
+  void* allocate(std::size_t bytes);
+  void deallocate(void* ptr, std::size_t size);
+ public:
+  void ra_allocate(std::size_t bytes, camp::resources::Resource resource);
+  void ra_deallocate(void* ptr, std::size_t size); //camp::resources::Resource resoure);
   void release() override;
 
   std::size_t getActualSize() const noexcept override;
@@ -172,7 +177,7 @@ class StreamAwareQuickPool : public AllocationStrategy, private mixins::AlignedA
   std::size_t m_releasable_bytes{0};
   std::size_t m_actual_highwatermark{0};
   bool m_is_destructing{false};
-  camp::resources::Resource m_pool_resource{camp::resources::Host()};
+  camp::resources::Resource m_pool_resource{resource_type{}};
 };
 
 std::ostream& operator<<(std::ostream& out, umpire::strategy::PoolCoalesceHeuristic<StreamAwareQuickPool>&);
