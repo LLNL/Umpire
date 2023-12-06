@@ -13,15 +13,11 @@
 #include <tuple>
 #include <unordered_map>
 
-#include "camp/camp.hpp"
-#include "camp/resource.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/PoolCoalesceHeuristic.hpp"
 #include "umpire/strategy/mixins/AlignedAllocation.hpp"
 #include "umpire/util/FixedMallocPool.hpp"
 #include "umpire/util/MemoryResourceTraits.hpp"
-
-using resource_type = camp::resources::Host;
 
 namespace umpire {
 
@@ -49,6 +45,7 @@ class StreamAwareQuickPool : public AllocationStrategy, private mixins::AlignedA
 
   /*!
    * \brief Construct a new StreamAwareQuickPool.
+   * The StreamAwareQuickPool will only be compiled if the GPU is used
    *
    * \param name Name of this instance of the StreamAwareQuickPool
    * \param id Unique identifier for this instance
@@ -56,8 +53,7 @@ class StreamAwareQuickPool : public AllocationStrategy, private mixins::AlignedA
    * \param first_minimum_pool_allocation_size Size the pool initially allocates
    * \param next_minimum_pool_allocation_size The minimum size of all future
    * allocations \param alignment Number of bytes with which to align allocation
-   * sizes (power-of-2) \param pool_resource Camp resource associated with this
-   * pool allocator (Host, Cuda, etc.) \param should_coalesce Heuristic for when
+   * sizes (power-of-2) \param should_coalesce Heuristic for when
    * to perform coalesce operation
    */
   StreamAwareQuickPool(const std::string& name, int id, Allocator allocator,
@@ -71,11 +67,11 @@ class StreamAwareQuickPool : public AllocationStrategy, private mixins::AlignedA
   StreamAwareQuickPool(const StreamAwareQuickPool&) = delete;
 
  private:
-  void* allocate(std::size_t bytes);
-  void deallocate(void* ptr, std::size_t size);
+  void* ra_allocate(std::size_t bytes);
+  void ra_deallocate(void* ptr, std::size_t size);
  public:
-  void ra_allocate(std::size_t bytes, camp::resources::Resource resource);
-  void ra_deallocate(void* ptr, std::size_t size); //camp::resources::Resource resoure);
+  void allocate(std::size_t bytes, cudaStream_t s);
+  void deallocate(void* ptr, std::size_t size, cudaStream_t s);
   void release() override;
 
   std::size_t getActualSize() const noexcept override;
@@ -177,7 +173,6 @@ class StreamAwareQuickPool : public AllocationStrategy, private mixins::AlignedA
   std::size_t m_releasable_bytes{0};
   std::size_t m_actual_highwatermark{0};
   bool m_is_destructing{false};
-  camp::resources::Resource m_pool_resource{resource_type{}};
 };
 
 std::ostream& operator<<(std::ostream& out, umpire::strategy::PoolCoalesceHeuristic<StreamAwareQuickPool>&);
