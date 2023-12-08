@@ -5,6 +5,12 @@
 # SPDX-License-Identifier: (MIT)
 ###############################################################################
 
+# Override reproducer section to define Umpire specific variables.
+.lassen_reproducer_vars: &lassen_reproducer_vars
+    - |
+      echo -e "export MODULE_LIST=\"${MODULE_LIST}\""
+      echo -e "export SPEC=\"${SPEC//\"/\\\"}\""
+
 ########################
 # Overridden shared jobs
 ########################
