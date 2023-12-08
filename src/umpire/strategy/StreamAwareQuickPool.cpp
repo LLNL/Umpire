@@ -44,7 +44,7 @@ StreamAwareQuickPool::~StreamAwareQuickPool()
 void StreamAwareQuickPool::allocate(std::size_t bytes, cudaStream_t s)
 {
   //do something for streams
-  ra_allocate(std::size_t bytes);
+  ra_allocate(bytes);
 }
 
 void* StreamAwareQuickPool::ra_allocate(std::size_t bytes)
