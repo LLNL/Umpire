@@ -154,6 +154,9 @@ class AllocationStrategy {
    */
   virtual void* allocate(std::size_t bytes) = 0;
   virtual void* allocate_named(const std::string& name, std::size_t bytes);
+#if defined (UMPIRE_ENABLE_CUDA)
+  virtual void* allocate(std::size_t bytes, void* stream);
+#endif
 
   /*!
    * \brief Free the memory at ptr.
@@ -161,6 +164,9 @@ class AllocationStrategy {
    * \param ptr Pointer to free.
    */
   virtual void deallocate(void* ptr, std::size_t size = 0) = 0;
+#if defined (UMPIRE_ENABLE_CUDA)
+  virtual void deallocate(void* ptr, std::size_t size = 0, void* stream = nullptr) = 0;
+#endif
 };
 
 } // end of namespace strategy

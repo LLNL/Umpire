@@ -18,7 +18,6 @@ set (umpire_strategy_headers
   NamedAllocationStrategy.hpp
   PoolCoalesceHeuristic.hpp
   QuickPool.hpp
-  StreamAwareQuickPool.hpp
   SizeLimiter.hpp
   SlotPool.hpp
   StdAllocator.hpp
@@ -30,11 +29,11 @@ if (UMPIRE_ENABLE_NUMA)
     NumaPolicy.hpp)
 endif ()
 
-#if (UMPIRE_ENABLE_CUDA) #Add HIP eventually too
-#  set (umpire_strategy_headers
-#    ${umpire_strategy_headers}
-#    StreamAwareQuickPool.hpp)
-#endif ()
+if (UMPIRE_ENABLE_CUDA) #Add HIP eventually too
+  set (umpire_strategy_headers
+    ${umpire_strategy_headers}
+    StreamAwareQuickPool.hpp)
+endif ()
 
 set (umpire_strategy_mixin_headers
   mixins/AlignedAllocation.hpp
@@ -56,7 +55,6 @@ set (umpire_strategy_sources
   MonotonicAllocationStrategy.cpp
   NamedAllocationStrategy.cpp
   QuickPool.cpp
-  StreamAwareQuickPool.cpp
   SizeLimiter.cpp
   SlotPool.cpp
   ThreadSafeAllocator.cpp)
@@ -67,11 +65,11 @@ if (UMPIRE_ENABLE_NUMA)
     NumaPolicy.cpp)
 endif ()
 
-#if (UMPIRE_ENABLE_CUDA) #Add HIP eventually too
-#  set (umpire_strategy_souces
-#    ${umpire_strategy_sources}
-#    StreamAwareQuickPool.cpp)
-#endif ()
+if (UMPIRE_ENABLE_CUDA) #Add HIP eventually too
+  set (umpire_strategy_sources
+    ${umpire_strategy_sources}
+    StreamAwareQuickPool.cpp)
+endif ()
 
 set(umpire_strategy_depends camp umpire_util)
 

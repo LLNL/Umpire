@@ -41,9 +41,12 @@ StreamAwareQuickPool::~StreamAwareQuickPool()
   release();
 }
 
-void StreamAwareQuickPool::allocate(std::size_t bytes, cudaStream_t s)
+void StreamAwareQuickPool::allocate(std::size_t bytes, void* stream)
 {
+  //cast to cudastream_t
   //do something for streams
+  //if different streams, same pool, and trying to put mem in same block, then...
+  //check to see if dealloc has happened
   ra_allocate(bytes);
 }
 
@@ -141,8 +144,9 @@ void* StreamAwareQuickPool::ra_allocate(std::size_t bytes)
   return ret;
 }
 
-void StreamAwareQuickPool::deallocate(void* ptr, std::size_t size, cudaStream_t s)
+void StreamAwareQuickPool::deallocate(void* ptr, std::size_t size, void* stream)
 {
+  //cast to cudastream_t
   //Do something with the stream
   ra_deallocate(ptr, size);
   camp::resources::Event deallocate_has_occurred;

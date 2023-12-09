@@ -121,7 +121,19 @@ inline void* Allocator::allocate(const std::string& name, std::size_t bytes)
   return m_thread_safe ? thread_safe_named_allocate(name, bytes) : do_named_allocate(name, bytes);
 }
 
+//TODO: do I need an overloaded do_allocate func?
+inline void* Allocator::allocate(std::size_t bytes, void* stream)
+{
+  return m_thread_safe ? thread_safe_allocate(bytes) : do_allocate(bytes);
+}
+
 inline void Allocator::deallocate(void* ptr)
+{
+  m_thread_safe ? thread_safe_deallocate(ptr) : do_deallocate(ptr);
+}
+
+//TODO: do I need an overloaded do_deallocate func?
+inline void* Allocator::deallocate(void* ptr, void* stream)
 {
   m_thread_safe ? thread_safe_deallocate(ptr) : do_deallocate(ptr);
 }

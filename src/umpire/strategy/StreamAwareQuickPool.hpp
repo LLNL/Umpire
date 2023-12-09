@@ -70,8 +70,8 @@ class StreamAwareQuickPool : public AllocationStrategy, private mixins::AlignedA
   void* ra_allocate(std::size_t bytes);
   void ra_deallocate(void* ptr, std::size_t size);
  public:
-  void allocate(std::size_t bytes, cudaStream_t s);
-  void deallocate(void* ptr, std::size_t size, cudaStream_t s);
+  void allocate(std::size_t bytes, void* stream);
+  void deallocate(void* ptr, std::size_t size, void* stream);
   void release() override;
 
   std::size_t getActualSize() const noexcept override;

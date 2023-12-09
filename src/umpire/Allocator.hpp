@@ -66,6 +66,8 @@ class Allocator : private strategy::mixins::Inspector, strategy::mixins::Allocat
 
   inline void* allocate(const std::string& name, std::size_t bytes);
 
+  inline void* allocate(std::size_t bytes, void* stream);
+
   /*!
    * \brief Free the memory at ptr.
    *
@@ -78,6 +80,8 @@ class Allocator : private strategy::mixins::Inspector, strategy::mixins::Allocat
    * \param ptr Pointer to free (If nullptr, it will be ignored.)
    */
   inline void deallocate(void* ptr);
+
+  inline void* deallocate(void* ptr, void* stream);
 
   /*!
    * \brief Release any and all unused memory held by this Allocator.
