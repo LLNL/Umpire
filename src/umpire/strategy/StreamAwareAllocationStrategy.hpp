@@ -4,14 +4,15 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_AllocationStrategy_HPP
-#define UMPIRE_AllocationStrategy_HPP
+#ifndef UMPIRE_StreamAwareAllocationStrategy_HPP
+#define UMPIRE_StreamAwareAllocationStrategy_HPP
 
 #include <cstddef>
 #include <memory>
 #include <ostream>
 #include <string>
 
+#include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/util/MemoryResourceTraits.hpp"
 #include "umpire/util/Platform.hpp"
 
@@ -26,7 +27,7 @@ namespace strategy {
  * \brief AllocationStrategy provides a unified interface to all classes that
  * can be used to allocate and free data.
  */
-class AllocationStrategy {
+class StreamAwareAllocationStrategy {
   friend class umpire::ResourceManager;
   friend class umpire::Allocator;
 
@@ -40,10 +41,10 @@ class AllocationStrategy {
    * \param name The name of this AllocationStrategy object.
    * \param id The id of this AllocationStrategy object.
    */
-  AllocationStrategy(const std::string& name, int id, AllocationStrategy* parent,
+  StreamAwareAllocationStrategy(const std::string& name, int id, AllocationStrategy* parent,
                      const std::string& strategy_name) noexcept;
 
-  virtual ~AllocationStrategy() = default;
+  virtual ~StreamAwareAllocationStrategy() = default;
 
   void* allocate_internal(std::size_t bytes);
 
@@ -115,7 +116,7 @@ class AllocationStrategy {
    */
   int getId() noexcept;
 
-  friend std::ostream& operator<<(std::ostream& os, const AllocationStrategy& strategy);
+  friend std::ostream& operator<<(std::ostream& os, const StreamAwareAllocationStrategy& strategy);
 
   /*!
    * \brief Traces where the allocator came from.
@@ -154,6 +155,9 @@ class AllocationStrategy {
    */
   virtual void* allocate(std::size_t bytes) = 0;
   virtual void* allocate_named(const std::string& name, std::size_t bytes);
+#if defined (UMPIRE_ENABLE_CUDA)
+  virtual void allocate(void* stream, std::size_t bytes);
+#endif
 
   /*!
    * \brief Free the memory at ptr.
@@ -161,9 +165,12 @@ class AllocationStrategy {
    * \param ptr Pointer to free.
    */
   virtual void deallocate(void* ptr, std::size_t size = 0) = 0;
+#if defined (UMPIRE_ENABLE_CUDA)
+  virtual void deallocate(void* stream, void* ptr, std::size_t size = 0);
+#endif
 };
 
 } // end of namespace strategy
 } // end of namespace umpire
 
-#endif // UMPIRE_AllocationStrategy_HPP
+#endif // UMPIRE_StreamAwareAllocationStrategy_HPP

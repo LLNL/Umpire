@@ -20,7 +20,7 @@ StreamAwareQuickPool::StreamAwareQuickPool(const std::string& name, int id, Allo
                      const std::size_t first_minimum_pool_allocation_size,
                      const std::size_t next_minimum_pool_allocation_size, std::size_t alignment,
                      PoolCoalesceHeuristic<StreamAwareQuickPool> should_coalesce) noexcept
-    : AllocationStrategy{name, id, allocator.getAllocationStrategy(), "StreamAwareQuickPool"},
+    : StreamAwareAllocationStrategy{name, id, allocator.getAllocationStrategy(), "StreamAwareQuickPool"},
       mixins::AlignedAllocation{alignment, allocator.getAllocationStrategy()},
       m_should_coalesce{should_coalesce},
       m_first_minimum_pool_allocation_size{first_minimum_pool_allocation_size},
@@ -41,16 +41,16 @@ StreamAwareQuickPool::~StreamAwareQuickPool()
   release();
 }
 
-void StreamAwareQuickPool::allocate(std::size_t bytes, void* stream)
+void StreamAwareQuickPool::allocate(void* stream, std::size_t bytes)
 {
   //cast to cudastream_t
   //do something for streams
   //if different streams, same pool, and trying to put mem in same block, then...
   //check to see if dealloc has happened
-  ra_allocate(bytes);
+  allocate(bytes);
 }
 
-void* StreamAwareQuickPool::ra_allocate(std::size_t bytes)
+void* StreamAwareQuickPool::allocate(std::size_t bytes)
 {
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ")");
   const std::size_t rounded_bytes{aligned_round_up(bytes)};
@@ -144,15 +144,15 @@ void* StreamAwareQuickPool::ra_allocate(std::size_t bytes)
   return ret;
 }
 
-void StreamAwareQuickPool::deallocate(void* ptr, std::size_t size, void* stream)
+void StreamAwareQuickPool::deallocate(void* stream, void* ptr, std::size_t size)
 {
   //cast to cudastream_t
   //Do something with the stream
-  ra_deallocate(ptr, size);
+  deallocate(ptr, size);
   camp::resources::Event deallocate_has_occurred;
 }
 
-void StreamAwareQuickPool::ra_deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
+void StreamAwareQuickPool::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   auto chunk = (*m_pointer_map.find(ptr)).second;
@@ -360,8 +360,8 @@ void StreamAwareQuickPool::do_coalesce(std::size_t suggested_size) noexcept
 
       UMPIRE_LOG(Debug, "coalescing " << alloc_size << " bytes.");
       //Because this is a controlled, internal function, I may just be able to do a normal allocate and deallocate
-      auto ptr = ra_allocate(alloc_size);
-      ra_deallocate(ptr, alloc_size);
+      auto ptr = allocate(alloc_size);
+      deallocate(ptr, alloc_size);
     }
   }
 }

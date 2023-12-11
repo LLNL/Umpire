@@ -13,7 +13,7 @@
 #include <tuple>
 #include <unordered_map>
 
-#include "umpire/strategy/AllocationStrategy.hpp"
+#include "umpire/strategy/StreamAwareAllocationStrategy.hpp"
 #include "umpire/strategy/PoolCoalesceHeuristic.hpp"
 #include "umpire/strategy/mixins/AlignedAllocation.hpp"
 #include "umpire/util/FixedMallocPool.hpp"
@@ -25,7 +25,7 @@ class Allocator;
 
 namespace strategy {
 
-class StreamAwareQuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
+class StreamAwareQuickPool : public StreamAwareAllocationStrategy, private mixins::AlignedAllocation {
  public:
   using Pointer = void*;
 
@@ -67,11 +67,11 @@ class StreamAwareQuickPool : public AllocationStrategy, private mixins::AlignedA
   StreamAwareQuickPool(const StreamAwareQuickPool&) = delete;
 
  private:
-  void* ra_allocate(std::size_t bytes);
-  void ra_deallocate(void* ptr, std::size_t size);
+  void* allocate(std::size_t bytes);
+  void deallocate(void* ptr, std::size_t size);
  public:
-  void allocate(std::size_t bytes, void* stream);
-  void deallocate(void* ptr, std::size_t size, void* stream);
+  void allocate(void* stream, std::size_t bytes);
+  void deallocate(void* stream, void* ptr, std::size_t size);
   void release() override;
 
   std::size_t getActualSize() const noexcept override;

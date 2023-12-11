@@ -14,6 +14,11 @@
 #include <string>
 
 #include "umpire/strategy/AllocationStrategy.hpp"
+
+#if defined (UMPIRE_ENABLE_CUDA)
+#include "umpire/strategy/StreamAwareAllocationStrategy.hpp"
+#endif
+
 #include "umpire/strategy/mixins/AllocateNull.hpp"
 #include "umpire/strategy/mixins/Inspector.hpp"
 #include "umpire/util/Platform.hpp"
@@ -66,7 +71,9 @@ class Allocator : private strategy::mixins::Inspector, strategy::mixins::Allocat
 
   inline void* allocate(const std::string& name, std::size_t bytes);
 
-  inline void* allocate(std::size_t bytes, void* stream);
+#if defined (UMPIRE_ENABLE_CUDA)
+  inline void* allocate(void* stream, std::size_t bytes);
+#endif
 
   /*!
    * \brief Free the memory at ptr.
@@ -81,7 +88,9 @@ class Allocator : private strategy::mixins::Inspector, strategy::mixins::Allocat
    */
   inline void deallocate(void* ptr);
 
-  inline void* deallocate(void* ptr, void* stream);
+#if defined (UMPIRE_ENABLE_CUDA)
+  inline void deallocate(void* stream, void* ptr);
+#endif
 
   /*!
    * \brief Release any and all unused memory held by this Allocator.

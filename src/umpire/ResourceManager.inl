@@ -22,6 +22,7 @@ Allocator ResourceManager::makeAllocator(const std::string& name, Tracking track
 {
   std::lock_guard<std::mutex> lock(m_mutex);
   std::unique_ptr<strategy::AllocationStrategy> allocator;
+
   bool is_tracked = (tracked == Tracking::Tracked) ? true : false;
 
   if (m_id + 1 == umpire::invalid_allocator_id) {

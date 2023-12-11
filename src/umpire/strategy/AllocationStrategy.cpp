@@ -34,13 +34,6 @@ void* AllocationStrategy::allocate_named(const std::string& UMPIRE_UNUSED_ARG(na
   return allocate(bytes);
 }
 
-#if defined (UMPIRE_ENABLE_CUDA)
-void* AllocationStrategy::allocate(std::size_t bytes, void* stream)
-{
-  return allocate(bytes);
-}
-#endif
-
 void AllocationStrategy::deallocate_internal(void* ptr, std::size_t size)
 {
   m_current_size -= size;
@@ -48,13 +41,6 @@ void AllocationStrategy::deallocate_internal(void* ptr, std::size_t size)
 
   deallocate(ptr, size);
 }
-
-#if defined (UMPIRE_ENABLE_CUDA)
-void* AllocationStrategy::deallocate(void* ptr, std::size_t size, void* stream)
-{
-  return deallocate(ptr, size);
-}
-#endif
 
 const std::string& AllocationStrategy::getName() noexcept
 {

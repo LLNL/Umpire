@@ -122,10 +122,12 @@ inline void* Allocator::allocate(const std::string& name, std::size_t bytes)
 }
 
 //TODO: do I need an overloaded do_allocate func?
-inline void* Allocator::allocate(std::size_t bytes, void* stream)
+#if defined (UMPIRE_ENABLE_CUDA)
+inline void* Allocator::allocate(void* stream, std::size_t bytes)
 {
   return m_thread_safe ? thread_safe_allocate(bytes) : do_allocate(bytes);
 }
+#endif
 
 inline void Allocator::deallocate(void* ptr)
 {
@@ -133,10 +135,12 @@ inline void Allocator::deallocate(void* ptr)
 }
 
 //TODO: do I need an overloaded do_deallocate func?
-inline void* Allocator::deallocate(void* ptr, void* stream)
+#if defined (UMPIRE_ENABLE_CUDA)
+inline void Allocator::deallocate(void* stream, void* ptr)
 {
   m_thread_safe ? thread_safe_deallocate(ptr) : do_deallocate(ptr);
 }
+#endif
 
 } // end of namespace umpire
 
