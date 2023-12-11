@@ -33,7 +33,7 @@ __global__ void touch_data(double* data, int len)
   }
 
   //sleep
-  sleep(100);
+  sleep(100000);
 
   //Then error check that data[id] still == id
   if (id < len) {
