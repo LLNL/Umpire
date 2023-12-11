@@ -20,7 +20,7 @@ StreamAwareQuickPool::StreamAwareQuickPool(const std::string& name, int id, Allo
                      const std::size_t first_minimum_pool_allocation_size,
                      const std::size_t next_minimum_pool_allocation_size, std::size_t alignment,
                      PoolCoalesceHeuristic<StreamAwareQuickPool> should_coalesce) noexcept
-    : StreamAwareAllocationStrategy{name, id, allocator.getAllocationStrategy(), "StreamAwareQuickPool"},
+    : AllocationStrategy{name, id, allocator.getAllocationStrategy(), "StreamAwareQuickPool"},
       mixins::AlignedAllocation{alignment, allocator.getAllocationStrategy()},
       m_should_coalesce{should_coalesce},
       m_first_minimum_pool_allocation_size{first_minimum_pool_allocation_size},

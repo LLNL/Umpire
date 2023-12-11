@@ -14,11 +14,6 @@
 #include <string>
 
 #include "umpire/strategy/AllocationStrategy.hpp"
-
-#if defined (UMPIRE_ENABLE_CUDA)
-#include "umpire/strategy/StreamAwareAllocationStrategy.hpp"
-#endif
-
 #include "umpire/strategy/mixins/AllocateNull.hpp"
 #include "umpire/strategy/mixins/Inspector.hpp"
 #include "umpire/util/Platform.hpp"

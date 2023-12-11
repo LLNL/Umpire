@@ -32,8 +32,7 @@ endif ()
 if (UMPIRE_ENABLE_CUDA) #Add HIP eventually too
   set (umpire_strategy_headers
     ${umpire_strategy_headers}
-    StreamAwareQuickPool.hpp
-    StreamAwareAllocationStrategy.hpp)
+    StreamAwareQuickPool.hpp)
 endif ()
 
 set (umpire_strategy_mixin_headers
@@ -69,8 +68,7 @@ endif ()
 if (UMPIRE_ENABLE_CUDA) #Add HIP eventually too
   set (umpire_strategy_sources
     ${umpire_strategy_sources}
-    StreamAwareQuickPool.cpp
-    StreamAwareAllocationStrategy.cpp)
+    StreamAwareQuickPool.cpp)
 endif ()
 
 set(umpire_strategy_depends camp umpire_util)

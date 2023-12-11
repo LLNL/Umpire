@@ -13,7 +13,7 @@
 #include <tuple>
 #include <unordered_map>
 
-#include "umpire/strategy/StreamAwareAllocationStrategy.hpp"
+#include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/PoolCoalesceHeuristic.hpp"
 #include "umpire/strategy/mixins/AlignedAllocation.hpp"
 #include "umpire/util/FixedMallocPool.hpp"
@@ -25,7 +25,7 @@ class Allocator;
 
 namespace strategy {
 
-class StreamAwareQuickPool : public StreamAwareAllocationStrategy, private mixins::AlignedAllocation {
+class StreamAwareQuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
  public:
   using Pointer = void*;
 
