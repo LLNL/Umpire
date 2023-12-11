@@ -11,8 +11,8 @@
 #include "umpire/ResourceManager.hpp"
 #include "umpire/strategy/StreamAwareQuickPool.hpp"
 
-constexpr int BLOCK_SIZE = 256;
-constexpr int NUM_THREADS = 4096;
+constexpr int BLOCK_SIZE = 16;
+constexpr int NUM_THREADS = 64;
 
 using clock_value_t = long long;
 
@@ -31,9 +31,17 @@ __global__ void touch_data(double* data, int len)
   if (id < len) {
     data[id] = id;
   }
+}
 
-  //sleep
+__global__ void do_sleep()
+{
+  //sleep - works still at 1000, so keeping it at 100k
   sleep(100000);
+}
+
+__global__ void check_data(double* data, int len)
+{
+  int id = blockIdx.x * blockDim.x + threadIdx.x;
 
   //Then error check that data[id] still == id
   if (id < len) {
@@ -55,6 +63,7 @@ int main(int, char**)
 {
   auto& rm = umpire::ResourceManager::getInstance();
   auto pool = rm.makeAllocator<umpire::strategy::StreamAwareQuickPool>("sap-pool", rm.getAllocator("DEVICE"));
+  //auto pool = umpire::strategy::StreamAwareQuickPool("sap-pool", rm.getAllocator("DEVICE"));
 
   cudaStream_t s1, s2;
   cudaStreamCreate(&s1);
@@ -66,15 +75,23 @@ int main(int, char**)
   int NUM_BLOCKS = NUM_THREADS / BLOCK_SIZE;
 
   touch_data<<<NUM_BLOCKS, BLOCK_SIZE, 0, s1>>>(a, NUM_THREADS);
+  do_sleep<<<NUM_BLOCKS, BLOCK_SIZE, 0, s1>>>();
+  check_data<<<NUM_BLOCKS, BLOCK_SIZE, 0, s1>>>(a, NUM_THREADS);
   touch_data_again<<<NUM_BLOCKS, BLOCK_SIZE, 0, s2>>>(a, NUM_THREADS);
 
   rm.copy(b, a);
   b = static_cast<double*>(rm.move(b, rm.getAllocator("HOST")));
 
+  cudaDeviceSynchronize();
+
+  std::cout << "Values are: " <<std::endl;
+  for (int i = 0; i < NUM_THREADS; i++) {
+    std::cout<< b[i] << " ";
+  }
   for (int i = 0; i < NUM_THREADS; i++) {
     UMPIRE_ASSERT(b[i] != (-1) && "Error: incorrect value!");
   }
-  std::cout << "Kernel succeeded! Expected result returned - " << std::endl;
+  std::cout << "Kernel succeeded! Expected result returned" << std::endl;
 
   rm.deallocate(a);
   rm.deallocate(b);
