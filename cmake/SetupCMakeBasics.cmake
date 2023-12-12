@@ -12,3 +12,5 @@ if(ENABLE_TESTS)
 endif()
 
 include(cmake/UmpireMacros.cmake)
+
+include(GNUInstallDirs)
