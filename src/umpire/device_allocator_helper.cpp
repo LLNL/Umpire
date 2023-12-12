@@ -85,6 +85,22 @@ __host__ __device__ inline int get_index(const char* name)
 }
 } // end of namespace
 
+namespace detail {
+struct DestroyDeviceAllocatorExit {
+  DestroyDeviceAllocatorExit() = default;
+  DestroyDeviceAllocatorExit(DestroyDeviceAllocatorExit&&) = delete;
+  DestroyDeviceAllocatorExit(const DestroyDeviceAllocatorExit&) = delete;
+  DestroyDeviceAllocatorExit& operator=(DestroyDeviceAllocatorExit&&) = delete;
+  DestroyDeviceAllocatorExit& operator=(const DestroyDeviceAllocatorExit&) = delete;
+  ~DestroyDeviceAllocatorExit()
+  {
+    if (umpire::UMPIRE_DEV_ALLOCS_h != nullptr) {
+      umpire::destroy_device_allocator();
+    }
+  }
+};
+} // namespace detail
+
 __host__ __device__ DeviceAllocator get_device_allocator(const char* name)
 {
   int index = get_index(name);
@@ -173,6 +189,15 @@ __host__ DeviceAllocator make_device_allocator(Allocator allocator, size_t size,
     index = 0; // If destroy_device_allocator has been called, reset counter.
 
     auto& rm = umpire::ResourceManager::getInstance();
+
+    // This function-local static will be constructed after the function-local
+    // static ResourceManager is constructed, guaranteeing that the destructor
+    // of destroy_exit will be called before the destructor of ResourceManager.
+    // The DestroyDeviceAllocatorExit destructor releases all allocated
+    // DeviceAllocators, unless destroy_device_allocator has already been called
+    // manually.
+    static detail::DestroyDeviceAllocatorExit destroy_exit;
+
     auto um_alloc = rm.getAllocator("UM");
     UMPIRE_DEV_ALLOCS_h =
         (umpire::DeviceAllocator*)um_alloc.allocate(UMPIRE_TOTAL_DEV_ALLOCS * sizeof(DeviceAllocator));

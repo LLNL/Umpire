@@ -343,6 +343,8 @@ TYPED_TEST(PrimaryPoolTest, coalesce)
     ptr_two = this->m_allocator->allocate(this->m_min_pool_growth_size);
   });
 
+  auto old_actual_size{pool->getActualSize()};
+
   ASSERT_EQ(pool->getBlocksInPool(), 3); // 1 Free, 2 Allocated
   ASSERT_NO_THROW(this->m_allocator->deallocate(ptr_two););
 
@@ -353,11 +355,10 @@ TYPED_TEST(PrimaryPoolTest, coalesce)
   ASSERT_NO_THROW(this->m_allocator->deallocate(ptr_one););
 
   umpire::coalesce(*this->m_allocator);
-
   ASSERT_EQ(pool->getBlocksInPool(), 1);
 
   ASSERT_EQ(this->m_allocator->getCurrentSize(), 0);
-  ASSERT_EQ(pool->getActualSize(), this->m_initial_pool_size + this->m_min_pool_growth_size);
+  ASSERT_LT(pool->getActualSize(), old_actual_size);
   ASSERT_EQ(this->m_allocator->getHighWatermark(), 1 + this->m_initial_pool_size);
 }
 
@@ -652,6 +653,35 @@ TYPED_TEST(PrimaryPoolTest, heuristic_100_percent)
   ASSERT_EQ(pool->getBlocksInPool(), 4);        // Collapse happened
   ASSERT_NO_THROW({ alloc.deallocate(a[0]); }); // 100% releasable
   ASSERT_EQ(pool->getBlocksInPool(), 1);        // Collapse happened
+}
+
+TYPED_TEST(PrimaryPoolTest, ReleasableSizeCheck)
+{
+  using Pool = typename TestFixture::Pool;
+  auto pool = umpire::util::unwrap_allocator<Pool>(*this->m_allocator);
+
+  ASSERT_NE(pool, nullptr);
+
+  const std::size_t iterations{8};
+  void* allocs[iterations];
+
+  ASSERT_EQ(pool->getReleasableSize(), 0);
+
+  // 8 Blocks (0 free, 8 allocated)
+  for (int i{0}; i < 8; ++i) {
+    ASSERT_NO_THROW(allocs[i] = this->m_allocator->allocate(this->m_initial_pool_size););
+    ASSERT_EQ(pool->getReleasableSize(), 0);
+  }
+
+  // 8 blocks (8 free, 0 allocated)
+  for (int i{0}; i < 8; ++i) {
+    ASSERT_NO_THROW(this->m_allocator->deallocate(allocs[i]););
+    ASSERT_EQ(pool->getReleasableSize(), this->m_initial_pool_size * (i + 1));
+  }
+
+  pool->release();
+
+  ASSERT_EQ(pool->getReleasableSize(), 0);
 }
 
 #if defined(UMPIRE_ENABLE_CONST)

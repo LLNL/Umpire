@@ -90,6 +90,46 @@ TYPED_TEST(PoolHeuristicsTest, PercentReleasable)
   ASSERT_EQ(a.second->getTotalBlocks(), 1);
 }
 
+TYPED_TEST(PoolHeuristicsTest, PercentReleasableHWM)
+{
+  using myPoolType = typename TestFixture::myPoolType;
+  using TestAllocator = typename TestFixture::TestAllocator;
+  TestAllocator a;
+
+  ASSERT_NO_THROW(a = this->getAllocator(myPoolType::percent_releasable_hwm(25)));
+  ASSERT_NE(a.second, nullptr);
+
+  std::vector<void*> ptrs;
+
+  // allocate 64 bytes 23 times with first block being 1024 bytes and next_block 128 bytes
+  for (int i{0}; i < 23; ++i) {
+    ASSERT_NO_THROW(ptrs.push_back(a.first.allocate(64)));
+    ASSERT_EQ(a.second->getReleasableBlocks(), 0);
+  }
+
+  ASSERT_EQ(a.second->getActualSize(), 1536);
+  ASSERT_EQ(a.second->getHighWatermark(), 1472);
+  ASSERT_EQ(a.second->getTotalBlocks(), 5);
+
+  // deallocate 7*64 = 448 bytes so that 25% of the pool is relesable and it will coalesce automatically
+  for (int i{22}; i > 15; --i) {
+    ASSERT_NO_THROW(a.first.deallocate(ptrs[i]););
+  }
+
+  ASSERT_EQ(a.second->getActualSize(), a.second->getHighWatermark());
+  ASSERT_EQ(a.second->getTotalBlocks(), 2);
+  ASSERT_EQ(a.second->getReleasableBlocks(), 1);
+
+  ASSERT_NO_THROW(a.first.release());
+
+  for (int i{16}; i > 0; --i) {
+    ASSERT_NO_THROW(a.first.deallocate(ptrs[i - 1]););
+  }
+
+  ASSERT_EQ(a.second->getReleasableBlocks(), 1);
+  ASSERT_EQ(a.second->getTotalBlocks(), 1);
+}
+
 TYPED_TEST(PoolHeuristicsTest, BlocksReleasable)
 {
   using myPoolType = typename TestFixture::myPoolType;
@@ -110,12 +150,47 @@ TYPED_TEST(PoolHeuristicsTest, BlocksReleasable)
 
   for (int i{max_blocks}; i > 0; i--) {
     ASSERT_NO_THROW(a.first.deallocate(ptrs[i - 1]););
-
-    if (i % 2)
-      ASSERT_EQ(a.second->getReleasableBlocks(), 1);
-    else
-      ASSERT_EQ(a.second->getReleasableBlocks(), 2);
+    ASSERT_EQ(a.second->getReleasableBlocks(), 1);
   }
+
+  ASSERT_EQ(a.second->getReleasableBlocks(), 1);
+  ASSERT_EQ(a.second->getTotalBlocks(), 1);
+}
+
+TYPED_TEST(PoolHeuristicsTest, BlocksReleasableHWM)
+{
+  using myPoolType = typename TestFixture::myPoolType;
+  using TestAllocator = typename TestFixture::TestAllocator;
+  TestAllocator a;
+
+  ASSERT_NO_THROW(a = this->getAllocator(myPoolType::blocks_releasable_hwm(2)));
+  ASSERT_NE(a.second, nullptr);
+
+  std::vector<void*> ptrs;
+
+  // allocate 64 bytes 23 times with first block being 1024 bytes and next_block 128 bytes
+  for (int i{0}; i < 23; ++i) {
+    ASSERT_NO_THROW(ptrs.push_back(a.first.allocate(64)));
+    ASSERT_EQ(a.second->getReleasableBlocks(), 0);
+  }
+
+  ASSERT_EQ(a.second->getActualSize(), 1536);
+  ASSERT_EQ(a.second->getHighWatermark(), 1472);
+  ASSERT_EQ(a.second->getTotalBlocks(), 5);
+
+  // deallocate 4 times so that two blocks are relesable and they will coalesce automatically
+  for (int i{22}; i > 18; --i) {
+    ASSERT_NO_THROW(a.first.deallocate(ptrs[i]););
+  }
+
+  ASSERT_EQ(a.second->getActualSize(), a.second->getHighWatermark());
+  ASSERT_EQ(a.second->getTotalBlocks(), 4);
+  ASSERT_EQ(a.second->getReleasableBlocks(), 1);
+
+  for (int i{19}; i > 0; --i) {
+    ASSERT_NO_THROW(a.first.deallocate(ptrs[i - 1]););
+  }
+
   ASSERT_EQ(a.second->getReleasableBlocks(), 1);
   ASSERT_EQ(a.second->getTotalBlocks(), 1);
 }

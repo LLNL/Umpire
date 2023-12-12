@@ -76,13 +76,6 @@ ResourceManager::ResourceManager()
 
 ResourceManager::~ResourceManager()
 {
-#if defined(UMPIRE_ENABLE_CUDA) && defined(UMPIRE_ENABLE_DEVICE_ALLOCATOR)
-  // Tear down and deallocate memory.
-  if (umpire::UMPIRE_DEV_ALLOCS_h != nullptr) {
-    umpire::destroy_device_allocator();
-  }
-#endif
-
   for (auto&& allocator : m_allocators) {
     if (allocator->getCurrentSize() != 0) {
       std::stringstream ss;
