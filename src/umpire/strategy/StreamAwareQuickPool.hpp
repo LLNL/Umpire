@@ -166,6 +166,8 @@ class StreamAwareQuickPool : public AllocationStrategy, private mixins::AlignedA
   const std::size_t m_first_minimum_pool_allocation_size;
   const std::size_t m_next_minimum_pool_allocation_size;
 
+  std::vector<void*> m_registered_streams{0};
+
   std::size_t m_total_blocks{0};
   std::size_t m_releasable_blocks{0};
   std::size_t m_actual_bytes{0};

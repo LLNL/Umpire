@@ -5,6 +5,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "camp/camp.hpp"
 #include "camp/resource.hpp"
+#include "cuda_runtime_api.h"
 
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/PoolCoalesceHeuristic.hpp"
@@ -43,11 +44,39 @@ StreamAwareQuickPool::~StreamAwareQuickPool()
 
 void StreamAwareQuickPool::allocate(void* stream, std::size_t bytes)
 {
-  //cast to cudastream_t
+  // register stream ID in some global (let's start with vectors)
+  unsigned int size = m_registered_streams.size();
+  std::cout << "Size is: " << size << std::endl;
+  for (unsigned int i = 0; i < size; i++) {
+    //if it does already contain stream ptr, then proceed with allocation
+    if (m_registered_streams.at(i) == stream) {
+      std::cout << "I found a registered stream, I am allocating bytes:  " << bytes << std::endl;
+      allocate(bytes);    
+    } else {
+      m_registered_streams.push_back(stream);
+      cudaError_t status = cudaStreamQuery((cudaStream_t)stream);
+      std::cout << "I did not find a registered stream so I am adding it to vector. My status here is " << status << std::endl;
+      if (status == cudaSuccess) {
+        allocate(bytes);
+        std::cout << "I added to vector and query status is complete, so I am allocating bytes:  " << bytes << std::endl;
+      }
+      else if (status == cudaErrorNotReady) {
+        //Maybe start with synchronize stream, then do something more efficient
+        cudaStreamSynchronize((cudaStream_t)stream);
+        std::cout << "I added to vector and my query status is not ready, so i synch'ed" << std::endl;
+        //check to see if dealloc event has happened
+      } else {
+        std::cout << "Error!" << std::endl;
+        UMPIRE_LOG(Debug, "Checking stream status didn't work"); 
+        /*something went wrong*/
+      }
+    }
+  }
+  //if m_registered streams does not contain ID, add ID and use cudaStreamQuery.. maybe a cudaStreamSynch?
+
   //do something for streams
   //if different streams, same pool, and trying to put mem in same block, then...
   //check to see if dealloc has happened
-  allocate(bytes);
 }
 
 void* StreamAwareQuickPool::allocate(std::size_t bytes)
