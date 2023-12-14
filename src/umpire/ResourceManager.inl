@@ -20,10 +20,8 @@ namespace umpire {
 template <typename Strategy, typename... Args>
 Allocator ResourceManager::makeAllocator(const std::string& name, Tracking tracked, Args&&... args)
 {
-  UMPIRE_LOG(Debug, "I made it to makeAllocator with" << name << "\")");
   std::lock_guard<std::mutex> lock(m_mutex);
   std::unique_ptr<strategy::AllocationStrategy> allocator;
-
   bool is_tracked = (tracked == Tracking::Tracked) ? true : false;
 
   if (m_id + 1 == umpire::invalid_allocator_id) {

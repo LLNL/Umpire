@@ -142,7 +142,7 @@ if (UMPIRE_ENABLE_CUDA)
     sap_test
     PROPERTIES CUDA_SEPARABLE_COMPILATION On)
 
-  list(APPEND umpire_examples multi_device)
+  list(APPEND umpire_examples multi_device sap_test)
 endif()
 
 install(TARGETS ${umpire_examples} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

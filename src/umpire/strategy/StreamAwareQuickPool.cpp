@@ -3,8 +3,6 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#include "camp/camp.hpp"
-#include "camp/resource.hpp"
 #include "cuda_runtime_api.h"
 
 #include "umpire/Allocator.hpp"
@@ -13,6 +11,7 @@
 #include "umpire/strategy/mixins/AlignedAllocation.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/memory_sanitizers.hpp"
+
 
 namespace umpire {
 namespace strategy {
@@ -42,41 +41,21 @@ StreamAwareQuickPool::~StreamAwareQuickPool()
   release();
 }
 
-void StreamAwareQuickPool::allocate(void* stream, std::size_t bytes)
+void* StreamAwareQuickPool::allocate(void* stream, std::size_t bytes)
 {
-  // register stream ID in some global (let's start with vectors)
   unsigned int size = m_registered_streams.size();
-  UMPIRE_LOG(Debug, "Size is: " << size);
+  UMPIRE_LOG(Debug, "Size of registered streams vector is: " << size);
+  
   for (unsigned int i = 0; i < size; i++) {
-    //if it does already contain stream ptr, then proceed with allocation
     if (m_registered_streams.at(i) == stream) {
       UMPIRE_LOG(Debug, "I found a registered stream, I am allocating bytes:  " << bytes );
-      allocate(bytes);    
-    } else {
-      m_registered_streams.push_back(stream);
-      cudaError_t status = cudaStreamQuery((cudaStream_t)stream);
-      UMPIRE_LOG(Debug, "I did not find a registered stream so I am adding it to vector. My status here is " << status );
-      if (status == cudaSuccess) {
-        allocate(bytes);
-        UMPIRE_LOG(Debug, "I added to vector and query status is complete, so I am allocating bytes:  " << bytes);
-      }
-      else if (status == cudaErrorNotReady) {
-        //Maybe start with synchronize stream, then do something more efficient
-        cudaStreamSynchronize((cudaStream_t)stream);
-        UMPIRE_LOG(Debug, "I added to vector and my query status is not ready, so i synch'ed");
-        //check to see if dealloc event has happened
-      } else {
-        std::cout << "Error!" << std::endl;
-        UMPIRE_LOG(Debug, "Checking stream status didn't work"); 
-        /*something went wrong*/
-      }
+      return allocate(bytes);
     }
   }
-  //if m_registered streams does not contain ID, add ID and use cudaStreamQuery.. maybe a cudaStreamSynch?
-
-  //do something for streams
-  //if different streams, same pool, and trying to put mem in same block, then...
-  //check to see if dealloc has happened
+    
+  UMPIRE_LOG(Debug, "I did not find a registered stream so I am adding it to vector.");
+  m_registered_streams.push_back(stream);
+  return allocate(bytes);
 }
 
 void* StreamAwareQuickPool::allocate(std::size_t bytes)
@@ -175,10 +154,22 @@ void* StreamAwareQuickPool::allocate(std::size_t bytes)
 
 void StreamAwareQuickPool::deallocate(void* stream, void* ptr, std::size_t size)
 {
-  //cast to cudastream_t
-  //Do something with the stream
+  unsigned int str_size = m_registered_streams.size();
+  UMPIRE_LOG(Debug, "Size of registered streams vector is: " << str_size);
+  
+  for (unsigned int i = 0; i < str_size; i++) {
+    if (m_registered_streams.at(i) == stream) {
+      UMPIRE_LOG(Debug, "Found the stream, now making deallocating event");
+      deallocate(ptr, size);
+      camp::resources::Event deallocate_has_occurred;
+      m_registered_dealloc.at(i) = deallocate_has_occurred;
+    }
+  }
+
+  UMPIRE_ERROR(
+        runtime_error,
+        umpire::fmt::format("Invalid deallocate: {} stream has not been allocated yet", stream));
   deallocate(ptr, size);
-  camp::resources::Event deallocate_has_occurred;
 }
 
 void StreamAwareQuickPool::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
@@ -376,9 +367,6 @@ void StreamAwareQuickPool::coalesce() noexcept
 
 void StreamAwareQuickPool::do_coalesce(std::size_t suggested_size) noexcept
 {
-  //Event is needed for allocation, but we just want to send the allocate the same event.
-  //camp::resources::Event event = camp::resources::Host().get_event();
-  camp::resources::Resource resource = camp::resources::Host();
   if (m_size_map.size() > 1) {
     UMPIRE_LOG(Debug, "()");
     release();
@@ -388,7 +376,6 @@ void StreamAwareQuickPool::do_coalesce(std::size_t suggested_size) noexcept
       std::size_t alloc_size{suggested_size - size_post};
 
       UMPIRE_LOG(Debug, "coalescing " << alloc_size << " bytes.");
-      //Because this is a controlled, internal function, I may just be able to do a normal allocate and deallocate
       auto ptr = allocate(alloc_size);
       deallocate(ptr, alloc_size);
     }

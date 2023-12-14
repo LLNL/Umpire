@@ -13,6 +13,8 @@
 #include <tuple>
 #include <unordered_map>
 
+#include "camp/camp.hpp"
+#include "camp/resource.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/PoolCoalesceHeuristic.hpp"
 #include "umpire/strategy/mixins/AlignedAllocation.hpp"
@@ -70,7 +72,7 @@ class StreamAwareQuickPool : public AllocationStrategy, private mixins::AlignedA
   void* allocate(std::size_t bytes);
   void deallocate(void* ptr, std::size_t size);
  public:
-  void allocate(void* stream, std::size_t bytes);
+  void* allocate(void* stream, std::size_t bytes);
   void deallocate(void* stream, void* ptr, std::size_t size);
   void release() override;
 
@@ -167,7 +169,7 @@ class StreamAwareQuickPool : public AllocationStrategy, private mixins::AlignedA
   const std::size_t m_next_minimum_pool_allocation_size;
 
   std::vector<void*> m_registered_streams{0};
-  std::vector<camp::resources::Event> m_registered_dealloc{0};
+  std::vector<camp::resources::Event> m_registered_dealloc{};
 
   std::size_t m_total_blocks{0};
   std::size_t m_releasable_blocks{0};
