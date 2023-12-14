@@ -127,15 +127,22 @@ if (UMPIRE_ENABLE_CUDA)
     SOURCES multi_device.cpp
     DEPENDS_ON umpire cuda)
 
+  blt_add_executable(
+    NAME sap_test 
+    SOURCES sap_test.cpp
+    DEPENDS_ON umpire cuda)
+
   set_source_files_properties(
     multi_device.cpp
+    sap_test.cpp
     PROPERTIES CUDA_SEPARABLE_COMPILATION On)
 
   set_target_properties(
     multi_device
+    sap_test
     PROPERTIES CUDA_SEPARABLE_COMPILATION On)
 
-  list(APPEND umpire_examples multi_device)
+  list(APPEND umpire_examples multi_device sap_test)
 endif()
 
 install(TARGETS ${umpire_examples} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
