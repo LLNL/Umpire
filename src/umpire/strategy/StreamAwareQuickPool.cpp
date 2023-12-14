@@ -46,24 +46,24 @@ void StreamAwareQuickPool::allocate(void* stream, std::size_t bytes)
 {
   // register stream ID in some global (let's start with vectors)
   unsigned int size = m_registered_streams.size();
-  std::cout << "Size is: " << size << std::endl;
+  UMPIRE_LOG(Debug, "Size is: " << size);
   for (unsigned int i = 0; i < size; i++) {
     //if it does already contain stream ptr, then proceed with allocation
     if (m_registered_streams.at(i) == stream) {
-      std::cout << "I found a registered stream, I am allocating bytes:  " << bytes << std::endl;
+      UMPIRE_LOG(Debug, "I found a registered stream, I am allocating bytes:  " << bytes );
       allocate(bytes);    
     } else {
       m_registered_streams.push_back(stream);
       cudaError_t status = cudaStreamQuery((cudaStream_t)stream);
-      std::cout << "I did not find a registered stream so I am adding it to vector. My status here is " << status << std::endl;
+      UMPIRE_LOG(Debug, "I did not find a registered stream so I am adding it to vector. My status here is " << status );
       if (status == cudaSuccess) {
         allocate(bytes);
-        std::cout << "I added to vector and query status is complete, so I am allocating bytes:  " << bytes << std::endl;
+        UMPIRE_LOG(Debug, "I added to vector and query status is complete, so I am allocating bytes:  " << bytes);
       }
       else if (status == cudaErrorNotReady) {
         //Maybe start with synchronize stream, then do something more efficient
         cudaStreamSynchronize((cudaStream_t)stream);
-        std::cout << "I added to vector and my query status is not ready, so i synch'ed" << std::endl;
+        UMPIRE_LOG(Debug, "I added to vector and my query status is not ready, so i synch'ed");
         //check to see if dealloc event has happened
       } else {
         std::cout << "Error!" << std::endl;

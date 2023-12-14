@@ -36,7 +36,7 @@ __global__ void touch_data(double* data, int len)
 __global__ void do_sleep()
 {
   //sleep - works still at 1000, so keeping it at 100k
-  sleep(100000);
+  sleep(1000);
 }
 
 __global__ void check_data(double* data, int len)
@@ -63,22 +63,29 @@ int main(int, char**)
 {
   auto& rm = umpire::ResourceManager::getInstance();
   auto pool = rm.makeAllocator<umpire::strategy::StreamAwareQuickPool>("sap-pool", rm.getAllocator("DEVICE"));
-  //auto pool = umpire::strategy::StreamAwareQuickPool("sap-pool", rm.getAllocator("DEVICE"));
+  int NUM_BLOCKS = NUM_THREADS / BLOCK_SIZE;
 
   cudaStream_t s1, s2;
   cudaStreamCreate(&s1);
   cudaStreamCreate(&s2);
 
+  //allocate memory with s1 stream for a
   double* a = static_cast<double*>(pool.allocate(s1, NUM_THREADS * sizeof(double)));
-  double* b = static_cast<double*>(pool.allocate(s2, NUM_THREADS * sizeof(double)));
 
-  int NUM_BLOCKS = NUM_THREADS / BLOCK_SIZE;
-
+  //with stream s1, use memory in a in kernels
   touch_data<<<NUM_BLOCKS, BLOCK_SIZE, 0, s1>>>(a, NUM_THREADS);
   do_sleep<<<NUM_BLOCKS, BLOCK_SIZE, 0, s1>>>();
   check_data<<<NUM_BLOCKS, BLOCK_SIZE, 0, s1>>>(a, NUM_THREADS);
+
+  //deallocate and reallocate a using different streams
+  pool.deallocate(s1, a);
+  a = static_cast<double*>(pool.allocate(s2, NUM_THREADS * sizeof(double)));
+
+  //with stream s2, use memory in reallocated a in kernel
   touch_data_again<<<NUM_BLOCKS, BLOCK_SIZE, 0, s2>>>(a, NUM_THREADS);
 
+  //after this, all of this is just for checking/validation purposes
+  double* b = static_cast<double*>(pool.allocate(s2, NUM_THREADS * sizeof(double)));
   rm.copy(b, a);
   b = static_cast<double*>(rm.move(b, rm.getAllocator("HOST")));
 
@@ -93,6 +100,8 @@ int main(int, char**)
   }
   std::cout << "Kernel succeeded! Expected result returned" << std::endl;
 
-  rm.deallocate(a);
+  //final deallocations
+  pool.deallocate(s2, a);
   rm.deallocate(b);
+  return 0;
 }
