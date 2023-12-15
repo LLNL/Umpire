@@ -43,6 +43,7 @@ StreamAwareQuickPool::~StreamAwareQuickPool()
 
 void* StreamAwareQuickPool::allocate(void* stream, std::size_t bytes)
 {
+/*
   unsigned int size = m_registered_streams.size();
   UMPIRE_LOG(Debug, "Size of registered streams vector is: " << size);
   
@@ -55,6 +56,7 @@ void* StreamAwareQuickPool::allocate(void* stream, std::size_t bytes)
     
   UMPIRE_LOG(Debug, "I did not find a registered stream so I am adding it to vector.");
   m_registered_streams.push_back(stream);
+*/
   return allocate(bytes);
 }
 
@@ -165,11 +167,12 @@ void StreamAwareQuickPool::deallocate(void* stream, void* ptr, std::size_t size)
       m_registered_dealloc.at(i) = deallocate_has_occurred;
     }
   }
-
+/*
   UMPIRE_ERROR(
         runtime_error,
         umpire::fmt::format("Invalid deallocate: {} stream has not been allocated yet", stream));
   deallocate(ptr, size);
+*/
 }
 
 void StreamAwareQuickPool::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))

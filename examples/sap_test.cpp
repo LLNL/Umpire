@@ -36,7 +36,7 @@ __global__ void touch_data(double* data, int len)
 __global__ void do_sleep()
 {
   //sleep - works still at 1000, so keeping it at 100k
-  sleep(1000);
+  sleep(1000000);
 }
 
 __global__ void check_data(double* data, int len)
@@ -62,7 +62,8 @@ __global__ void touch_data_again(double* data, int len)
 int main(int, char**)
 {
   auto& rm = umpire::ResourceManager::getInstance();
-  auto pool = rm.makeAllocator<umpire::strategy::StreamAwareQuickPool>("sap-pool", rm.getAllocator("DEVICE"));
+  //auto pool = rm.makeAllocator<umpire::strategy::StreamAwareQuickPool>("sap-pool", rm.getAllocator("DEVICE"));
+  auto pool = umpire::strategy::StreamAwareQuickPool("sap-pool", 150, rm.getAllocator("DEVICE"), 32, 32);
   int NUM_BLOCKS = NUM_THREADS / BLOCK_SIZE;
 
   cudaStream_t s1, s2;
@@ -78,7 +79,7 @@ int main(int, char**)
   check_data<<<NUM_BLOCKS, BLOCK_SIZE, 0, s1>>>(a, NUM_THREADS);
 
   //deallocate and reallocate a using different streams
-  pool.deallocate(s1, a);
+  pool.deallocate(s1, a, NUM_THREADS * sizeof(double));
   a = static_cast<double*>(pool.allocate(s2, NUM_THREADS * sizeof(double)));
 
   //with stream s2, use memory in reallocated a in kernel
@@ -101,7 +102,7 @@ int main(int, char**)
   std::cout << "Kernel succeeded! Expected result returned" << std::endl;
 
   //final deallocations
-  pool.deallocate(s2, a);
+  pool.deallocate(s2, a, NUM_THREADS * sizeof(double));
   rm.deallocate(b);
   return 0;
 }
