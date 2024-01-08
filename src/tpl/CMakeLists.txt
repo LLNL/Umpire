@@ -159,6 +159,8 @@ if (NOT TARGET fmt::fmt)
         ${fmt_DIR}
         ${fmt_DIR}/lib64/cmake/fmt)
 
+    set_target_properties(fmt::fmt PROPERTIES IMPORTED_GLOBAL TRUE)
+
     if (TARGET fmt)
       message(WARNING "Target fmt found")
     endif()
