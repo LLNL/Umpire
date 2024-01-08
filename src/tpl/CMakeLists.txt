@@ -135,11 +135,17 @@ endif ()
 
 if (NOT TARGET fmt::fmt)
   if (DEFINED fmt_DIR)
-    find_package(fmt 9.1...10 REQUIRED NO_DEFAULT_PATH PATHS ${fmt_DIR})
+    find_package(fmt 9.1...10 REQUIRED
+      NO_DEFAULT_PATH
+      PATHS ${fmt_DIR})
   else ()
-    set(FMT_INSTALL ON)
-    set(FMT_SYSTEM_HEADERS ON)
-    add_subdirectory(umpire/fmt)
+    if (NOT EXISTS ${PROJECT_SOURCE_DIR}/src/tpl/umpire/fmt/CMakeLists.txt)
+      message(FATAL_ERROR "fmt submodule not initialized. Run 'git submodule update --init --recursive' in the git repository or set fmt_DIR to use an external build of fmt.")
+    else ()
+      set(FMT_INSTALL ON)
+      set(FMT_SYSTEM_HEADERS ON)
+      add_subdirectory(umpire/fmt)
+    endif ()
   endif ()
 endif ()
 
