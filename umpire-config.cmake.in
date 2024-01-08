@@ -33,6 +33,19 @@ if (NOT TARGET camp)
     @PACKAGE_CMAKE_INSTALL_PREFIX@/lib/cmake/camp)
 endif ()
 
+if (NOT TARGET fmt::fmt)
+  set(UMPIRE_FMT_DIR "@fmt_DIR@")
+  if(NOT fmt_DIR)
+    set(fmt_DIR ${UMPIRE_FMT_DIR})
+  endif()
+
+  find_dependency(fmt 9.1...10 CONFIG NO_DEFAULT_PATH PATHS
+    ${fmt_DIR}
+    ${fmt_DIR}/lib64/cmake/fmt
+    @PACKAGE_CMAKE_INSTALL_PREFIX@
+    @PACKAGE_CMAKE_INSTALL_PREFIX@/lib64/cmake/fmt)
+endif ()
+
 if (@UMPIRE_ENABLE_SQLITE_EXPERIMENTAL@)
   find_package(SQLite3 REQUIRED)
 endif()
