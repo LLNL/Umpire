@@ -4,19 +4,6 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
-if (TARGET fmt)
-  message(WARNING "3 Target fmt found")
-endif()
-
-if (TARGET fmt::fmt)
-  message(WARNING "3 Target fmt::fmt found")
-endif()
-
-if (TARGET std::fmt)
-  message(WARNING "3 Target std::fmt found")
-endif()
-
-message(WARNING "3 fmt_FOUND: ${fmt_FOUND}")
 
 set(UMPIRE_ENABLE_SYCL ${UMPIRE_ENABLE_SYCL})
 

@@ -5,20 +5,6 @@
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
 
-if (TARGET fmt)
-  message(WARNING "2 Target fmt found")
-endif()
-
-if (TARGET fmt::fmt)
-  message(WARNING "2 Target fmt::fmt found")
-endif()
-
-if (TARGET std::fmt)
-  message(WARNING "2 Target std::fmt found")
-endif()
-
-message(WARNING "2 fmt_FOUND: ${fmt_FOUND}")
-
 add_subdirectory(util)
 add_subdirectory(resource)
 add_subdirectory(alloc)

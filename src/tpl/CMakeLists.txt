@@ -133,26 +133,8 @@ if (NOT TARGET camp)
   endif()
 endif ()
 
-if (TARGET fmt)
-   message(WARNING "Target fmt found")
-endif()
-
-if (TARGET fmt::fmt)
-   message(WARNING "Target fmt::fmt found")
-endif()
-
-if (TARGET std::fmt)
-   message(WARNING "Target std::fmt found")
-endif()
-
-message(WARNING "fmt_DIR: ${fmt_DIR}")
-message(WARNING "FMT_DIR: ${FMT_DIR}")
-
 if (NOT TARGET fmt::fmt)
-  message(WARNING "Part 1")
-
   if (DEFINED fmt_DIR)
-    message(WARNING "Part 2")
     find_package(fmt 9.1...10 REQUIRED
       NO_DEFAULT_PATH
       PATHS
@@ -160,28 +142,10 @@ if (NOT TARGET fmt::fmt)
         ${fmt_DIR}/lib64/cmake/fmt)
 
     set_target_properties(fmt::fmt PROPERTIES IMPORTED_GLOBAL TRUE)
-
-    if (TARGET fmt)
-      message(WARNING "Target fmt found")
-    endif()
-
-    if (TARGET fmt::fmt)
-      message(WARNING "Target fmt::fmt found")
-    endif()
-
-    if (TARGET std::fmt)
-      message(WARNING "Target std::fmt found")
-    endif()
-
-    message(WARNING "fmt_FOUND: ${fmt_FOUND}")
-
   else ()
-    message(WARNING "Part 3")
     if (NOT EXISTS ${PROJECT_SOURCE_DIR}/src/tpl/umpire/fmt/CMakeLists.txt)
-      message(WARNING "Part 4")
       message(FATAL_ERROR "fmt submodule not initialized. Run 'git submodule update --init --recursive' in the git repository or set fmt_DIR to use an external build of fmt.")
     else ()
-      message(WARNING "Part 5")
       set(FMT_INSTALL ON)
       set(FMT_SYSTEM_HEADERS ON)
       add_subdirectory(umpire/fmt)
