@@ -135,7 +135,7 @@ endif ()
 
 if (NOT TARGET fmt::fmt)
   if (DEFINED fmt_DIR)
-    find_package(fmt 9.1...10 REQUIRED
+    find_package(fmt REQUIRED
       NO_DEFAULT_PATH
       PATHS
         ${fmt_DIR}
