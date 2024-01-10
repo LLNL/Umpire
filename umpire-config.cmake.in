@@ -39,7 +39,7 @@ if (NOT TARGET fmt::fmt)
     set(fmt_DIR ${UMPIRE_FMT_DIR})
   endif()
 
-  find_dependency(fmt 9.1...10 CONFIG NO_DEFAULT_PATH PATHS
+  find_dependency(fmt CONFIG NO_DEFAULT_PATH PATHS
     ${fmt_DIR}
     ${fmt_DIR}/lib64/cmake/fmt
     @PACKAGE_CMAKE_INSTALL_PREFIX@
