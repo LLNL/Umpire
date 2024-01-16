@@ -9,7 +9,7 @@ set (integration_tests_depends
 set (accessibility_test_depends
   umpire gtest)
 set (device_allocator_test_depends
-  umpire gtest)
+  umpire_device umpire gtest)
 
 if (UMPIRE_ENABLE_CUDA)
   set (integration_tests_depends

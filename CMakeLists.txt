@@ -140,11 +140,11 @@ configure_package_config_file(
   "${PROJECT_SOURCE_DIR}/umpire-config.cmake.in"
   "${PROJECT_BINARY_DIR}/umpire-config.cmake"
   PATH_VARS CMAKE_INSTALL_PREFIX
-  INSTALL_DESTINATION lib/cmake/umpire)
+  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/umpire)
 
 install(FILES
   ${PROJECT_BINARY_DIR}/umpire-config.cmake
-  DESTINATION lib/cmake/umpire)
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/umpire)
 
 write_basic_package_version_file(
   ${PROJECT_BINARY_DIR}/umpire-config-version.cmake
@@ -152,9 +152,9 @@ write_basic_package_version_file(
 
 install(FILES 
   "${PROJECT_BINARY_DIR}/umpire-config-version.cmake"
-  DESTINATION lib/cmake/umpire)
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/umpire)
 
-install(EXPORT umpire-targets DESTINATION lib/cmake/umpire)
+install(EXPORT umpire-targets DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/umpire)
 
 if (UMPIRE_ENABLE_TESTS)
   add_subdirectory(tests)
