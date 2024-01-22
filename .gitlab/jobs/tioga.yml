@@ -13,9 +13,9 @@
 # the comparison with the original job is easier.
 
 # We override the cce job because we can’t use +device-alloc with it
-cce_16_0_0:
+cce_16_0_1:
   variables:
-    SPEC: "~shared +fortran tests=basic %cce@16.0.0"
+    SPEC: "~shared +fortran tests=basic %cce@16.0.1"
   extends: .job_on_tioga
 
 ############
