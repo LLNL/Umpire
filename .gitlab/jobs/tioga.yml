@@ -34,3 +34,10 @@ rocmcc_5_6_0_hip_openmp_device_alloc:
     SPEC: "~shared +fortran +openmp +rocm +device_alloc tests=basic amdgpu_target=gfx90a %rocmcc@5.6.0 ^hip@5.6.0"
   extends: .job_on_tioga
 
+# To be added when support for rocm 6.0.0 is added
+#rocmcc_6_0_0_hip_memleak:
+#  variables:
+#    SPEC: "~shared +asan +sanitizer_tests +tools +rocm tests=basic  cxxflags==\"-fsanitize=address -Wl,-rpath=/opt/rocm-6.0.0/llvm/lib/clang/17.0.0/lib/linux/\" %rocmcc@6.0.0 ^hip@6.0.0"
+#    ASAN_OPTIONS: "detect_leaks=1"
+#  extends: .job_on_corona
+#

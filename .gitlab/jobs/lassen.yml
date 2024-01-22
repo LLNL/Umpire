@@ -43,7 +43,7 @@ clang_12_0_1_libcpp:
 
 clang_12_0_1_gcc_8_3_1_memleak:
   variables:
-    SPEC: "~shared +asan +sanitizer_tests +tools tests=basic %clang@12.0.1.gcc.8.3.1 cxxflags==\"-fsanitize=address -Wl,-rpath=/opt/rocm-6.0.0/llvm/lib/clang/17.0.0/lib/linux/\""
+    SPEC: "~shared +asan +sanitizer_tests +tools tests=basic %clang@12.0.1.gcc.8.3.1 cxxflags==\"-fsanitize=address\""
     ASAN_OPTIONS: "detect_leaks=1"
   extends: .job_on_lassen
 
