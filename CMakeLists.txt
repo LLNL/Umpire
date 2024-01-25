@@ -50,8 +50,6 @@ if (UMPIRE_ENABLE_NUMA AND (NOT UNIX OR APPLE))
   Please re-configure with UMPIRE_ENABLE_NUMA=Off (default value)")
 endif ()
 
-set(BLT_EXPORT_THIRDPARTY ON CACHE BOOL "")
-
 ################################
 # BLT
 ################################

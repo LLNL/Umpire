@@ -84,15 +84,12 @@ set(UMPIRE_NEEDS_BLT_TPLS False)
 if (UMPIRE_ENABLE_MPI OR UMPIRE_ENABLE_HIP OR UMPIRE_ENABLE_OPENMP OR UMPIRE_ENABLE_CUDA)
   set(UMPIRE_NEEDS_BLT_TPLS True)
 
-  if (NOT BLT_EXPORTED)
-    set(BLT_EXPORTED On CACHE BOOL "" FORCE)
+  ## Camp Way: keep only the imports
+  if (NOT BLT_EXPORT_THIRDPARTY)
     blt_import_library(NAME          blt_stub EXPORTABLE On)
     set_target_properties(blt_stub PROPERTIES EXPORT_NAME blt::blt_stub)
     install(TARGETS blt_stub
       EXPORT               bltTargets)
-    blt_export_tpl_targets(EXPORT bltTargets NAMESPACE blt)
-    install(EXPORT bltTargets
-      DESTINATION  ${CMAKE_INSTALL_LIBDIR}/cmake/umpire)
   elseif (UMPIRE_ENABLE_MPI)
     # If the target is EXPORTABLE, add it to the export set
     get_target_property(_is_imported mpi IMPORTED)
@@ -101,8 +98,13 @@ if (UMPIRE_ENABLE_MPI OR UMPIRE_ENABLE_HIP OR UMPIRE_ENABLE_OPENMP OR UMPIRE_ENA
         EXPORT               ${arg_EXPORT})
       # Namespace target to avoid conflicts
       set_target_properties(mpi PROPERTIES EXPORT_NAME blt::mpi)
-      install(EXPORT bltTargets
-        DESTINATION  ${CMAKE_INSTALL_LIBDIR}/cmake/umpire)
     endif()
   endif()
+  ## Versus
+  # ## RAJA Way: no import
+  #   ## Nothing to be done
+  # ##
+
+  blt_install_tpl_setups(DESTINATION lib/cmake/umpire)
+
 endif()
