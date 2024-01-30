@@ -23,8 +23,8 @@ bool CudaGetAttributeOperation<ATTRIBUTE>::check_apply(void* src_ptr, umpire::ut
   error = ::cudaGetDeviceProperties(&properties, 0);
 
   if (error != cudaSuccess) {
-    UMPIRE_ERROR(runtime_error, umpire::fmt::format("cudaGetDeviceProperties( device = 0 ) failed with error: {}",
-                                                    cudaGetErrorString(error)));
+    UMPIRE_ERROR(runtime_error,
+                 fmt::format("cudaGetDeviceProperties( device = 0 ) failed with error: {}", cudaGetErrorString(error)));
   }
 
   if (properties.managedMemory == 1 && properties.concurrentManagedAccess == 1) {
