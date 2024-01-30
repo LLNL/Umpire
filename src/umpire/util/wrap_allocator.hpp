@@ -39,8 +39,8 @@ Strategy* unwrap_allocation_strategy(strategy::AllocationStrategy* base_strategy
   Strategy* strategy{dynamic_cast<Strategy*>(base_strategy)};
 
   if (!strategy) {
-    UMPIRE_ERROR(runtime_error, umpire::fmt::format("Couldn't unwrap allocator \"{}\" to strategy \"{}\"",
-                                                    base_strategy->getName(), typeid(Strategy).name()));
+    UMPIRE_ERROR(runtime_error, fmt::format("Couldn't unwrap allocator \"{}\" to strategy \"{}\"",
+                                            base_strategy->getName(), typeid(Strategy).name()));
   }
 
   return strategy;

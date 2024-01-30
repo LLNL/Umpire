@@ -224,15 +224,14 @@ std::shared_ptr<umpire::op::MemoryOperation> MemoryOperationRegistry::find(const
   auto operations = m_operators.find(name);
 
   if (operations == m_operators.end()) {
-    UMPIRE_ERROR(runtime_error, umpire::fmt::format("Cannot find operator \"{}\"", name));
+    UMPIRE_ERROR(runtime_error, fmt::format("Cannot find operator \"{}\"", name));
   }
 
   auto op = operations->second.find(platforms);
 
   if (op == operations->second.end()) {
-    UMPIRE_ERROR(runtime_error,
-                 umpire::fmt::format("Cannot find operator \"{}\" for platforms {}, {}", name,
-                                     static_cast<int>(platforms.first), static_cast<int>(platforms.second)));
+    UMPIRE_ERROR(runtime_error, fmt::format("Cannot find operator \"{}\" for platforms {}, {}", name,
+                                            static_cast<int>(platforms.first), static_cast<int>(platforms.second)));
   }
 
   return op->second;

@@ -87,16 +87,16 @@ void initialize_io(const bool enable_log)
           if (enable_log) {
 #ifndef WIN32
             if (mkdir(root_io_dir.c_str(), S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH)) {
-              UMPIRE_ERROR(runtime_error, umpire::fmt::format("mkdir({}) failed", root_io_dir));
+              UMPIRE_ERROR(runtime_error, fmt::format("mkdir({}) failed", root_io_dir));
             }
 #else
             if (_mkdir(root_io_dir.c_str())) {
-              UMPIRE_ERROR(runtime_error, umpire::fmt::format("mkdir( \"{}\" ) failed", root_io_dir));
+              UMPIRE_ERROR(runtime_error, fmt::format("mkdir( \"{}\" ) failed", root_io_dir));
             }
 #endif
           }
         } else if (!(S_ISDIR(info.st_mode))) {
-          UMPIRE_ERROR(runtime_error, umpire::fmt::format("{} exists and is not a directory", root_io_dir));
+          UMPIRE_ERROR(runtime_error, fmt::format("{} exists and is not a directory", root_io_dir));
         }
 #endif
       }
@@ -114,7 +114,7 @@ void initialize_io(const bool enable_log)
     if (s_log_ofstream) {
       s_log_buffer.setFileStream(&s_log_ofstream);
     } else {
-      UMPIRE_ERROR(runtime_error, umpire::fmt::format("Couldn't open log file: {}", log_filename));
+      UMPIRE_ERROR(runtime_error, fmt::format("Couldn't open log file: {}", log_filename));
     }
   }
 
