@@ -45,7 +45,7 @@ MemoryResourceTraits CudaDeviceResourceFactory::getDefaultTraits()
 
   if (error != cudaSuccess) {
     UMPIRE_ERROR(runtime_error,
-                 umpire::fmt::format("cudaGetDeviceProperties failed with error: {}", cudaGetErrorString(error)));
+                 fmt::format("cudaGetDeviceProperties failed with error: {}", cudaGetErrorString(error)));
   }
 
   traits.unified = false;

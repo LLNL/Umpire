@@ -54,7 +54,7 @@ inline std::string resource_to_string(MemoryResourceType type)
     case Shared:
       return "SHARED";
     default:
-      UMPIRE_ERROR(runtime_error, umpire::fmt::format("Unkown resource type: {}", type));
+      UMPIRE_ERROR(runtime_error, fmt::format("Unknown resource type: {}", static_cast<int>(type)));
   }
 
     //
@@ -88,7 +88,7 @@ inline MemoryResourceType string_to_resource(const std::string& resource)
   else if (resource == "SHARED")
     return MemoryResourceType::Shared;
   else {
-    UMPIRE_ERROR(runtime_error, umpire::fmt::format("Unkown resource name \"{}\"", resource));
+    UMPIRE_ERROR(runtime_error, fmt::format("Unknown resource name \"{}\"", resource));
   }
 
   //

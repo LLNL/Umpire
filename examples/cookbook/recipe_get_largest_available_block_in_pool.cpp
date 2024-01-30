@@ -23,7 +23,7 @@ int main(int, char**)
   // _sphinx_tag_tut_unwrap_end
 
   if (quick_pool == nullptr) {
-    UMPIRE_ERROR(umpire::runtime_error, umpire::fmt::format("{} is not a QuickPool", pool.getName()));
+    UMPIRE_ERROR(umpire::runtime_error, fmt::format("{} is not a QuickPool", pool.getName()));
   }
 
   auto ptr = pool.allocate(1024);

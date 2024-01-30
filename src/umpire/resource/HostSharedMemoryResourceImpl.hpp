@@ -74,15 +74,15 @@ class HostSharedMemoryResource::impl {
         created = true;
         completed = true;
       } else if (err != EEXIST) {
-        UMPIRE_ERROR(runtime_error, umpire::fmt::format("Failed to create shared memory segment \"{}\": {}",
-                                                        m_segment_name, strerror(err)));
+        UMPIRE_ERROR(runtime_error,
+                     fmt::format("Failed to create shared memory segment \"{}\": {}", m_segment_name, strerror(err)));
       } else {
         if (open_shared_memory_segment(err, O_RDWR)) {
           created = false;
           completed = true;
         } else if (err != ENOENT) {
-          UMPIRE_ERROR(runtime_error, umpire::fmt::format("Failed to open shared memory file \"{}\": {}",
-                                                          m_segment_name, strerror(err)));
+          UMPIRE_ERROR(runtime_error,
+                       fmt::format("Failed to open shared memory file \"{}\": {}", m_segment_name, strerror(err)));
         }
       }
       std::this_thread::yield();
@@ -91,8 +91,8 @@ class HostSharedMemoryResource::impl {
     if (created) {
       if (0 != ftruncate(m_segment_fd, size)) {
         err = errno;
-        UMPIRE_ERROR(runtime_error, umpire::fmt::format("Failed to set size for shared memory segment \"{}\": {}",
-                                                        m_segment_name, strerror(err)));
+        UMPIRE_ERROR(runtime_error, fmt::format("Failed to set size for shared memory segment \"{}\": {}",
+                                                m_segment_name, strerror(err)));
       }
 
       map_shared_memory_segment();
@@ -102,20 +102,18 @@ class HostSharedMemoryResource::impl {
       pthread_mutexattr_t mattr;
       if ((err = pthread_mutexattr_init(&mattr)) != 0) {
         UMPIRE_ERROR(runtime_error,
-                     umpire::fmt::format("Failed to initialize mutex attributes for shared memory segment \"{}\": {}",
-                                         m_segment_name, strerror(err)));
+                     fmt::format("Failed to initialize mutex attributes for shared memory segment \"{}\": {}",
+                                 m_segment_name, strerror(err)));
       }
 
       if ((err = pthread_mutexattr_setpshared(&mattr, PTHREAD_PROCESS_SHARED)) != 0) {
-        UMPIRE_ERROR(runtime_error,
-                     umpire::fmt::format("Failed to set shared attributes for shared memory segment \"{}\": {}",
-                                         m_segment_name, strerror(err)));
+        UMPIRE_ERROR(runtime_error, fmt::format("Failed to set shared attributes for shared memory segment \"{}\": {}",
+                                                m_segment_name, strerror(err)));
       }
 
       if ((err = pthread_mutex_init(&m_segment->mutex, &mattr)) != 0) {
-        UMPIRE_ERROR(runtime_error,
-                     umpire::fmt::format("Failed to initialize mutex for shared memory segment \"{}\": {}",
-                                         m_segment_name, strerror(err)));
+        UMPIRE_ERROR(runtime_error, fmt::format("Failed to initialize mutex for shared memory segment \"{}\": {}",
+                                                m_segment_name, strerror(err)));
       }
 
       m_segment->segment_size = size;
@@ -140,8 +138,8 @@ class HostSharedMemoryResource::impl {
 
         if (fstat(m_segment_fd, &st) < 0) {
           err = errno;
-          UMPIRE_ERROR(runtime_error, umpire::fmt::format("Failed fstat for shared memory segment  {}: {}",
-                                                          m_segment_name, strerror(err)));
+          UMPIRE_ERROR(runtime_error,
+                       fmt::format("Failed fstat for shared memory segment  {}: {}", m_segment_name, strerror(err)));
         }
         filesize = st.st_size;
         std::this_thread::yield();
@@ -192,8 +190,8 @@ class HostSharedMemoryResource::impl {
     UMPIRE_LOG(Debug, "(name=\"" << name << ", requested_size=" << requested_size << ")");
 
     if ((err = pthread_mutex_lock(&m_segment->mutex)) != 0) {
-      UMPIRE_ERROR(runtime_error, umpire::fmt::format("Failed to lock mutex for shared memory segment {}: {}",
-                                                      m_segment_name, strerror(err)));
+      UMPIRE_ERROR(runtime_error,
+                   fmt::format("Failed to lock mutex for shared memory segment {}: {}", m_segment_name, strerror(err)));
     }
 
     // First let's see if the allaction already exists
@@ -232,8 +230,7 @@ class HostSharedMemoryResource::impl {
     pthread_mutex_unlock(&m_segment->mutex);
 
     if (best == nullptr) {
-      UMPIRE_ERROR(out_of_memory_error,
-                   umpire::fmt::format("shared memory allocation( bytes = {} ) failed", requested_size));
+      UMPIRE_ERROR(out_of_memory_error, fmt::format("shared memory allocation( bytes = {} ) failed", requested_size));
     } else {
       offset_to_pointer(best->memory_offset, ptr);
     }
@@ -255,8 +252,8 @@ class HostSharedMemoryResource::impl {
 
     int err{0};
     if ((err = pthread_mutex_lock(&m_segment->mutex)) != 0) {
-      UMPIRE_ERROR(runtime_error, umpire::fmt::format("Failed to lock mutex for shared memory segment {}: {}",
-                                                      m_segment_name, strerror(err)));
+      UMPIRE_ERROR(runtime_error,
+                   fmt::format("Failed to lock mutex for shared memory segment {}: {}", m_segment_name, strerror(err)));
     }
 
     block_ptr->reference_count--;
@@ -289,8 +286,8 @@ class HostSharedMemoryResource::impl {
     int err{0};
 
     if ((err = pthread_mutex_lock(&m_segment->mutex)) != 0) {
-      UMPIRE_ERROR(runtime_error, umpire::fmt::format("Failed to lock mutex for shared memory segment {}: {}",
-                                                      m_segment_name, strerror(err)));
+      UMPIRE_ERROR(runtime_error,
+                   fmt::format("Failed to lock mutex for shared memory segment {}: {}", m_segment_name, strerror(err)));
     }
 
     // First let's see if the allaction already exists
@@ -492,8 +489,8 @@ class HostSharedMemoryResource::impl {
     struct ::stat buf;
     if (0 != fstat(m_segment_fd, &buf)) {
       int err = errno;
-      UMPIRE_ERROR(runtime_error, umpire::fmt::format("Failed to obtain size of shared object \"{}\": {}",
-                                                      m_segment_name, strerror(err)));
+      UMPIRE_ERROR(runtime_error,
+                   fmt::format("Failed to obtain size of shared object \"{}\": {}", m_segment_name, strerror(err)));
     }
 
     auto size = buf.st_size;
@@ -505,8 +502,7 @@ class HostSharedMemoryResource::impl {
 
     if (base == MAP_FAILED) {
       int err = errno;
-      UMPIRE_ERROR(runtime_error,
-                   umpire::fmt::format("Failed to map shared object \"{}\": {}", m_segment_name, strerror(err)));
+      UMPIRE_ERROR(runtime_error, fmt::format("Failed to map shared object \"{}\": {}", m_segment_name, strerror(err)));
     }
 
     m_segment = static_cast<SharedMemorySegmentHeader*>(base);

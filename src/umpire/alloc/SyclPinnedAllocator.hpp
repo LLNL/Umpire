@@ -35,7 +35,7 @@ struct SyclPinnedAllocator {
     UMPIRE_LOG(Debug, "(bytes=" << size << ") returning " << ptr);
 
     if (ptr == nullptr) {
-      UMPIRE_ERROR(runtime_error, umpire::fmt::format("sycl::malloc_host( bytes = {} ) failed", size));
+      UMPIRE_ERROR(runtime_error, fmt::format("sycl::malloc_host( bytes = {} ) failed", size));
     } else {
       return ptr;
     }

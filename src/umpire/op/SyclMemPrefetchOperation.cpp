@@ -16,7 +16,7 @@ namespace op {
 void SyclMemPrefetchOperation::apply(void* src_ptr, util::AllocationRecord* allocation, int value, std::size_t length)
 {
   if (allocation->strategy->getTraits().id != value) {
-    UMPIRE_ERROR(runtime_error, umpire::fmt::format("SYCL memPrefetch failed with invalid deviceID  = {} ", value));
+    UMPIRE_ERROR(runtime_error, fmt::format("SYCL memPrefetch failed with invalid deviceID  = {} ", value));
   }
 
   auto sycl_queue = allocation->strategy->getTraits().queue;
@@ -28,7 +28,7 @@ void SyclMemPrefetchOperation::apply(void* src_ptr, util::AllocationRecord* allo
     sycl_queue->prefetch(src_ptr, length);
     sycl_queue->wait();
   } else {
-    UMPIRE_ERROR(runtime_error, umpire::fmt::format("SYCL memPrefetch failed ( bytes = {} )", length));
+    UMPIRE_ERROR(runtime_error, fmt::format("SYCL memPrefetch failed ( bytes = {} )", length));
   }
 }
 
