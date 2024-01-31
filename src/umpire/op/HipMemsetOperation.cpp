@@ -21,9 +21,8 @@ void HipMemsetOperation::apply(void* src_ptr, util::AllocationRecord* UMPIRE_UNU
   hipError_t error = ::hipMemset(src_ptr, value, length);
 
   if (error != hipSuccess) {
-    UMPIRE_ERROR(runtime_error,
-                 umpire::fmt::format("hipMemset( src_ptr = {}, value = {}, length = {}) failed with error: {}", src_ptr,
-                                     value, length, hipGetErrorString(error)));
+    UMPIRE_ERROR(runtime_error, fmt::format("hipMemset( src_ptr = {}, value = {}, length = {}) failed with error: {}",
+                                            src_ptr, value, length, hipGetErrorString(error)));
   }
 }
 
@@ -33,8 +32,8 @@ camp::resources::EventProxy<camp::resources::Resource> HipMemsetOperation::apply
 {
   auto device = ctx.try_get<camp::resources::Hip>();
   if (!device) {
-    UMPIRE_ERROR(resource_error, umpire::fmt::format("Expected resources::Hip, got resources::{}",
-                                                     platform_to_string(ctx.get_platform())));
+    UMPIRE_ERROR(resource_error,
+                 fmt::format("Expected resources::Hip, got resources::{}", platform_to_string(ctx.get_platform())));
   }
   auto stream = device->get_stream();
 
@@ -43,8 +42,8 @@ camp::resources::EventProxy<camp::resources::Resource> HipMemsetOperation::apply
   if (error != hipSuccess) {
     UMPIRE_ERROR(
         runtime_error,
-        umpire::fmt::format("hipMemsetAsync( src_ptr = {}, value = {}, length = {}, stream = {}) failed with error: {}",
-                            src_ptr, value, length, (void*)stream, hipGetErrorString(error)));
+        fmt::format("hipMemsetAsync( src_ptr = {}, value = {}, length = {}, stream = {}) failed with error: {}",
+                    src_ptr, value, length, (void*)stream, hipGetErrorString(error)));
   }
 
   return camp::resources::EventProxy<camp::resources::Resource>{ctx};

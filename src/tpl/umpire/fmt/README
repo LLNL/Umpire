@@ -1,7 +1,0 @@
-This directory holds the source files for MIT-licensed fmt libary (version 7.1.3)
-retrieved from https://github.com/fmtlib/fmt/archive/7.1.3.tar.gz
-
-Note: Axom adds a custom header file ('fmt.hpp') to simplify usage of fmt configured as a header only library.
-This can be included in source files as follows:
-
-   #include "umpire/fmt.hpp"

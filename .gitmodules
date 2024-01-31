@@ -14,3 +14,6 @@
 [submodule "scripts/uberenv"]
 	path = scripts/uberenv
 	url = https://github.com/LLNL/uberenv
+[submodule "src/tpl/umpire/fmt"]
+	path = src/tpl/umpire/fmt
+	url = https://github.com/fmtlib/fmt
