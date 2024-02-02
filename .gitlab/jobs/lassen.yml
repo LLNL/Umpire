@@ -5,12 +5,27 @@
 # SPDX-License-Identifier: (MIT)
 ###############################################################################
 
+# Override reproducer section to define Umpire specific variables.
+.lassen_reproducer_vars:
+  script:
+    - |
+      echo -e "export MODULE_LIST=\"${MODULE_LIST}\""
+      echo -e "export SPEC=\"${SPEC//\"/\\\"}\""
+
 ########################
 # Overridden shared jobs
 ########################
 # We duplicate the shared jobs description and add necessary changes for RAJA.
 # We keep ${PROJECT_<MACHINE>_VARIANTS} and ${PROJECT_<MACHINE>_DEPS} So that
 # the comparison with the original job is easier.
+
+# Overriden to increase allocation
+xl_2022_08_19_gcc_8_3_1_cuda_11_2_0:
+  variables:
+    SPEC: "${PROJECT_LASSEN_VARIANTS} +cuda %xl@16.1.1.12.gcc.8.3.1 ^cuda@11.2.0+allow-unsupported-compilers ${PROJECT_LASSEN_DEPS}"
+    MODULE_LIST: "cuda/11.2.0"
+    LASSEN_JOB_ALLOC: "1 -W 20 -q pci"
+  extends: .job_on_lassen
 
 
 ############
@@ -92,4 +107,5 @@ xl_2022_08_19_gcc_8_3_1_cuda_11_2_tpls:
   variables:
     SPEC: "~shared +fortran +cuda +tools tests=basic %xl@16.1.1.12.gcc.8.3.1 ^cuda@11.7.0+allow-unsupported-compilers"
     MODULE_LIST: "cuda/11.7.0"
+    LASSEN_JOB_ALLOC: "1 -W 20 -q pci"
   extends: .job_on_lassen
