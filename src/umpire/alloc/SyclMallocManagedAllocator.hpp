@@ -35,7 +35,7 @@ struct SyclMallocManagedAllocator {
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << usm_ptr);
 
     if (usm_ptr == nullptr) {
-      UMPIRE_ERROR(runtime_error, umpire::fmt::format("sycl::malloc_shared( bytes = {} ) failed", bytes));
+      UMPIRE_ERROR(runtime_error, fmt::format("sycl::malloc_shared( bytes = {} ) failed", bytes));
     } else {
       return usm_ptr;
     }

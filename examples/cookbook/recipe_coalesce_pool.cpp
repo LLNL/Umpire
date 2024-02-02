@@ -27,7 +27,7 @@ int main(int, char**)
     quick_pool->coalesce();
     // _sphinx_tag_tut_call_coalesce_end
   } else {
-    UMPIRE_ERROR(umpire::runtime_error, umpire::fmt::format("{} is not a QuickPool, cannot coalesce!", pool.getName()));
+    UMPIRE_ERROR(umpire::runtime_error, fmt::format("{} is not a QuickPool, cannot coalesce!", pool.getName()));
   }
 
   return 0;

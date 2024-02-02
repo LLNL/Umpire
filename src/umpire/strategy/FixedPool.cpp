@@ -144,7 +144,7 @@ void* FixedPool::allocate(std::size_t bytes)
   }
 
   if (!ptr) {
-    UMPIRE_ERROR(runtime_error, umpire::fmt::format("FixedPool::allocate(size={}): Could not allocate.", m_obj_bytes));
+    UMPIRE_ERROR(runtime_error, fmt::format("FixedPool::allocate(size={}): Could not allocate.", m_obj_bytes));
   }
   return ptr;
 }

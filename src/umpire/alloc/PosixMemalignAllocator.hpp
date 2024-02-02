@@ -40,12 +40,11 @@ struct PosixMemalignAllocator {
     if (ret == nullptr) {
       if (err == ENOMEM) {
         UMPIRE_ERROR(out_of_memory_error,
-                     umpire::fmt::format("posix_memalign( bytes = {}, pagesize = {} ) failed with error = {}", bytes,
-                                         get_page_size(), strerror(err)));
+                     fmt::format("posix_memalign( bytes = {}, pagesize = {} ) failed with error = {}", bytes,
+                                 get_page_size(), strerror(err)));
       } else {
-        UMPIRE_ERROR(runtime_error,
-                     umpire::fmt::format("posix_memalign( bytes = {}, pagesize = {} ) failed with error = {}", bytes,
-                                         get_page_size(), strerror(err)));
+        UMPIRE_ERROR(runtime_error, fmt::format("posix_memalign( bytes = {}, pagesize = {} ) failed with error = {}",
+                                                bytes, get_page_size(), strerror(err)));
       }
     }
 
