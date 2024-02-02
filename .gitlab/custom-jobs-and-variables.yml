@@ -14,19 +14,30 @@ variables:
 
 # Ruby
 # Arguments for top level allocation
-  RUBY_SHARED_ALLOC: "--exclusive --reservation=ci --qos=ci_ruby --time=10 --nodes=1"
+  RUBY_SHARED_ALLOC: "--exclusive --reservation=ci --time=10 --nodes=2"
 # Arguments for job level allocation
-  RUBY_JOB_ALLOC: "--overlap --reservation=ci --qos=ci_ruby --time=10 --nodes=1"
+# Note: We repeat the reservation, necessary when jobs are manually re-triggered.
+  RUBY_JOB_ALLOC: "--overlap --reservation=ci --nodes=1"
 # Project specific variants for ruby
   PROJECT_RUBY_VARIANTS: "~shared +fortran +tools tests=basic "
 # Project specific deps for ruby
   PROJECT_RUBY_DEPS: ""
 
+# Poodle
+# Arguments for top level allocation
+  POODLE_SHARED_ALLOC: "--exclusive --partition=pdebug --time=8 --nodes=1"
+# Arguments for job level allocation
+  POODLE_JOB_ALLOC: "--overlap --nodes=1"
+# Project specific variants for poodle
+  PROJECT_POODLE_VARIANTS: "~shared +fortran +tools tests=basic"
+# Project specific deps for poodle
+  PROJECT_POODLE_DEPS: ""
+
 # Corona
 # Arguments for top level allocation
-  CORONA_SHARED_ALLOC: "--exclusive --time-limit=15m --nodes=1"
+  CORONA_SHARED_ALLOC: "--exclusive --time-limit=10m --nodes=1"
 # Arguments for job level allocation
-  CORONA_JOB_ALLOC: "--time-limit=10m --nodes=1 --begin-time=+5s"
+  CORONA_JOB_ALLOC: "--nodes=1 --begin-time=+5s"
 # Project specific variants for corona
   PROJECT_CORONA_VARIANTS: "~shared +fortran +device_alloc tests=basic "
 # Project specific deps for corona
@@ -34,9 +45,9 @@ variables:
 
 # Tioga
 # Arguments for top level allocation
-  TIOGA_SHARED_ALLOC: "--exclusive --time-limit=20m --nodes=1"
+  TIOGA_SHARED_ALLOC: "--exclusive --time-limit=15m --nodes=1"
 # Arguments for job level allocation
-  TIOGA_JOB_ALLOC: "--time-limit=15m --nodes=1 --begin-time=+5s"
+  TIOGA_JOB_ALLOC: "--nodes=1 --begin-time=+5s"
 # Project specific variants for tioga
   PROJECT_TIOGA_VARIANTS: "~shared +fortran +device_alloc tests=basic "
 # Project specific deps for tioga
@@ -45,7 +56,7 @@ variables:
 # Lassen and Butte use a different job scheduler (spectrum lsf) that does not
 # allow pre-allocation the same way slurm does.
 # Arguments for job level allocation
-  LASSEN_JOB_ALLOC: "1 -W 18"
+  LASSEN_JOB_ALLOC: "1 -W 10 -q pci"
 # Project specific variants for lassen
   PROJECT_LASSEN_VARIANTS: "~shared +fortran +tools tests=basic "
 # Project specific deps for lassen

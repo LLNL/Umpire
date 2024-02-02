@@ -459,7 +459,7 @@ class HostSharedMemoryResource::impl {
 
     if (prev != nullptr) {
       std::size_t offset;
-      pointer_to_offset(prev, offset);
+      pointer_to_offset(next, offset);
       prev->next_block_off = offset;
     } else {
       std::size_t offset;
