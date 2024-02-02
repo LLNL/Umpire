@@ -4,10 +4,6 @@
 [submodule "src/tpl/umpire/camp"]
 	path = src/tpl/umpire/camp
 	url = https://github.com/LLNL/camp.git
-[submodule ".radiuss-ci"]
-	path = .radiuss-ci
-	url = https://github.com/LLNL/radiuss-ci
-	branch = feature/umpire-ci
 [submodule "scripts/radiuss-spack-configs"]
 	path = scripts/radiuss-spack-configs
 	url = https://github.com/LLNL/radiuss-spack-configs
