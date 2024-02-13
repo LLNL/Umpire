@@ -30,3 +30,4 @@ that have introspection disabled for improved performance, and applying CUDA
    cookbook/thread_safe.rst
    cookbook/file_allocation.rst
    cookbook/strategy_name.rst
+   cookbook/shared_memory.rst
