@@ -19,7 +19,7 @@ find_package(umpire REQUIRED
 
 # Check if fmt::fmt was imported from above find_package
 if(NOT TARGET fmt::fmt)
-    message(FATAL_ERROR "fmt targets were not imported from installed config files")
+    message(FATAL_ERROR "fmt targets were not imported from installed config files.")
 endif()
 
 add_executable(using-with-cmake using-with-cmake.cpp)
