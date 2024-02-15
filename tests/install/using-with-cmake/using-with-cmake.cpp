@@ -8,12 +8,13 @@
 
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
+#include "fmt/format.h"
 
 int main()
 {
   auto& rm = umpire::ResourceManager::getInstance();
   umpire::Allocator alloc = rm.getAllocator("HOST");
-  std::cout << "Got allocator: " << alloc.getName() << std::endl;
+  std::cout << fmt::format("Got allocator: {0}", alloc.getName()) << std::endl;
 
   std::cout << "Available allocators: ";
   for (auto s : rm.getAllocatorNames()) {
