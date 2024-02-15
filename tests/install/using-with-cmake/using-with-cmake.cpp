@@ -6,9 +6,9 @@
 //////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 
+#include "fmt/format.h"
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
-#include "fmt/format.h"
 
 int main()
 {
