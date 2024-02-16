@@ -54,8 +54,6 @@ jobs:
         docker_target: clang11
       clang12:
         docker_target: clang12
-      nvcc10:
-        docker_target: nvcc10
       sycl:
         docker_target: sycl
       umap_build:
