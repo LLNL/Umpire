@@ -17,5 +17,10 @@ find_package(umpire REQUIRED
              NO_DEFAULT_PATH 
              PATHS ${umpire_DIR})
 
+# Check if fmt::fmt was imported from above find_package
+if(NOT TARGET fmt::fmt)
+    message(FATAL_ERROR "fmt targets were not imported from installed config files.")
+endif()
+
 add_executable(using-with-cmake using-with-cmake.cpp)
-target_link_libraries(using-with-cmake umpire)
+target_link_libraries(using-with-cmake umpire fmt::fmt)
