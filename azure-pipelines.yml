@@ -56,8 +56,6 @@ jobs:
         docker_target: clang12
       sycl:
         docker_target: sycl
-      hip:
-        docker_target: hip
       umap_build:
         docker_target: umap_build
   pool:

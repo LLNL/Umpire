@@ -36,6 +36,10 @@ if (NOT TARGET camp)
     ${UMPIRE_PACKAGE_PREFIX_DIR}/lib/cmake/camp)
 endif ()
 
+if (@UMPIRE_ENABLE_IPC_SHARED_MEMORY@)
+  find_dependency(Threads)
+endif ()
+
 if (NOT TARGET fmt::fmt)
   set(UMPIRE_FMT_DIR "@fmt_DIR@")
   if(NOT fmt_DIR)
@@ -53,6 +57,7 @@ if (@UMPIRE_ENABLE_SQLITE_EXPERIMENTAL@)
   find_package(SQLite3 REQUIRED)
 endif()
 
+include("${CMAKE_CURRENT_LIST_DIR}/BLTSetupTargets.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/umpire-targets.cmake")
 
 check_required_components(@PROJECT_NAME@)
