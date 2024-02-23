@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -15,7 +15,7 @@ include(CMakePackageConfigHelpers)
 
 project(Umpire
   LANGUAGES CXX C
-  VERSION 2023.06.0)
+  VERSION 2024.02.0)
 
 cmake_minimum_required(VERSION 3.14)
 
