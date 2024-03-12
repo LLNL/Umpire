@@ -22,7 +22,7 @@
 # Overriden to increase allocation
 xl_2022_08_19_gcc_8_3_1_cuda_11_2_0:
   variables:
-    SPEC: "${PROJECT_LASSEN_VARIANTS} +cuda %xl@16.1.1.12.gcc.8.3.1 ^cuda@11.2.0+allow-unsupported-compilers ${PROJECT_LASSEN_DEPS}"
+    SPEC: "${PROJECT_LASSEN_VARIANTS} +cuda %xl@=16.1.1.12.gcc.8.3.1 ^cuda@11.2.0+allow-unsupported-compilers ${PROJECT_LASSEN_DEPS}"
     MODULE_LIST: "cuda/11.2.0"
     LASSEN_JOB_ALLOC: "1 -W 20 -q pci"
   extends: .job_on_lassen
@@ -37,56 +37,56 @@ xl_2022_08_19_gcc_8_3_1_cuda_11_2_0:
 
 ibm_clang_14_0_5_mpi_shmem:
   variables:
-    SPEC: "~shared +tools tests=basic +ipc_shmem +mpi %clang@14.0.5.ibm.gcc.8.3.1 ^spectrum-mpi"
+    SPEC: "~shared +tools tests=basic +ipc_shmem +mpi %clang@=14.0.5.ibm.gcc.8.3.1 ^spectrum-mpi"
   extends: .job_on_lassen
 
 ibm_clang_14_0_5_mpi:
   variables:
-    SPEC: "~shared +fortran +tools +mpi tests=basic %clang@14.0.5.ibm.gcc.8.3.1 ^spectrum-mpi"
+    SPEC: "~shared +fortran +tools +mpi tests=basic %clang@=14.0.5.ibm.gcc.8.3.1 ^spectrum-mpi"
   extends: .job_on_lassen
 
 ibm_clang_14_0_5_gcc_8_3_1_cuda_11_7_0_mpi_shmem:
   variables:
-    SPEC: "~shared +tools +cuda +ipc_shmem +mpi tests=basic %clang@14.0.5.ibm.gcc.8.3.1 ^spectrum-mpi ^cuda@11.7.0+allow-unsupported-compilers"
+    SPEC: "~shared +tools +cuda +ipc_shmem +mpi tests=basic %clang@=14.0.5.ibm.gcc.8.3.1 ^spectrum-mpi ^cuda@11.7.0+allow-unsupported-compilers"
     MODULE_LIST: "cuda/11.7.0"
   extends: .job_on_lassen
 
 clang_12_0_1_libcpp:
   variables:
-    SPEC: "~shared +tools tests=basic %clang@12.0.1 cflags==\"-DGTEST_HAS_CXXABI_H_=0\" cxxflags==\"-stdlib=libc++ -DGTEST_HAS_CXXABI_H_=0\""
+    SPEC: "~shared +tools tests=basic %clang@=12.0.1 cflags==\"-DGTEST_HAS_CXXABI_H_=0\" cxxflags==\"-stdlib=libc++ -DGTEST_HAS_CXXABI_H_=0\""
   extends: .job_on_lassen
 
 clang_12_0_1_gcc_8_3_1_memleak:
   variables:
-    SPEC: "~shared +asan +sanitizer_tests +tools tests=basic %clang@12.0.1.gcc.8.3.1 cxxflags==-fsanitize=address"
+    SPEC: "~shared +asan +sanitizer_tests +tools tests=basic %clang@=12.0.1.gcc.8.3.1 cxxflags==-fsanitize=address"
     ASAN_OPTIONS: "detect_leaks=1"
   extends: .job_on_lassen
 
 # clang_9_0_0_datarace (build and test on lassen):
 #   variables:
-#     SPEC: "%clang@9.0.0 cxxflags==\"-fsanitize=thread\""
+#     SPEC: "%clang@=9.0.0 cxxflags==\"-fsanitize=thread\""
 #   allow_failure: true
 #   extends: .job_on_lassen
 
 gcc_8_3_1_dev_benchmarks:
   variables:
-    SPEC: "~shared +dev_benchmarks +tools build_type=Release %gcc@8.3.1"
+    SPEC: "~shared +dev_benchmarks +tools build_type=Release %gcc@=8.3.1"
   extends: .job_on_lassen
 
 xl_2022_08_19_default_omp_target:
   variables:
-    SPEC: "~shared +tools +openmp +openmp_target tests=basic %xl@16.1.1.12"
+    SPEC: "~shared +tools +openmp +openmp_target tests=basic %xl@=16.1.1.12"
   allow_failure: true
   extends: .job_on_lassen
 
 gcc_8_3_1_numa:
   variables:
-    SPEC: "~shared +fortran +numa +tools tests=basic %gcc@8.3.1"
+    SPEC: "~shared +fortran +numa +tools tests=basic %gcc@=8.3.1"
   extends: .job_on_lassen
 
 gcc_8_3_1_cuda_11_7_0:
   variables:
-    SPEC: "+fortran +cuda +tools +backtrace tests=basic %gcc@8.3.1 ^cuda@11.7.0+allow-unsupported-compilers"
+    SPEC: "+fortran +cuda +tools +backtrace tests=basic %gcc@=8.3.1 ^cuda@11.7.0+allow-unsupported-compilers"
     MODULE_LIST: "cuda/11.7.0"
   extends: .job_on_lassen
 
@@ -94,18 +94,18 @@ gcc_8_3_1_cuda_11_7_0:
 
 gcc_8_3_1_tpls:
   variables:
-    SPEC: "~shared +fortran +tools tests=basic %gcc@8.3.1"
+    SPEC: "~shared +fortran +tools tests=basic %gcc@=8.3.1"
   extends: .job_on_lassen
 
 ibm_clang_14_0_5_gcc_8_3_1_cuda_11_7_0_tpls:
   variables:
-    SPEC: "~shared +fortran +cuda +tools tests=basic %clang@14.0.5.ibm.gcc.8.3.1 ^cuda@11.7.0+allow-unsupported-compilers"
+    SPEC: "~shared +fortran +cuda +tools tests=basic %clang@=14.0.5.ibm.gcc.8.3.1 ^cuda@11.7.0+allow-unsupported-compilers"
     MODULE_LIST: "cuda/11.7.0"
   extends: .job_on_lassen
 
 xl_2022_08_19_gcc_8_3_1_cuda_11_2_tpls:
   variables:
-    SPEC: "~shared +fortran +cuda +tools tests=basic %xl@16.1.1.12.gcc.8.3.1 ^cuda@11.7.0+allow-unsupported-compilers"
+    SPEC: "~shared +fortran +cuda +tools tests=basic %xl@=16.1.1.12.gcc.8.3.1 ^cuda@11.7.0+allow-unsupported-compilers"
     MODULE_LIST: "cuda/11.7.0"
     LASSEN_JOB_ALLOC: "1 -W 20 -q pci"
   extends: .job_on_lassen
