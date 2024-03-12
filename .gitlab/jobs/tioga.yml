@@ -22,7 +22,7 @@
 # We override the cce job because we can’t use +device-alloc with it
 cce_16_0_1:
   variables:
-    SPEC: "~shared +fortran tests=basic %cce@16.0.1"
+    SPEC: "~shared +fortran tests=basic %cce@=16.0.1"
   extends: .job_on_tioga
 
 ############
@@ -38,6 +38,6 @@ cce_16_0_1:
 ###
 rocmcc_5_7_1_hip_openmp_device_alloc:
   variables:
-    SPEC: "~shared +fortran +openmp +rocm +device_alloc tests=basic amdgpu_target=gfx90a %rocmcc@5.7.1 ^hip@5.7.1"
+    SPEC: "~shared +fortran +openmp +rocm +device_alloc tests=basic amdgpu_target=gfx90a %rocmcc@=5.7.1 ^hip@5.7.1"
   extends: .job_on_tioga
 
