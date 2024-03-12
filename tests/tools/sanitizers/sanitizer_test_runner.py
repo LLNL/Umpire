@@ -31,13 +31,14 @@ def check_output(file_object, expected):
         print("{BLUE}[      OK]{END} Found \"{expected}\"".format(expected=expected, **formatters))
 
 
-def run_sanitizer_test(strategy, kind):
+def run_sanitizer_test(strategy, kind, resource):
     import subprocess
     import os
 
     cmd_args = ['./sanitizer_tests']
     cmd_args.append(strategy)
     cmd_args.append(kind)
+    cmd_args.append(resource)
 
     test_program = subprocess.Popen(cmd_args,
             stdout=subprocess.PIPE,
@@ -57,9 +58,9 @@ if __name__ == '__main__':
     import sys
 
     print("{BLUE}[--------]{END}".format(**formatters))
-    run_sanitizer_test('DynamicPoolList', 'read')
-    run_sanitizer_test('DynamicPoolList', 'write')
-    run_sanitizer_test('QuickPool', 'read')
-    run_sanitizer_test('QuickPool', 'write')
+    run_sanitizer_test('DynamicPoolList', 'read', 'HOST')
+    run_sanitizer_test('DynamicPoolList', 'write', 'HOST')
+    run_sanitizer_test('QuickPool', 'read', 'HOST')
+    run_sanitizer_test('QuickPool', 'write', 'HOST')
     print("{BLUE}[--------]{END}".format(**formatters))
     sys.exit(errors)
