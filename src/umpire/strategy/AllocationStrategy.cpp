@@ -109,6 +109,11 @@ bool AllocationStrategy::isTracked() const noexcept
   return m_tracked;
 }
 
+bool AllocationStrategy::treatAsPassthrough() const noexcept
+{
+  return false;
+}
+
 std::ostream& operator<<(std::ostream& os, const AllocationStrategy& strategy)
 {
   os << "[" << strategy.m_name << "," << strategy.m_id << "]";
