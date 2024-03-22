@@ -51,14 +51,14 @@ ibm_clang_14_0_5_gcc_8_3_1_cuda_11_7_0_mpi_shmem:
     MODULE_LIST: "cuda/11.7.0"
   extends: .job_on_lassen
 
-clang_14_0_5_libcpp:
+clang_12_0_1_libcpp:
   variables:
-    SPEC: "~shared +tools tests=basic %clang@=14.0.5 cflags==\"-DGTEST_HAS_CXXABI_H_=0\" cxxflags==\"-stdlib=libc++ -DGTEST_HAS_CXXABI_H_=0\""
+    SPEC: "~shared +tools tests=basic %clang@=12.0.1 cflags==\"-DGTEST_HAS_CXXABI_H_=0\" cxxflags==\"-stdlib=libc++ -DGTEST_HAS_CXXABI_H_=0\""
   extends: .job_on_lassen
 
-clang_14_0_5_gcc_8_3_1_memleak:
+clang_12_0_1_gcc_8_3_1_memleak:
   variables:
-    SPEC: "~shared +asan +sanitizer_tests +tools tests=basic %clang@=14.0.5.gcc.8.3.1 cxxflags==-fsanitize=address"
+    SPEC: "~shared +asan +sanitizer_tests +tools tests=basic %clang@=12.0.1.gcc.8.3.1 cxxflags==-fsanitize=address"
     ASAN_OPTIONS: "detect_leaks=1"
   extends: .job_on_lassen
 
