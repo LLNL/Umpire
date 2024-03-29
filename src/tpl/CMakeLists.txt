@@ -143,8 +143,8 @@ if (NOT TARGET ${UMPIRE_FMT_TARGET})
         ${fmt_DIR}
         ${fmt_DIR}/lib64/cmake/fmt)
 
-    set_target_properties(fmt::fmt PROPERTIES IMPORTED_GLOBAL TRUE)
-    blt_convert_to_system_includes(TARGET fmt::fmt)
+    set_target_properties(${UMPIRE_FMT_TARGET} PROPERTIES IMPORTED_GLOBAL TRUE)
+    blt_convert_to_system_includes(TARGET ${UMPIRE_FMT_TARGET}
   else ()
     if (NOT EXISTS ${PROJECT_SOURCE_DIR}/src/tpl/umpire/fmt/CMakeLists.txt)
       message(FATAL_ERROR "fmt submodule not initialized. Run 'git submodule update --init --recursive' in the git repository or set fmt_DIR to use an external build of fmt.")
@@ -153,7 +153,6 @@ if (NOT TARGET ${UMPIRE_FMT_TARGET})
       set(fmt_DIR ${CMAKE_INSTALL_PREFIX} CACHE PATH "")
       set(FMT_INSTALL ON)
       set(FMT_SYSTEM_HEADERS ON)
-      set(UMPIRE_FMT_TARGET fmt::fmt-header-only CACHE STRING "" FORCE)
       add_subdirectory(umpire/fmt)
     endif ()
   endif ()

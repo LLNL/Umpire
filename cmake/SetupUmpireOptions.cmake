@@ -39,7 +39,7 @@ option(UMPIRE_ENABLE_SANITIZER_TESTS "Enable address sanitizer tests" Off)
 option(UMPIRE_ENABLE_DEVICE_ALLOCATOR "Enable Device Allocator" Off)
 option(UMPIRE_ENABLE_SQLITE_EXPERIMENTAL "Build with sqlite event integration (experimental)" Off)
 option(UMPIRE_DISABLE_ALLOCATIONMAP_DEBUG "Disable verbose output from AllocationMap during debug builds" Off)
-set(UMPIRE_FMT_TARGET fmt::fmt CACHE STRING "Name of fmt target to use") 
+set(UMPIRE_FMT_TARGET fmt::fmt-header-only CACHE STRING "Name of fmt target to use") 
 
 if (UMPIRE_ENABLE_INACCESSIBILITY_TESTS)
   set(ENABLE_GTEST_DEATH_TESTS On CACHE BOOL "Enable tests asserting failure.")
