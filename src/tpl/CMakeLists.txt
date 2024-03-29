@@ -135,7 +135,7 @@ if (NOT TARGET camp)
   endif()
 endif ()
 
-if (NOT TARGET fmt::fmt)
+if (NOT TARGET ${UMPIRE_FMT_TARGET})
   if (DEFINED fmt_DIR)
     find_package(fmt REQUIRED
       NO_DEFAULT_PATH
@@ -153,6 +153,7 @@ if (NOT TARGET fmt::fmt)
       set(fmt_DIR ${CMAKE_INSTALL_PREFIX} CACHE PATH "")
       set(FMT_INSTALL ON)
       set(FMT_SYSTEM_HEADERS ON)
+      set(UMPIRE_FMT_TARGET fmt::fmt-header-only CACHE STRING "" FORCE)
       add_subdirectory(umpire/fmt)
     endif ()
   endif ()
