@@ -50,9 +50,13 @@ FROM ghcr.io/rse-ops/clang-ubuntu-22.04:llvm-12.0.0 AS clang12
 ENV GTEST_COLOR=1
 COPY . /home/umpire/workspace
 WORKDIR /home/umpire/workspace/build
-RUN cmake -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DCMAKE_CXX_COMPILER=clang++ .. && \
+RUN cmake -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_INSTALL_PREFIX=/home/umpire/workspace/install .. && \
     make -j 16 && \
-    ctest -T test --output-on-failure
+    ctest -T test --output-on-failure && \
+    cd /home/umpire/workspace/install/examples/umpire/using-with-cmake && \
+    mkdir build && cd build && \
+    cmake -C ../host-config.cmake .. && \
+    make
 
 FROM ghcr.io/rse-ops/clang-ubuntu-22.04:llvm-11.0.0 AS umap_build
 ENV GTEST_COLOR=1
