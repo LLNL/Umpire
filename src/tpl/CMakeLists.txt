@@ -135,7 +135,7 @@ if (NOT TARGET camp)
   endif()
 endif ()
 
-if (NOT TARGET fmt::fmt)
+if (NOT TARGET ${UMPIRE_FMT_TARGET})
   if (DEFINED fmt_DIR)
     find_package(fmt REQUIRED
       NO_DEFAULT_PATH
@@ -143,8 +143,8 @@ if (NOT TARGET fmt::fmt)
         ${fmt_DIR}
         ${fmt_DIR}/lib64/cmake/fmt)
 
-    set_target_properties(fmt::fmt PROPERTIES IMPORTED_GLOBAL TRUE)
-    blt_convert_to_system_includes(TARGET fmt::fmt)
+    set_target_properties(${UMPIRE_FMT_TARGET} PROPERTIES IMPORTED_GLOBAL TRUE)
+    blt_convert_to_system_includes(TARGET ${UMPIRE_FMT_TARGET})
   else ()
     if (NOT EXISTS ${PROJECT_SOURCE_DIR}/src/tpl/umpire/fmt/CMakeLists.txt)
       message(FATAL_ERROR "fmt submodule not initialized. Run 'git submodule update --init --recursive' in the git repository or set fmt_DIR to use an external build of fmt.")
