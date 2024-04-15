@@ -1,4 +1,8 @@
 # v2024.02.1
+## Bug Fixes
+- Made fmt header-only by default allowing users to define preferred fmt target using UMPIRE_FMT_TARGET variable.
+
+# v2024.02.0
 
 ## New Features
 
