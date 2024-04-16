@@ -15,7 +15,7 @@ include(CMakePackageConfigHelpers)
 
 project(Umpire
   LANGUAGES CXX C
-  VERSION 2024.02.0)
+  VERSION 2024.02.1)
 
 cmake_minimum_required(VERSION 3.14)
 
