@@ -17,6 +17,10 @@
 #include "umpire/strategy/mixins/AllocateNull.hpp"
 #include "umpire/strategy/mixins/Inspector.hpp"
 #include "umpire/util/Platform.hpp"
+#include "camp/camp.hpp"
+#include "camp/resource.hpp"
+
+using Resource = camp::resources::Resource;
 
 class AllocatorTest;
 
@@ -64,6 +68,8 @@ class Allocator : private strategy::mixins::Inspector, strategy::mixins::Allocat
    */
   inline void* allocate(std::size_t bytes);
 
+  inline void* allocate(std::size_t bytes, Resource* r);
+
   inline void* allocate(const std::string& name, std::size_t bytes);
 
   /*!
@@ -78,6 +84,8 @@ class Allocator : private strategy::mixins::Inspector, strategy::mixins::Allocat
    * \param ptr Pointer to free (If nullptr, it will be ignored.)
    */
   inline void deallocate(void* ptr);
+
+  inline void deallocate(void* ptr, Resource* r);
 
   /*!
    * \brief Release any and all unused memory held by this Allocator.

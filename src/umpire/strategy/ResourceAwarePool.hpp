@@ -18,6 +18,11 @@
 #include "umpire/strategy/mixins/AlignedAllocation.hpp"
 #include "umpire/util/FixedMallocPool.hpp"
 #include "umpire/util/MemoryResourceTraits.hpp"
+#include "camp/camp.hpp"
+#include "camp/resource.hpp"
+
+using Resource = camp::resources::Resource;
+using Event = camp::resources::Event;
 
 namespace umpire {
 
@@ -65,13 +70,16 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
 
   ResourceAwarePool(const ResourceAwarePool&) = delete;
 
-  void* allocate(std::size_t bytes) override;
-  void deallocate(void* ptr, std::size_t size) override;
+  ///////
+  void* allocate(std::size_t bytes, Resource* r);
+  void deallocate(void* ptr, std::size_t size, Resource* r);
+  ///////
   void release() override;
 
   std::size_t getActualSize() const noexcept override;
   std::size_t getCurrentSize() const noexcept override;
   std::size_t getReleasableSize() const noexcept;
+  camp::resources::Resource getResource() noexcept;
   std::size_t getActualHighwaterMark() const noexcept;
 
   Platform getPlatform() noexcept override;
@@ -134,11 +142,14 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
   };
 
   using PointerMap = std::unordered_map<void*, Chunk*>;
+  ///////
+  using PendingMap = std::unordered_map<Chunk*, bool>;
+  ///////
   using SizeMap =
       std::multimap<std::size_t, Chunk*, std::less<std::size_t>, pool_allocator<std::pair<const std::size_t, Chunk*>>>;
 
   struct Chunk {
-    Chunk(void* ptr, std::size_t s, std::size_t cs) : data{ptr}, size{s}, chunk_size{cs}
+    Chunk(void* ptr, std::size_t s, std::size_t cs, Resource r) : data{ptr}, size{s}, chunk_size{cs}, m_resource{r}
     {
     }
 
@@ -149,6 +160,11 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
     Chunk* prev{nullptr};
     Chunk* next{nullptr};
     SizeMap::iterator size_map_it;
+    ///////
+    Resource m_resource;
+    Event m_event;
+    bool m_is_pending{false};
+    ///////
   };
 
   PointerMap m_pointer_map{};

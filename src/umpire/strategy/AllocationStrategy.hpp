@@ -14,6 +14,8 @@
 
 #include "umpire/util/MemoryResourceTraits.hpp"
 #include "umpire/util/Platform.hpp"
+#include "camp/camp.hpp"
+#include "camp/resource.hpp"
 
 namespace umpire {
 
@@ -153,6 +155,7 @@ class AllocationStrategy {
    * \return Pointer to start of allocated bytes.
    */
   virtual void* allocate(std::size_t bytes) = 0;
+  virtual void* allocate(std::size_t bytes, camp::resources::Resource* r);
   virtual void* allocate_named(const std::string& name, std::size_t bytes);
 
   /*!

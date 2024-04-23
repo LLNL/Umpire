@@ -40,7 +40,7 @@ ResourceAwarePool::~ResourceAwarePool()
   release();
 }
 
-void* ResourceAwarePool::allocate(std::size_t bytes)
+void* ResourceAwarePool::allocate(std::size_t bytes, camp::resources::Resource* r)
 {
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ")");
   const std::size_t rounded_bytes{aligned_round_up(bytes)};
@@ -88,7 +88,7 @@ void* ResourceAwarePool::allocate(std::size_t bytes)
     m_actual_highwatermark = (m_actual_bytes > m_actual_highwatermark) ? m_actual_bytes : m_actual_highwatermark;
 
     void* chunk_storage{m_chunk_pool.allocate()};
-    chunk = new (chunk_storage) Chunk{ret, size, size};
+    chunk = new (chunk_storage) Chunk{ret, size, size, *r};
   } else {
     chunk = (*best).second;
     m_size_map.erase(best);
@@ -113,7 +113,7 @@ void* ResourceAwarePool::allocate(std::size_t bytes)
 
     void* chunk_storage{m_chunk_pool.allocate()};
     Chunk* split_chunk{new (chunk_storage)
-                           Chunk{static_cast<char*>(ret) + rounded_bytes, remaining, chunk->chunk_size}};
+                           Chunk{static_cast<char*>(ret) + rounded_bytes, remaining, chunk->chunk_size, *r}};
 
     auto old_next = chunk->next;
     chunk->next = split_chunk;
@@ -133,7 +133,7 @@ void* ResourceAwarePool::allocate(std::size_t bytes)
   return ret;
 }
 
-void ResourceAwarePool::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
+void ResourceAwarePool::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size), camp::resources::Resource* UMPIRE_UNUSED_ARG(r))
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   auto chunk = (*m_pointer_map.find(ptr)).second;
@@ -282,6 +282,11 @@ Platform ResourceAwarePool::getPlatform() noexcept
   return m_allocator->getPlatform();
 }
 
+camp::resources::Resource ResourceAwarePool::getResource() noexcept
+{
+  return m_resource;
+}
+
 MemoryResourceTraits ResourceAwarePool::getTraits() const noexcept
 {
   return m_allocator->getTraits();
@@ -331,8 +336,8 @@ void ResourceAwarePool::do_coalesce(std::size_t suggested_size) noexcept
       std::size_t alloc_size{suggested_size - size_post};
 
       UMPIRE_LOG(Debug, "coalescing " << alloc_size << " bytes.");
-      auto ptr = allocate(alloc_size);
-      deallocate(ptr, alloc_size);
+      auto ptr = allocate(alloc_size, getResource());
+      deallocate(ptr, alloc_size, getResource());
     }
   }
 }
