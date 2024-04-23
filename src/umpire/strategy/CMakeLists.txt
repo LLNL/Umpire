@@ -29,6 +29,12 @@ if (UMPIRE_ENABLE_NUMA)
     NumaPolicy.hpp)
 endif ()
 
+if (UMPIRE_ENABLE_CUDA)
+  set (umpire_strategy_headers
+    ${umpire_strategy_headers}
+    ResourceAwarePool.hpp)
+endif ()
+
 set (umpire_strategy_mixin_headers
   mixins/AlignedAllocation.hpp
   mixins/AlignedAllocation.inl
@@ -57,6 +63,12 @@ if (UMPIRE_ENABLE_NUMA)
   set (umpire_strategy_sources
     ${umpire_strategy_sources}
     NumaPolicy.cpp)
+endif ()
+
+if (UMPIRE_ENABLE_CUDA)
+  set (umpire_strategy_sources
+    ${umpire_strategy_sources}
+    ResourceAwarePool.cpp)
 endif ()
 
 set(umpire_strategy_depends camp umpire_util)
