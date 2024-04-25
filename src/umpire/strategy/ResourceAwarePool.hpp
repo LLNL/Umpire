@@ -71,6 +71,7 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
   ResourceAwarePool(const ResourceAwarePool&) = delete;
 
   ///////
+  void* allocate(std::size_t bytes);
   void* allocate(std::size_t bytes, Resource* r);
   void deallocate(void* ptr, std::size_t size, Resource* r);
   ///////
@@ -79,7 +80,6 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
   std::size_t getActualSize() const noexcept override;
   std::size_t getCurrentSize() const noexcept override;
   std::size_t getReleasableSize() const noexcept;
-  //camp::resources::Resource* getResource() noexcept;
   std::size_t getActualHighwaterMark() const noexcept;
 
   Platform getPlatform() noexcept override;

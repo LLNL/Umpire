@@ -40,6 +40,14 @@ ResourceAwarePool::~ResourceAwarePool()
   release();
 }
 
+void* ResourceAwarePool::allocate(std::size_t UMPIRE_UNUSED_ARG(bytes))
+{
+  void* ptr{nullptr};
+  UMPIRE_ERROR(runtime_error,
+    fmt::format("Don't call this function!"));
+  return ptr;
+}
+
 void* ResourceAwarePool::allocate(std::size_t bytes, camp::resources::Resource* r)
 {
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ")");
