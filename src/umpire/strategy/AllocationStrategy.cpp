@@ -34,6 +34,16 @@ void* AllocationStrategy::allocate_named(const std::string& UMPIRE_UNUSED_ARG(na
   return allocate(bytes);
 }
 
+void* AllocationStrategy::allocate(std::size_t bytes, camp::resources::Resource* UMPIRE_UNUSED_ARG(r))
+{
+  return allocate(bytes);
+}
+
+void AllocationStrategy::deallocate(void* ptr, std::size_t size, camp::resources::Resource* UMPIRE_UNUSED_ARG(r))
+{
+  deallocate(ptr, size);
+}
+
 void AllocationStrategy::deallocate_internal(void* ptr, std::size_t size)
 {
   m_current_size -= size;

@@ -98,3 +98,4 @@ int main(int, char**)
   rm.deallocate(b);
   return 0;
 }
+

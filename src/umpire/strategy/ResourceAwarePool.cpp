@@ -282,10 +282,11 @@ Platform ResourceAwarePool::getPlatform() noexcept
   return m_allocator->getPlatform();
 }
 
-camp::resources::Resource ResourceAwarePool::getResource() noexcept
-{
-  return m_resource;
-}
+//Given a chunk, return it's resource... is this needed?
+//camp::resources::Resource* ResourceAwarePool::getResource() noexcept
+//{
+  //return r;
+//}
 
 MemoryResourceTraits ResourceAwarePool::getTraits() const noexcept
 {
@@ -335,9 +336,10 @@ void ResourceAwarePool::do_coalesce(std::size_t suggested_size) noexcept
     if (size_post < suggested_size) {
       std::size_t alloc_size{suggested_size - size_post};
 
+      camp::resources::Resource r = camp::resources::Host::get_default(); 
       UMPIRE_LOG(Debug, "coalescing " << alloc_size << " bytes.");
-      auto ptr = allocate(alloc_size, getResource());
-      deallocate(ptr, alloc_size, getResource());
+      auto ptr = allocate(alloc_size, &r); //, getResource());
+      deallocate(ptr, alloc_size, &r); //, getResource());
     }
   }
 }

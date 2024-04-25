@@ -79,7 +79,7 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
   std::size_t getActualSize() const noexcept override;
   std::size_t getCurrentSize() const noexcept override;
   std::size_t getReleasableSize() const noexcept;
-  camp::resources::Resource getResource() noexcept;
+  //camp::resources::Resource* getResource() noexcept;
   std::size_t getActualHighwaterMark() const noexcept;
 
   Platform getPlatform() noexcept override;
@@ -169,6 +169,7 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
 
   PointerMap m_pointer_map{};
   SizeMap m_size_map{};
+  PendingMap m_pending_map{};
 
   util::FixedMallocPool m_chunk_pool{sizeof(Chunk)};
 

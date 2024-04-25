@@ -164,6 +164,7 @@ class AllocationStrategy {
    * \param ptr Pointer to free.
    */
   virtual void deallocate(void* ptr, std::size_t size = 0) = 0;
+  virtual void deallocate(void* ptr, std::size_t size, camp::resources::Resource* r);
 };
 
 } // end of namespace strategy
