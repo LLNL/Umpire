@@ -9,6 +9,7 @@ constexpr int BLOCK_SIZE = 16;
 constexpr int NUM_THREADS = 64;
 
 using clock_value_t = long long;
+using namespace camp::resources;
 
 __device__ void sleep(clock_value_t sleep_cycles)
 {
@@ -30,7 +31,7 @@ __global__ void touch_data(double* data, int len)
 __global__ void do_sleep()
 {
   //sleep - works still at 1000, so keeping it at 100k
-  sleep(1000);
+  sleep(100000);
 }
 
 __global__ void check_data(double* data, int len)
@@ -55,27 +56,36 @@ __global__ void touch_data_again(double* data, int len)
 
 int main(int, char**)
 {
+  int device = 0; // Assuming we're querying properties for device 0
+  cudaDeviceProp prop;
+  cudaGetDeviceProperties(&prop, device);
+
+  // Get clock frequency in kHz and convert to MHz
+  float clockFrequencyMHz = prop.clockRate / 1000.0f;
+
+  printf("Clock frequency of CUDA device %d: %.2f MHz\n", device, clockFrequencyMHz);
+
   auto& rm = umpire::ResourceManager::getInstance();
   auto pool = rm.makeAllocator<umpire::strategy::ResourceAwarePool>("rap-pool", rm.getAllocator("UM"));
   int NUM_BLOCKS = NUM_THREADS / BLOCK_SIZE;
 
-  camp::resources::Cuda r1;
-  camp::resources::Cuda r2;
+  Cuda c1, c2;
+  Resource r1{c1}, r2{c2};
 
   //allocate memory with s1 stream for a
   double* a = static_cast<double*>(pool.allocate(NUM_THREADS * sizeof(double), r1));
 
   //with stream s1, use memory in a in kernels
-  touch_data<<<NUM_BLOCKS, BLOCK_SIZE, 0, r1.get_stream()>>>(a, NUM_THREADS);
-  do_sleep<<<NUM_BLOCKS, BLOCK_SIZE, 0, r1.get_stream()>>>();
-  check_data<<<NUM_BLOCKS, BLOCK_SIZE, 0, r1.get_stream()>>>(a, NUM_THREADS);
+  touch_data<<<NUM_BLOCKS, BLOCK_SIZE, 0, c1.get_stream()>>>(a, NUM_THREADS);
+  do_sleep<<<NUM_BLOCKS, BLOCK_SIZE, 0, c1.get_stream()>>>();
+  check_data<<<NUM_BLOCKS, BLOCK_SIZE, 0, c1.get_stream()>>>(a, NUM_THREADS);
 
   //deallocate and reallocate a using different streams
   pool.deallocate(a, r1);
   a = static_cast<double*>(pool.allocate(NUM_THREADS * sizeof(double), r2));
 
   //with stream s2, use memory in reallocated a in kernel
-  touch_data_again<<<NUM_BLOCKS, BLOCK_SIZE, 0, r2.get_stream()>>>(a, NUM_THREADS);
+  touch_data_again<<<NUM_BLOCKS, BLOCK_SIZE, 0, c2.get_stream()>>>(a, NUM_THREADS);
 
   //after this, all of this is just for checking/validation purposes
   double* b = static_cast<double*>(pool.allocate(NUM_THREADS * sizeof(double), r2));

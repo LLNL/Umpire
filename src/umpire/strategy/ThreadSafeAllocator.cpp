@@ -25,6 +25,16 @@ void* ThreadSafeAllocator::allocate(std::size_t bytes)
   return m_allocator->allocate_internal(bytes);
 }
 
+void* ThreadSafeAllocator::allocate(std::size_t bytes, camp::resources::Resource const& UMPIRE_UNUSED_ARG(r))
+{
+  return m_allocator->allocate_internal(bytes, r);
+}
+
+void deallocate(void* ptr, camp::resources::Resource const& UMPIRE_UNUSED_ARG(r), std::size_t size)
+{
+  m_allocator->deallocate_internal(ptr, size);
+}
+
 void ThreadSafeAllocator::deallocate(void* ptr, std::size_t size)
 {
   m_allocator->deallocate_internal(ptr, size);

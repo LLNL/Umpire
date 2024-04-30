@@ -34,12 +34,12 @@ void* AllocationStrategy::allocate_named(const std::string& UMPIRE_UNUSED_ARG(na
   return allocate(bytes);
 }
 
-void* AllocationStrategy::allocate(std::size_t bytes, camp::resources::Resource* UMPIRE_UNUSED_ARG(r))
+void* AllocationStrategy::allocate(std::size_t bytes, camp::resources::Resource const& UMPIRE_UNUSED_ARG(r))
 {
   return allocate(bytes);
 }
 
-void AllocationStrategy::deallocate(void* ptr, std::size_t size, camp::resources::Resource* UMPIRE_UNUSED_ARG(r))
+void AllocationStrategy::deallocate(void* ptr, camp::resources::Resource const& UMPIRE_UNUSED_ARG(r), std::size_t size)
 {
   deallocate(ptr, size);
 }

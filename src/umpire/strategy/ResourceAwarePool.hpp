@@ -71,9 +71,10 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
   ResourceAwarePool(const ResourceAwarePool&) = delete;
 
   ///////
-  void* allocate(std::size_t bytes);
-  void* allocate(std::size_t bytes, Resource* r);
-  void deallocate(void* ptr, std::size_t size, Resource* r);
+  void* allocate(std::size_t bytes) override;
+  void* allocate(std::size_t bytes, Resource const&) override;
+  void deallocate(void* ptr, Resource const&, std::size_t size) override;
+  void deallocate(void* ptr, std::size_t size) override;
   ///////
   void release() override;
 

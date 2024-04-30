@@ -27,6 +27,8 @@ class ThreadSafeAllocator : public AllocationStrategy {
   ThreadSafeAllocator(const std::string& name, int id, Allocator allocator);
 
   void* allocate(std::size_t bytes) override;
+  void* allocate(std::size_t bytes, camp::resources::Resource const&) override;
+  void deallocate(void* ptr, camp::resources::Resource const&, std::size_t size) override;
   void deallocate(void* ptr, std::size_t size) override;
 
   Platform getPlatform() noexcept override;

@@ -116,7 +116,7 @@ inline void* Allocator::allocate(std::size_t bytes)
   return m_thread_safe ? thread_safe_allocate(bytes) : do_allocate(bytes);
 }
 
-inline void* Allocator::allocate(std::size_t bytes, camp::resources::Resource* UMPIRE_UNUSED_ARG(r))
+inline void* Allocator::allocate(std::size_t bytes, camp::resources::Resource UMPIRE_UNUSED_ARG(r))
 {
   return m_thread_safe ? thread_safe_allocate(bytes) : do_allocate(bytes);
 }
@@ -131,7 +131,7 @@ inline void Allocator::deallocate(void* ptr)
   m_thread_safe ? thread_safe_deallocate(ptr) : do_deallocate(ptr);
 }
 
-inline void Allocator::deallocate(void* ptr, camp::resources::Resource* UMPIRE_UNUSED_ARG(r))
+inline void Allocator::deallocate(void* ptr, camp::resources::Resource UMPIRE_UNUSED_ARG(r))
 {
   m_thread_safe ? thread_safe_deallocate(ptr) : do_deallocate(ptr);
 }
