@@ -44,6 +44,7 @@ camp::resources::EventProxy<camp::resources::Resource> CudaCopyOperation::transf
                  fmt::format("Expected resources::Cuda, got resources::{}", platform_to_string(ctx.get_platform())));
   }
   auto stream = device->get_stream();
+  std::cout << "CCO kind : " << m_kind << std::endl;
 
   cudaError_t error = ::cudaMemcpyAsync(*dst_ptr, src_ptr, length, m_kind, stream);
 

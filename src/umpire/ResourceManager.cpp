@@ -406,6 +406,61 @@ void ResourceManager::copy(void* dst_ptr, void* src_ptr, std::size_t size)
   op->transform(src_ptr, &dst_ptr, src_alloc_record, dst_alloc_record, size);
 }
 
+camp::resources::EventProxy<camp::resources::Resource> ResourceManager::copy_poly(void* dst_ptr, void* src_ptr,
+                                                                             camp::resources::Resource& ctx,
+                                                                             std::size_t size)
+{
+  UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", dst_ptr=" << dst_ptr << ", size=" << size << ")");
+
+  auto& op_registry = op::MemoryOperationRegistry::getInstance();
+
+  std::size_t vtable_size = sizeof(void*); 
+
+  auto src_alloc_record = m_allocations.find(src_ptr);
+  std::ptrdiff_t src_offset = static_cast<char*>(src_ptr) - static_cast<char*>(src_alloc_record->ptr);
+  std::size_t src_size = src_alloc_record->size - src_offset;
+
+  auto dst_alloc_record = m_allocations.find(dst_ptr);
+  std::ptrdiff_t dst_offset = static_cast<char*>(dst_ptr) - static_cast<char*>(dst_alloc_record->ptr);
+  std::size_t dst_size = dst_alloc_record->size - dst_offset;
+
+  if (size == 0) {
+    size = src_size;
+  }
+
+  umpire::event::record([&](auto& event) {
+    event.name("copy")
+        .category(event::category::operation)
+        .arg("src", src_ptr)
+        .arg("dst", dst_ptr)
+        .arg("src_offset", src_offset)
+        .arg("dst_offset", dst_offset)
+        .arg("size", size)
+        .arg("src_allocator_ref", (void*)src_alloc_record->strategy)
+        .arg("dst_allocator_ref", (void*)dst_alloc_record->strategy)
+        .tag("src_allocator_name", src_alloc_record->strategy->getName())
+        .tag("dst_allocator_name", dst_alloc_record->strategy->getName())
+        .tag("replay", "true")
+        .tag("async", "true");
+  });
+
+  if (size > dst_size) {
+    UMPIRE_ERROR(runtime_error, fmt::format("Not enough resource in destination for copy: {} -> {}", size, dst_size));
+  }
+  std::cout << src_alloc_record->strategy->getName() << std::endl;
+  std::cout << dst_alloc_record->strategy->getName() << std::endl;
+
+  auto op = op_registry.find("COPY", src_alloc_record->strategy, dst_alloc_record->strategy);
+
+  std::cout << findAllocatorForPointer(dst_ptr)->getName() << std::endl;
+  std::cout << findAllocatorForPointer(src_ptr)->getName() << std::endl;
+  std::cout << "Umpire Check\n";
+
+  void* poly_src_ptr = ((char*)src_ptr + vtable_size);
+  void* poly_dst_ptr = ((char*)dst_ptr + vtable_size);
+
+  return op->transform_async(poly_src_ptr, &poly_dst_ptr, src_alloc_record, dst_alloc_record, size - vtable_size, ctx);
+}
 camp::resources::EventProxy<camp::resources::Resource> ResourceManager::copy(void* dst_ptr, void* src_ptr,
                                                                              camp::resources::Resource& ctx,
                                                                              std::size_t size)
@@ -445,9 +500,14 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::copy(voi
   if (size > dst_size) {
     UMPIRE_ERROR(runtime_error, fmt::format("Not enough resource in destination for copy: {} -> {}", size, dst_size));
   }
+  std::cout << src_alloc_record->strategy->getName() << std::endl;
+  std::cout << dst_alloc_record->strategy->getName() << std::endl;
 
   auto op = op_registry.find("COPY", src_alloc_record->strategy, dst_alloc_record->strategy);
 
+  std::cout << findAllocatorForPointer(dst_ptr)->getName() << std::endl;
+  std::cout << findAllocatorForPointer(src_ptr)->getName() << std::endl;
+  std::cout << "Umpire Check\n";
   return op->transform_async(src_ptr, &dst_ptr, src_alloc_record, dst_alloc_record, size, ctx);
 }
 

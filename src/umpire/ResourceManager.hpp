@@ -201,8 +201,12 @@ class ResourceManager {
    * \param size Size in bytes.
    */
   void copy(void* dst_ptr, void* src_ptr, std::size_t size = 0);
+  void copy_poly(void* dst_ptr, void* src_ptr, std::size_t size = 0);
 
   camp::resources::EventProxy<camp::resources::Resource> copy(void* dst_ptr, void* src_ptr,
+                                                              camp::resources::Resource& ctx, std::size_t size = 0);
+
+  camp::resources::EventProxy<camp::resources::Resource> copy_poly(void* dst_ptr, void* src_ptr,
                                                               camp::resources::Resource& ctx, std::size_t size = 0);
 
   /*!
@@ -308,12 +312,12 @@ class ResourceManager {
   ResourceManager(const ResourceManager&) = delete;
   ResourceManager& operator=(const ResourceManager&) = delete;
 
- private:
-  ResourceManager();
-
   strategy::AllocationStrategy* findAllocatorForPointer(void* ptr);
   strategy::AllocationStrategy* findAllocatorForId(int id);
   strategy::AllocationStrategy* getAllocationStrategy(const std::string& name);
+
+ private:
+  ResourceManager();
 
   int getNextId() noexcept;
 
