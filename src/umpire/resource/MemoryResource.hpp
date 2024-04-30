@@ -44,7 +44,7 @@ class MemoryResource : public strategy::AllocationStrategy {
    * \return Pointer to start of allocation.
    */
   virtual void* allocate(std::size_t bytes) override = 0;
-  void* allocate(std::size_t bytes, camp::resources::Resource const&) override;
+  //void* allocate(std::size_t bytes, camp::resources::Resource const&) override;
 
   /*!
    * \brief Free the memory at ptr.
@@ -55,7 +55,7 @@ class MemoryResource : public strategy::AllocationStrategy {
    * \param ptr Pointer to free.
    */
   virtual void deallocate(void* ptr, std::size_t size) override = 0;
-  void deallocate(void* ptr, camp::resources::Resource const&, std::size_t size) override;
+  //void deallocate(void* ptr, camp::resources::Resource const&, std::size_t size) override;
 
   /*!
    * \brief Get the Platform assocatiated with this MemoryResource.

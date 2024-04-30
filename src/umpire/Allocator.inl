@@ -88,6 +88,30 @@ inline void* Allocator::do_named_allocate(const std::string& name, std::size_t b
   return ret;
 }
 
+inline void* Allocator::do_resource_allocate(std::size_t bytes, camp::resources::Resource const& r)
+{
+  void* ret = nullptr;
+
+  UMPIRE_ASSERT(UMPIRE_VERSION_OK());
+
+  UMPIRE_LOG(Debug, "(" << bytes << ")");
+
+  if (0 == bytes) {
+    ret = allocateNull();
+  } else {
+    ret = m_allocator->allocate_resource(bytes, r);
+  }
+
+  // TODO: track the resource?
+  if (m_tracking) {
+    registerAllocation(ret, bytes, m_allocator);
+  }
+
+  //umpire::event::record<umpire::event::named_allocate>(
+  //    [&](auto& event) { event.name(name).size(bytes).ref((void*)m_allocator).ptr(ret); });
+  return ret;
+}
+
 inline void Allocator::do_deallocate(void* ptr)
 {
   umpire::event::record<umpire::event::deallocate>([&](auto& event) { event.ref((void*)m_allocator).ptr(ptr); });
@@ -111,14 +135,37 @@ inline void Allocator::do_deallocate(void* ptr)
   }
 }
 
+inline void Allocator::do_resource_deallocate(void* ptr, camp::resources::Resource const& r)
+{
+  //umpire::event::record<umpire::event::deallocate>([&](auto& event) { event.ref((void*)m_allocator).ptr(ptr); });
+
+  UMPIRE_LOG(Debug, "(" << ptr << ")");
+
+  if (!ptr) {
+    UMPIRE_LOG(Info, "Deallocating a null pointer (This behavior is intentionally allowed and ignored)");
+    return;
+  } else {
+    if (m_tracking) {
+      auto record = deregisterAllocation(ptr, m_allocator);
+      if (!deallocateNull(ptr)) {
+        m_allocator->deallocate_resource(ptr, r, record.size);
+      }
+    } else {
+      if (!deallocateNull(ptr)) {
+        m_allocator->deallocate_resource(ptr, r);
+      }
+    }
+  }
+}
+
 inline void* Allocator::allocate(std::size_t bytes)
 {
   return m_thread_safe ? thread_safe_allocate(bytes) : do_allocate(bytes);
 }
 
-inline void* Allocator::allocate(std::size_t bytes, camp::resources::Resource UMPIRE_UNUSED_ARG(r))
+inline void* Allocator::allocate(std::size_t bytes, camp::resources::Resource const& r)
 {
-  return m_thread_safe ? thread_safe_allocate(bytes) : do_allocate(bytes);
+  return m_thread_safe ? thread_safe_allocate(bytes) : do_resource_allocate(bytes, r);
 }
 
 inline void* Allocator::allocate(const std::string& name, std::size_t bytes)
@@ -131,9 +178,9 @@ inline void Allocator::deallocate(void* ptr)
   m_thread_safe ? thread_safe_deallocate(ptr) : do_deallocate(ptr);
 }
 
-inline void Allocator::deallocate(void* ptr, camp::resources::Resource UMPIRE_UNUSED_ARG(r))
+inline void Allocator::deallocate(void* ptr, camp::resources::Resource const& r)
 {
-  m_thread_safe ? thread_safe_deallocate(ptr) : do_deallocate(ptr);
+  m_thread_safe ? thread_safe_deallocate(ptr) : do_resource_deallocate(ptr, r);
 }
 
 } // end of namespace umpire
