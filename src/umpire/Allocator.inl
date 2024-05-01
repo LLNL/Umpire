@@ -53,6 +53,13 @@ inline void* Allocator::thread_safe_allocate(std::size_t bytes)
   return do_allocate(bytes);
 }
 
+//TODO: Do I need a thread safe resource allocate?
+inline void* Allocator::thread_safe_resource_allocate(camp::resources::Resource const& r, std::size_t bytes)
+{
+  //std::lock_guard<std::mutex> lock(*m_thread_safe_mutex);
+  return do_resource_allocate(r, bytes);
+}
+
 inline void* Allocator::thread_safe_named_allocate(const std::string& name, std::size_t bytes)
 {
   std::lock_guard<std::mutex> lock(*m_thread_safe_mutex);
@@ -63,6 +70,13 @@ inline void Allocator::thread_safe_deallocate(void* ptr)
 {
   std::lock_guard<std::mutex> lock(*m_thread_safe_mutex);
   return do_deallocate(ptr);
+}
+
+//TODO: Do I need a thread safe resource deallocate?
+inline void Allocator::thread_safe_resource_deallocate(camp::resources::Resource const& r, void* ptr)
+{
+  //std::lock_guard<std::mutex> lock(*m_thread_safe_mutex);
+  return do_resource_deallocate(r, ptr);
 }
 
 inline void* Allocator::do_named_allocate(const std::string& name, std::size_t bytes)
@@ -163,10 +177,9 @@ inline void* Allocator::allocate(std::size_t bytes)
   return m_thread_safe ? thread_safe_allocate(bytes) : do_allocate(bytes);
 }
 
-//TODO: Create thread safe resource allocate?
 inline void* Allocator::allocate(camp::resources::Resource const& r, std::size_t bytes)
 {
-  return m_thread_safe ? thread_safe_allocate(bytes) : do_resource_allocate(r, bytes);
+  return m_thread_safe ? thread_safe_resource_allocate(r, bytes) : do_resource_allocate(r, bytes);
 }
 
 inline void* Allocator::allocate(const std::string& name, std::size_t bytes)
@@ -182,7 +195,7 @@ inline void Allocator::deallocate(void* ptr)
 //TODO: Create thread safe resource deallocate?
 inline void Allocator::deallocate(camp::resources::Resource const& r, void* ptr)
 {
-  m_thread_safe ? thread_safe_deallocate(ptr) : do_resource_deallocate(r, ptr);
+  m_thread_safe ? thread_safe_resource_deallocate(r, ptr) : do_resource_deallocate(r, ptr);
 }
 
 } // end of namespace umpire

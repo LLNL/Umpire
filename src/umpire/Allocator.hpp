@@ -221,7 +221,9 @@ class Allocator : private strategy::mixins::Inspector, strategy::mixins::Allocat
    */
   inline void* thread_safe_allocate(std::size_t bytes);
   inline void* thread_safe_named_allocate(const std::string& name, std::size_t bytes);
+  inline void* thread_safe_resource_allocate(camp::resources::Resource const& r, std::size_t bytes);
   inline void thread_safe_deallocate(void* ptr);
+  inline void thread_safe_resource_deallocate(camp::resources::Resource const& r, void* ptr);
 
   inline void* do_allocate(std::size_t bytes);
   inline void* do_resource_allocate(camp::resources::Resource const& r, std::size_t bytes);

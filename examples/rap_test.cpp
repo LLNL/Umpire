@@ -73,7 +73,7 @@ int main(int, char**)
   Resource r1{c1}, r2{c2};
 
   //allocate memory with s1 stream for a
-  double* a = static_cast<double*>(r1, pool.allocate(NUM_THREADS * sizeof(double)));
+  double* a = static_cast<double*>(pool.allocate(r1, NUM_THREADS * sizeof(double)));
 
   //with stream s1, use memory in a in kernels
   touch_data<<<NUM_BLOCKS, BLOCK_SIZE, 0, c1.get_stream()>>>(a, NUM_THREADS);

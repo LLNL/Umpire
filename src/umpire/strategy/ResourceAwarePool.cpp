@@ -141,10 +141,11 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource const& r, s
   return ret;
 }
 
-void ResourceAwarePool::deallocate(void* UMPIRE_UNUSED_ARG(ptr), std::size_t UMPIRE_UNUSED_ARG(size))
+void ResourceAwarePool::deallocate(void* ptr, std::size_t size)
 {
-  UMPIRE_ERROR(runtime_error,
-    fmt::format("Don't call this function! BANANAS!"));
+  UMPIRE_LOG(Debug, "You shouldn't be calling this function. Creating default Host resource and calling other allocate function! BANANAS!");
+  camp::resources::Resource r = camp::resources::Host();
+  deallocate_resource(r, ptr, size);
 }
 
 void ResourceAwarePool::deallocate_resource(camp::resources::Resource const& UMPIRE_UNUSED_ARG(r), void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
