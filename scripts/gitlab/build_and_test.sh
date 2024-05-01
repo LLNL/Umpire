@@ -85,7 +85,7 @@ then
 
     ./scripts/uberenv/uberenv.py --spec="${spec}" ${prefix_opt}
 
-    ${prefix_opt}/spack/bin/spack -D ${prefix_opt}/spack_env buildcache push --only dependencies gitlab_ci
+    ${prefix}/spack/bin/spack -D ${prefix}/spack_env buildcache push --only dependencies gitlab_ci
 
 fi
   echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
