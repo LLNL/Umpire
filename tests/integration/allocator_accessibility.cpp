@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -32,7 +32,7 @@ size_t* do_allocate(umpire::Allocator* alloc, size_t size)
   size_t* data;
 
   if (alloc->getAllocationStrategy()->getTraits().resource == umpire::MemoryResourceTraits::resource_type::shared) {
-    data = static_cast<size_t*>(alloc->allocate("named_allocation", size * sizeof(size_t)));
+    data = static_cast<size_t*>(alloc->allocate(std::string{"named_allocation"}, size * sizeof(size_t)));
   } else {
     data = static_cast<size_t*>(alloc->allocate(size * sizeof(size_t)));
   }
@@ -131,7 +131,7 @@ class AllocatorAccessibilityTest : public ::testing::TestWithParam<std::string> 
 
     if (rm.getAllocator(GetParam()).getAllocationStrategy()->getTraits().resource ==
         umpire::MemoryResourceTraits::resource_type::shared) {
-      umpire::MemoryResourceTraits traits(umpire::get_default_resource_traits("SHARED"));
+      umpire::MemoryResourceTraits traits{umpire::get_default_resource_traits("SHARED")};
 
       traits.size = 1 * 1024 * 1024; // Maximum size of this Allocator
 
@@ -275,6 +275,6 @@ std::vector<std::string> get_allocators(bool ignore_shared_memory)
 }
 
 INSTANTIATE_TEST_SUITE_P(Allocators, AllocatorAccessibilityTest, ::testing::ValuesIn(get_allocators(false)));
-INSTANTIATE_TEST_SUITE_P(Pools, PoolAccessibilityTest, ::testing::ValuesIn(get_allocators(true)));
+INSTANTIATE_TEST_SUITE_P(Pools, PoolAccessibilityTest, ::testing::ValuesIn(get_allocators(false)));
 
 // END gtest

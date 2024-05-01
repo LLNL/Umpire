@@ -73,7 +73,7 @@ int main(int, char**)
   Resource r1{c1}, r2{c2};
 
   //allocate memory with s1 stream for a
-  double* a = static_cast<double*>(pool.allocate(NUM_THREADS * sizeof(double), r1));
+  double* a = static_cast<double*>(r1, pool.allocate(NUM_THREADS * sizeof(double)));
 
   //with stream s1, use memory in a in kernels
   touch_data<<<NUM_BLOCKS, BLOCK_SIZE, 0, c1.get_stream()>>>(a, NUM_THREADS);
@@ -81,14 +81,14 @@ int main(int, char**)
   check_data<<<NUM_BLOCKS, BLOCK_SIZE, 0, c1.get_stream()>>>(a, NUM_THREADS);
 
   //deallocate and reallocate a using different streams
-  pool.deallocate(a, r1);
-  a = static_cast<double*>(pool.allocate(NUM_THREADS * sizeof(double), r2));
+  pool.deallocate(r1, a);
+  a = static_cast<double*>(pool.allocate(r2, NUM_THREADS * sizeof(double)));
 
   //with stream s2, use memory in reallocated a in kernel
   touch_data_again<<<NUM_BLOCKS, BLOCK_SIZE, 0, c2.get_stream()>>>(a, NUM_THREADS);
 
   //after this, all of this is just for checking/validation purposes
-  double* b = static_cast<double*>(pool.allocate(NUM_THREADS * sizeof(double), r2));
+  double* b = static_cast<double*>(pool.allocate(r2, NUM_THREADS * sizeof(double)));
   rm.copy(b, a);
   b = static_cast<double*>(rm.move(b, rm.getAllocator("HOST")));
 
@@ -104,7 +104,7 @@ int main(int, char**)
   std::cout << "Kernel succeeded! Expected result returned" << std::endl;
 
   //final deallocations
-  pool.deallocate(a, r2);
+  pool.deallocate(r2, a);
   rm.deallocate(b);
   return 0;
 }

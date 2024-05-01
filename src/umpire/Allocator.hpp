@@ -68,7 +68,7 @@ class Allocator : private strategy::mixins::Inspector, strategy::mixins::Allocat
    */
   inline void* allocate(std::size_t bytes);
 
-  inline void* allocate(std::size_t bytes, Resource const& r);
+  inline void* allocate(Resource const& r, std::size_t bytes);
 
   inline void* allocate(const std::string& name, std::size_t bytes);
 
@@ -85,7 +85,7 @@ class Allocator : private strategy::mixins::Inspector, strategy::mixins::Allocat
    */
   inline void deallocate(void* ptr);
 
-  inline void deallocate(void* ptr, Resource const& r);
+  inline void deallocate(Resource const& r, void* ptr);
 
   /*!
    * \brief Release any and all unused memory held by this Allocator.
@@ -224,10 +224,10 @@ class Allocator : private strategy::mixins::Inspector, strategy::mixins::Allocat
   inline void thread_safe_deallocate(void* ptr);
 
   inline void* do_allocate(std::size_t bytes);
-  inline void* do_resource_allocate(std::size_t bytes, camp::resources::Resource const& r);
+  inline void* do_resource_allocate(camp::resources::Resource const& r, std::size_t bytes);
   inline void* do_named_allocate(const std::string& name, std::size_t bytes);
   inline void do_deallocate(void* ptr);
-  inline void do_resource_deallocate(void* ptr, camp::resources::Resource const& r);
+  inline void do_resource_deallocate(camp::resources::Resource const& r, void* ptr);
 
   bool m_thread_safe{false};
   std::mutex* m_thread_safe_mutex{nullptr};

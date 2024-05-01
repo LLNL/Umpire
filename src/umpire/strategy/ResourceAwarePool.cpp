@@ -48,7 +48,7 @@ void* ResourceAwarePool::allocate(std::size_t UMPIRE_UNUSED_ARG(bytes))
   return ptr;
 }
 
-void* ResourceAwarePool::allocate_resource(std::size_t bytes, camp::resources::Resource const& r)
+void* ResourceAwarePool::allocate_resource(camp::resources::Resource const& r, std::size_t bytes)
 {
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ")");
   const std::size_t rounded_bytes{aligned_round_up(bytes)};
@@ -147,7 +147,7 @@ void ResourceAwarePool::deallocate(void* UMPIRE_UNUSED_ARG(ptr), std::size_t UMP
     fmt::format("Don't call this function! BANANAS!"));
 }
 
-void ResourceAwarePool::deallocate_resource(void* ptr, camp::resources::Resource const& UMPIRE_UNUSED_ARG(r), std::size_t UMPIRE_UNUSED_ARG(size))
+void ResourceAwarePool::deallocate_resource(camp::resources::Resource const& UMPIRE_UNUSED_ARG(r), void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   auto chunk = (*m_pointer_map.find(ptr)).second;
@@ -352,8 +352,8 @@ void ResourceAwarePool::do_coalesce(std::size_t suggested_size) noexcept
 
       camp::resources::Resource r = camp::resources::Host::get_default(); 
       UMPIRE_LOG(Debug, "coalescing " << alloc_size << " bytes.");
-      auto ptr = allocate_resource(alloc_size, r); //, getResource());
-      deallocate_resource(ptr, r, alloc_size); //, getResource());
+      auto ptr = allocate_resource(r, alloc_size);
+      deallocate_resource(r, ptr, alloc_size);
     }
   }
 }
