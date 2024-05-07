@@ -83,7 +83,7 @@ then
     export SPACK_USER_CACHE_PATH="${spack_user_cache}"
     mkdir -p ${spack_user_cache}
 
-    ./scripts/uberenv/uberenv.py --spack-debug --setup-and-env-only
+    ./scripts/uberenv/uberenv.py --spack-debug --setup-and-env-only --spec="${spec}" ${prefix_opt}
 
     ${prefix}/spack/bin/spack --debug --stacktrace -D ${prefix}/spack_env mirror add --unsigned --oci-username ${CI_REGISTRY_USER} --oci-password ${SPACK_TOKEN} gitlab_ci oci://${CI_REGISTRY}
 
