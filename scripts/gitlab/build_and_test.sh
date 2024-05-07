@@ -85,7 +85,7 @@ then
 
     ./scripts/uberenv/uberenv.py --spack-debug --setup-and-env-only --spec="${spec}" ${prefix_opt}
 
-    ${prefix}/spack/bin/spack --debug --stacktrace -D ${prefix}/spack_env mirror add --unsigned --oci-username ${CI_REGISTRY_USER} --oci-password ${SPACK_TOKEN} gitlab_ci oci://${CI_REGISTRY_IMAGE}
+    ${prefix}/spack/bin/spack --debug --stacktrace -D ${prefix}/spack_env mirror add --unsigned --oci-username ${CI_REGISTRY_USER} --oci-password ${CI_JOB_TOKEN} gitlab_ci oci://${CI_REGISTRY_IMAGE}
 
     ./scripts/uberenv/uberenv.py --spack-debug --skip-setup-and-env --spec="${spec}" ${prefix_opt}
 
