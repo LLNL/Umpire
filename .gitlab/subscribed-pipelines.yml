@@ -37,8 +37,7 @@ generate-job-lists:
     RADIUSS_JOBS_PATH: "scripts/radiuss-spack-configs/gitlab/radiuss-jobs"
     LOCAL_JOBS_PATH: ".gitlab/jobs"
   script:
-    #- cat ${RADIUSS_JOBS_PATH}/ruby.yml ${LOCAL_JOBS_PATH}/ruby.yml > ruby-jobs.yml
-    - cat ${LOCAL_JOBS_PATH}/ruby.yml > ruby-jobs.yml
+    - cat ${RADIUSS_JOBS_PATH}/ruby.yml ${LOCAL_JOBS_PATH}/ruby.yml > ruby-jobs.yml
     - cat ${RADIUSS_JOBS_PATH}/poodle.yml ${LOCAL_JOBS_PATH}/poodle.yml > poodle-jobs.yml
     - cat ${RADIUSS_JOBS_PATH}/lassen.yml ${LOCAL_JOBS_PATH}/lassen.yml > lassen-jobs.yml
     - cat ${RADIUSS_JOBS_PATH}/corona.yml ${LOCAL_JOBS_PATH}/corona.yml > corona-jobs.yml
@@ -63,65 +62,65 @@ ruby-build-and-test:
   needs: [ruby-up-check, generate-job-lists]
   extends: [.build-and-test]
 
-## POODLE
-#poodle-up-check:
+# POODLE
+poodle-up-check:
+  variables:
+    CI_MACHINE: "poodle"
+  extends: [.machine-check]
+
+poodle-build-and-test:
+  variables:
+    CI_MACHINE: "poodle"
+  needs: [poodle-up-check, generate-job-lists]
+  extends: [.build-and-test]
+
+# CORONA
+corona-up-check:
+  variables:
+    CI_MACHINE: "corona"
+  extends: [.machine-check]
+
+corona-build-and-test:
+  variables:
+    CI_MACHINE: "corona"
+  needs: [corona-up-check, generate-job-lists]
+  extends: [.build-and-test]
+
+# TIOGA
+tioga-up-check:
+  variables:
+    CI_MACHINE: "tioga"
+  extends: [.machine-check]
+
+tioga-build-and-test:
+  variables:
+    CI_MACHINE: "tioga"
+  needs: [tioga-up-check, generate-job-lists]
+  extends: [.build-and-test]
+
+# LASSEN
+lassen-up-check:
+  variables:
+    CI_MACHINE: "lassen"
+  extends: [.machine-check]
+
+lassen-build-and-test:
+  variables:
+    CI_MACHINE: "lassen"
+  needs: [lassen-up-check, generate-job-lists]
+  extends: [.build-and-test]
+
+
+## If testing develop branch, trigger CHAI pipeline with this version of Umpire.
+## TODO: Once Spack allows to clone a specific commit on demand, then point to
+## the exact commit. This will prevent from sticking to a branch (here develop).
+# trigger-chai:
+#  stage: multi-project
+#  rules:
+#    - if: '$CI_COMMIT_BRANCH == "develop" || $MULTI_PROJECT == "ON"' #run only if ...
 #  variables:
-#    CI_MACHINE: "poodle"
-#  extends: [.machine-check]
-#
-#poodle-build-and-test:
-#  variables:
-#    CI_MACHINE: "poodle"
-#  needs: [poodle-up-check, generate-job-lists]
-#  extends: [.build-and-test]
-#
-## CORONA
-#corona-up-check:
-#  variables:
-#    CI_MACHINE: "corona"
-#  extends: [.machine-check]
-#
-#corona-build-and-test:
-#  variables:
-#    CI_MACHINE: "corona"
-#  needs: [corona-up-check, generate-job-lists]
-#  extends: [.build-and-test]
-#
-## TIOGA
-#tioga-up-check:
-#  variables:
-#    CI_MACHINE: "tioga"
-#  extends: [.machine-check]
-#
-#tioga-build-and-test:
-#  variables:
-#    CI_MACHINE: "tioga"
-#  needs: [tioga-up-check, generate-job-lists]
-#  extends: [.build-and-test]
-#
-## LASSEN
-#lassen-up-check:
-#  variables:
-#    CI_MACHINE: "lassen"
-#  extends: [.machine-check]
-#
-#lassen-build-and-test:
-#  variables:
-#    CI_MACHINE: "lassen"
-#  needs: [lassen-up-check, generate-job-lists]
-#  extends: [.build-and-test]
-#
-#
-### If testing develop branch, trigger CHAI pipeline with this version of Umpire.
-### TODO: Once Spack allows to clone a specific commit on demand, then point to
-### the exact commit. This will prevent from sticking to a branch (here develop).
-## trigger-chai:
-##  stage: multi-project
-##  rules:
-##    - if: '$CI_COMMIT_BRANCH == "develop" || $MULTI_PROJECT == "ON"' #run only if ...
-##  variables:
-##    UPDATE_UMPIRE: develop
-##  trigger:
-##    project: radiuss/chai
-##    branch: develop
-##    strategy: depend
+#    UPDATE_UMPIRE: develop
+#  trigger:
+#    project: radiuss/chai
+#    branch: develop
+#    strategy: depend
