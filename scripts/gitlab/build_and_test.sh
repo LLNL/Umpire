@@ -52,7 +52,16 @@ then
     mkdir -p ${prefix}
 else
     # We set the prefix in the parent directory so that spack dependencies are not installed inside the source tree.
-    prefix="$(pwd)/../spack-and-build-root"
+    prefix="/usr/workspace/${USER}/spack-and-build-root"
+    if [[ -z ${job_unique_id} ]]; then
+      job_unique_id=manual_job_$(date +%s)
+      while [[ -d ${prefix}-${job_unique_id} ]] ; do
+          sleep 1
+          job_unique_id=manual_job_$(date +%s)
+      done
+    fi
+
+    prefix="${prefix}-${job_unique_id}"
     mkdir -p ${prefix}
 fi
 
