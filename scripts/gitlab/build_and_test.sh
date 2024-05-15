@@ -92,9 +92,9 @@ then
     export SPACK_USER_CACHE_PATH="${spack_user_cache}"
     mkdir -p ${spack_user_cache}
 
-    ./scripts/uberenv/uberenv.py --spec="${spec}" ${prefix_opt}
+    ./scripts/uberenv/uberenv.py --spack-debug --spec="${spec}" ${prefix_opt}
 
-    ${prefix}/spack/bin/spack -D ${prefix}/spack_env buildcache push --only dependencies gitlab_ci
+    ${prefix}/spack/bin/spack --debug --stacktrace -D ${prefix}/spack_env buildcache push --only dependencies gitlab_ci
 
 fi
   echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
