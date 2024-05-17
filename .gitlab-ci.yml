@@ -80,7 +80,7 @@ stages:
     forward:
       pipeline_variables: true
 
-# If testing develop branch, trigger RAJAPerf pipeline with this version of
+# If testing develop branch, trigger CHAI pipeline with this version of Umpire
 trigger-chai:
   stage: multi-project
   rules:
@@ -88,7 +88,7 @@ trigger-chai:
       when: on_success
     - when: never
   variables:
-    UPDATE_RAJA: ${MP_BRANCH}
+    UPDATE_UMPIRE: ${MP_BRANCH}
   trigger:
     project: radiuss/chai
     branch: develop
