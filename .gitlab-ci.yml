@@ -38,6 +38,7 @@ variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
 ##### PROJECT VARIABLES
+  MP_BRANCH: "woptim/multi-project-ci"
 # We build the projects in the CI clone directory.
 # Used in script/gitlab/build_and_test.sh script.
 # TODO: add a clean-up mechanism.
@@ -78,6 +79,19 @@ stages:
     strategy: depend
     forward:
       pipeline_variables: true
+
+# If testing develop branch, trigger RAJAPerf pipeline with this version of
+trigger-chai:
+  stage: multi-project
+  rules:
+    - if: $CI_COMMIT_BRANCH == ${MP_BRANCH}
+      when: on_success
+    - when: never
+  variables:
+    UPDATE_RAJA: ${MP_BRANCH}
+  trigger:
+    project: radiuss/chai
+    branch: develop
 
 include:
   - project: 'lc-templates/id_tokens'
