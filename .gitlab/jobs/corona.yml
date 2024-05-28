@@ -14,8 +14,8 @@
       echo -e "export SPEC=\"${SPEC//\"/\\\"}\""
       echo -e "# Allow to set job script for debugging (only this differs from CI)"
       echo -e "export DEBUG_MODE=true"
-      echo -e "# Using the CI build cache is optional (requires a token)"
-      echo -e "read REGISTRY_TOKEN -p \"To use the Spack build cache, please enter a GitLab token with read access to the container registry, otherwise just press ENTER.\""
+      echo -e "# Using the CI build cache is optional and requires a token. Set it like so:"
+      echo -e "# export REGISTRY_TOKEN=\"<your token here>\""
 
 ########################
 # Overridden shared jobs
