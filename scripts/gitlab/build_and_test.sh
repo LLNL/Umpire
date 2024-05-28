@@ -82,8 +82,8 @@ spack_env_path="${prefix}/spack_env"
 uberenv_cmd="./scripts/uberenv/uberenv.py"
 if [[ ${spack_debug} ]]
 then
-    spack_cmd="${spack_opt} --debug --stacktrace"
-    uberenv_cmd="${uberenv_opt} --spack-debug"
+    spack_cmd="${spack_cmd} --debug --stacktrace"
+    uberenv_cmd="${uberenv_cmd} --spack-debug"
 fi
 
 # Dependencies
