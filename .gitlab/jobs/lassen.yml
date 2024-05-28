@@ -9,8 +9,13 @@
 .lassen_reproducer_vars:
   script:
     - |
+      echo -e "# Mandatory variables"
       echo -e "export MODULE_LIST=\"${MODULE_LIST}\""
       echo -e "export SPEC=\"${SPEC//\"/\\\"}\""
+      echo -e "# Allow to set job script for debugging (only this differs from CI)"
+      echo -e "export DEBUG_MODE=true"
+      echo -e "# Using the CI build cache is optional (requires a token)"
+      echo -e "read REGISTRY_TOKEN -p \"To use the Spack build cache, please enter a GitLab token with read access to the container registry, otherwise just press ENTER.\""
 
 ########################
 # Overridden shared jobs
