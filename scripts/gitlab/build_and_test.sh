@@ -29,9 +29,8 @@ use_dev_shm=${USE_DEV_SHM:-true}
 spack_debug=${SPACK_DEBUG:-false}
 debug_mode=${DEBUG_MODE:-false}
 
-if [[ ${debug_mode} ]]
+if [[ ${debug_mode} == true ]]
 then
-    echo "Debug mode: spack debug and deactivated shared memory, do not push to buildcache"
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
     echo "~~~~~ Debug mode:"
     echo "~~~~~ - Spack debug mode."
@@ -132,7 +131,7 @@ then
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
     ${uberenv_cmd} --skip-setup-and-env --spec="${spec}" ${prefix_opt}
 
-    if [[ -n ${ci_registry_token} && ! ${debug_mode} ]]
+    if [[ -n ${ci_registry_token} && ${debug_mode} == false ]]
     then
         echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         echo "~~~~~ Push dependencies to Build Cache "
