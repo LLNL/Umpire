@@ -65,6 +65,7 @@ clang_12_0_1_gcc_8_3_1_memleak:
   variables:
     SPEC: "~shared +asan +sanitizer_tests +tools tests=basic %clang@=12.0.1.gcc.8.3.1 cxxflags==-fsanitize=address"
     ASAN_OPTIONS: "detect_leaks=1"
+    LASSEN_JOB_ALLOC: "1 -W 20 -q pci"
   extends: .job_on_lassen
 
 # clang_9_0_0_datarace (build and test on lassen):
