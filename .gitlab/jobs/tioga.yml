@@ -8,14 +8,7 @@
 # Override reproducer section to define Umpire specific variables.
 .tioga_reproducer_vars:
   script:
-    - |
-      echo -e "# Required variables"
-      echo -e "export MODULE_LIST=\"${MODULE_LIST}\""
-      echo -e "export SPEC=\"${SPEC//\"/\\\"}\""
-      echo -e "# Allow to set job script for debugging (only this differs from CI)"
-      echo -e "export DEBUG_MODE=true"
-      echo -e "# Using the CI build cache is optional and requires a token. Set it like so:"
-      echo -e "# export REGISTRY_TOKEN=\"<your token here>\""
+    - !reference [.reproducer_vars, script]
 
 # Overridden shared jobs
 ########################
