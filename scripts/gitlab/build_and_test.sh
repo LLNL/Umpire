@@ -80,7 +80,7 @@ fi
 spack_cmd="${prefix}/spack/bin/spack"
 spack_env_path="${prefix}/spack_env"
 uberenv_cmd="./scripts/uberenv/uberenv.py"
-if [[ ${spack_debug} ]]
+if [[ ${spack_debug} == true ]]
 then
     spack_cmd="${spack_cmd} --debug --stacktrace"
     uberenv_cmd="${uberenv_cmd} --spack-debug"
