@@ -40,7 +40,7 @@ if (@UMPIRE_ENABLE_IPC_SHARED_MEMORY@)
   find_dependency(Threads)
 endif ()
 
-if (NOT TARGET fmt::fmt)
+if (NOT TARGET @UMPIRE_FMT_TARGET@)
   set(UMPIRE_FMT_DIR "@fmt_DIR@")
   if(NOT fmt_DIR)
     set(fmt_DIR ${UMPIRE_FMT_DIR})

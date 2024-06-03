@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
 
-set(umpire_resource_depends umpire_util camp fmt::fmt)
+set(umpire_resource_depends umpire_util camp ${UMPIRE_FMT_TARGET})
 
 set (umpire_resource_headers
   DefaultMemoryResource.hpp
