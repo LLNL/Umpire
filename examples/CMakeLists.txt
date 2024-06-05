@@ -45,7 +45,13 @@ if (UMPIRE_ENABLE_HIP)
     NAME multi_device
     SOURCES multi_device.cpp
     DEPENDS_ON umpire blt::hip)
-  list(APPEND umpire_examples multi_device)
+
+  blt_add_executable(
+    NAME my_test
+    SOURCES my_test.cpp
+    DEPENDS_ON umpire blt::hip)
+
+  list(APPEND umpire_examples multi_device my_test)
 endif()
 
 blt_add_executable(
@@ -132,17 +138,24 @@ if (UMPIRE_ENABLE_CUDA)
     SOURCES rap_test.cpp
     DEPENDS_ON umpire cuda)
 
+  blt_add_executable(
+    NAME my_test 
+    SOURCES my_test.cpp
+    DEPENDS_ON umpire cuda)
+
   set_source_files_properties(
     multi_device.cpp
     rap_test.cpp
+    my_test.cpp
     PROPERTIES CUDA_SEPARABLE_COMPILATION On)
 
   set_target_properties(
     multi_device
     rap_test
+    my_test
     PROPERTIES CUDA_SEPARABLE_COMPILATION On)
 
-  list(APPEND umpire_examples multi_device rap_test)
+  list(APPEND umpire_examples multi_device rap_test my_test)
 endif()
 
 install(TARGETS ${umpire_examples} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

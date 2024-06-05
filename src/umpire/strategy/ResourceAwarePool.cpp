@@ -12,6 +12,12 @@
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/memory_sanitizers.hpp"
 
+#if defined(UMPIRE_ENABLE_CUDA)
+using resource_type = camp::resources::Cuda;
+#elif defined(UMPIRE_ENABLE_HIP)
+using resource_type = camp::resources::Hip;
+#endif
+
 namespace umpire {
 namespace strategy {
 
@@ -152,6 +158,7 @@ void ResourceAwarePool::deallocate_resource(camp::resources::Resource const& UMP
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   auto chunk = (*m_pointer_map.find(ptr)).second;
+  //chunk.is_pending = true; - this doesn't need any kind of protection does it?
   chunk->free = true;
 
   m_current_bytes -= chunk->size;
@@ -211,6 +218,8 @@ void ResourceAwarePool::deallocate_resource(camp::resources::Resource const& UMP
     UMPIRE_LOG(Debug, "coalesce heuristic true, performing coalesce.");
     do_coalesce(suggested_size);
   }
+  //camp::resources::EventProxy<resource_type> e{r};
+  //chunk.is_pending = false ... If we've gotten to this point, does that mean we are no longer pending? Maybe do this in allocate?
 }
 
 void ResourceAwarePool::release()
