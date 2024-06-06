@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -144,7 +144,7 @@ void* FixedPool::allocate(std::size_t bytes)
   }
 
   if (!ptr) {
-    UMPIRE_ERROR(runtime_error, umpire::fmt::format("FixedPool::allocate(size={}): Could not allocate.", m_obj_bytes));
+    UMPIRE_ERROR(runtime_error, fmt::format("FixedPool::allocate(size={}): Could not allocate.", m_obj_bytes));
   }
   return ptr;
 }

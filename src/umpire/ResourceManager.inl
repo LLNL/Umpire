@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -30,7 +30,7 @@ Allocator ResourceManager::makeAllocator(const std::string& name, Tracking track
 
   UMPIRE_LOG(Debug, "(name=\"" << name << "\")");
   if (isAllocator(name)) {
-    UMPIRE_ERROR(runtime_error, umpire::fmt::format("Allocator with name \"{}\" is already registered", name));
+    UMPIRE_ERROR(runtime_error, fmt::format("Allocator with name \"{}\" is already registered", name));
   }
 
   allocator = util::make_unique<Strategy>(name, getNextId(), std::forward<Args>(args)...);

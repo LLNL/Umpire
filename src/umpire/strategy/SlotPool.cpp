@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -51,8 +51,7 @@ void* SlotPool::allocate(std::size_t bytes)
   int64_t int_bytes = static_cast<int64_t>(bytes);
 
   if (int_bytes < 0) {
-    UMPIRE_ERROR(runtime_error,
-                 umpire::fmt::format("allocation request of size: {} bytes is too large for this pool", bytes));
+    UMPIRE_ERROR(runtime_error, fmt::format("allocation request of size: {} bytes is too large for this pool", bytes));
   }
 
   for (std::size_t i = 0; i < m_slots; ++i) {

@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -8,10 +8,13 @@
   
 include(CMakeFindDependencyMacro)
 
+# cache the prefix dir (could be overriden by find_dependency)
+set(UMPIRE_PACKAGE_PREFIX_DIR ${PACKAGE_PREFIX_DIR})
+
 if (@UMPIRE_NEEDS_BLT_TPLS@)
   set(BLT_TGTS "${CMAKE_CURRENT_LIST_DIR}/bltTargets.cmake")
   if(EXISTS "${BLT_TGTS}")
-  include("${BLT_TGTS}")
+    include("${BLT_TGTS}")
   endif()
   unset(BLT_TGTS)
 endif()
@@ -29,14 +32,32 @@ if (NOT TARGET camp)
   find_dependency(camp CONFIG NO_DEFAULT_PATH PATHS 
     ${camp_DIR}
     ${camp_DIR}/lib/cmake/camp
-    @PACKAGE_CMAKE_INSTALL_PREFIX@
-    @PACKAGE_CMAKE_INSTALL_PREFIX@/lib/cmake/camp)
+    ${UMPIRE_PACKAGE_PREFIX_DIR}
+    ${UMPIRE_PACKAGE_PREFIX_DIR}/lib/cmake/camp)
+endif ()
+
+if (@UMPIRE_ENABLE_IPC_SHARED_MEMORY@)
+  find_dependency(Threads)
+endif ()
+
+if (NOT TARGET @UMPIRE_FMT_TARGET@)
+  set(UMPIRE_FMT_DIR "@fmt_DIR@")
+  if(NOT fmt_DIR)
+    set(fmt_DIR ${UMPIRE_FMT_DIR})
+  endif()
+
+  find_dependency(fmt CONFIG NO_DEFAULT_PATH PATHS
+    ${fmt_DIR}
+    ${fmt_DIR}/lib64/cmake/fmt
+    ${UMPIRE_PACKAGE_PREFIX_DIR}
+    ${UMPIRE_PACKAGE_PREFIX_DIR}/lib64/cmake/fmt)
 endif ()
 
 if (@UMPIRE_ENABLE_SQLITE_EXPERIMENTAL@)
   find_package(SQLite3 REQUIRED)
 endif()
 
+include("${CMAKE_CURRENT_LIST_DIR}/BLTSetupTargets.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/umpire-targets.cmake")
 
 check_required_components(@PROJECT_NAME@)

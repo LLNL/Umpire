@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -43,8 +43,7 @@ MemoryResourceTraits HipUnifiedMemoryResourceFactory::getDefaultTraits()
   auto error = ::hipGetDeviceProperties(&properties, 0);
 
   if (error != hipSuccess) {
-    UMPIRE_ERROR(runtime_error,
-                 umpire::fmt::format("hipGetDeviceProperties failed with error: {}", hipGetErrorString(error)));
+    UMPIRE_ERROR(runtime_error, fmt::format("hipGetDeviceProperties failed with error: {}", hipGetErrorString(error)));
   }
 
   traits.unified = true;

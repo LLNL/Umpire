@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -15,7 +15,7 @@ include(CMakePackageConfigHelpers)
 
 project(Umpire
   LANGUAGES CXX C
-  VERSION 2023.06.0)
+  VERSION 2024.02.1)
 
 cmake_minimum_required(VERSION 3.14)
 
@@ -50,7 +50,7 @@ if (UMPIRE_ENABLE_NUMA AND (NOT UNIX OR APPLE))
   Please re-configure with UMPIRE_ENABLE_NUMA=Off (default value)")
 endif ()
 
-set(BLT_EXPORT_THIRDPARTY ON CACHE BOOL "")
+set(BLT_EXPORT_THIRDPARTY OFF CACHE BOOL "")
 
 ################################
 # BLT

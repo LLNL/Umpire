@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -229,7 +229,7 @@ void* find_pointer_from_name(Allocator allocator, const std::string& name)
   {
     if (ptr == nullptr) {
       UMPIRE_ERROR(runtime_error,
-                   umpire::fmt::format("Allocator \"{}\" is not a Shared Memory Allocator", allocator.getName()));
+                   fmt::format("Allocator \"{}\" is not a Shared Memory Allocator", allocator.getName()));
     }
   }
   return ptr;
@@ -311,7 +311,7 @@ void coalesce(Allocator a)
   bool coalesced{try_coalesce(a)};
 
   if (!coalesced)
-    UMPIRE_ERROR(runtime_error, umpire::fmt::format("Allocator \"{}\" could not be coalesced", a.getName()));
+    UMPIRE_ERROR(runtime_error, fmt::format("Allocator \"{}\" could not be coalesced", a.getName()));
 }
 
 } // end namespace umpire

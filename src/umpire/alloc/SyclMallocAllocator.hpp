@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -35,7 +35,7 @@ struct SyclMallocAllocator {
     UMPIRE_LOG(Debug, "(bytes=" << size << ") returning " << ptr);
 
     if (ptr == nullptr) {
-      UMPIRE_ERROR(runtime_error, umpire::fmt::format("sycl::malloc_device( bytes = {} ) failed", size));
+      UMPIRE_ERROR(runtime_error, fmt::format("sycl::malloc_device( bytes = {} ) failed", size));
     } else {
       return ptr;
     }

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -23,7 +23,7 @@ int main(int, char**)
   // _sphinx_tag_tut_unwrap_end
 
   if (quick_pool == nullptr) {
-    UMPIRE_ERROR(umpire::runtime_error, umpire::fmt::format("{} is not a QuickPool", pool.getName()));
+    UMPIRE_ERROR(umpire::runtime_error, fmt::format("{} is not a QuickPool", pool.getName()));
   }
 
   auto ptr = pool.allocate(1024);

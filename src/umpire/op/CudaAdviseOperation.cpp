@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -25,8 +25,8 @@ void CudaAdviseOperation::apply(void* src_ptr, util::AllocationRecord* UMPIRE_UN
 
   if (error != cudaSuccess) {
     UMPIRE_ERROR(runtime_error,
-                 umpire::fmt::format("cudaMemAdvise( src_ptr = {}, length = {}, device = {}) failed with error: {}",
-                                     src_ptr, length, device, cudaGetErrorString(error)));
+                 fmt::format("cudaMemAdvise( src_ptr = {}, length = {}, device = {}) failed with error: {}", src_ptr,
+                             length, device, cudaGetErrorString(error)));
   }
 }
 

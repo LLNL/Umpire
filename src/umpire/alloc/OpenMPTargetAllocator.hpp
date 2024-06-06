@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -36,8 +36,7 @@ struct OpenMPTargetAllocator {
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
 
     if (ret == nullptr) {
-      UMPIRE_ERROR(runtime_error,
-                   umpire::fmt::format("omp_target_alloc( bytes = {}, device = {} ) failed. ", bytes, device));
+      UMPIRE_ERROR(runtime_error, fmt::format("omp_target_alloc( bytes = {}, device = {} ) failed. ", bytes, device));
     } else {
       return ret;
     }

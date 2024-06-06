@@ -5,6 +5,13 @@
 # SPDX-License-Identifier: (MIT)
 ###############################################################################
 
+# Override reproducer section to define Umpire specific variables.
+.tioga_reproducer_vars:
+  script:
+    - |
+      echo -e "export MODULE_LIST=\"${MODULE_LIST}\""
+      echo -e "export SPEC=\"${SPEC//\"/\\\"}\""
+
 ########################
 # Overridden shared jobs
 ########################
@@ -13,9 +20,9 @@
 # the comparison with the original job is easier.
 
 # We override the cce job because we can’t use +device-alloc with it
-cce_16_0_0:
+cce_16_0_1:
   variables:
-    SPEC: "~shared +fortran tests=basic %cce@16.0.0"
+    SPEC: "~shared +fortran tests=basic %cce@=16.0.1"
   extends: .job_on_tioga
 
 ############
@@ -27,17 +34,15 @@ cce_16_0_0:
 
 ###
 # This job intentionally tests our umpire package.py because although this job does not
-# explicitly have the ~tools, the package.py should still disable tools from being built.
+# explicitly have the ~tools, the package.py should still prevent tools from being built.
 ###
-rocmcc_5_6_0_hip_openmp_device_alloc:
+rocmcc_6_1_1_hip_openmp_device_alloc:
   variables:
-    SPEC: "~shared +fortran +openmp +rocm +device_alloc tests=basic amdgpu_target=gfx90a %rocmcc@5.6.0 ^hip@5.6.0"
+    SPEC: "~shared +fortran +openmp +rocm +device_alloc tests=basic amdgpu_target=gfx90a %rocmcc@=6.1.1 ^hip@6.1.1"
   extends: .job_on_tioga
 
-# To be added when support for rocm 6.0.0 is added
-#rocmcc_6_0_0_hip_memleak:
-#  variables:
-#    SPEC: "~shared +asan +sanitizer_tests +tools +rocm tests=basic  cxxflags==\"-fsanitize=address -Wl,-rpath=/opt/rocm-6.0.0/llvm/lib/clang/17.0.0/lib/linux/\" %rocmcc@6.0.0 ^hip@6.0.0"
-#    ASAN_OPTIONS: "detect_leaks=1"
-#  extends: .job_on_corona
-#
+rocmcc_6_1_1_hip_memleak:
+  variables:
+    SPEC: "~shared +asan +sanitizer_tests +tools +rocm tests=basic  cxxflags==\"-fsanitize=address -Wl,-rpath=/opt/rocm-6.0.0/llvm/lib/clang/17.0.0/lib/linux/\" %rocmcc@6.1.1 ^hip@6.1.1"
+    ASAN_OPTIONS: "detect_leaks=1"
+  extends: .job_on_tioga

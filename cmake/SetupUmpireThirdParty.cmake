@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -80,29 +80,4 @@ if (UMPIRE_ENABLE_SQLITE_EXPERIMENTAL)
   find_package(SQLite3 REQUIRED)
 endif()
 
-set(UMPIRE_NEEDS_BLT_TPLS False)
-if (UMPIRE_ENABLE_MPI OR UMPIRE_ENABLE_HIP OR UMPIRE_ENABLE_OPENMP OR UMPIRE_ENABLE_CUDA)
-  set(UMPIRE_NEEDS_BLT_TPLS True)
-
-  if (NOT BLT_EXPORTED)
-    set(BLT_EXPORTED On CACHE BOOL "" FORCE)
-    blt_import_library(NAME          blt_stub EXPORTABLE On)
-    set_target_properties(blt_stub PROPERTIES EXPORT_NAME blt::blt_stub)
-    install(TARGETS blt_stub
-      EXPORT               bltTargets)
-    blt_export_tpl_targets(EXPORT bltTargets NAMESPACE blt)
-    install(EXPORT bltTargets
-      DESTINATION  ${CMAKE_INSTALL_LIBDIR}/cmake/umpire)
-  elseif (UMPIRE_ENABLE_MPI)
-    # If the target is EXPORTABLE, add it to the export set
-    get_target_property(_is_imported mpi IMPORTED)
-    if(NOT ${_is_imported})
-      install(TARGETS              mpi
-        EXPORT               ${arg_EXPORT})
-      # Namespace target to avoid conflicts
-      set_target_properties(mpi PROPERTIES EXPORT_NAME blt::mpi)
-      install(EXPORT bltTargets
-        DESTINATION  ${CMAKE_INSTALL_LIBDIR}/cmake/umpire)
-    endif()
-  endif()
-endif()
+blt_install_tpl_setups(DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/umpire)

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -39,9 +39,8 @@ void* HipConstantMemoryResource::allocate(std::size_t bytes)
   void* ret{static_cast<void*>(ptr)};
 
   if (m_offset > 1024 * 64) {
-    UMPIRE_ERROR(runtime_error,
-                 umpire::fmt::format("Max total size of constant allocations is 64KB, current size is {} bytes",
-                                     (m_offset - bytes)));
+    UMPIRE_ERROR(runtime_error, fmt::format("Max total size of constant allocations is 64KB, current size is {} bytes",
+                                            (m_offset - bytes)));
   }
 
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);

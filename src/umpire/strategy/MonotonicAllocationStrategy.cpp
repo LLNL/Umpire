@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -35,7 +35,7 @@ void* MonotonicAllocationStrategy::allocate(std::size_t bytes)
 
   if (m_size > m_capacity) {
     UMPIRE_ERROR(runtime_error,
-                 umpire::fmt::format("MonotonicAllocationStrategy capacity exceeded {} > {}", m_size, m_capacity));
+                 fmt::format("MonotonicAllocationStrategy capacity exceeded {} > {}", m_size, m_capacity));
   }
 
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);

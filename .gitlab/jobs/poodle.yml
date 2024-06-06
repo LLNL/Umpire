@@ -5,8 +5,8 @@
 # SPDX-License-Identifier: (MIT)
 ###############################################################################
 
-# Override reproducer section to define UMPIRE specific variables.
-.ruby_reproducer_vars:
+# Override reproducer section to define Umpire specific variables.
+.poodle_reproducer_vars:
   script:
     - |
       echo -e "export MODULE_LIST=\"${MODULE_LIST}\""
@@ -23,7 +23,7 @@
 intel_2022_1_0:
   variables:
     SPEC: "${PROJECT_RUBY_VARIANTS} %intel@=2022.1.0 ${PROJECT_RUBY_DEPS}"
-  extends: .job_on_ruby
+  extends: .job_on_poodle
   allow_failure: true
 
 ############
@@ -36,25 +36,25 @@ intel_2022_1_0:
 gcc_10_3_1_numa:
   variables:
     SPEC: "~shared +fortran +numa +tools tests=basic %gcc@=10.3.1"
-  extends: .job_on_ruby
+  extends: .job_on_poodle
 
 clang_14_0_6_gcc_10_3_1_sqlite_experimental:
   variables:
     SPEC: "~shared +sqlite_experimental +tools tests=basic %clang@=14.0.6.gcc.10.3.1"
-  extends: .job_on_ruby
+  extends: .job_on_poodle
 
 # Develop builds against specific tpl version.
 clang_14_0_6_gcc_10_3_1_tpls:
   variables:
     SPEC: "~shared +fortran +tools tests=basic %clang@=14.0.6.gcc.10.3.1"
-  extends: .job_on_ruby
+  extends: .job_on_poodle
 
 gcc_10_3_1_tpls:
   variables:
     SPEC: "~shared +fortran +tools tests=basic %gcc@=10.3.1"
-  extends: .job_on_ruby
+  extends: .job_on_poodle
 
 gcc_10_3_1_ipc_no_mpi:
   variables:
     SPEC: "~shared +ipc_shmem tests=basic %gcc@=10.3.1"
-  extends: .job_on_ruby
+  extends: .job_on_poodle

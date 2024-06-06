@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -230,7 +230,7 @@ std::unique_ptr<resource::MemoryResource> MemoryResourceRegistry::makeMemoryReso
     }
   }
 
-  UMPIRE_ERROR(runtime_error, umpire::fmt::format("MemoryResource \"{}\" not found", name));
+  UMPIRE_ERROR(runtime_error, fmt::format("MemoryResource \"{}\" not found", name));
 }
 
 std::unique_ptr<resource::MemoryResource> MemoryResourceRegistry::makeMemoryResource(const std::string& name, int id,
@@ -243,7 +243,7 @@ std::unique_ptr<resource::MemoryResource> MemoryResourceRegistry::makeMemoryReso
     }
   }
 
-  UMPIRE_ERROR(runtime_error, umpire::fmt::format("MemoryResource \"{}\" not found", name));
+  UMPIRE_ERROR(runtime_error, fmt::format("MemoryResource \"{}\" not found", name));
 }
 
 MemoryResourceTraits MemoryResourceRegistry::getDefaultTraitsForResource(const std::string& name)
@@ -254,7 +254,7 @@ MemoryResourceTraits MemoryResourceRegistry::getDefaultTraitsForResource(const s
     }
   }
 
-  UMPIRE_ERROR(runtime_error, umpire::fmt::format("MemoryResource \"{}\" not found", name));
+  UMPIRE_ERROR(runtime_error, fmt::format("MemoryResource \"{}\" not found", name));
 }
 
 } // end of namespace resource

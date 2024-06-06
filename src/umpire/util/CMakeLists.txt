@@ -1,9 +1,10 @@
 ##############################################################################
-# Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
+
 set(UMPIRE_ENABLE_SYCL ${UMPIRE_ENABLE_SYCL})
 
 set (umpire_util_headers
@@ -51,7 +52,7 @@ if (UMPIRE_ENABLE_NUMA)
     numa.cpp)
 endif ()
 
-set (umpire_util_depends camp umpire_event umpire_tpl_judy umpire_tpl_fmt)
+set (umpire_util_depends camp umpire_event umpire_tpl_judy ${UMPIRE_FMT_TARGET})
 
 if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   set (umpire_util_depends

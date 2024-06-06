@@ -1,13 +1,13 @@
 #!/bin/bash
 ##############################################################################
-# Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
 
 TAR_CMD=gtar
-VERSION=2023.06.0
+VERSION=2024.02.1
 
 git archive --prefix=umpire-${VERSION}/ -o umpire-${VERSION}.tar HEAD 2> /dev/null
 

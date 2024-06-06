@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -188,7 +188,7 @@ const AllocationRecord* AllocationMap::find(void* ptr) const
     // use this from a debugger to dump the contents of the AllocationMap
     printAll();
 #endif
-    UMPIRE_ERROR(unknown_pointer_error, umpire::fmt::format("Allocation not mapped: {}", ptr));
+    UMPIRE_ERROR(unknown_pointer_error, fmt::format("Allocation not mapped: {}", ptr));
   }
 }
 
@@ -252,7 +252,7 @@ AllocationRecord AllocationMap::remove(void* ptr)
     if (iter->second->empty())
       m_map.removeLast();
   } else {
-    UMPIRE_ERROR(runtime_error, umpire::fmt::format("Cannot remove {}", ptr));
+    UMPIRE_ERROR(runtime_error, fmt::format("Cannot remove {}", ptr));
   }
 
   --m_size;
