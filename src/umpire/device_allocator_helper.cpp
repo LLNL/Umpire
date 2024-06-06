@@ -85,12 +85,28 @@ __host__ __device__ inline int get_index(const char* name)
 }
 } // end of namespace
 
+namespace detail {
+struct DestroyDeviceAllocatorExit {
+  DestroyDeviceAllocatorExit() = default;
+  DestroyDeviceAllocatorExit(DestroyDeviceAllocatorExit&&) = delete;
+  DestroyDeviceAllocatorExit(const DestroyDeviceAllocatorExit&) = delete;
+  DestroyDeviceAllocatorExit& operator=(DestroyDeviceAllocatorExit&&) = delete;
+  DestroyDeviceAllocatorExit& operator=(const DestroyDeviceAllocatorExit&) = delete;
+  ~DestroyDeviceAllocatorExit()
+  {
+    if (umpire::UMPIRE_DEV_ALLOCS_h != nullptr) {
+      umpire::destroy_device_allocator();
+    }
+  }
+};
+} // namespace detail
+
 __host__ __device__ DeviceAllocator get_device_allocator(const char* name)
 {
   int index = get_index(name);
 
   if (index == -1) {
-    UMPIRE_ERROR(runtime_error, umpire::fmt::format("No DeviceAllocator named \"{}\" was found", name));
+    UMPIRE_ERROR(runtime_error, fmt::format("No DeviceAllocator named \"{}\" was found", name));
   }
 
 #if !defined(__CUDA_ARCH__) && !defined(__HIP_DEVICE_COMPILE__)
@@ -105,10 +121,10 @@ __host__ __device__ DeviceAllocator get_device_allocator(int da_id)
   int id = convert_to_array_index(da_id);
 
   if (id < 0 || id > (UMPIRE_TOTAL_DEV_ALLOCS - 1)) {
-    UMPIRE_ERROR(runtime_error, umpire::fmt::format("Invalid id given: {}", id));
+    UMPIRE_ERROR(runtime_error, fmt::format("Invalid id given: {}", id));
   }
   if (!is_device_allocator(da_id)) {
-    UMPIRE_ERROR(runtime_error, umpire::fmt::format("No DeviceAllocator with id: {} was found", id));
+    UMPIRE_ERROR(runtime_error, fmt::format("No DeviceAllocator with id: {} was found", id));
   }
 
 #if !defined(__CUDA_ARCH__) && !defined(__HIP_DEVICE_COMPILE__)
@@ -127,7 +143,7 @@ __host__ __device__ bool is_device_allocator(const char* name)
     UMPIRE_LOG(Warning, "No DeviceAllocator by the name " << name << " was found.");
     return false;
 #else
-    UMPIRE_ERROR(runtime_error, umpire::fmt::format("No DeviceAllocator by the name \"{}\" was found", name));
+    UMPIRE_ERROR(runtime_error, fmt::format("No DeviceAllocator by the name \"{}\" was found", name));
 #endif
   }
 
@@ -147,7 +163,7 @@ __host__ __device__ bool is_device_allocator(int da_id)
     UMPIRE_LOG(Warning, "Invalid ID given: " << id);
     return false;
 #else
-    UMPIRE_ERROR(runtime_error, umpire::fmt::format("Invalid id given: {}", id));
+    UMPIRE_ERROR(runtime_error, fmt::format("Invalid id given: {}", id));
 #endif
   }
 
@@ -166,13 +182,22 @@ __host__ DeviceAllocator make_device_allocator(Allocator allocator, size_t size,
   static int index{0};
 
   if (size <= 0) {
-    UMPIRE_ERROR(runtime_error, umpire::fmt::format("Invalid size passed to DeviceAllocator: ", size));
+    UMPIRE_ERROR(runtime_error, fmt::format("Invalid size passed to DeviceAllocator: ", size));
   }
 
   if (UMPIRE_DEV_ALLOCS_h == nullptr) {
     index = 0; // If destroy_device_allocator has been called, reset counter.
 
     auto& rm = umpire::ResourceManager::getInstance();
+
+    // This function-local static will be constructed after the function-local
+    // static ResourceManager is constructed, guaranteeing that the destructor
+    // of destroy_exit will be called before the destructor of ResourceManager.
+    // The DestroyDeviceAllocatorExit destructor releases all allocated
+    // DeviceAllocators, unless destroy_device_allocator has already been called
+    // manually.
+    static detail::DestroyDeviceAllocatorExit destroy_exit;
+
     auto um_alloc = rm.getAllocator("UM");
     UMPIRE_DEV_ALLOCS_h =
         (umpire::DeviceAllocator*)um_alloc.allocate(UMPIRE_TOTAL_DEV_ALLOCS * sizeof(DeviceAllocator));

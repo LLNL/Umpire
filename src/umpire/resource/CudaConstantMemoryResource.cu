@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -37,7 +37,7 @@ void* CudaConstantMemoryResource::allocate(std::size_t bytes)
     cudaError_t error = ::cudaGetSymbolAddress((void**)&m_ptr, s_umpire_internal_device_constant_memory);
 
     if (error != cudaSuccess) {
-      UMPIRE_ERROR(runtime_error, umpire::fmt::format("cudaGetSymbolAddress failed with error: {}", cudaGetErrorString(error)));
+      UMPIRE_ERROR(runtime_error, fmt::format("cudaGetSymbolAddress failed with error: {}", cudaGetErrorString(error)));
     }
 
     m_initialized = true;
@@ -50,7 +50,7 @@ void* CudaConstantMemoryResource::allocate(std::size_t bytes)
 
   if (m_offset > (1024 * 64))
   {
-    UMPIRE_ERROR(runtime_error, umpire::fmt::format("Max total size of constant allocations is 64KB, current size is {} bytes", (m_offset - bytes)));
+    UMPIRE_ERROR(runtime_error, fmt::format("Max total size of constant allocations is 64KB, current size is {} bytes", (m_offset - bytes)));
   }
 
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);

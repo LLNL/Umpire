@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -14,5 +14,5 @@ blt_add_executable(
   DEPENDS_ON ${test_debug_depends})
 list(APPEND umpire_test_debug allocate_deallocate)
 
-install(TARGETS ${umpire_test_debug} RUNTIME DESTINATION bin)
+install(TARGETS ${umpire_test_debug} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 umpire_add_code_checks(PREFIX test_debug)

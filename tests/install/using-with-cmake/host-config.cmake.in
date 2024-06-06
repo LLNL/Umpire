@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -28,4 +28,4 @@ set(MPIEXEC_NUMPROC_FLAG   "@MPIEXEC_NUMPROC_FLAG@"   CACHE STRING "")
 set(HIP_ROOT_DIR "@HIP_ROOT_DIR" CACHE PATH "")
 set(ROCM_ROOT_DIR "@ROCM_ROOT_DIR" CACHE PATH "")
 
-set(umpire_DIR        "@CMAKE_INSTALL_PREFIX@" CACHE PATH "")
+set(umpire_DIR        "@CMAKE_INSTALL_FULL_LIBDIR@/cmake/umpire" CACHE PATH "")

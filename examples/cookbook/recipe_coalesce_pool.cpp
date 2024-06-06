@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -27,7 +27,7 @@ int main(int, char**)
     quick_pool->coalesce();
     // _sphinx_tag_tut_call_coalesce_end
   } else {
-    UMPIRE_ERROR(umpire::runtime_error, umpire::fmt::format("{} is not a QuickPool, cannot coalesce!", pool.getName()));
+    UMPIRE_ERROR(umpire::runtime_error, fmt::format("{} is not a QuickPool, cannot coalesce!", pool.getName()));
   }
 
   return 0;

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -40,12 +40,11 @@ struct PosixMemalignAllocator {
     if (ret == nullptr) {
       if (err == ENOMEM) {
         UMPIRE_ERROR(out_of_memory_error,
-                     umpire::fmt::format("posix_memalign( bytes = {}, pagesize = {} ) failed with error = {}", bytes,
-                                         get_page_size(), strerror(err)));
+                     fmt::format("posix_memalign( bytes = {}, pagesize = {} ) failed with error = {}", bytes,
+                                 get_page_size(), strerror(err)));
       } else {
-        UMPIRE_ERROR(runtime_error,
-                     umpire::fmt::format("posix_memalign( bytes = {}, pagesize = {} ) failed with error = {}", bytes,
-                                         get_page_size(), strerror(err)));
+        UMPIRE_ERROR(runtime_error, fmt::format("posix_memalign( bytes = {}, pagesize = {} ) failed with error = {}",
+                                                bytes, get_page_size(), strerror(err)));
       }
     }
 

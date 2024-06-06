@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -32,6 +32,8 @@ class ThreadSafeAllocator : public AllocationStrategy {
   Platform getPlatform() noexcept override;
 
   MemoryResourceTraits getTraits() const noexcept override;
+
+  std::mutex* get_mutex();
 
  protected:
   strategy::AllocationStrategy* m_allocator;

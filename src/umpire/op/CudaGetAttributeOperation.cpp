@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -23,8 +23,8 @@ bool CudaGetAttributeOperation<ATTRIBUTE>::check_apply(void* src_ptr, umpire::ut
   error = ::cudaGetDeviceProperties(&properties, 0);
 
   if (error != cudaSuccess) {
-    UMPIRE_ERROR(runtime_error, umpire::fmt::format("cudaGetDeviceProperties( device = 0 ) failed with error: {}",
-                                                    cudaGetErrorString(error)));
+    UMPIRE_ERROR(runtime_error,
+                 fmt::format("cudaGetDeviceProperties( device = 0 ) failed with error: {}", cudaGetErrorString(error)));
   }
 
   if (properties.managedMemory == 1 && properties.concurrentManagedAccess == 1) {

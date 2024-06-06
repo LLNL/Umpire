@@ -1,11 +1,11 @@
 ##############################################################################
-# Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
 
-set(umpire_resource_depends umpire_util camp umpire_tpl_fmt)
+set(umpire_resource_depends umpire_util camp ${UMPIRE_FMT_TARGET})
 
 set (umpire_resource_headers
   DefaultMemoryResource.hpp
@@ -182,10 +182,10 @@ target_include_directories(
   PUBLIC
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 install(FILES
   ${umpire_resource_headers}
-  DESTINATION include/umpire/resource)
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/umpire/resource)
 
 umpire_add_code_checks(PREFIX resource)

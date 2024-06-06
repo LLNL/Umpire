@@ -50,9 +50,13 @@ FROM ghcr.io/rse-ops/clang-ubuntu-22.04:llvm-12.0.0 AS clang12
 ENV GTEST_COLOR=1
 COPY . /home/umpire/workspace
 WORKDIR /home/umpire/workspace/build
-RUN cmake -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DCMAKE_CXX_COMPILER=clang++ .. && \
-    make -j 16 && \
-    ctest -T test --output-on-failure
+RUN cmake -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_INSTALL_PREFIX=/home/umpire/workspace/install .. && \
+    make -j 16 && make install && \
+    ctest -T test --output-on-failure && \
+    cd /home/umpire/workspace/install/examples/umpire/using-with-cmake && \
+    mkdir build && cd build && \
+    cmake -C ../host-config.cmake .. && \
+    make
 
 FROM ghcr.io/rse-ops/clang-ubuntu-22.04:llvm-11.0.0 AS umap_build
 ENV GTEST_COLOR=1
@@ -97,15 +101,7 @@ RUN . /opt/spack/share/spack/setup-env.sh && spack load cuda && \
     cmake -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DCMAKE_CXX_COMPILER=g++ -DENABLE_CUDA=On .. && \
     make -j 16
 
-FROM ghcr.io/rse-ops/cuda-ubuntu-20.04:cuda-11.1.1 AS nvcc11
-ENV GTEST_COLOR=1
-COPY . /home/umpire/workspace
-WORKDIR /home/umpire/workspace/build
-RUN . /opt/spack/share/spack/setup-env.sh && spack load cuda && \
-    cmake -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DCMAKE_CXX_COMPILER=g++ -DENABLE_CUDA=On .. && \
-    make -j 16
-
-FROM ghcr.io/rse-ops/hip-ubuntu-22.04:hip-4.3.1 AS hip
+FROM ghcr.io/rse-ops/hip-ubuntu-20.04:hip-5.1.3 AS hip
 ENV GTEST_COLOR=1
 ENV HCC_AMDGPU_TARGET=gfx900
 COPY . /home/umpire/workspace
@@ -114,7 +110,7 @@ RUN . /opt/spack/share/spack/setup-env.sh && spack load hip llvm-amdgpu && \
     cmake -DENABLE_WARNINGS_AS_ERRORS=Off -DCMAKE_CXX_COMPILER=amdclang++ -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DENABLE_HIP=On .. && \
     make -j 16 VERBOSE=1
 
-FROM ghcr.io/rse-ops/hip-ubuntu-22.04:hip-4.3.1 AS hip.debug
+FROM ghcr.io/rse-ops/hip-ubuntu-20.04:hip-5.1.3 AS hip.debug
 ENV GTEST_COLOR=1
 ENV HCC_AMDGPU_TARGET=gfx900
 COPY . /home/umpire/workspace

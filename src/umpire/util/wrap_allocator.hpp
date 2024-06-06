@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -39,8 +39,8 @@ Strategy* unwrap_allocation_strategy(strategy::AllocationStrategy* base_strategy
   Strategy* strategy{dynamic_cast<Strategy*>(base_strategy)};
 
   if (!strategy) {
-    UMPIRE_ERROR(runtime_error, umpire::fmt::format("Couldn't unwrap allocator \"{}\" to strategy \"{}\"",
-                                                    base_strategy->getName(), typeid(Strategy).name()));
+    UMPIRE_ERROR(runtime_error, fmt::format("Couldn't unwrap allocator \"{}\" to strategy \"{}\"",
+                                            base_strategy->getName(), typeid(Strategy).name()));
   }
 
   return strategy;

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -36,11 +36,11 @@ struct CudaMallocManagedAllocator {
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
     if (error != cudaSuccess) {
       if (error == cudaErrorMemoryAllocation) {
-        UMPIRE_ERROR(out_of_memory_error, umpire::fmt::format("cudaMallocManaged( bytes = {} ) failed with error: {}",
-                                                              bytes, cudaGetErrorString(error)));
+        UMPIRE_ERROR(out_of_memory_error, fmt::format("cudaMallocManaged( bytes = {} ) failed with error: {}", bytes,
+                                                      cudaGetErrorString(error)));
       } else {
-        UMPIRE_ERROR(runtime_error, umpire::fmt::format("cudaMallocManaged( bytes = {} ) failed with error: {}", bytes,
-                                                        cudaGetErrorString(error)));
+        UMPIRE_ERROR(runtime_error, fmt::format("cudaMallocManaged( bytes = {} ) failed with error: {}", bytes,
+                                                cudaGetErrorString(error)));
       }
     }
     return ptr;
@@ -60,7 +60,7 @@ struct CudaMallocManagedAllocator {
     cudaError_t error = ::cudaFree(ptr);
     if (error != cudaSuccess) {
       UMPIRE_ERROR(runtime_error,
-                   umpire::fmt::format("cudaFree( ptr = {} ) failed with error: {}", ptr, cudaGetErrorString(error)));
+                   fmt::format("cudaFree( ptr = {} ) failed with error: {}", ptr, cudaGetErrorString(error)));
     }
   }
 

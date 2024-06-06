@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -125,29 +125,33 @@ void DynamicPoolList::coalesce() noexcept
   umpire::event::record([&](auto& event) {
     event.name("coalesce").category(event::category::operation).tag("allocator_name", getName()).tag("replay", "true");
   });
-  dpa.coalesce(dpa.getActualSize());
+
+  std::size_t suggested_size{m_should_coalesce(*this)};
+  if (0 != suggested_size) {
+    UMPIRE_LOG(Debug, "coalesce heuristic true, performing coalesce, suggested size is " << suggested_size);
+    dpa.coalesce(suggested_size);
+  }
 }
 
 PoolCoalesceHeuristic<DynamicPoolList> DynamicPoolList::blocks_releasable(std::size_t nblocks)
 {
   return [=](const strategy::DynamicPoolList& pool) {
-    return pool.getReleasableBlocks() > nblocks ? pool.getActualSize() : 0;
+    return pool.getReleasableBlocks() >= nblocks ? pool.getActualSize() : 0;
   };
 }
 
 PoolCoalesceHeuristic<DynamicPoolList> DynamicPoolList::blocks_releasable_hwm(std::size_t nblocks)
 {
   return [=](const strategy::DynamicPoolList& pool) {
-    return pool.getReleasableBlocks() > nblocks ? pool.getHighWatermark() : 0;
+    return pool.getReleasableBlocks() >= nblocks ? pool.getHighWatermark() : 0;
   };
 }
 
 PoolCoalesceHeuristic<DynamicPoolList> DynamicPoolList::percent_releasable(int percentage)
 {
   if (percentage < 0 || percentage > 100) {
-    UMPIRE_ERROR(
-        runtime_error,
-        umpire::fmt::format("Invalid percentage {}, percentage must be an integer between 0 and 100", percentage));
+    UMPIRE_ERROR(runtime_error,
+                 fmt::format("Invalid percentage {}, percentage must be an integer between 0 and 100", percentage));
   }
 
   if (percentage == 0) {
@@ -167,9 +171,8 @@ PoolCoalesceHeuristic<DynamicPoolList> DynamicPoolList::percent_releasable(int p
 PoolCoalesceHeuristic<DynamicPoolList> DynamicPoolList::percent_releasable_hwm(int percentage)
 {
   if (percentage < 0 || percentage > 100) {
-    UMPIRE_ERROR(
-        runtime_error,
-        umpire::fmt::format("Invalid percentage {}, percentage must be an integer between 0 and 100", percentage));
+    UMPIRE_ERROR(runtime_error,
+                 fmt::format("Invalid percentage {}, percentage must be an integer between 0 and 100", percentage));
   }
 
   if (percentage == 0) {

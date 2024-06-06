@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -15,7 +15,7 @@ include(CMakePackageConfigHelpers)
 
 project(Umpire
   LANGUAGES CXX C
-  VERSION 2023.06.0)
+  VERSION 2024.02.1)
 
 cmake_minimum_required(VERSION 3.14)
 
@@ -50,7 +50,7 @@ if (UMPIRE_ENABLE_NUMA AND (NOT UNIX OR APPLE))
   Please re-configure with UMPIRE_ENABLE_NUMA=Off (default value)")
 endif ()
 
-set(BLT_EXPORT_THIRDPARTY ON CACHE BOOL "")
+set(BLT_EXPORT_THIRDPARTY OFF CACHE BOOL "")
 
 ################################
 # BLT
@@ -140,11 +140,11 @@ configure_package_config_file(
   "${PROJECT_SOURCE_DIR}/umpire-config.cmake.in"
   "${PROJECT_BINARY_DIR}/umpire-config.cmake"
   PATH_VARS CMAKE_INSTALL_PREFIX
-  INSTALL_DESTINATION lib/cmake/umpire)
+  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/umpire)
 
 install(FILES
   ${PROJECT_BINARY_DIR}/umpire-config.cmake
-  DESTINATION lib/cmake/umpire)
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/umpire)
 
 write_basic_package_version_file(
   ${PROJECT_BINARY_DIR}/umpire-config-version.cmake
@@ -152,9 +152,9 @@ write_basic_package_version_file(
 
 install(FILES 
   "${PROJECT_BINARY_DIR}/umpire-config-version.cmake"
-  DESTINATION lib/cmake/umpire)
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/umpire)
 
-install(EXPORT umpire-targets DESTINATION lib/cmake/umpire)
+install(EXPORT umpire-targets DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/umpire)
 
 if (UMPIRE_ENABLE_TESTS)
   add_subdirectory(tests)

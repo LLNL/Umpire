@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -43,4 +43,4 @@ blt_add_target_compile_flags(
   TO poison_memory_checks 
   FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
 
-install(TARGETS ${umpire_test_applications} RUNTIME DESTINATION bin)
+install(TARGETS ${umpire_test_applications} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

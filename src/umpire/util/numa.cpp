@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -41,8 +41,8 @@ void move_to_node(void* ptr, std::size_t bytes, int node)
 
   if (mbind(ptr, bytes, MPOL_BIND, mask->maskp, mask->size + 1, MPOL_MF_MOVE | MPOL_MF_STRICT) != 0) {
     UMPIRE_ERROR(runtime_error,
-                 umpire::fmt::format("numa::move_to_node error: mbind( ptr = {}, bytes = {}, node = {} ) failed: {}",
-                                     ptr, bytes, node, strerror(errno)));
+                 fmt::format("numa::move_to_node error: mbind( ptr = {}, bytes = {}, node = {} ) failed: {}", ptr,
+                             bytes, node, strerror(errno)));
   }
 
   numa_bitmask_free(mask);
@@ -52,8 +52,8 @@ int get_location(void* ptr)
 {
   int numa_node = -1;
   if (get_mempolicy(&numa_node, NULL, 0, ptr, MPOL_F_NODE | MPOL_F_ADDR) != 0) {
-    UMPIRE_ERROR(runtime_error, umpire::fmt::format("numa::get_location error: get_mempolicy( ptr = {} ) failed: {}",
-                                                    ptr, strerror(errno)));
+    UMPIRE_ERROR(runtime_error,
+                 fmt::format("numa::get_location error: get_mempolicy( ptr = {} ) failed: {}", ptr, strerror(errno)));
   }
   return numa_node;
 }

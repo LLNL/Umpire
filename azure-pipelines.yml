@@ -54,14 +54,8 @@ jobs:
         docker_target: clang11
       clang12:
         docker_target: clang12
-      nvcc10:
-        docker_target: nvcc10
-      nvcc11:
-        docker_target: nvcc11
       sycl:
         docker_target: sycl
-      hip:
-        docker_target: hip
       umap_build:
         docker_target: umap_build
   pool:

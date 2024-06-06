@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -9,6 +9,7 @@
 
 #include <cstddef>
 #include <memory>
+#include <mutex>
 #include <ostream>
 #include <string>
 
@@ -199,6 +200,27 @@ class Allocator : private strategy::mixins::Inspector, strategy::mixins::Allocat
   umpire::strategy::AllocationStrategy* m_allocator;
 
   bool m_tracking{true};
+
+  /*!
+   * \brief Implementation to conditionally make Allocator thread-safe
+   *
+   * Make allocations thread-safe by syncronizing access to the entire
+   * allocation sequence including zero-byte-allocation check, allocation,
+   * and tracking bookkeeping.
+   *
+   * TODO: This is a temporary workaround until we update the Allocator API to
+   * automatically do this based upon type and/or policy information.
+   */
+  inline void* thread_safe_allocate(std::size_t bytes);
+  inline void* thread_safe_named_allocate(const std::string& name, std::size_t bytes);
+  inline void thread_safe_deallocate(void* ptr);
+
+  inline void* do_allocate(std::size_t bytes);
+  inline void* do_named_allocate(const std::string& name, std::size_t bytes);
+  inline void do_deallocate(void* ptr);
+
+  bool m_thread_safe{false};
+  std::mutex* m_thread_safe_mutex{nullptr};
 };
 
 inline std::string to_string(const Allocator& a)

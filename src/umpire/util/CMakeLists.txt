@@ -1,9 +1,10 @@
 ##############################################################################
-# Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
+
 set(UMPIRE_ENABLE_SYCL ${UMPIRE_ENABLE_SYCL})
 
 set (umpire_util_headers
@@ -51,7 +52,7 @@ if (UMPIRE_ENABLE_NUMA)
     numa.cpp)
 endif ()
 
-set (umpire_util_depends camp umpire_event umpire_tpl_judy umpire_tpl_fmt)
+set (umpire_util_depends camp umpire_event umpire_tpl_judy ${UMPIRE_FMT_TARGET})
 
 if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   set (umpire_util_depends
@@ -108,10 +109,10 @@ target_include_directories(
   PUBLIC
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 install(FILES
   ${umpire_util_headers}
-  DESTINATION include/umpire/util)
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/umpire/util)
 
 umpire_add_code_checks(PREFIX util)

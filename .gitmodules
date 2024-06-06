@@ -4,13 +4,12 @@
 [submodule "src/tpl/umpire/camp"]
 	path = src/tpl/umpire/camp
 	url = https://github.com/LLNL/camp.git
-[submodule ".radiuss-ci"]
-	path = .radiuss-ci
-	url = https://github.com/LLNL/radiuss-ci
-	branch = feature/umpire-ci
 [submodule "scripts/radiuss-spack-configs"]
 	path = scripts/radiuss-spack-configs
 	url = https://github.com/LLNL/radiuss-spack-configs
 [submodule "scripts/uberenv"]
 	path = scripts/uberenv
 	url = https://github.com/LLNL/uberenv
+[submodule "src/tpl/umpire/fmt"]
+	path = src/tpl/umpire/fmt
+	url = https://github.com/fmtlib/fmt

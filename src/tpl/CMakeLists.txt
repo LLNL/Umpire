@@ -57,18 +57,17 @@ blt_convert_to_system_includes(TARGET umpire_tpl_json)
 target_include_directories(
   umpire_tpl_json
   INTERFACE
-  $<INSTALL_INTERFACE:include>)
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 install(FILES
   ${json_headers}
-  DESTINATION include/umpire/json)
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/umpire/json)
 
 install(TARGETS
   umpire_tpl_json
   EXPORT umpire-targets
-  RUNTIME DESTINATION lib
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 
 #
@@ -93,18 +92,17 @@ blt_convert_to_system_includes(TARGET umpire_tpl_CLI11)
 target_include_directories(
   umpire_tpl_CLI11
   INTERFACE
-  $<INSTALL_INTERFACE:include>)
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 install(FILES
   ${CLI11_headers}
-  DESTINATION include/umpire/CLI11)
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/umpire/CLI11)
 
 install(TARGETS
   umpire_tpl_CLI11
   EXPORT umpire-targets
-  RUNTIME DESTINATION lib
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 add_subdirectory(umpire/judy)
 
@@ -117,6 +115,8 @@ if (NOT TARGET camp)
     )
     set_target_properties(camp PROPERTIES IMPORTED_GLOBAL TRUE)
   else ()
+    # In this case, camp will be installed inside of Umpire install prefix
+    set(camp_DIR ${CMAKE_INSTALL_PREFIX} CACHE PATH "")
     add_subdirectory(umpire/camp)
   endif()
 
@@ -133,82 +133,30 @@ if (NOT TARGET camp)
       SCOPE INTERFACE
       TARGET_DEFINITIONS CAMP_HAVE_HIP)
   endif()
-
 endif ()
 
-set(fmt_headers
-    umpire/fmt/fmt.hpp
-    umpire/fmt/args.h
-    umpire/fmt/chrono.h
-    umpire/fmt/color.h
-    umpire/fmt/compile.h
-    umpire/fmt/core.h
-    umpire/fmt/format-inl.h
-    umpire/fmt/format.h
-    umpire/fmt/locale.h
-    umpire/fmt/os.h
-    umpire/fmt/ostream.h
-    umpire/fmt/printf.h
-    umpire/fmt/ranges.h
-    )
+if (NOT TARGET ${UMPIRE_FMT_TARGET})
+  if (DEFINED fmt_DIR)
+    find_package(fmt REQUIRED
+      NO_DEFAULT_PATH
+      PATHS
+        ${fmt_DIR}
+        ${fmt_DIR}/lib64/cmake/fmt)
 
-blt_add_library(NAME    umpire_tpl_fmt
-                HEADERS ${fmt_headers})
-
-
-target_include_directories(
-  umpire_tpl_fmt
-  INTERFACE
-  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/tpl>
-  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>)
-
-# Avoid warnings from fmt (so we can still use -Werror)
-blt_convert_to_system_includes(TARGET umpire_tpl_fmt)
-
-target_include_directories(
-  umpire_tpl_fmt
-  INTERFACE
-  $<INSTALL_INTERFACE:include>)
-
-if (C_COMPILER_FAMILY_IS_XL)
-  set(_fmt_warning_disable_flag
-    $<$<NOT:$<COMPILE_LANGUAGE:CUDA>>:-Wno-unknown-attributes> 
-    $<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=-Wno-unknown-attributes>)
-
-    target_compile_options(umpire_tpl_fmt INTERFACE ${_fmt_warning_disable_flag})
-endif ()
-
-if (C_COMPILER_FAMILY_IS_PGI)
-  set(_fmt_warning_disable_flag
-   "--diag_suppress 1625;--diag_suppress 185;--diag_suppress 811;--diag_suppress 186")
-   
-  if (ENABLE_FORTRAN)
-    target_compile_options(umpire_tpl_fmt
-      INTERFACE 
-      $<$<NOT:$<COMPILE_LANGUAGE:Fortran>>:${_fmt_warning_disable_flag}>)
+    set_target_properties(${UMPIRE_FMT_TARGET} PROPERTIES IMPORTED_GLOBAL TRUE)
+    blt_convert_to_system_includes(TARGET ${UMPIRE_FMT_TARGET})
   else ()
-    target_compile_options(umpire_tpl_fmt
-      INTERFACE 
-      ${_fmt_warning_disable_flag})
+    if (NOT EXISTS ${PROJECT_SOURCE_DIR}/src/tpl/umpire/fmt/CMakeLists.txt)
+      message(FATAL_ERROR "fmt submodule not initialized. Run 'git submodule update --init --recursive' in the git repository or set fmt_DIR to use an external build of fmt.")
+    else ()
+      # In this case, fmt will be installed inside of Umpire install prefix
+      set(fmt_DIR ${CMAKE_INSTALL_PREFIX} CACHE PATH "")
+      set(FMT_INSTALL ON)
+      set(FMT_SYSTEM_HEADERS ON)
+      add_subdirectory(umpire/fmt)
+    endif ()
   endif ()
 endif ()
-
-if (C_COMPILER_FAMILY_IS_GNU)
-  target_compile_options(umpire_tpl_fmt
-    INTERFACE 
-    $<$<COMPILE_LANGUAGE:CXX>:-fcompare-debug-second>)
-endif ()
-
-install(TARGETS
-  umpire_tpl_fmt
-  EXPORT umpire-targets
-  RUNTIME DESTINATION lib
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
-
-install(FILES
-  ${fmt_headers}
-  DESTINATION include/umpire/fmt)
 
 set(UMPIRE_ENABLE_TESTS ${OLD_ENABLE_TESTS})
 set(UMPIRE_ENABLE_FORTRAN ${OLD_ENABLE_FORTRAN})

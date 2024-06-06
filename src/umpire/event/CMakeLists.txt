@@ -17,7 +17,7 @@ set (umpire_event_sources
   json_file_store.cpp
   recorder_factory.cpp)
 
-set (umpire_event_depends umpire_tpl_fmt umpire_tpl_json camp)
+set (umpire_event_depends ${UMPIRE_FMT_TARGET} umpire_tpl_json camp)
 
 if (UMPIRE_ENABLE_CUDA)
   set(umpire_event_depends
@@ -55,10 +55,10 @@ target_include_directories(
   PUBLIC
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 install(FILES
   ${umpire_event_headers}
-  DESTINATION include/umpire/event)
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/umpire/event)
 
 umpire_add_code_checks(PREFIX event)

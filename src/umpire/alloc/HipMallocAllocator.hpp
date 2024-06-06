@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -57,7 +57,7 @@ struct HipMallocAllocator : HipAllocator {
         error = ::hipExtMallocWithFlags(&ptr, size, hipDeviceMallocDefault);
 #else
         UMPIRE_ERROR(runtime_error,
-                     umpire::fmt::format("Course grained memory coherence not supported for allocation"));
+                     fmt::format("Course grained memory coherence not supported for allocation"));
 #endif // UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY
         break;
     }
@@ -65,10 +65,10 @@ struct HipMallocAllocator : HipAllocator {
     if (error != hipSuccess) {
       if (error == hipErrorMemoryAllocation) {
         UMPIRE_ERROR(out_of_memory_error,
-                     umpire::fmt::format("hipExtMallocWithFlags( bytes = {} ) failed with error: {}", size,
+                     fmt::format("hipExtMallocWithFlags( bytes = {} ) failed with error: {}", size,
                                          hipGetErrorString(error)));
       } else {
-        UMPIRE_ERROR(runtime_error, umpire::fmt::format("ExtMallocWithFlags( bytes = {} ) failed with error: {}", size,
+        UMPIRE_ERROR(runtime_error, fmt::format("hipExtMallocWithFlags( bytes = {} ) failed with error: {}", size,
                                                         hipGetErrorString(error)));
       }
     }
@@ -91,7 +91,7 @@ struct HipMallocAllocator : HipAllocator {
     hipError_t error = ::hipFree(ptr);
     if (error != hipSuccess) {
       UMPIRE_ERROR(runtime_error,
-                   umpire::fmt::format("hipFree( ptr = {} ) failed with error: {}", ptr, hipGetErrorString(error)));
+                   fmt::format("hipFree( ptr = {} ) failed with error: {}", ptr, hipGetErrorString(error)));
     }
   }
 };

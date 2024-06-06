@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -49,7 +49,7 @@ Inspector::deregisterAllocation(void* ptr, strategy::AllocationStrategy* s)
   } else {
     // Re-register the pointer and throw an error
     ResourceManager::getInstance().registerAllocation(ptr, {ptr, record.size, record.strategy, record.name});
-    UMPIRE_ERROR(runtime_error, umpire::fmt::format("{} was not allocated by {}", ptr, s->getName()));
+    UMPIRE_ERROR(runtime_error, fmt::format("{} was not allocated by {}", ptr, s->getName()));
   }
 
   return record;

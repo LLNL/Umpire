@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -59,7 +59,7 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
             const std::size_t first_minimum_pool_allocation_size = s_default_first_block_size,
             const std::size_t next_minimum_pool_allocation_size = s_default_next_block_size,
             const std::size_t alignment = s_default_alignment,
-            PoolCoalesceHeuristic<QuickPool> should_coalesce = percent_releasable(100)) noexcept;
+            PoolCoalesceHeuristic<QuickPool> should_coalesce = percent_releasable_hwm(100)) noexcept;
 
   ~QuickPool();
 

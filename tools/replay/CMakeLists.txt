@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -52,6 +52,6 @@ blt_add_target_compile_flags(
   TO replaydiff
   FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
 
-install(TARGETS ${replay_tools} RUNTIME DESTINATION bin)
+install(TARGETS ${replay_tools} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 umpire_add_code_checks(PREFIX tools)

@@ -1,12 +1,15 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/Allocator.hpp"
 
+#include <mutex>
+
 #include "umpire/ResourceManager.hpp"
+#include "umpire/strategy/ThreadSafeAllocator.hpp"
 #include "umpire/util/Macros.hpp"
 
 namespace umpire {
@@ -15,8 +18,11 @@ Allocator::Allocator(strategy::AllocationStrategy* allocator) noexcept
     : strategy::mixins::Inspector{},
       strategy::mixins::AllocateNull{},
       m_allocator{allocator},
-      m_tracking{allocator->isTracked()}
+      m_tracking{allocator->isTracked()},
+      m_thread_safe{(dynamic_cast<umpire::strategy::ThreadSafeAllocator*>(allocator) != nullptr)}
 {
+  m_thread_safe_mutex =
+      m_thread_safe ? dynamic_cast<umpire::strategy::ThreadSafeAllocator*>(m_allocator)->get_mutex() : nullptr;
 }
 
 void Allocator::release()

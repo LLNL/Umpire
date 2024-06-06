@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -9,7 +9,7 @@ set (integration_tests_depends
 set (accessibility_test_depends
   umpire gtest)
 set (device_allocator_test_depends
-  umpire gtest)
+  umpire_device umpire gtest)
 
 if (UMPIRE_ENABLE_CUDA)
   set (integration_tests_depends

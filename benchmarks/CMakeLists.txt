@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -22,7 +22,7 @@ if (UMPIRE_ENABLE_DEVICE_ALLOCATOR)
   blt_add_executable(
     NAME device_allocator_stress_test
     SOURCES device_allocator_stress_test.cpp
-    DEPENDS_ON umpire cuda)
+    DEPENDS_ON umpire_device umpire cuda)
 
   set_source_files_properties(
     device_allocator_stress_test.cpp
@@ -35,7 +35,7 @@ if (UMPIRE_ENABLE_DEVICE_ALLOCATOR)
     blt_add_executable(
       NAME device_allocator_stress_test
       SOURCES device_allocator_stress_test.cpp
-      DEPENDS_ON umpire blt::hip blt::hip_runtime)
+      DEPENDS_ON umpire_device umpire blt::hip blt::hip_runtime)
 
     set_target_properties(
       device_allocator_stress_test
