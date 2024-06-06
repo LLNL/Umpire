@@ -57,8 +57,8 @@ struct HipMallocManagedAllocator : HipAllocator {
 
       if (error != hipSuccess) {
         UMPIRE_ERROR(runtime_error,
-                     fmt::format("hipMemAdvise( src_ptr = {}, length = {}, device = {}) failed with error: {}",
-                                         ptr, bytes, device, hipGetErrorString(error)));
+                     fmt::format("hipMemAdvise( src_ptr = {}, length = {}, device = {}) failed with error: {}", ptr,
+                                 bytes, device, hipGetErrorString(error)));
       }
     }
 #endif // UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY

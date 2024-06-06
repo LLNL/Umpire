@@ -44,8 +44,7 @@ struct HipPinnedAllocator : HipAllocator {
         UMPIRE_LOG(Debug, "::hipHostMalloc(" << bytes << ", hipHostMallocNonCoherent)");
         error = ::hipHostMalloc(&ptr, bytes, hipHostMallocNonCoherent);
 #else
-        UMPIRE_ERROR(runtime_error,
-                     fmt::format("Course grained memory coherence not supported for allocation"));
+        UMPIRE_ERROR(runtime_error, fmt::format("Course grained memory coherence not supported for allocation"));
 #endif // UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY
         break;
     }
