@@ -47,7 +47,7 @@ struct HipMallocAllocator : HipAllocator {
         UMPIRE_LOG(Debug, "::hipMallocWithFlags(" << size << ", hipDeviceMallocFinegrained)");
         error = ::hipExtMallocWithFlags(&ptr, size, hipDeviceMallocFinegrained);
 #else
-        UMPIRE_ERROR(runtime_error, umpire::fmt::format("Fine grained memory coherence not supported for allocation"));
+        UMPIRE_ERROR(runtime_error, fmt::format("Fine grained memory coherence not supported for allocation"));
 #endif // UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY
         break;
 

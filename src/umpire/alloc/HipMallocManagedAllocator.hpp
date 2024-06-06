@@ -57,7 +57,7 @@ struct HipMallocManagedAllocator : HipAllocator {
 
       if (error != hipSuccess) {
         UMPIRE_ERROR(runtime_error,
-                     umpire::fmt::format("hipMemAdvise( src_ptr = {}, length = {}, device = {}) failed with error: {}",
+                     fmt::format("hipMemAdvise( src_ptr = {}, length = {}, device = {}) failed with error: {}",
                                          ptr, bytes, device, hipGetErrorString(error)));
       }
     }

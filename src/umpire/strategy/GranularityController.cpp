@@ -28,7 +28,7 @@ GranularityController::GranularityController(const std::string& name, int id, Al
   umpire::resource::HipMemoryResource* strat{dynamic_cast<umpire::resource::HipMemoryResource*>(m_allocator)};
 
   if (strat == nullptr) {
-    UMPIRE_ERROR(runtime_error, umpire::fmt::format("Cannot place Granularity Controller atop non-HIP device"));
+    UMPIRE_ERROR(runtime_error, fmt::format("Cannot place Granularity Controller atop non-HIP device"));
   }
 }
 
