@@ -80,7 +80,7 @@ int main(int argc, char* argv[])
   if ((resource_type.find("DEVICE") != std::string::npos) || (resource_type.find("UM") != std::string::npos)) {
 #if !defined(UMPIRE_ENABLE_HIP)
     UMPIRE_ERROR(umpire::runtime_error,
-                 umpire::fmt::format("The resource, \"{}\", can't be used if HIP is not enabled.", resource_type));
+                 fmt::format("The resource, \"{}\", can't be used if HIP is not enabled.", resource_type));
 #endif
   } else {
     if (resource_type.find("HOST") == std::string::npos) {
