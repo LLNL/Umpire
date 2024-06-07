@@ -7,8 +7,8 @@
 #ifndef UMPIRE_HipAllocator_HPP
 #define UMPIRE_HipAllocator_HPP
 
-#include "umpire/util/MemoryResourceTraits.hpp"
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/MemoryResourceTraits.hpp"
 #include "umpire/util/error.hpp"
 
 namespace umpire {
