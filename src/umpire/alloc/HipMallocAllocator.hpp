@@ -22,6 +22,8 @@ namespace alloc {
  *        AMD GPUs.
  */
 struct HipMallocAllocator : HipAllocator {
+  using HipAllocator::HipAllocator;
+
   /*!
    * \brief Allocate bytes of memory using hipMalloc
    *

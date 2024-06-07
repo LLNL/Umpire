@@ -140,17 +140,33 @@ MemoryResourceRegistry::MemoryResourceRegistry() : m_allocator_factories()
     } else {
       registerMemoryResource(util::make_unique<resource::HipDeviceResourceFactory>());
       m_resource_names.push_back("DEVICE");
+#if defined(UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY)
+      m_resource_names.push_back("DEVICE::FINE");
+      m_resource_names.push_back("DEVICE::COARSE");
+#endif
 
       for (int device = 0; device < device_count; ++device) {
         std::string name{"DEVICE::" + std::to_string(device)};
         m_resource_names.push_back(name);
+#if defined(UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY)
+      m_resource_names.push_back(std::string{name + "::FINE"});
+      m_resource_names.push_back(std::string{name + "::COARSE"});
+#endif
       }
 
       registerMemoryResource(util::make_unique<resource::HipUnifiedMemoryResourceFactory>());
       m_resource_names.push_back("UM");
+#if defined(UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY)
+      m_resource_names.push_back("UM::FINE");
+      m_resource_names.push_back("UM::COARSE");
+#endif
 
       registerMemoryResource(util::make_unique<resource::HipPinnedMemoryResourceFactory>());
       m_resource_names.push_back("PINNED");
+#if defined(UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY)
+      m_resource_names.push_back("PINNED::FINE");
+      m_resource_names.push_back("PINNED::COARSE");
+#endif
 
 #if defined(UMPIRE_ENABLE_CONST)
       registerMemoryResource(util::make_unique<resource::HipConstantMemoryResourceFactory>());

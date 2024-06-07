@@ -11,6 +11,7 @@
 
 #include "umpire/alloc/HipAllocator.hpp"
 #include "umpire/config.hpp"
+#include "umpire/util/Platform.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/error.hpp"
 
@@ -18,6 +19,8 @@ namespace umpire {
 namespace alloc {
 
 struct HipPinnedAllocator : HipAllocator {
+  using HipAllocator::HipAllocator;
+
   void* allocate(std::size_t bytes)
   {
     hipError_t error;

@@ -6,7 +6,6 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/resource/HipPinnedMemoryResourceFactory.hpp"
 
-#include "umpire/resource/HipMemoryResource.hpp"
 #include "umpire/util/make_unique.hpp"
 
 namespace umpire {

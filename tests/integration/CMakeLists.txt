@@ -229,17 +229,6 @@ blt_add_test(
   NAME introspection_tests
   COMMAND introspection_tests)
 
-if (UMPIRE_ENABLE_HIP AND UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY)
-  blt_add_executable(
-    NAME granularity_control_allocator
-    SOURCES granularity_control_allocator.cpp
-    DEPENDS_ON ${integration_tests_depends})
-
-    blt_add_test(
-      NAME granularity_control_allocator
-      COMMAND granularity_control_allocator)
-endif ()
-
 if (UMPIRE_ENABLE_IPC_SHARED_MEMORY AND UMPIRE_ENABLE_MPI)
   blt_add_executable(
     NAME get_communicator_tests

@@ -152,7 +152,7 @@ Allocator ResourceManager::makeResource(const std::string& name, MemoryResourceT
   }
 
   if (name.find("::FINE") != std::string::npos) {
-    traits.granularity = MemoryResourceTraits::granularity_type::fine;
+    traits.granularity = MemoryResourceTraits::granularity_type::fine_grained;
   }
 
   std::unique_ptr<strategy::AllocationStrategy> allocator{registry.makeMemoryResource(name, getNextId(), traits)};

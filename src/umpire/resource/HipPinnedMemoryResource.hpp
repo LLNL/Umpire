@@ -8,7 +8,6 @@
 #define UMPIRE_HipPinnedMemoryResource_HPP
 
 #include "umpire/alloc/HipPinnedAllocator.hpp"
-#include "umpire/resource/HipMemoryResource.hpp"
 #include "umpire/resource/MemoryResource.hpp"
 #include "umpire/util/AllocationRecord.hpp"
 #include "umpire/util/Platform.hpp"

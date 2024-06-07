@@ -110,7 +110,6 @@ if (UMPIRE_ENABLE_HIP)
     ${umpire_resource_headers}
     HipDeviceMemoryResource.hpp
     HipDeviceResourceFactory.hpp
-    HipMemoryResource.hpp
     HipUnifiedMemoryResource.hpp
     HipUnifiedMemoryResourceFactory.hpp
     HipPinnedMemoryResource.hpp

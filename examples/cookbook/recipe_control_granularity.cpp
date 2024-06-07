@@ -12,7 +12,6 @@
 
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
-#include "umpire/strategy/GranularityController.hpp"
 
 // Statistics information for allocated memory
 struct myMemStats {
@@ -29,7 +28,7 @@ struct myMemStats {
   void print(std::ostream& stream) const
   {
     stream << name << std::endl
-           << "        Memory Type: " << hipattrs.memoryType << std::endl
+           << "        Memory Type: " << hipattrs.type << std::endl
            << "             device: " << hipattrs.device << std::endl
            << "        hostPointer: " << hipattrs.hostPointer << std::endl
            << "      devicePointer: " << hipattrs.devicePointer << std::endl
@@ -48,17 +47,11 @@ std::ostream& operator<<(std::ostream& stream, const myMemStats& mstats)
 
 int main(int, char**)
 {
-  const std::vector<std::string> resources{"DEVICE", "UM", "PINNED"};
+  const std::vector<std::string> resources{"DEVICE::COARSE", "DEVICE::FINE", "DEVICE::0::COARSE",  "UM::FINE", "UM::COARSE", "PINNED::FINE", "PINNED::COARSE" };
 
   for (auto&& resource : resources) {
-    const std::vector<std::pair<umpire::strategy::GranularityController::Granularity, std::string>> mtypes{
-        {umpire::strategy::GranularityController::Granularity::CoarseGrainedCoherence, resource + "_COURSE"},
-        {umpire::strategy::GranularityController::Granularity::FineGrainedCoherence, resource + "_FINE"}};
     auto& rm = umpire::ResourceManager::getInstance();
-    auto allocator = rm.getAllocator(resource);
-
-    for (auto&& mtype : mtypes) {
-      auto alloc = rm.makeAllocator<umpire::strategy::GranularityController>(mtype.second, allocator, mtype.first);
+    auto alloc = rm.getAllocator(resource);
 
       std::vector<void*> ptrs;
       const int N{1};
@@ -74,7 +67,6 @@ int main(int, char**)
         std::cout << stat << std::endl;
         alloc.deallocate(ptrs[i]);
       }
-    }
   }
 
   return 0;
