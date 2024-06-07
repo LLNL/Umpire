@@ -47,26 +47,27 @@ std::ostream& operator<<(std::ostream& stream, const myMemStats& mstats)
 
 int main(int, char**)
 {
-  const std::vector<std::string> resources{"DEVICE::COARSE", "DEVICE::FINE", "DEVICE::0::COARSE",  "UM::FINE", "UM::COARSE", "PINNED::FINE", "PINNED::COARSE" };
+  const std::vector<std::string> resources{"DEVICE::COARSE", "DEVICE::FINE", "DEVICE::0::COARSE", "UM::FINE",
+                                           "UM::COARSE",     "PINNED::FINE", "PINNED::COARSE"};
 
   for (auto&& resource : resources) {
     auto& rm = umpire::ResourceManager::getInstance();
     auto alloc = rm.getAllocator(resource);
 
-      std::vector<void*> ptrs;
-      const int N{1};
-      int size{2};
+    std::vector<void*> ptrs;
+    const int N{1};
+    int size{2};
 
-      for (int i = 0; i < N; i++) {
-        ptrs.push_back(alloc.allocate(size));
-        size *= 2;
-      }
+    for (int i = 0; i < N; i++) {
+      ptrs.push_back(alloc.allocate(size));
+      size *= 2;
+    }
 
-      for (int i = 0; i < N; i++) {
-        myMemStats stat{ptrs[i]};
-        std::cout << stat << std::endl;
-        alloc.deallocate(ptrs[i]);
-      }
+    for (int i = 0; i < N; i++) {
+      myMemStats stat{ptrs[i]};
+      std::cout << stat << std::endl;
+      alloc.deallocate(ptrs[i]);
+    }
   }
 
   return 0;

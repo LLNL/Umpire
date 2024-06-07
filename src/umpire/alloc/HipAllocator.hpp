@@ -15,13 +15,13 @@ namespace umpire {
 namespace alloc {
 
 struct HipAllocator {
-  HipAllocator() 
-    : m_granularity{MemoryResourceTraits::granularity_type::unknown}
-  {}
+  HipAllocator() : m_granularity{MemoryResourceTraits::granularity_type::unknown}
+  {
+  }
 
-  HipAllocator(MemoryResourceTraits::granularity_type g)
-   : m_granularity{g} 
-  {}
+  HipAllocator(MemoryResourceTraits::granularity_type g) : m_granularity{g}
+  {
+  }
 
   MemoryResourceTraits::granularity_type m_granularity;
 };

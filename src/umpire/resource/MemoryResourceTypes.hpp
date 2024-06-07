@@ -8,8 +8,8 @@
 #define UMPIRE_MemoryResourceTypes_HPP
 
 #include <cstddef>
-#include <string>
 #include <regex>
+#include <string>
 
 #include "umpire/config.hpp"
 #include "umpire/util/error.hpp"

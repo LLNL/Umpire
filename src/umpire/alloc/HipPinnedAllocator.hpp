@@ -11,8 +11,8 @@
 
 #include "umpire/alloc/HipAllocator.hpp"
 #include "umpire/config.hpp"
-#include "umpire/util/Platform.hpp"
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/Platform.hpp"
 #include "umpire/util/error.hpp"
 
 namespace umpire {

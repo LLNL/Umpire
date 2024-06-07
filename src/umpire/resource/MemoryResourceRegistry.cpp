@@ -149,8 +149,8 @@ MemoryResourceRegistry::MemoryResourceRegistry() : m_allocator_factories()
         std::string name{"DEVICE::" + std::to_string(device)};
         m_resource_names.push_back(name);
 #if defined(UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY)
-      m_resource_names.push_back(std::string{name + "::FINE"});
-      m_resource_names.push_back(std::string{name + "::COARSE"});
+        m_resource_names.push_back(std::string{name + "::FINE"});
+        m_resource_names.push_back(std::string{name + "::COARSE"});
 #endif
       }
 
