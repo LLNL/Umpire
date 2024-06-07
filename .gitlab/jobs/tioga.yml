@@ -43,6 +43,6 @@ rocmcc_6_1_1_hip_openmp_device_alloc:
 
 rocmcc_6_1_1_hip_memleak:
   variables:
-    SPEC: "~shared +asan +sanitizer_tests +tools +rocm tests=basic  cxxflags==\"-fsanitize=address -Wl,-rpath=/opt/rocm-6.0.0/llvm/lib/clang/17.0.0/lib/linux/\" %rocmcc@6.1.1 ^hip@6.1.1"
+    SPEC: "~shared +asan +sanitizer_tests +tools +rocm tests=basic amdgpu_target=gfx90a cxxflags==\"-fsanitize=address -Wl,-rpath=/opt/rocm-6.0.0/llvm/lib/clang/17.0.0/lib/linux/\" %rocmcc@6.1.1 ^hip@6.1.1"
     ASAN_OPTIONS: "detect_leaks=1"
   extends: .job_on_tioga
