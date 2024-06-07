@@ -222,7 +222,7 @@ then
       ${project_dir}
     if ! $cmake_exe --build . -j
     then
-        echo "[Error]: compilation failed, building with verbose output..."
+        echo "[Error]: Compilation failed, building with verbose output..."
         echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         echo "~~~~~ Running make VERBOSE=1"
         echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
@@ -277,26 +277,26 @@ then
 
     if grep -q "Errors while running CTest" ./tests_output.txt
     then
-        echo "[Error]: failure(s) while running CTest" && exit 1
+        echo "[Error]: Failure(s) while running CTest" && exit 1
     fi
 
     if grep -q -i "ENABLE_HIP.*ON" ${hostconfig_path}
     then
-        echo "[Warning]: not testing install with HIP"
+        echo "[Warning]: Not testing install with HIP"
     else
         if [[ ! -d ${install_dir} ]]
         then
-            echo "[Error]: install directory not found : ${install_dir}" && exit 1
+            echo "[Error]: Install directory not found : ${install_dir}" && exit 1
         fi
 
         cd ${install_dir}/examples/umpire/using-with-cmake
         mkdir build && cd build
         if ! $cmake_exe -C ../host-config.cmake ..; then
-        echo "[Error]: running $cmake_exe for using-with-cmake test" && exit 1
+            echo "[Error]: Running $cmake_exe for using-with-cmake test" && exit 1
         fi
 
         if ! make; then
-        echo "[Error]: running make for using-with-cmake test" && exit 1
+            echo "[Error]: Running make for using-with-cmake test" && exit 1
         fi
     fi
 
