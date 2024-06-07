@@ -37,12 +37,12 @@ struct HipMallocAllocator : HipAllocator {
 
     switch (m_granularity) {
       default:
-      case umpire::strategy::GranularityController::Granularity::Default:
+      case MemoryResourceTraits::granularity_type::unknown:
         UMPIRE_LOG(Debug, "::hipMalloc(" << size << ")");
         error = ::hipMalloc(&ptr, size);
         break;
 
-      case umpire::strategy::GranularityController::Granularity::FineGrainedCoherence:
+      case MemoryResourceTraits::granularity_type::fine_grained:
 #ifdef UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY
         UMPIRE_LOG(Debug, "::hipMallocWithFlags(" << size << ", hipDeviceMallocFinegrained)");
         error = ::hipExtMallocWithFlags(&ptr, size, hipDeviceMallocFinegrained);
@@ -51,12 +51,12 @@ struct HipMallocAllocator : HipAllocator {
 #endif // UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY
         break;
 
-      case umpire::strategy::GranularityController::Granularity::CoarseGrainedCoherence:
+      case MemoryResourceTraits::granularity_type::coarse_grained:
 #ifdef UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY
         UMPIRE_LOG(Debug, "::hipMallocWithFlags(" << size << ", hipDeviceMallocDefault)");
         error = ::hipExtMallocWithFlags(&ptr, size, hipDeviceMallocDefault);
 #else
-        UMPIRE_ERROR(runtime_error, fmt::format("Course grained memory coherence not supported for allocation"));
+        UMPIRE_ERROR(runtime_error, fmt::format("Coarse grained memory coherence not supported for allocation"));
 #endif // UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY
         break;
     }

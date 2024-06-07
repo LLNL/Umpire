@@ -18,7 +18,7 @@ namespace resource {
 
 HipUnifiedMemoryResource::HipUnifiedMemoryResource(Platform platform, const std::string& name, int id,
                                                    MemoryResourceTraits traits)
-    : MemoryResource(name, id, traits), m_allocator{}, m_platform(platform)
+    : MemoryResource(name, id, traits), m_allocator{traits.granularity}, m_platform(platform)
 {
 }
 

@@ -47,7 +47,7 @@ struct HipMallocManagedAllocator : HipAllocator {
     }
 
 #ifdef UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY
-    if (m_granularity == umpire::strategy::GranularityController::Granularity::CoarseGrainedCoherence) {
+    if (m_granularity == MemoryResourceTraits::granularity_type::coarse_grained) {
       int device;
 
       ::hipGetDevice(&device);

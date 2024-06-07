@@ -20,9 +20,7 @@ namespace resource {
  * \brief Concrete MemoryResource object that uses the template _allocator to
  * allocate and deallocate memory.
  */
-class HipUnifiedMemoryResource : public HipMemoryResourceProxy<HipUnifiedMemoryResource>, public MemoryResource {
-  friend struct HipMemoryResourceProxy<HipUnifiedMemoryResource>;
-
+class HipUnifiedMemoryResource : public MemoryResource {
  public:
   HipUnifiedMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits);
 
