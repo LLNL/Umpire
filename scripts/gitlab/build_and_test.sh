@@ -203,7 +203,6 @@ then
         cmake_options="-DBLT_MPI_COMMAND_APPEND:STRING=--overlap"
     fi
 
-    date
     if [[ "${truehostname}" == "corona" || "${truehostname}" == "tioga" ]]
     then
         module unload rocm
