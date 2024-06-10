@@ -45,7 +45,7 @@ variables:
 
 # Tioga
 # Arguments for top level allocation
-  TIOGA_SHARED_ALLOC: "--queue=pci --exclusive --time-limit=15m --nodes=1"
+  TIOGA_SHARED_ALLOC: "--queue=pci --exclusive --time-limit=60m --nodes=1"
 # Arguments for job level allocation
   TIOGA_JOB_ALLOC: "--nodes=1 --begin-time=+5s"
 # Project specific variants for tioga
