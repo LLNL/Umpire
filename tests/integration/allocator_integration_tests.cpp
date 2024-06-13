@@ -177,17 +177,27 @@ std::vector<std::string> allocator_strings()
 
 #if defined(UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY)
 #if defined(UMPIRE_ENABLE_DEVICE)
-  allocators.push_back("DEVICE::FINE");
-  allocators.push_back("DEVICE::COARSE");
-  allocators.push_back("DEVICE::0::COARSE");
+  int coherence{0};
+  auto error = hipGettDeviceAttribute(&coherence, hipDeviceAttributeFineGrainSupport, 0);
+  const bool coherence_enabled{coherence == 1};
+
+  if (coherence_enabled) {
+    allocators.push_back("DEVICE::FINE");
+    allocators.push_back("DEVICE::COARSE");
+    allocators.push_back("DEVICE::0::COARSE");
+  }
 #endif
 #if defined(UMPIRE_ENABLE_UM)
-  allocators.push_back("UM::FINE");
-  allocators.push_back("UM::COARSE");
+  if (coherence_enabled) {
+    allocators.push_back("UM::FINE");
+    allocators.push_back("UM::COARSE");
+  }
 #endif
 #if defined(UMPIRE_ENABLE_PINNED)
-  allocators.push_back("PINNED::COARSE");
-  allocators.push_back("PINNED::FINE");
+  if (coherence_enabled) {
+    allocators.push_back("PINNED::COARSE");
+    allocators.push_back("PINNED::FINE");
+  }
 #endif
 #endif
 
