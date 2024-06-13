@@ -134,10 +134,10 @@ MemoryResourceRegistry::MemoryResourceRegistry() : m_allocator_factories()
 #if defined(UMPIRE_ENABLE_HIP)
   {
     int coherence{0};
-    auto error = hipGetDeviceAttribute(&coherence, hipDeviceAttributeFineGrainSupport, 0);
+    auto error = hipDeviceGetAttribute(&coherence, hipDeviceAttributeFineGrainSupport, 0);
     const bool coherence_enabled{coherence == 1};
     int device_count{0};
-    auto error = ::hipGetDeviceCount(&device_count);
+    error = ::hipGetDeviceCount(&device_count);
     if (error != hipSuccess) {
       UMPIRE_LOG(Warning, "Umpire compiled with HIP support but no GPUs detected!");
     } else {

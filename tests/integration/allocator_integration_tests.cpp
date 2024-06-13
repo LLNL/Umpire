@@ -178,7 +178,7 @@ std::vector<std::string> allocator_strings()
 #if defined(UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY)
 #if defined(UMPIRE_ENABLE_DEVICE)
   int coherence{0};
-  auto error = hipGetDeviceAttribute(&coherence, hipDeviceAttributeFineGrainSupport, 0);
+  auto error = hipDeviceGetAttribute(&coherence, hipDeviceAttributeFineGrainSupport, 0);
   const bool coherence_enabled{coherence == 1};
 
   if (coherence_enabled) {
