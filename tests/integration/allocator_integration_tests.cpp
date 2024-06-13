@@ -179,6 +179,7 @@ std::vector<std::string> allocator_strings()
 #if defined(UMPIRE_ENABLE_DEVICE)
   int coherence{0};
   auto error = hipDeviceGetAttribute(&coherence, hipDeviceAttributeFineGrainSupport, 0);
+  UMPIRE_USE_VAR(error);
   const bool coherence_enabled{coherence == 1};
 
   if (coherence_enabled) {
