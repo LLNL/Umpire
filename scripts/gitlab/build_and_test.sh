@@ -253,7 +253,7 @@ then
         echo "[Error]: No tests were found" && exit 1
     fi
 
-    timed_message "Preparing tests xml reports for export"
+    timed_message "Preparing testing xml reports for export"
     tree Testing
     xsltproc -o junit.xml ${project_dir}/blt/tests/ctest-to-junit.xsl Testing/*/Test.xml
     mv junit.xml ${project_dir}/junit.xml
