@@ -134,7 +134,7 @@ MemoryResourceRegistry::MemoryResourceRegistry() : m_allocator_factories()
 #if defined(UMPIRE_ENABLE_HIP)
   {
     int coherence{0};
-    auto error = hipGettDeviceAttribute(&coherence, hipDeviceAttributeFineGrainSupport, 0);
+    auto error = hipGetDeviceAttribute(&coherence, hipDeviceAttributeFineGrainSupport, 0);
     const bool coherence_enabled{coherence == 1};
     int device_count{0};
     auto error = ::hipGetDeviceCount(&device_count);
