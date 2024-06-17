@@ -9,6 +9,8 @@
 
 #include <hip/hip_runtime_api.h>
 
+#include "umpire/alloc/HipAllocator.hpp"
+#include "umpire/config.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/error.hpp"
 
@@ -19,7 +21,9 @@ namespace alloc {
  * \brief Uses hipMalloc and hipFree to allocate and deallocate memory on
  *        AMD GPUs.
  */
-struct HipMallocAllocator {
+struct HipMallocAllocator : HipAllocator {
+  using HipAllocator::HipAllocator;
+
   /*!
    * \brief Allocate bytes of memory using hipMalloc
    *
@@ -30,19 +34,46 @@ struct HipMallocAllocator {
    */
   void* allocate(std::size_t size)
   {
+    hipError_t error;
     void* ptr{nullptr};
 
-    hipError_t error = ::hipMalloc(&ptr, size);
-    UMPIRE_LOG(Debug, "(bytes=" << size << ") returning " << ptr);
+    switch (m_granularity) {
+      default:
+      case MemoryResourceTraits::granularity_type::unknown:
+        UMPIRE_LOG(Debug, "::hipMalloc(" << size << ")");
+        error = ::hipMalloc(&ptr, size);
+        break;
+
+      case MemoryResourceTraits::granularity_type::fine_grained:
+#ifdef UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY
+        UMPIRE_LOG(Debug, "::hipMallocWithFlags(" << size << ", hipDeviceMallocFinegrained)");
+        error = ::hipExtMallocWithFlags(&ptr, size, hipDeviceMallocFinegrained);
+#else
+        UMPIRE_ERROR(runtime_error, fmt::format("Fine grained memory coherence not supported for allocation"));
+#endif // UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY
+        break;
+
+      case MemoryResourceTraits::granularity_type::coarse_grained:
+#ifdef UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY
+        UMPIRE_LOG(Debug, "::hipMallocWithFlags(" << size << ", hipDeviceMallocDefault)");
+        error = ::hipExtMallocWithFlags(&ptr, size, hipDeviceMallocDefault);
+#else
+        UMPIRE_ERROR(runtime_error, fmt::format("Coarse grained memory coherence not supported for allocation"));
+#endif // UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY
+        break;
+    }
+
     if (error != hipSuccess) {
       if (error == hipErrorMemoryAllocation) {
-        UMPIRE_ERROR(out_of_memory_error,
-                     fmt::format("hipMalloc( bytes = {} ) failed with error: {}", size, hipGetErrorString(error)));
+        UMPIRE_ERROR(out_of_memory_error, fmt::format("hipExtMallocWithFlags( bytes = {} ) failed with error: {}", size,
+                                                      hipGetErrorString(error)));
       } else {
-        UMPIRE_ERROR(runtime_error,
-                     fmt::format("hipMalloc( bytes = {} ) failed with error: {}", size, hipGetErrorString(error)));
+        UMPIRE_ERROR(runtime_error, fmt::format("hipExtMallocWithFlags( bytes = {} ) failed with error: {}", size,
+                                                hipGetErrorString(error)));
       }
     }
+
+    UMPIRE_LOG(Debug, "(bytes=" << size << ") returning " << ptr);
 
     return ptr;
   }
