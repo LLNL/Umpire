@@ -110,14 +110,18 @@ if (UMPIRE_ENABLE_HIP)
     ${umpire_resource_headers}
     HipDeviceMemoryResource.hpp
     HipDeviceResourceFactory.hpp
+    HipUnifiedMemoryResource.hpp
     HipUnifiedMemoryResourceFactory.hpp
+    HipPinnedMemoryResource.hpp
     HipPinnedMemoryResourceFactory.hpp)
 
   set (umpire_resource_sources
     ${umpire_resource_sources}
     HipDeviceMemoryResource.cpp
     HipDeviceResourceFactory.cpp
+    HipUnifiedMemoryResource.cpp
     HipUnifiedMemoryResourceFactory.cpp
+    HipPinnedMemoryResource.cpp
     HipPinnedMemoryResourceFactory.cpp)
 
   if (UMPIRE_ENABLE_DEVICE_CONST)

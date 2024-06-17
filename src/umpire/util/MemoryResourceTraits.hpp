@@ -19,6 +19,7 @@ namespace umpire {
 
 struct MemoryResourceTraits {
   MemoryResourceTraits(){};
+
   enum class optimized_for { any, latency, bandwidth, access };
 
   enum class vendor_type { unknown, amd, ibm, intel, nvidia };
@@ -28,6 +29,8 @@ struct MemoryResourceTraits {
   enum class resource_type { unknown, host, device, device_const, pinned, um, file, shared };
 
   enum class shared_scope { unknown, node, socket };
+
+  enum class granularity_type { unknown, fine_grained, coarse_grained };
 
   int id;
 
@@ -46,6 +49,7 @@ struct MemoryResourceTraits {
   optimized_for used_for = optimized_for::any;
   resource_type resource = resource_type::unknown;
   shared_scope scope = shared_scope::unknown;
+  granularity_type granularity = granularity_type::unknown;
   bool tracking{true};
 };
 

@@ -146,6 +146,15 @@ Allocator ResourceManager::makeResource(const std::string& name, MemoryResourceT
   if (name.find("DEVICE") != std::string::npos) {
     traits.id = resource::resource_to_device_id(name);
   }
+
+  if (name.find("::COARSE") != std::string::npos) {
+    traits.granularity = MemoryResourceTraits::granularity_type::coarse_grained;
+  }
+
+  if (name.find("::FINE") != std::string::npos) {
+    traits.granularity = MemoryResourceTraits::granularity_type::fine_grained;
+  }
+
   std::unique_ptr<strategy::AllocationStrategy> allocator{registry.makeMemoryResource(name, getNextId(), traits)};
   allocator->setTracking(traits.tracking);
 
