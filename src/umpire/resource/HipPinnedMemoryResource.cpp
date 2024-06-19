@@ -1,10 +1,10 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-22, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/resource/HipDeviceMemoryResource.hpp"
+#include "umpire/resource/HipPinnedMemoryResource.hpp"
 
 #include <memory>
 #include <sstream>
@@ -15,43 +15,29 @@
 namespace umpire {
 namespace resource {
 
-HipDeviceMemoryResource::HipDeviceMemoryResource(Platform platform, const std::string& name, int id,
+HipPinnedMemoryResource::HipPinnedMemoryResource(Platform platform, const std::string& name, int id,
                                                  MemoryResourceTraits traits)
     : MemoryResource(name, id, traits), m_allocator{traits.granularity}, m_platform(platform)
 {
 }
 
-void* HipDeviceMemoryResource::allocate(std::size_t bytes)
+void* HipPinnedMemoryResource::allocate(std::size_t bytes)
 {
-  int old_device;
-  hipGetDevice(&old_device);
-  if (old_device != m_traits.id)
-    hipSetDevice(m_traits.id);
-
   void* ptr = m_allocator.allocate(bytes);
 
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
 
-  if (old_device != m_traits.id)
-    hipSetDevice(old_device);
   return ptr;
 }
 
-void HipDeviceMemoryResource::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
+void HipPinnedMemoryResource::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
 {
-  int old_device;
-  hipGetDevice(&old_device);
-  if (old_device != m_traits.id)
-    hipSetDevice(m_traits.id);
-
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
 
   m_allocator.deallocate(ptr);
-  if (old_device != m_traits.id)
-    hipSetDevice(old_device);
 }
 
-bool HipDeviceMemoryResource::isAccessibleFrom(Platform p) noexcept
+bool HipPinnedMemoryResource::isAccessibleFrom(Platform p) noexcept
 {
   if (p == Platform::hip || p == Platform::host)
     return true;
@@ -59,7 +45,7 @@ bool HipDeviceMemoryResource::isAccessibleFrom(Platform p) noexcept
     return false;
 }
 
-Platform HipDeviceMemoryResource::getPlatform() noexcept
+Platform HipPinnedMemoryResource::getPlatform() noexcept
 {
   return m_platform;
 }

@@ -9,18 +9,49 @@
 
 #include <hip/hip_runtime.h>
 
+#include "umpire/alloc/HipAllocator.hpp"
+#include "umpire/config.hpp"
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/Platform.hpp"
 #include "umpire/util/error.hpp"
 
 namespace umpire {
 namespace alloc {
 
-struct HipPinnedAllocator {
+struct HipPinnedAllocator : HipAllocator {
+  using HipAllocator::HipAllocator;
+
   void* allocate(std::size_t bytes)
   {
+    hipError_t error;
     void* ptr{nullptr};
 
-    hipError_t error = ::hipHostMalloc(&ptr, bytes);
+    switch (m_granularity) {
+      default:
+      case MemoryResourceTraits::granularity_type::unknown:
+        UMPIRE_LOG(Debug, "::hipHostMalloc(" << bytes << ")");
+        error = ::hipHostMalloc(&ptr, bytes);
+        break;
+
+      case MemoryResourceTraits::granularity_type::fine_grained:
+#ifdef UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY
+        UMPIRE_LOG(Debug, "::hipHostMalloc(" << bytes << ", hipHostMallocDefault)");
+        error = ::hipHostMalloc(&ptr, bytes, hipHostMallocDefault);
+#else
+        UMPIRE_ERROR(runtime_error, fmt::format("Fine grained memory coherence not supported for allocation"));
+#endif // UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY
+        break;
+
+      case MemoryResourceTraits::granularity_type::coarse_grained:
+#ifdef UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY
+        UMPIRE_LOG(Debug, "::hipHostMalloc(" << bytes << ", hipHostMallocNonCoherent)");
+        error = ::hipHostMalloc(&ptr, bytes, hipHostMallocNonCoherent);
+#else
+        UMPIRE_ERROR(runtime_error, fmt::format("Coarse grained memory coherence not supported for allocation"));
+#endif // UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY
+        break;
+    }
+
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
     if (error != hipSuccess) {
       if (error == hipErrorMemoryAllocation) {

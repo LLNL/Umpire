@@ -8,6 +8,7 @@
 #define UMPIRE_MemoryResourceTypes_HPP
 
 #include <cstddef>
+#include <regex>
 #include <string>
 
 #include "umpire/config.hpp"
@@ -105,9 +106,12 @@ inline MemoryResourceType string_to_resource(const std::string& resource)
 
 inline int resource_to_device_id(const std::string& resource)
 {
+  const std::regex id_regex{R"(.*::(\d+))", std::regex_constants::ECMAScript | std::regex_constants::optimize};
+  std::smatch m;
+
   int device_id{0};
-  if (resource.find("::") != std::string::npos) {
-    device_id = std::stoi(resource.substr(resource.find("::") + 2));
+  if (std::regex_match(resource, m, id_regex)) {
+    device_id = std::stoi(m[1]);
   } else {
 // get the device bound to the current process
 #if defined(UMPIRE_ENABLE_CUDA)

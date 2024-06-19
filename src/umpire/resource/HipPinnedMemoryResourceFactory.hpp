@@ -7,6 +7,7 @@
 #ifndef UMPIRE_HipPinnedMemoryResourceFactory_HPP
 #define UMPIRE_HipPinnedMemoryResourceFactory_HPP
 
+#include "umpire/resource/HipPinnedMemoryResource.hpp"
 #include "umpire/resource/MemoryResourceFactory.hpp"
 
 namespace umpire {
