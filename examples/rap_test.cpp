@@ -56,6 +56,7 @@ __global__ void touch_data_again(double* data, int len)
 
 int main(int, char**)
 {
+/*
   int device = 0; // Assuming we're querying properties for device 0
   cudaDeviceProp prop;
   cudaGetDeviceProperties(&prop, device);
@@ -64,35 +65,45 @@ int main(int, char**)
   float clockFrequencyMHz = prop.clockRate / 1000.0f;
 
   printf("Clock frequency of CUDA device %d: %.2f MHz\n", device, clockFrequencyMHz);
-
+*/
   auto& rm = umpire::ResourceManager::getInstance();
   auto pool = rm.makeAllocator<umpire::strategy::ResourceAwarePool>("rap-pool", rm.getAllocator("UM"));
   int NUM_BLOCKS = NUM_THREADS / BLOCK_SIZE;
 
-  Cuda c1, c2;
-  Resource r1{c1}, r2{c2};
+#if defined(UMPIRE_ENABLE_CUDA)
+  Cuda d1, d2;
+#elif defined(UMPIRE_ENABLE_HIP)
+  Hip d1, d2;
+#else
+  Host d1, d2;
+#endif
+  Resource r1{d1}, r2{d2};
 
   //allocate memory with s1 stream for a
   double* a = static_cast<double*>(pool.allocate(r1, NUM_THREADS * sizeof(double)));
 
   //with stream s1, use memory in a in kernels
-  touch_data<<<NUM_BLOCKS, BLOCK_SIZE, 0, c1.get_stream()>>>(a, NUM_THREADS);
-  do_sleep<<<NUM_BLOCKS, BLOCK_SIZE, 0, c1.get_stream()>>>();
-  check_data<<<NUM_BLOCKS, BLOCK_SIZE, 0, c1.get_stream()>>>(a, NUM_THREADS);
+  touch_data<<<NUM_BLOCKS, BLOCK_SIZE, 0, d1.get_stream()>>>(a, NUM_THREADS);
+  do_sleep<<<NUM_BLOCKS, BLOCK_SIZE, 0, d1.get_stream()>>>();
+  check_data<<<NUM_BLOCKS, BLOCK_SIZE, 0, d1.get_stream()>>>(a, NUM_THREADS);
 
   //deallocate and reallocate a using different streams
   pool.deallocate(r1, a);
   a = static_cast<double*>(pool.allocate(r2, NUM_THREADS * sizeof(double)));
 
   //with stream s2, use memory in reallocated a in kernel
-  touch_data_again<<<NUM_BLOCKS, BLOCK_SIZE, 0, c2.get_stream()>>>(a, NUM_THREADS);
+  touch_data_again<<<NUM_BLOCKS, BLOCK_SIZE, 0, d2.get_stream()>>>(a, NUM_THREADS);
 
   //after this, all of this is just for checking/validation purposes
   double* b = static_cast<double*>(pool.allocate(r2, NUM_THREADS * sizeof(double)));
   rm.copy(b, a);
   b = static_cast<double*>(rm.move(b, rm.getAllocator("HOST")));
 
+#if defined(UMPIRE_ENABLE_CUDA)
   cudaDeviceSynchronize();
+#elif defined(UMPIRE_ENABLE_HIP)
+  hipDeviceSynchronize();
+#endif
 
   std::cout << "Values are: " <<std::endl;
   for (int i = 0; i < NUM_THREADS; i++) {

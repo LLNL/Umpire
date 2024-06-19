@@ -62,7 +62,7 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource const& r, s
 
   Chunk* chunk{nullptr};
 
-  if (best == m_size_map.end()) {
+  if (best == m_size_map.end()) { //if this is the first use...
     std::size_t bytes_to_use{(m_actual_bytes == 0) ? m_first_minimum_pool_allocation_size
                                                    : m_next_minimum_pool_allocation_size};
 
@@ -106,6 +106,9 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource const& r, s
   } else {
     chunk = (*best).second;
     m_size_map.erase(best);
+    //Is there where I check for same or different resource?
+    //if(!chunk.m_resource == r)
+    //  if(!r.get_event().check()) -- use different chunk of memory
   }
 
   UMPIRE_LOG(Debug, "Using chunk " << chunk << " with data " << chunk->data << " and size " << chunk->size
@@ -158,7 +161,8 @@ void ResourceAwarePool::deallocate_resource(camp::resources::Resource const& UMP
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   auto chunk = (*m_pointer_map.find(ptr)).second;
-  //chunk.is_pending = true; - this doesn't need any kind of protection does it?
+  //chunk.m_is_pending = true; - this doesn't need any kind of protection does it?
+  //need to update through map instead right?
   chunk->free = true;
 
   m_current_bytes -= chunk->size;
@@ -219,7 +223,8 @@ void ResourceAwarePool::deallocate_resource(camp::resources::Resource const& UMP
     do_coalesce(suggested_size);
   }
   //camp::resources::EventProxy<resource_type> e{r};
-  //chunk.is_pending = false ... If we've gotten to this point, does that mean we are no longer pending? Maybe do this in allocate?
+  //chunk.m_event = e;
+  //chunk.m_is_pending = false ... If we've gotten to this point, does that mean we are no longer pending? Maybe do this in allocate?
 }
 
 void ResourceAwarePool::release()
@@ -232,6 +237,7 @@ void ResourceAwarePool::release()
 
   for (auto pair = m_size_map.begin(); pair != m_size_map.end();) {
     auto chunk = (*pair).second;
+    //if(chunk.is_pending == true) do an event check. if event has occurred set is_pending to false
     UMPIRE_LOG(Debug, "Found chunk @ " << chunk->data);
     if ((chunk->size == chunk->chunk_size) && chunk->free) {
       UMPIRE_LOG(Debug, "Releasing chunk " << chunk->data);
@@ -280,6 +286,8 @@ std::size_t ResourceAwarePool::getTotalBlocks() const noexcept
 {
   return m_total_blocks;
 }
+
+//Could create a function that returns the number of pending chunks...
 
 std::size_t ResourceAwarePool::getActualSize() const noexcept
 {

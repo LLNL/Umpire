@@ -51,7 +51,12 @@ if (UMPIRE_ENABLE_HIP)
     SOURCES my_test.cpp
     DEPENDS_ON umpire blt::hip)
 
-  list(APPEND umpire_examples multi_device my_test)
+  blt_add_executable(
+    NAME rap_test
+    SOURCES rap_test.cpp
+    DEPENDS_ON umpire blt::hip)
+
+  list(APPEND umpire_examples multi_device rap_test my_test)
 endif()
 
 blt_add_executable(
