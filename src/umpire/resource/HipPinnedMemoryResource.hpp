@@ -1,14 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-22, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_HipConstantMemoryResource_HPP
-#define UMPIRE_HipConstantMemoryResource_HPP
+#ifndef UMPIRE_HipPinnedMemoryResource_HPP
+#define UMPIRE_HipPinnedMemoryResource_HPP
 
-#include <mutex>
-
+#include "umpire/alloc/HipPinnedAllocator.hpp"
 #include "umpire/resource/MemoryResource.hpp"
 #include "umpire/util/AllocationRecord.hpp"
 #include "umpire/util/Platform.hpp"
@@ -16,32 +15,27 @@
 namespace umpire {
 namespace resource {
 
-class HipConstantMemoryResource : public MemoryResource {
+/*!
+ * \brief Concrete MemoryResource object that uses the template _allocator to
+ * allocate and deallocate memory.
+ */
+class HipPinnedMemoryResource : public MemoryResource {
  public:
-  HipConstantMemoryResource(const std::string& name, int id, MemoryResourceTraits traits);
+  HipPinnedMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits);
 
   void* allocate(std::size_t bytes);
   void deallocate(void* ptr, std::size_t size);
 
-  std::size_t getCurrentSize() const noexcept;
-  std::size_t getHighWatermark() const noexcept;
-
   bool isAccessibleFrom(Platform p) noexcept;
   Platform getPlatform() noexcept;
 
- private:
-  std::size_t m_current_size;
-  std::size_t m_highwatermark;
+ protected:
+  alloc::HipPinnedAllocator m_allocator;
 
   Platform m_platform;
-
-  std::size_t m_offset;
-  void* m_ptr;
-
-  std::mutex m_mutex;
 };
 
 } // end of namespace resource
 } // end of namespace umpire
 
-#endif // UMPIRE_HipConstantMemoryResource_HPP
+#endif // UMPIRE_HipPinnedMemoryResource_HPP
