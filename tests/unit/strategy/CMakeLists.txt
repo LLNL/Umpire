@@ -13,6 +13,12 @@ if (UMPIRE_ENABLE_OPENMP_TARGET)
     openmp)
 endif ()
 
+if (UMPIRE_ENABLE_CUDA)
+  set (strategy_tests_depends
+    ${strategy_tests_depends}
+    cuda)
+endif ()
+
 blt_add_executable(
   NAME pool_heuristics_tests
   SOURCES pool_heuristics_tests.cpp
@@ -25,6 +31,11 @@ blt_add_test(
 blt_add_executable(
   NAME fixed_pool_tests
   SOURCES fixed_pool_tests.cpp
+  DEPENDS_ON ${strategy_tests_depends})
+
+blt_add_executable(
+  NAME resource_aware_pool_tests
+  SOURCES resource_aware_pool_tests.cpp
   DEPENDS_ON ${strategy_tests_depends})
 
 blt_add_test(

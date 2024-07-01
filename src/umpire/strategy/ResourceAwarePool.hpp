@@ -72,8 +72,8 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
 
   ///////
   void* allocate(std::size_t bytes) override;
-  void* allocate_resource(Resource const& r, std::size_t bytes) override;
-  void deallocate_resource(Resource const& r, void* ptr, std::size_t size) override;
+  void* allocate_resource(Resource  r, std::size_t bytes) override;
+  void deallocate_resource(Resource r, void* ptr, std::size_t size) override;
   void deallocate(void* ptr, std::size_t size) override;
   ///////
   void release() override;
@@ -84,6 +84,7 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
   std::size_t getActualHighwaterMark() const noexcept;
 
   Platform getPlatform() noexcept override;
+  Resource getResource(void* ptr) const noexcept;
 
   MemoryResourceTraits getTraits() const noexcept override;
 
@@ -164,7 +165,7 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
     ///////
     Resource m_resource;
     Event m_event;
-    bool m_is_pending{false};
+    //bool m_is_pending{false};
     ///////
   };
 

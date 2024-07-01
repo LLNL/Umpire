@@ -54,7 +54,7 @@ void* ResourceAwarePool::allocate(std::size_t UMPIRE_UNUSED_ARG(bytes))
   return ptr;
 }
 
-void* ResourceAwarePool::allocate_resource(camp::resources::Resource const& r, std::size_t bytes)
+void* ResourceAwarePool::allocate_resource(camp::resources::Resource r, std::size_t bytes)
 {
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ")");
   const std::size_t rounded_bytes{aligned_round_up(bytes)};
@@ -62,7 +62,7 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource const& r, s
 
   Chunk* chunk{nullptr};
 
-  if (best == m_size_map.end()) { //if this is the first use...
+  if (best == m_size_map.end()) { //if it did not find best in map
     std::size_t bytes_to_use{(m_actual_bytes == 0) ? m_first_minimum_pool_allocation_size
                                                    : m_next_minimum_pool_allocation_size};
 
@@ -103,12 +103,36 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource const& r, s
 
     void* chunk_storage{m_chunk_pool.allocate()};
     chunk = new (chunk_storage) Chunk{ret, size, size, r};
-  } else {
-    chunk = (*best).second;
-    m_size_map.erase(best);
-    //Is there where I check for same or different resource?
-    //if(!chunk.m_resource == r)
-    //  if(!r.get_event().check()) -- use different chunk of memory
+  } else { //found best in the map
+    //if(!(chunk->m_resource == r)) {
+      //if(!r.get_event().check()) { //use different chunk of memory
+        /*
+        std::size_t bytes_to_use{(m_actual_bytes == 0) ? m_first_minimum_pool_allocation_size
+                                                   : m_next_minimum_pool_allocation_size};
+        std::size_t size{(rounded_bytes > bytes_to_use) ? rounded_bytes : bytes_to_use};
+        m_actual_bytes += size;
+        m_releasable_bytes += size;
+        m_releasable_blocks++;
+        m_total_blocks++;
+        m_actual_highwatermark = (m_actual_bytes > m_actual_highwatermark) ? m_actual_bytes : m_actual_highwatermark;
+        */
+        //void* ret{nullptr};
+        //ret = aligned_allocate((*best).first);
+
+        //void* chunk_storage{m_chunk_pool.allocate()};
+        //chunk = new (chunk_storage) Chunk{ret, (*best).first, (*best).first, r};
+        //do i erase best?
+        //m_size_map.erase(best);
+      //} else {
+      //  chunk = (*best).second;
+      //  m_size_map.erase(best);
+      //}
+    //} //else {
+    //if(chunk->m_resource == camp::resources::Cuda()) std::cerr<< "the resource is cuda" <<std::endl;
+    if(r == camp::resources::Cuda()) std::cerr<< "the PASSED IN resource is cuda" <<std::endl;
+      chunk = (*best).second;
+      m_size_map.erase(best);
+    //}
   }
 
   UMPIRE_LOG(Debug, "Using chunk " << chunk << " with data " << chunk->data << " and size " << chunk->size
@@ -157,12 +181,10 @@ void ResourceAwarePool::deallocate(void* ptr, std::size_t size)
   deallocate_resource(r, ptr, size);
 }
 
-void ResourceAwarePool::deallocate_resource(camp::resources::Resource const& UMPIRE_UNUSED_ARG(r), void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
+void ResourceAwarePool::deallocate_resource(camp::resources::Resource r, void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   auto chunk = (*m_pointer_map.find(ptr)).second;
-  //chunk.m_is_pending = true; - this doesn't need any kind of protection does it?
-  //need to update through map instead right?
   chunk->free = true;
 
   m_current_bytes -= chunk->size;
@@ -222,9 +244,13 @@ void ResourceAwarePool::deallocate_resource(camp::resources::Resource const& UMP
     UMPIRE_LOG(Debug, "coalesce heuristic true, performing coalesce.");
     do_coalesce(suggested_size);
   }
-  //camp::resources::EventProxy<resource_type> e{r};
-  //chunk.m_event = e;
-  //chunk.m_is_pending = false ... If we've gotten to this point, does that mean we are no longer pending? Maybe do this in allocate?
+
+  //Create/record event when deallocate is done
+  camp::resources::Event e{r.get_event()};
+  //chunk->m_event = e;
+  //m_pending_map.insert(std::make_pair(chunk, true));
+  //This would be creating a camp event which should call CudaEvent which should call cudaEventRecord.
+  //When the event gets recorded, that is when the deallocate has finished (and is no longer pending...)
 }
 
 void ResourceAwarePool::release()
@@ -237,7 +263,11 @@ void ResourceAwarePool::release()
 
   for (auto pair = m_size_map.begin(); pair != m_size_map.end();) {
     auto chunk = (*pair).second;
-    //if(chunk.is_pending == true) do an event check. if event has occurred set is_pending to false
+    //To keep the m_pending_map up to date with only those events that are still pending
+    //This will check all chunks in m_pending_map and erase the entry if event is complete
+    //if(chunk.m_resource.get_event().check()) {
+    //  m_pending_map.erase(chunk);      
+    //}
     UMPIRE_LOG(Debug, "Found chunk @ " << chunk->data);
     if ((chunk->size == chunk->chunk_size) && chunk->free) {
       UMPIRE_LOG(Debug, "Releasing chunk " << chunk->data);
@@ -315,10 +345,11 @@ Platform ResourceAwarePool::getPlatform() noexcept
 }
 
 //Given a chunk, return it's resource... is this needed?
-//camp::resources::Resource* ResourceAwarePool::getResource() noexcept
-//{
-  //return r;
-//}
+camp::resources::Resource ResourceAwarePool::getResource(void* ptr) const noexcept
+{
+  auto chunk = (*m_pointer_map.find(ptr)).second;
+  return chunk->m_resource;
+}
 
 MemoryResourceTraits ResourceAwarePool::getTraits() const noexcept
 {

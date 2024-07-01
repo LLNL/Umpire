@@ -31,7 +31,7 @@ __global__ void touch_data(double* data, int len)
 __global__ void do_sleep()
 {
   //sleep - works still at 1000, so keeping it at 100k
-  sleep(100000);
+  sleep(1000000);
 }
 
 __global__ void check_data(double* data, int len)
@@ -69,35 +69,45 @@ int main(int, char**)
   auto& rm = umpire::ResourceManager::getInstance();
   auto pool = rm.makeAllocator<umpire::strategy::ResourceAwarePool>("rap-pool", rm.getAllocator("UM"));
   int NUM_BLOCKS = NUM_THREADS / BLOCK_SIZE;
+  std::cout << "HERE1 " <<std::endl;
 
 #if defined(UMPIRE_ENABLE_CUDA)
-  Cuda d1, d2;
+  Cuda d1, d2, d3;
 #elif defined(UMPIRE_ENABLE_HIP)
-  Hip d1, d2;
+  Hip d1, d2, d3;
 #else
-  Host d1, d2;
+  Host d1, d2, d3;
 #endif
-  Resource r1{d1}, r2{d2};
+  Resource r1{d1}, r2{d2}, r3{d3};
 
   //allocate memory with s1 stream for a
   double* a = static_cast<double*>(pool.allocate(r1, NUM_THREADS * sizeof(double)));
+  std::cout << "HERE2 " <<std::endl;
 
   //with stream s1, use memory in a in kernels
   touch_data<<<NUM_BLOCKS, BLOCK_SIZE, 0, d1.get_stream()>>>(a, NUM_THREADS);
   do_sleep<<<NUM_BLOCKS, BLOCK_SIZE, 0, d1.get_stream()>>>();
   check_data<<<NUM_BLOCKS, BLOCK_SIZE, 0, d1.get_stream()>>>(a, NUM_THREADS);
+  std::cout << "HERE3 " <<std::endl;
 
   //deallocate and reallocate a using different streams
   pool.deallocate(r1, a);
+  std::cout << "HERE3-first " <<std::endl;
   a = static_cast<double*>(pool.allocate(r2, NUM_THREADS * sizeof(double)));
+  std::cout << "HERE3-second " <<std::endl;
+  std::cout << "HERE4 " <<std::endl;
 
   //with stream s2, use memory in reallocated a in kernel
   touch_data_again<<<NUM_BLOCKS, BLOCK_SIZE, 0, d2.get_stream()>>>(a, NUM_THREADS);
+  std::cout << "HERE5 " <<std::endl;
 
   //after this, all of this is just for checking/validation purposes
-  double* b = static_cast<double*>(pool.allocate(r2, NUM_THREADS * sizeof(double)));
+  double* b = static_cast<double*>(pool.allocate(r3, NUM_THREADS * sizeof(double)));
+  std::cout << "HERE6 " <<std::endl;
   rm.copy(b, a);
+  std::cout << "HERE7 " <<std::endl;
   b = static_cast<double*>(rm.move(b, rm.getAllocator("HOST")));
+  std::cout << "HERE8 " <<std::endl;
 
 #if defined(UMPIRE_ENABLE_CUDA)
   cudaDeviceSynchronize();
@@ -105,6 +115,7 @@ int main(int, char**)
   hipDeviceSynchronize();
 #endif
 
+  std::cout << "HERE9 " <<std::endl;
   std::cout << "Values are: " <<std::endl;
   for (int i = 0; i < NUM_THREADS; i++) {
     std::cout<< b[i] << " ";
@@ -116,6 +127,7 @@ int main(int, char**)
 
   //final deallocations
   pool.deallocate(r2, a);
+  pool.deallocate(r3, a);
   rm.deallocate(b);
   return 0;
 }
