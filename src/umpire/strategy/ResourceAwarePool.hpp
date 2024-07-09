@@ -111,9 +111,9 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
   void coalesce() noexcept;
   void do_coalesce(std::size_t suggested_size) noexcept;
 
- private:
   struct Chunk;
 
+ private:
   template <typename Value>
   class pool_allocator {
    public:
@@ -149,7 +149,7 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
   ///////
   using SizeMap =
       std::multimap<std::size_t, Chunk*, std::less<std::size_t>, pool_allocator<std::pair<const std::size_t, Chunk*>>>;
-
+public:
   struct Chunk {
     Chunk(void* ptr, std::size_t s, std::size_t cs, Resource r) : data{ptr}, size{s}, chunk_size{cs}, m_resource{r}
     {
@@ -165,10 +165,10 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
     ///////
     Resource m_resource;
     Event m_event;
-    //bool m_is_pending{false};
+    bool m_pending{true};
     ///////
   };
-
+private:
   PointerMap m_pointer_map{};
   SizeMap m_size_map{};
   PendingMap m_pending_map{};

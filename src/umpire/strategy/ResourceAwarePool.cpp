@@ -104,9 +104,11 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource r, std::siz
     void* chunk_storage{m_chunk_pool.allocate()};
     chunk = new (chunk_storage) Chunk{ret, size, size, r};
   } else { //found best in the map
-    //if(!(chunk->m_resource == r)) {
-      //if(!r.get_event().check()) { //use different chunk of memory
-        /*
+    chunk = (*best).second;
+    if(!(chunk->m_resource == r)) {
+      if(!chunk->m_resource.get_event().check()) { //use different chunk of memory
+      //if(chunk->m_pending == true) {
+
         std::size_t bytes_to_use{(m_actual_bytes == 0) ? m_first_minimum_pool_allocation_size
                                                    : m_next_minimum_pool_allocation_size};
         std::size_t size{(rounded_bytes > bytes_to_use) ? rounded_bytes : bytes_to_use};
@@ -115,24 +117,15 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource r, std::siz
         m_releasable_blocks++;
         m_total_blocks++;
         m_actual_highwatermark = (m_actual_bytes > m_actual_highwatermark) ? m_actual_bytes : m_actual_highwatermark;
-        */
-        //void* ret{nullptr};
-        //ret = aligned_allocate((*best).first);
+        
+        void* ret{nullptr};
+        ret = aligned_allocate((*best).first);
 
-        //void* chunk_storage{m_chunk_pool.allocate()};
-        //chunk = new (chunk_storage) Chunk{ret, (*best).first, (*best).first, r};
-        //do i erase best?
-        //m_size_map.erase(best);
-      //} else {
-      //  chunk = (*best).second;
-      //  m_size_map.erase(best);
-      //}
-    //} //else {
-    //if(chunk->m_resource == camp::resources::Cuda()) std::cerr<< "the resource is cuda" <<std::endl;
-    if(r == camp::resources::Cuda()) std::cerr<< "the PASSED IN resource is cuda" <<std::endl;
-      chunk = (*best).second;
-      m_size_map.erase(best);
-    //}
+        void* chunk_storage{m_chunk_pool.allocate()};
+        chunk = new (chunk_storage) Chunk{ret, (*best).first, (*best).first, r};
+      }
+    }
+    m_size_map.erase(best);
   }
 
   UMPIRE_LOG(Debug, "Using chunk " << chunk << " with data " << chunk->data << " and size " << chunk->size
@@ -155,7 +148,6 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource r, std::siz
     void* chunk_storage{m_chunk_pool.allocate()};
     Chunk* split_chunk{new (chunk_storage)
                            Chunk{static_cast<char*>(ret) + rounded_bytes, remaining, chunk->chunk_size, r}};
-
     auto old_next = chunk->next;
     chunk->next = split_chunk;
     split_chunk->prev = chunk;
@@ -185,6 +177,9 @@ void ResourceAwarePool::deallocate_resource(camp::resources::Resource r, void* p
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   auto chunk = (*m_pointer_map.find(ptr)).second;
+  chunk->m_pending = true;
+  camp::resources::Event e;
+  chunk->m_event = e;
   chunk->free = true;
 
   m_current_bytes -= chunk->size;
@@ -246,7 +241,8 @@ void ResourceAwarePool::deallocate_resource(camp::resources::Resource r, void* p
   }
 
   //Create/record event when deallocate is done
-  camp::resources::Event e{r.get_event()};
+  chunk->m_event = r.get_event();
+  chunk->m_pending = false;
   //chunk->m_event = e;
   //m_pending_map.insert(std::make_pair(chunk, true));
   //This would be creating a camp event which should call CudaEvent which should call cudaEventRecord.

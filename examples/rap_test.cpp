@@ -92,9 +92,7 @@ int main(int, char**)
 
   //deallocate and reallocate a using different streams
   pool.deallocate(r1, a);
-  std::cout << "HERE3-first " <<std::endl;
   a = static_cast<double*>(pool.allocate(r2, NUM_THREADS * sizeof(double)));
-  std::cout << "HERE3-second " <<std::endl;
   std::cout << "HERE4 " <<std::endl;
 
   //with stream s2, use memory in reallocated a in kernel
@@ -102,7 +100,7 @@ int main(int, char**)
   std::cout << "HERE5 " <<std::endl;
 
   //after this, all of this is just for checking/validation purposes
-  double* b = static_cast<double*>(pool.allocate(r3, NUM_THREADS * sizeof(double)));
+  double* b = static_cast<double*>(pool.allocate(r2, NUM_THREADS * sizeof(double)));
   std::cout << "HERE6 " <<std::endl;
   rm.copy(b, a);
   std::cout << "HERE7 " <<std::endl;
@@ -127,7 +125,7 @@ int main(int, char**)
 
   //final deallocations
   pool.deallocate(r2, a);
-  pool.deallocate(r3, a);
+  //pool.deallocate(r3, a);
   rm.deallocate(b);
   return 0;
 }
