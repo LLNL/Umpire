@@ -123,19 +123,26 @@ if (UMPIRE_ENABLE_CUDA)
   endif()
 
   blt_add_executable(
+    NAME quickpool_heuristic
+    SOURCES quickpool_heuristic.cpp
+    DEPENDS_ON umpire cuda)
+
+  blt_add_executable(
     NAME multi_device
     SOURCES multi_device.cpp
     DEPENDS_ON umpire cuda)
 
   set_source_files_properties(
     multi_device.cpp
+    quickpool_heuristic.cpp
     PROPERTIES CUDA_SEPARABLE_COMPILATION On)
 
   set_target_properties(
     multi_device
+    quickpool_heuristic
     PROPERTIES CUDA_SEPARABLE_COMPILATION On)
 
-  list(APPEND umpire_examples multi_device)
+  list(APPEND umpire_examples multi_device quickpool_heuristic)
 endif()
 
 install(TARGETS ${umpire_examples} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
