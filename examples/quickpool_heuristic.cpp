@@ -12,6 +12,7 @@
 
 int main(int, char**)
 {
+  //Create the instance of the Resource Manager and use it to create an allocator using the DEVICE memory resource.
   auto& rm = umpire::ResourceManager::getInstance();
   auto allocator = rm.getAllocator("DEVICE");
 
@@ -66,8 +67,6 @@ int main(int, char**)
     c[i] = pool3.allocate(1024);
     d[i] = pool4.allocate(1024);
   }
-
-  //Do computation
 
   //Only deallocate one element of the array so that one block is freed up.
   pool1.deallocate(a[1]);
