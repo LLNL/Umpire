@@ -56,21 +56,11 @@ __global__ void touch_data_again(double* data, int len)
 
 int main(int, char**)
 {
-/*
-  int device = 0; // Assuming we're querying properties for device 0
-  cudaDeviceProp prop;
-  cudaGetDeviceProperties(&prop, device);
-
-  // Get clock frequency in kHz and convert to MHz
-  float clockFrequencyMHz = prop.clockRate / 1000.0f;
-
-  printf("Clock frequency of CUDA device %d: %.2f MHz\n", device, clockFrequencyMHz);
-*/
   auto& rm = umpire::ResourceManager::getInstance();
   auto pool = rm.makeAllocator<umpire::strategy::ResourceAwarePool>("rap-pool", rm.getAllocator("UM"));
   int NUM_BLOCKS = NUM_THREADS / BLOCK_SIZE;
-  std::cout << "HERE1 " <<std::endl;
 
+  //Create camp resources
 #if defined(UMPIRE_ENABLE_CUDA)
   Cuda d1, d2, d3;
 #elif defined(UMPIRE_ENABLE_HIP)
@@ -80,40 +70,34 @@ int main(int, char**)
 #endif
   Resource r1{d1}, r2{d2}, r3{d3};
 
-  //allocate memory with s1 stream for a
+  //allocate memory in the pool with r1
   double* a = static_cast<double*>(pool.allocate(r1, NUM_THREADS * sizeof(double)));
-  std::cout << "HERE2 " <<std::endl;
 
-  //with stream s1, use memory in a in kernels
+  //launch kernels on r1's stream
   touch_data<<<NUM_BLOCKS, BLOCK_SIZE, 0, d1.get_stream()>>>(a, NUM_THREADS);
   do_sleep<<<NUM_BLOCKS, BLOCK_SIZE, 0, d1.get_stream()>>>();
   check_data<<<NUM_BLOCKS, BLOCK_SIZE, 0, d1.get_stream()>>>(a, NUM_THREADS);
-  std::cout << "HERE3 " <<std::endl;
 
-  //deallocate and reallocate a using different streams
+  //deallocate memory with r1 and reallocate using a different stream r2
   pool.deallocate(r1, a);
   a = static_cast<double*>(pool.allocate(r2, NUM_THREADS * sizeof(double)));
-  std::cout << "HERE4 " <<std::endl;
 
-  //with stream s2, use memory in reallocated a in kernel
+  //launch kernel with r2's stream using newly reallocated 'a'
   touch_data_again<<<NUM_BLOCKS, BLOCK_SIZE, 0, d2.get_stream()>>>(a, NUM_THREADS);
-  std::cout << "HERE5 " <<std::endl;
 
-  //after this, all of this is just for checking/validation purposes
+  //bring final data from 'a' back to host var 'b'
   double* b = static_cast<double*>(pool.allocate(r2, NUM_THREADS * sizeof(double)));
-  std::cout << "HERE6 " <<std::endl;
   rm.copy(b, a);
-  std::cout << "HERE7 " <<std::endl;
   b = static_cast<double*>(rm.move(b, rm.getAllocator("HOST")));
-  std::cout << "HERE8 " <<std::endl;
 
+  //For validation/error checking below, synchronize host and device
 #if defined(UMPIRE_ENABLE_CUDA)
   cudaDeviceSynchronize();
 #elif defined(UMPIRE_ENABLE_HIP)
   hipDeviceSynchronize();
 #endif
 
-  std::cout << "HERE9 " <<std::endl;
+  //Error check and validation
   std::cout << "Values are: " <<std::endl;
   for (int i = 0; i < NUM_THREADS; i++) {
     std::cout<< b[i] << " ";
@@ -123,9 +107,8 @@ int main(int, char**)
   }
   std::cout << "Kernel succeeded! Expected result returned" << std::endl;
 
-  //final deallocations
+  //deallocate and clean up
   pool.deallocate(r2, a);
-  //pool.deallocate(r3, a);
   rm.deallocate(b);
   return 0;
 }
