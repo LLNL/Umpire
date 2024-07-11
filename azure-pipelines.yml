@@ -48,8 +48,8 @@ jobs:
       #   docker_target: cuda
       hip:
         docker_target: hip
-      umap_build:
-        docker_target: umap_build
+      # umap_build:
+      #   docker_target: umap_build
   pool:
     vmImage: 'ubuntu-latest'
   variables:
