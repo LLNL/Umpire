@@ -108,12 +108,14 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
   std::size_t getReleasableBlocks() const noexcept;
   std::size_t getTotalBlocks() const noexcept;
 
-  void coalesce() noexcept;
-  void do_coalesce(std::size_t suggested_size) noexcept;
+  void coalesce(camp::resources::Resource r) noexcept;
+  void do_coalesce(camp::resources::Resource r, std::size_t suggested_size) noexcept;
 
   struct Chunk;
 
  private:
+  void do_deallocate(Chunk* chunk, bool merge_pending_chunk) noexcept;
+
   template <typename Value>
   class pool_allocator {
    public:
