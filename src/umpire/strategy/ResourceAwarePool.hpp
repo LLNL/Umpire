@@ -108,8 +108,8 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
   std::size_t getReleasableBlocks() const noexcept;
   std::size_t getTotalBlocks() const noexcept;
 
-  void coalesce(camp::resources::Resource r) noexcept;
-  void do_coalesce(camp::resources::Resource r, std::size_t suggested_size) noexcept;
+  void coalesce() noexcept;
+  void do_coalesce(std::size_t suggested_size) noexcept;
 
   struct Chunk;
 
@@ -146,9 +146,8 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
   };
 
   using PointerMap = std::unordered_map<void*, Chunk*>;
-  ///////
-  using PendingMap = std::unordered_map<Chunk*, bool>;
-  ///////
+  //using PendingMap = std::unordered_map<camp::resources::Resource, Chunk*>;
+  using PendingMap = std::vector<Chunk*>;
   using SizeMap =
       std::multimap<std::size_t, Chunk*, std::less<std::size_t>, pool_allocator<std::pair<const std::size_t, Chunk*>>>;
 public:
@@ -164,16 +163,13 @@ public:
     Chunk* prev{nullptr};
     Chunk* next{nullptr};
     SizeMap::iterator size_map_it;
-    ///////
     Resource m_resource;
     Event m_event;
-    bool m_pending{true};
-    ///////
   };
 private:
   PointerMap m_pointer_map{};
   SizeMap m_size_map{};
-  PendingMap m_pending_map{};
+  PendingMap m_pending_chunks{};
 
   util::FixedMallocPool m_chunk_pool{sizeof(Chunk)};
 
