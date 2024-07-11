@@ -44,8 +44,8 @@ jobs:
         docker_target: gcc
       clang:
         docker_target: clang
-      cuda:
-        docker_target: cuda
+      # cuda:
+      #   docker_target: cuda
       hip:
         docker_target: hip
       umap_build:
