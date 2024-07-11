@@ -17,7 +17,7 @@ project(Umpire
   LANGUAGES CXX C
   VERSION 2024.02.1)
 
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.23)
 
 set(UMPIRE_VERSION_RC "")
 
