@@ -1,0 +1,14 @@
+on: push
+name: Build
+jobs:
+  build:
+    strategy:
+      matrix:
+        target: [gcc, clang, hip, cuda]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: docker/setup-buildx-action@v3
+    - uses: docker/build-push-action@v6
+      with:
+        target: ${{ matrix.target }}
