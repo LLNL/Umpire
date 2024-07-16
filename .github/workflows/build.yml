@@ -4,7 +4,7 @@ jobs:
   build_docker:
     strategy:
       matrix:
-        target: [gcc, clang, hip, cuda]
+        target: [gcc, clang, hip, cuda, sycl, intel]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
