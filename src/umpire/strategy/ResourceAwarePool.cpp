@@ -87,16 +87,16 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource r, std::siz
       //uncommenting that out causes a seg fault at the very end, so no probably not
   }
   if (chunk == nullptr) {
-  if (best == m_free_map.end()) { //if it did not find best in map
-    std::size_t bytes_to_use{(m_actual_bytes == 0) ? m_first_minimum_pool_allocation_size
-                                                   : m_next_minimum_pool_allocation_size};
+    if (best == m_free_map.end()) { //if it did not find best in map
+      std::size_t bytes_to_use{(m_actual_bytes == 0) ? m_first_minimum_pool_allocation_size
+                                                     : m_next_minimum_pool_allocation_size};
 
-    std::size_t size{(rounded_bytes > bytes_to_use) ? rounded_bytes : bytes_to_use};
+      std::size_t size{(rounded_bytes > bytes_to_use) ? rounded_bytes : bytes_to_use};
 
-    UMPIRE_LOG(Debug, "Allocating new chunk of size " << size);
+      UMPIRE_LOG(Debug, "Allocating new chunk of size " << size);
 
-    void* ret{nullptr};
-    try {
+      void* ret{nullptr};
+      try {
 #if defined(UMPIRE_ENABLE_BACKTRACE)
       {
         umpire::util::backtrace bt;
@@ -105,52 +105,52 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource r, std::siz
                                         << umpire::util::backtracer<>::print(bt));
       }
 #endif
-      ret = aligned_allocate(size); // Will Poison
-    } catch (...) {
-      UMPIRE_LOG(Error,
-                 "Caught error allocating new chunk, giving up free chunks and "
-                 "retrying...");
-      release();
-      try {
         ret = aligned_allocate(size); // Will Poison
-        UMPIRE_LOG(Debug, "memory reclaimed, chunk successfully allocated.");
       } catch (...) {
-        UMPIRE_LOG(Error, "recovery failed.");
-        throw;
+        UMPIRE_LOG(Error,
+                   "Caught error allocating new chunk, giving up free chunks and "
+                   "retrying...");
+        release();
+        try {
+          ret = aligned_allocate(size); // Will Poison
+          UMPIRE_LOG(Debug, "memory reclaimed, chunk successfully allocated.");
+        } catch (...) {
+          UMPIRE_LOG(Error, "recovery failed.");
+          throw;
+        }
       }
-    }
 
-    m_actual_bytes += size;
-    m_releasable_bytes += size;
-    m_releasable_blocks++;
-    m_total_blocks++;
-    m_actual_highwatermark = (m_actual_bytes > m_actual_highwatermark) ? m_actual_bytes : m_actual_highwatermark;
+      m_actual_bytes += size;
+      m_releasable_bytes += size;
+      m_releasable_blocks++;
+      m_total_blocks++;
+      m_actual_highwatermark = (m_actual_bytes > m_actual_highwatermark) ? m_actual_bytes : m_actual_highwatermark;
 
-    void* chunk_storage{m_chunk_pool.allocate()};
-    chunk = new (chunk_storage) Chunk{ret, size, size, r};
-  } else { //found best in the map
-    chunk = (*best).second;
-    if(!(chunk->m_resource == r)) {
-      if(!chunk->m_event.check()) { //use different chunk of memory
+      void* chunk_storage{m_chunk_pool.allocate()};
+      chunk = new (chunk_storage) Chunk{ret, size, size, r};
+    } else { //found best in the map
+      chunk = (*best).second;
+      if(!(chunk->m_resource == r)) {
+        if(!chunk->m_event.check()) { //use different chunk of memory
 
-        std::size_t bytes_to_use{(m_actual_bytes == 0) ? m_first_minimum_pool_allocation_size
-                                                   : m_next_minimum_pool_allocation_size};
-        std::size_t size{(rounded_bytes > bytes_to_use) ? rounded_bytes : bytes_to_use};
-        m_actual_bytes += size;
-        m_releasable_bytes += size;
-        m_releasable_blocks++;
-        m_total_blocks++;
-        m_actual_highwatermark = (m_actual_bytes > m_actual_highwatermark) ? m_actual_bytes : m_actual_highwatermark;
-        
-        void* ret{nullptr};
-        ret = aligned_allocate((*best).first);
+          std::size_t bytes_to_use{(m_actual_bytes == 0) ? m_first_minimum_pool_allocation_size
+                                                     : m_next_minimum_pool_allocation_size};
+          std::size_t size{(rounded_bytes > bytes_to_use) ? rounded_bytes : bytes_to_use};
+          m_actual_bytes += size;
+          m_releasable_bytes += size;
+          m_releasable_blocks++;
+          m_total_blocks++;
+          m_actual_highwatermark = (m_actual_bytes > m_actual_highwatermark) ? m_actual_bytes : m_actual_highwatermark;
+          
+          void* ret{nullptr};
+          ret = aligned_allocate((*best).first);
 
-        void* chunk_storage{m_chunk_pool.allocate()};
-        chunk = new (chunk_storage) Chunk{ret, (*best).first, (*best).first, r};
+          void* chunk_storage{m_chunk_pool.allocate()};
+          chunk = new (chunk_storage) Chunk{ret, (*best).first, (*best).first, r};
+        }
       }
+      m_free_map.erase(best);
     }
-    m_free_map.erase(best);
-  }
   }
 
   UMPIRE_LOG(Debug, "Using chunk " << chunk << " with data " << chunk->data << " and size " << chunk->size
@@ -211,7 +211,13 @@ void ResourceAwarePool::do_deallocate(Chunk* chunk, bool merge_pending_chunk) no
     if (merge_pending_chunk) {
       prev->m_event = chunk->m_event;
       prev->m_resource = chunk->m_resource;
-      //should also copy over "pending status" in m_pending_map too
+
+      //copy over "pending status" in m_pending_map too
+      auto it = std::find(m_pending_map.begin(), m_pending_map.end(), chunk);
+      if(it != m_pending_map.end()) {
+        *it = prev;
+      }
+
     }
 
     if (prev->next)
@@ -283,10 +289,7 @@ void ResourceAwarePool::deallocate_resource(camp::resources::Resource r, void* p
 
   //Create/record event when deallocate is done
   chunk->m_event = r.get_event();
-  //wouldn't m_pending_map need to be popped?
-  //m_pending_map.erase(chunk);
-  //m_pending_map.erase(std::remove(m_pending_map.begin(), m_pending_map.end(), chunk), 
-  //                        m_pending_map.end());
+  //wouldn't m_pending_map need to be popped? I guess we can't guarantee it here? Updated in release...
 }
 
 void ResourceAwarePool::release()
@@ -299,12 +302,13 @@ void ResourceAwarePool::release()
 
   for (auto pair = m_free_map.begin(); pair != m_free_map.end();) {
     auto chunk = (*pair).second;
-    //To keep the m_pending_map up to date with only those events that are still pending
+
     //This will check all chunks in m_pending_map and erase the entry if event is complete
     auto it = std::find(m_pending_map.begin(), m_pending_map.end(), chunk);
-    if(it != m_pending_map.end() && chunk->m_event.check()) { //should i add m_pending_map.count(r) > 0 as a check here?
+    if(it != m_pending_map.end() && chunk->m_event.check()) {
       m_pending_map.erase(it);
     }
+
     UMPIRE_LOG(Debug, "Found chunk @ " << chunk->data);
     if ((chunk->size == chunk->chunk_size) && chunk->free) {
       UMPIRE_LOG(Debug, "Releasing chunk " << chunk->data);
@@ -355,6 +359,10 @@ std::size_t ResourceAwarePool::getTotalBlocks() const noexcept
 }
 
 //Could create a function that returns the number of pending chunks...
+std::size_t ResourceAwarePool::getPendingSize() const noexcept
+{
+  return m_pending_map.size();
+}
 
 std::size_t ResourceAwarePool::getActualSize() const noexcept
 {

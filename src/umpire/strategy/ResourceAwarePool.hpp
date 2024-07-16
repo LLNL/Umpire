@@ -82,6 +82,7 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
   std::size_t getCurrentSize() const noexcept override;
   std::size_t getReleasableSize() const noexcept;
   std::size_t getActualHighwaterMark() const noexcept;
+  std::size_t getPendingSize() const noexcept;
 
   Platform getPlatform() noexcept override;
   Resource getResource(void* ptr) const noexcept;
