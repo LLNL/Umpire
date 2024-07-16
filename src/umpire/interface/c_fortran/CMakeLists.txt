@@ -22,10 +22,17 @@ if (UMPIRE_ENABLE_FORTRAN)
     ${umpire_interface_c_fortran_sources}
     wrapfumpire.f)
 
-  set_source_files_properties(
-    wrapfumpire.f
-    PROPERTIES
-    Fortran_FORMAT FREE)
+  if ("${CMAKE_Fortran_COMPILER_ID}" STREQUAL "Flang")
+    set_source_files_properties(
+      wrapfumpire.f
+      PROPERTIES
+      COMPILE_FLAGS -Mfree)
+  else()
+    set_source_files_properties(
+      wrapfumpire.f
+      PROPERTIES
+      Fortran_FORMAT FREE)
+  endif()
 endif ()
     
 set_source_files_properties(
