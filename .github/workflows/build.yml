@@ -4,9 +4,15 @@ jobs:
   build_docker:
     strategy:
       matrix:
-        target: [gcc, clang, hip, cuda]
+        target: [gcc, clang, hip, cuda, sycl, intel]
     runs-on: ubuntu-latest
     steps:
+    - run: |
+        sudo rm -rf /usr/share/dotnet
+        sudo rm -rf /usr/local/lib/android
+        sudo rm -rf /opt/ghc
+        sudo rm -rf /opt/hostedtoolcache/CodeQL
+        sudo docker image prune --all --force
     - uses: actions/checkout@v2
       with:
         submodules: recursive
