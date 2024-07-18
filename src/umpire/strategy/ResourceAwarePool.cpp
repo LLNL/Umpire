@@ -66,7 +66,7 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource r, std::siz
 
   if (!m_pending_map.empty()) {
     for(auto pending_chunk : m_pending_map) {
-      if (pending_chunk->size >= (*best).first && pending_chunk->m_resource == r) {
+      if (pending_chunk->size >= rounded_bytes && pending_chunk->m_resource == r) {
         chunk->size = pending_chunk->size; // is this necessary?
         chunk = pending_chunk;
         chunk->free = false;
@@ -82,12 +82,10 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource r, std::siz
         break;
       }
     }
-      //do i have to do something with best?
-      //m_free_map.erase(best);
-      //uncommenting that out causes a seg fault at the very end, so no probably not
   }
+
   if (chunk == nullptr) {
-    if (best == m_free_map.end()) { //if it did not find best in map
+    if (best == m_free_map.end()) {
       std::size_t bytes_to_use{(m_actual_bytes == 0) ? m_first_minimum_pool_allocation_size
                                                      : m_next_minimum_pool_allocation_size};
 
@@ -128,27 +126,8 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource r, std::siz
 
       void* chunk_storage{m_chunk_pool.allocate()};
       chunk = new (chunk_storage) Chunk{ret, size, size, r};
-    } else { //found best in the map
+    } else {
       chunk = (*best).second;
-      if(!(chunk->m_resource == r)) {
-        if(!chunk->m_event.check()) { //use different chunk of memory
-
-          std::size_t bytes_to_use{(m_actual_bytes == 0) ? m_first_minimum_pool_allocation_size
-                                                     : m_next_minimum_pool_allocation_size};
-          std::size_t size{(rounded_bytes > bytes_to_use) ? rounded_bytes : bytes_to_use};
-          m_actual_bytes += size;
-          m_releasable_bytes += size;
-          m_releasable_blocks++;
-          m_total_blocks++;
-          m_actual_highwatermark = (m_actual_bytes > m_actual_highwatermark) ? m_actual_bytes : m_actual_highwatermark;
-          
-          void* ret{nullptr};
-          ret = aligned_allocate((*best).first);
-
-          void* chunk_storage{m_chunk_pool.allocate()};
-          chunk = new (chunk_storage) Chunk{ret, (*best).first, (*best).first, r};
-        }
-      }
       m_free_map.erase(best);
     }
   }
@@ -198,8 +177,12 @@ void ResourceAwarePool::deallocate(void* ptr, std::size_t size)
   deallocate_resource(r, ptr, size);
 }
 
-void ResourceAwarePool::do_deallocate(Chunk* chunk, bool merge_pending_chunk) noexcept
+void ResourceAwarePool::do_deallocate(Chunk* chunk) noexcept
 {
+  UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, chunk->size);
+
+  UMPIRE_LOG(Debug, "Deallocating data held by " << chunk);
+
   if (chunk->prev && chunk->prev->free == true) {
     auto prev = chunk->prev;
     UMPIRE_LOG(Debug, "Removing chunk" << prev << " from size map");
@@ -208,17 +191,16 @@ void ResourceAwarePool::do_deallocate(Chunk* chunk, bool merge_pending_chunk) no
 
     prev->size += chunk->size;
     prev->next = chunk->next;
-    if (merge_pending_chunk) {
-      prev->m_event = chunk->m_event;
-      prev->m_resource = chunk->m_resource;
 
-      //copy over "pending status" in m_pending_map too
-      auto it = std::find(m_pending_map.begin(), m_pending_map.end(), chunk);
-      if(it != m_pending_map.end()) {
-        *it = prev;
-      }
+    prev->m_event = chunk->m_event;
+    prev->m_resource = chunk->m_resource;
 
-    }
+    //DO NOT need to copy pending status because if we are DOING the deallocate, it is not pending...
+    //copy over "pending status" in m_pending_map too
+    //auto it = std::find(m_pending_map.begin(), m_pending_map.end(), chunk);
+    //if(it != m_pending_map.end()) {
+    //  *it = prev;
+    //}
 
     if (prev->next)
       prev->next->prev = prev;
@@ -255,7 +237,7 @@ void ResourceAwarePool::do_deallocate(Chunk* chunk, bool merge_pending_chunk) no
   }
 
   chunk->size_map_it = m_free_map.insert(std::make_pair(chunk->size, chunk));
-  //make sure m_pending_map is updated
+  chunk->free = true;
 }
  
 void ResourceAwarePool::deallocate_resource(camp::resources::Resource r, void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
@@ -265,31 +247,22 @@ void ResourceAwarePool::deallocate_resource(camp::resources::Resource r, void* p
 
   //chunk is now pending
   m_pending_map.push_back(chunk);
-  camp::resources::Event e;
-  chunk->m_event = e;
-
-  chunk->free = true;
-
-  m_current_bytes -= chunk->size;
-
-  UMPIRE_LOG(Debug, "Deallocating data held by " << chunk);
-
-  UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, chunk->size);
-
-  //Call deallocate logic for merging a pending chunk
-  do_deallocate(chunk, true);
+  chunk->m_event = r.get_event();
 
   m_used_map.erase(ptr);
+  m_current_bytes -= chunk->size;
+
+  //Call deallocate logic only for a non-pending chunk
+  if(chunk->m_event.check())
+  {
+    do_deallocate(chunk);
+  }
 
   std::size_t suggested_size{m_should_coalesce(*this)};
   if (0 != suggested_size) {
     UMPIRE_LOG(Debug, "coalesce heuristic true, performing coalesce.");
     do_coalesce(suggested_size);
   }
-
-  //Create/record event when deallocate is done
-  chunk->m_event = r.get_event();
-  //wouldn't m_pending_map need to be popped? I guess we can't guarantee it here? Updated in release...
 }
 
 void ResourceAwarePool::release()
@@ -300,15 +273,16 @@ void ResourceAwarePool::release()
   std::size_t prev_size{m_actual_bytes};
 #endif
 
+  //TODO: fix me
+    //This will check all chunks in m_pending_map and erase the entry if event is complete
+    //auto it = std::find(m_pending_map.begin(), m_pending_map.end(), chunk);
+    //if(it != m_pending_map.end() && chunk->m_event.check()) {
+      //
+      //m_pending_map.erase(it);
+    //}
+
   for (auto pair = m_free_map.begin(); pair != m_free_map.end();) {
     auto chunk = (*pair).second;
-
-    //This will check all chunks in m_pending_map and erase the entry if event is complete
-    auto it = std::find(m_pending_map.begin(), m_pending_map.end(), chunk);
-    if(it != m_pending_map.end() && chunk->m_event.check()) {
-      m_pending_map.erase(it);
-    }
-
     UMPIRE_LOG(Debug, "Found chunk @ " << chunk->data);
     if ((chunk->size == chunk->chunk_size) && chunk->free) {
       UMPIRE_LOG(Debug, "Releasing chunk " << chunk->data);

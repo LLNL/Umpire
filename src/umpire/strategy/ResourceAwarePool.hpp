@@ -115,7 +115,7 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
   struct Chunk;
 
  private:
-  void do_deallocate(Chunk* chunk, bool merge_pending_chunk) noexcept;
+  void do_deallocate(Chunk* chunk) noexcept;
 
   template <typename Value>
   class pool_allocator {
