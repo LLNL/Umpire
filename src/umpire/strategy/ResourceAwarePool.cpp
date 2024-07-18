@@ -66,6 +66,10 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource r, std::siz
 
   if (!m_pending_map.empty()) {
     for(auto pending_chunk : m_pending_map) {
+      if(pending_chunk->m_event.check()) //no longer pending
+      {
+        do_deallocate(pending_chunk);
+      }
       if (pending_chunk->size >= rounded_bytes && pending_chunk->m_resource == r) {
         chunk->size = pending_chunk->size; // is this necessary?
         chunk = pending_chunk;
@@ -195,13 +199,6 @@ void ResourceAwarePool::do_deallocate(Chunk* chunk) noexcept
     prev->m_event = chunk->m_event;
     prev->m_resource = chunk->m_resource;
 
-    //DO NOT need to copy pending status because if we are DOING the deallocate, it is not pending...
-    //copy over "pending status" in m_pending_map too
-    //auto it = std::find(m_pending_map.begin(), m_pending_map.end(), chunk);
-    //if(it != m_pending_map.end()) {
-    //  *it = prev;
-    //}
-
     if (prev->next)
       prev->next->prev = prev;
 
@@ -273,13 +270,14 @@ void ResourceAwarePool::release()
   std::size_t prev_size{m_actual_bytes};
 #endif
 
-  //TODO: fix me
-    //This will check all chunks in m_pending_map and erase the entry if event is complete
-    //auto it = std::find(m_pending_map.begin(), m_pending_map.end(), chunk);
-    //if(it != m_pending_map.end() && chunk->m_event.check()) {
-      //
-      //m_pending_map.erase(it);
-    //}
+  //TODO: Fix me
+  //This will check all chunks in m_pending_map and erase the entry if event is complete
+  //for (auto chunk = m_pending_map.begin(); chunk != m_pending_map.end(); chunk++) {
+  //  if((*chunk) != nullptr && (*chunk)->m_event.check()) {
+      //don't i need to insert into the free map?
+  //    m_pending_map.erase(chunk);
+  //  }
+  //}
 
   for (auto pair = m_free_map.begin(); pair != m_free_map.end();) {
     auto chunk = (*pair).second;

@@ -72,30 +72,23 @@ int main(int, char**)
 
   //allocate memory in the pool with r1
   double* a = static_cast<double*>(pool.allocate(r1, NUM_THREADS * sizeof(double)));
-  std::cout << "HERE1" << std::endl;
 
   //launch kernels on r1's stream
   touch_data<<<NUM_BLOCKS, BLOCK_SIZE, 0, d1.get_stream()>>>(a, NUM_THREADS);
   do_sleep<<<NUM_BLOCKS, BLOCK_SIZE, 0, d1.get_stream()>>>();
   check_data<<<NUM_BLOCKS, BLOCK_SIZE, 0, d1.get_stream()>>>(a, NUM_THREADS);
-  std::cout << "HERE2" << std::endl;
 
   //deallocate memory with r1 and reallocate using a different stream r2
   pool.deallocate(r1, a);
-  std::cout << "HERE3" << std::endl;
   a = static_cast<double*>(pool.allocate(r2, NUM_THREADS * sizeof(double)));
-  std::cout << "HERE4" << std::endl;
 
   //launch kernel with r2's stream using newly reallocated 'a'
   touch_data_again<<<NUM_BLOCKS, BLOCK_SIZE, 0, d2.get_stream()>>>(a, NUM_THREADS);
-  std::cout << "HERE5" << std::endl;
 
   //bring final data from 'a' back to host var 'b'
   double* b = static_cast<double*>(pool.allocate(r2, NUM_THREADS * sizeof(double)));
-  std::cout << "HERE6" << std::endl;
   rm.copy(b, a);
   b = static_cast<double*>(rm.move(b, rm.getAllocator("HOST")));
-  std::cout << "HERE7" << std::endl;
 
   //For validation/error checking below, synchronize host and device
 #if defined(UMPIRE_ENABLE_CUDA)
@@ -104,7 +97,6 @@ int main(int, char**)
   hipDeviceSynchronize();
 #endif
 
-  std::cout << "HERE8" << std::endl;
   //Error check and validation
   std::cout << "Values are: " <<std::endl;
   for (int i = 0; i < NUM_THREADS; i++) {
