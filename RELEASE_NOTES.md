@@ -8,7 +8,7 @@ This release of Umpire contains new build requirements including:
 
 ## Bug Fixes
 
-- Umpire uses Fortran_FORMAT to avoids compilation errors when using LLVM flang
+- Umpire uses Fortran_FORMAT to avoid compilation errors when using LLVM flang.
 
 ## Improvements
 
