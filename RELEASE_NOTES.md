@@ -1,3 +1,19 @@
+# v2024.07.0
+
+## Changes Impacting Builds
+
+This release of Umpire contains new build requirements including:
+
+- Cmake version 3.23 or later is required.
+
+## Bug Fixes
+
+- Umpire uses Fortran_FORMAT to avoids compilation errors when using LLVM flang
+
+## Improvements
+
+- SYCL and Intel builds were added to Umpire`s DockerFile in addition to other builds in the Github workflow for better testing.
+
 # v2024.02.1
 ## Bug Fixes
 - Made fmt header-only by default allowing users to define preferred fmt target using UMPIRE_FMT_TARGET variable.
