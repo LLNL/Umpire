@@ -330,7 +330,6 @@ std::size_t ResourceAwarePool::getTotalBlocks() const noexcept
   return m_total_blocks;
 }
 
-//Could create a function that returns the number of pending chunks...
 std::size_t ResourceAwarePool::getPendingSize() const noexcept
 {
   return m_pending_map.size();
@@ -361,7 +360,6 @@ Platform ResourceAwarePool::getPlatform() noexcept
   return m_allocator->getPlatform();
 }
 
-//Given a chunk, return it's resource... is this needed?
 camp::resources::Resource ResourceAwarePool::getResource(void* ptr) const noexcept
 {
   auto chunk = (*m_used_map.find(ptr)).second;

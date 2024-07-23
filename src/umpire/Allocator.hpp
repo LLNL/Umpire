@@ -20,8 +20,6 @@
 #include "camp/camp.hpp"
 #include "camp/resource.hpp"
 
-using Resource = camp::resources::Resource;
-
 class AllocatorTest;
 
 namespace umpire {

@@ -33,11 +33,6 @@ blt_add_executable(
   SOURCES fixed_pool_tests.cpp
   DEPENDS_ON ${strategy_tests_depends})
 
-blt_add_executable(
-  NAME resource_aware_pool_tests
-  SOURCES resource_aware_pool_tests.cpp
-  DEPENDS_ON ${strategy_tests_depends})
-
 blt_add_test(
   NAME fixed_pool_tests
   COMMAND fixed_pool_tests)

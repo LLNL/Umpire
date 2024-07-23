@@ -4,6 +4,7 @@
 #include "camp/camp.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/strategy/ResourceAwarePool.hpp"
+#include "umpire/Umpire.hpp"
 
 constexpr int BLOCK_SIZE = 16;
 constexpr int NUM_THREADS = 64;
@@ -73,6 +74,12 @@ int main(int, char**)
   //allocate memory in the pool with r1
   double* a = static_cast<double*>(pool.allocate(r1, NUM_THREADS * sizeof(double)));
 
+  //Make sure resource was correctly tracked
+  //UMPIRE_ASSERT(getResource(pool, a) == r1);
+
+  //Test to make sure there are no pending deallocations
+  UMPIRE_ASSERT(getPendingSize(pool) == 0);
+
   //launch kernels on r1's stream
   touch_data<<<NUM_BLOCKS, BLOCK_SIZE, 0, d1.get_stream()>>>(a, NUM_THREADS);
   do_sleep<<<NUM_BLOCKS, BLOCK_SIZE, 0, d1.get_stream()>>>();
@@ -80,6 +87,10 @@ int main(int, char**)
 
   //deallocate memory with r1 and reallocate using a different stream r2
   pool.deallocate(r1, a);
+
+  //A deallocate should be scheduled and should now be pending
+  UMPIRE_ASSERT(getPendingSize(pool) != 0);
+
   a = static_cast<double*>(pool.allocate(r2, NUM_THREADS * sizeof(double)));
 
   //launch kernel with r2's stream using newly reallocated 'a'

@@ -21,10 +21,10 @@ TEST(ResourceAwarePoolTest, Construction)
   EXPECT_EQ(pool.getCurrentSize(), 0);
 }
 
-TEST(ResourceAwarePoolTest, Get_Resource)
+TEST(ResourceAwarePoolTest, Check_States)
 {
   auto& rm = umpire::ResourceManager::getInstance();
-  auto pool = rm.makeAllocator<umpire::strategy::ResourceAwarePool>("rap-pool2", rm.getAllocator("HOST"));
+  auto pool = rm.makeAllocator<umpire::strategy::ResourceAwarePool>("rap-pool2", rm.getAllocator("DEVICE"));
   
   Cuda d1;
   Resource r1{d1};
@@ -32,9 +32,8 @@ TEST(ResourceAwarePoolTest, Get_Resource)
   void* ptr{pool.allocate(r1, 1024)};
 
   //EXPECT_EQ(pool.getResource(ptr), Cuda);
-}
+  
+  pool.deallocate(ptr);
 
-TEST(ResourceAwarePoolTest, Make_Event)
-{
-
+  
 }

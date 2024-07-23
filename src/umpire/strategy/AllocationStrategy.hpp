@@ -17,6 +17,8 @@
 #include "camp/camp.hpp"
 #include "camp/resource.hpp"
 
+using Resource = camp::resources::Resource;
+
 namespace umpire {
 
 class ResourceManager;

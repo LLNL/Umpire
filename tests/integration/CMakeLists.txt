@@ -148,6 +148,11 @@ blt_add_test(
   COMMAND strategy_tests)
 
 blt_add_executable(
+  NAME resource_aware_pool_tests
+  SOURCES resource_aware_pool_tests.cpp
+  DEPENDS_ON ${integration_tests_depends})
+
+blt_add_executable(
   NAME operation_tests
   SOURCES operation_tests.cpp
   DEPENDS_ON ${integration_tests_depends})
