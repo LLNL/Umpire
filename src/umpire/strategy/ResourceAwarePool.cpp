@@ -360,10 +360,15 @@ Platform ResourceAwarePool::getPlatform() noexcept
   return m_allocator->getPlatform();
 }
 
-camp::resources::Resource ResourceAwarePool::getResource(void* ptr) const noexcept
+camp::resources::Resource ResourceAwarePool::getResource(void* ptr) const
 {
-  auto chunk = (*m_used_map.find(ptr)).second;
-  return chunk->m_resource;
+  auto it = m_used_map.find(ptr);
+  if (it != m_used_map.end()){
+    auto chunk = it->second;
+    return chunk->m_resource;
+  }
+  UMPIRE_ERROR(runtime_error, fmt::format("BANANAS!!"));
+  return camp::resources::Host{};
 }
 
 MemoryResourceTraits ResourceAwarePool::getTraits() const noexcept

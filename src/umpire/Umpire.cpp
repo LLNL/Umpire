@@ -292,11 +292,11 @@ Resource getResource(Allocator a, void* ptr)
   auto s = a.getAllocationStrategy();
   strategy::ResourceAwarePool* rap{dynamic_cast<strategy::ResourceAwarePool*>(s)};
 
-  if (rap) {
-    rap->getResource(ptr);
-  } else {
+  if (!rap) {
     UMPIRE_ERROR(runtime_error, fmt::format("Allocator \"{}\" is not a ResourceAwarePool!", a.getName()));
   }
+
+  return rap->getResource(ptr);
 }
 
 std::size_t getPendingSize(Allocator a)
@@ -304,11 +304,11 @@ std::size_t getPendingSize(Allocator a)
   auto s = a.getAllocationStrategy();
   strategy::ResourceAwarePool* rap{dynamic_cast<strategy::ResourceAwarePool*>(s)};
 
-  if (rap) {
-    rap->getPendingSize();
-  } else {
+  if (!rap) {
     UMPIRE_ERROR(runtime_error, fmt::format("Allocator \"{}\" is not a ResourceAwarePool!", a.getName()));
   }
+
+  return rap->getPendingSize();
 }
 
 bool try_coalesce(Allocator a)

@@ -74,8 +74,10 @@ int main(int, char**)
   //allocate memory in the pool with r1
   double* a = static_cast<double*>(pool.allocate(r1, NUM_THREADS * sizeof(double)));
 
+  auto r = getResource(pool, a);
+  auto p = r.get_platform();
   //Make sure resource was correctly tracked
-  //UMPIRE_ASSERT(getResource(pool, a) == r1);
+  UMPIRE_ASSERT(r == r1);
 
   //Test to make sure there are no pending deallocations
   UMPIRE_ASSERT(getPendingSize(pool) == 0);

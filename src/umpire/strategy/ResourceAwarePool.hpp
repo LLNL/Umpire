@@ -85,7 +85,7 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
   std::size_t getPendingSize() const noexcept;
 
   Platform getPlatform() noexcept override;
-  Resource getResource(void* ptr) const noexcept;
+  Resource getResource(void* ptr) const;
 
   MemoryResourceTraits getTraits() const noexcept override;
 
