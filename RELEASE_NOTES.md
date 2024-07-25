@@ -1,3 +1,9 @@
+# v2024.07.1
+
+## Build Improvements
+
+- The latest version of camp has been added to Umpire.
+
 # v2024.07.0
 
 ## Changes Impacting Builds
