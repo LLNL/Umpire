@@ -52,10 +52,26 @@ std::ostream& error()
 
 namespace util {
 
+namespace detail {
+
+OutputBuffer& s_log_buffer_accessor()
+{
+  static OutputBuffer buffer;
+  return buffer;
+}
+
+OutputBuffer& s_error_buffer_accessor()
+{
+  static OutputBuffer buffer;
+  return buffer;
+}
+
+}  // namespace detail
+
 void initialize_io(const bool enable_log)
 {
-  static util::OutputBuffer s_log_buffer;
-  static util::OutputBuffer s_error_buffer;
+  OutputBuffer& s_log_buffer = detail::s_log_buffer_accessor();
+  OutputBuffer& s_error_buffer = detail::s_error_buffer_accessor();
 
   s_log_buffer.setConsoleStream(nullptr);
   s_error_buffer.setConsoleStream(&std::cerr);
@@ -119,6 +135,16 @@ void initialize_io(const bool enable_log)
   }
 
   MPI::logMpiInfo();
+}
+
+void finalize_io()
+{
+  detail::s_log_buffer_accessor().sync();
+  detail::s_log_buffer_accessor().setConsoleStream(nullptr);
+  detail::s_log_buffer_accessor().setFileStream(nullptr);
+  detail::s_error_buffer_accessor().sync();
+  detail::s_error_buffer_accessor().setConsoleStream(nullptr);
+  detail::s_error_buffer_accessor().setFileStream(nullptr);
 }
 
 void flush_files()
