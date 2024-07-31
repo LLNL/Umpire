@@ -64,7 +64,7 @@ class DynamicPoolList : public AllocationStrategy {
                   const std::size_t first_minimum_pool_allocation_size = s_default_first_block_size,
                   const std::size_t next_minimum_pool_allocation_size = s_default_next_block_size,
                   const std::size_t alignment = s_default_alignment,
-                  PoolCoalesceHeuristic<DynamicPoolList> should_coalesce = percent_releasable_hwm(100)) noexcept;
+                  PoolCoalesceHeuristic<DynamicPoolList> should_coalesce = percent_releasable(100)) noexcept;
 
   DynamicPoolList(const DynamicPoolList&) = delete;
 
