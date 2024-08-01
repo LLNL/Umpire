@@ -22,9 +22,9 @@ namespace umpire {
 namespace strategy {
 
 ResourceAwarePool::ResourceAwarePool(const std::string& name, int id, Allocator allocator,
-                     const std::size_t first_minimum_pool_allocation_size,
-                     const std::size_t next_minimum_pool_allocation_size, std::size_t alignment,
-                     PoolCoalesceHeuristic<ResourceAwarePool> should_coalesce) noexcept
+                                     const std::size_t first_minimum_pool_allocation_size,
+                                     const std::size_t next_minimum_pool_allocation_size, std::size_t alignment,
+                                     PoolCoalesceHeuristic<ResourceAwarePool> should_coalesce) noexcept
     : AllocationStrategy{name, id, allocator.getAllocationStrategy(), "ResourceAwarePool"},
       mixins::AlignedAllocation{alignment, allocator.getAllocationStrategy()},
       m_should_coalesce{should_coalesce},
@@ -49,8 +49,7 @@ ResourceAwarePool::~ResourceAwarePool()
 void* ResourceAwarePool::allocate(std::size_t UMPIRE_UNUSED_ARG(bytes))
 {
   void* ptr{nullptr};
-  UMPIRE_ERROR(runtime_error,
-    fmt::format("Don't call this function!"));
+  UMPIRE_ERROR(runtime_error, fmt::format("Don't call this function!"));
   return ptr;
 }
 
@@ -62,21 +61,21 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource r, std::siz
 
   Chunk* chunk{nullptr};
 
-  //auto pending_chunks_exist = m_pending_map.find(r);
+  // auto pending_chunks_exist = m_pending_map.find(r);
 
   if (!m_pending_map.empty()) {
-    for(auto pending_chunk : m_pending_map) {
-      if(pending_chunk->m_event.check()) //no longer pending
+    for (auto pending_chunk : m_pending_map) {
+      if (pending_chunk->m_event.check()) // no longer pending
       {
-        do_deallocate(pending_chunk);//TODO: can I erase it from the list then?
+        do_deallocate(pending_chunk); // TODO: can I erase it from the list then?
       }
       if (pending_chunk->size >= rounded_bytes && pending_chunk->m_resource == r) {
         chunk->size = pending_chunk->size; // is this necessary?
         chunk = pending_chunk;
         chunk->free = false;
-        //TODO: Do I add to actual bytes, releasable blocks, total blocks, etc.????
+        // TODO: Do I add to actual bytes, releasable blocks, total blocks, etc.????
         std::size_t bytes_to_use{(m_actual_bytes == 0) ? m_first_minimum_pool_allocation_size
-                                                   : m_next_minimum_pool_allocation_size};
+                                                       : m_next_minimum_pool_allocation_size};
         std::size_t size{(rounded_bytes > bytes_to_use) ? rounded_bytes : bytes_to_use};
         m_actual_bytes += size;
         m_releasable_bytes += size;
@@ -100,12 +99,12 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource r, std::siz
       void* ret{nullptr};
       try {
 #if defined(UMPIRE_ENABLE_BACKTRACE)
-      {
-        umpire::util::backtrace bt;
-        umpire::util::backtracer<>::get_backtrace(bt);
-        UMPIRE_LOG(Info, "actual_size:" << (m_actual_bytes + rounded_bytes) << " (prev: " << m_actual_bytes << ") "
-                                        << umpire::util::backtracer<>::print(bt));
-      }
+        {
+          umpire::util::backtrace bt;
+          umpire::util::backtracer<>::get_backtrace(bt);
+          UMPIRE_LOG(Info, "actual_size:" << (m_actual_bytes + rounded_bytes) << " (prev: " << m_actual_bytes << ") "
+                                          << umpire::util::backtracer<>::print(bt));
+        }
 #endif
         ret = aligned_allocate(size); // Will Poison
       } catch (...) {
@@ -176,7 +175,9 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource r, std::siz
 
 void ResourceAwarePool::deallocate(void* ptr, std::size_t size)
 {
-  UMPIRE_LOG(Debug, "You shouldn't be calling this function. Creating default Host resource and calling other allocate function! BANANAS!");
+  UMPIRE_LOG(Debug,
+             "You shouldn't be calling this function. Creating default Host resource and calling other allocate "
+             "function! BANANAS!");
   camp::resources::Resource r = camp::resources::Host();
   deallocate_resource(r, ptr, size);
 }
@@ -236,31 +237,30 @@ void ResourceAwarePool::do_deallocate(Chunk* chunk) noexcept
   chunk->size_map_it = m_free_map.insert(std::make_pair(chunk->size, chunk));
   chunk->free = true;
 }
- 
+
 void ResourceAwarePool::deallocate_resource(camp::resources::Resource r, void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   auto chunk = (*m_used_map.find(ptr)).second;
 
-  //TODO: if( !chunk) --> isn't this a error to check for?
-  //TODO: trying to implement a check so that if user messes up and tries to deallocate with the wrong resource, we catch it
-  //TODO: Should we just be able to use the ptr to figure out the resource that should be used here? Or will that cause problems?
-  //auto my_r = getResource(ptr);
-  //if(my_r != r)
+  // TODO: if( !chunk) --> isn't this a error to check for?
+  // TODO: trying to implement a check so that if user messes up and tries to deallocate with the wrong resource, we
+  // catch it
+  // TODO: Should we just be able to use the ptr to figure out the resource that should be used here? Or will that cause
+  // problems? auto my_r = getResource(ptr); if(my_r != r)
   //{
   //  UMPIRE_ERROR(runtime_error, fmt::format("Called deallocate with incorrect resource type!"));
   //}
 
-  //chunk is now pending
+  // chunk is now pending
   m_pending_map.push_back(chunk);
   chunk->m_event = r.get_event();
 
   m_used_map.erase(ptr);
   m_current_bytes -= chunk->size;
 
-  //Call deallocate logic only for a non-pending chunk
-  if(chunk->m_event.check())
-  {
+  // Call deallocate logic only for a non-pending chunk
+  if (chunk->m_event.check()) {
     do_deallocate(chunk);
   }
 
@@ -279,12 +279,12 @@ void ResourceAwarePool::release()
   std::size_t prev_size{m_actual_bytes};
 #endif
 
-  //This will check all chunks in m_pending_map and erase the entry if event is complete
+  // This will check all chunks in m_pending_map and erase the entry if event is complete
   for (auto chunk = m_pending_map.begin(); chunk != m_pending_map.end(); chunk++) {
-    if((*chunk) != nullptr && (*chunk)->m_event.check()) {
+    if ((*chunk) != nullptr && (*chunk)->m_event.check()) {
       m_pending_map.erase(chunk);
-      m_free_map.insert(std::make_pair((*chunk)->size, (*chunk))); //Make sure this is correct!
-      (*chunk)->free = true; //Is free up to date everywhere else too?
+      m_free_map.insert(std::make_pair((*chunk)->size, (*chunk))); // Make sure this is correct!
+      (*chunk)->free = true;                                       // Is free up to date everywhere else too?
     }
   }
 
@@ -371,19 +371,19 @@ Platform ResourceAwarePool::getPlatform() noexcept
 
 camp::resources::Resource ResourceAwarePool::getResource(void* ptr) const
 {
-  auto it = m_used_map.find(ptr); //check used chunks
-  if (it != m_used_map.end()){
+  auto it = m_used_map.find(ptr); // check used chunks
+  if (it != m_used_map.end()) {
     auto chunk = it->second;
     return chunk->m_resource;
   }
-  for (auto& chunk : m_pending_map) { //chunk pending chunks
-    if (chunk->data == ptr){
+  for (auto& chunk : m_pending_map) { // chunk pending chunks
+    if (chunk->data == ptr) {
       return chunk->m_resource;
     }
   }
-  //UMPIRE_ERROR(runtime_error, fmt::format("BANANAS!!"));
-  //TODO: if it is free, do we care what resource it has?
-  return camp::resources::Host{}; //If we get here, the chunk is free
+  // UMPIRE_ERROR(runtime_error, fmt::format("BANANAS!!"));
+  // TODO: if it is free, do we care what resource it has?
+  return camp::resources::Host{}; // If we get here, the chunk is free
 }
 
 MemoryResourceTraits ResourceAwarePool::getTraits() const noexcept
@@ -444,8 +444,9 @@ void ResourceAwarePool::do_coalesce(std::size_t suggested_size) noexcept
 
 PoolCoalesceHeuristic<ResourceAwarePool> ResourceAwarePool::blocks_releasable(std::size_t nblocks)
 {
-  return
-      [=](const strategy::ResourceAwarePool& pool) { return pool.getReleasableBlocks() >= nblocks ? pool.getActualSize() : 0; };
+  return [=](const strategy::ResourceAwarePool& pool) {
+    return pool.getReleasableBlocks() >= nblocks ? pool.getActualSize() : 0;
+  };
 }
 
 PoolCoalesceHeuristic<ResourceAwarePool> ResourceAwarePool::blocks_releasable_hwm(std::size_t nblocks)

@@ -12,10 +12,10 @@
 #include <ostream>
 #include <string>
 
-#include "umpire/util/MemoryResourceTraits.hpp"
-#include "umpire/util/Platform.hpp"
 #include "camp/camp.hpp"
 #include "camp/resource.hpp"
+#include "umpire/util/MemoryResourceTraits.hpp"
+#include "umpire/util/Platform.hpp"
 
 using Resource = camp::resources::Resource;
 

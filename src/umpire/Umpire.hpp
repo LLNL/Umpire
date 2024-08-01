@@ -10,6 +10,7 @@
 #include <iostream>
 #include <string>
 
+#include "camp/camp.hpp"
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/config.hpp"
@@ -17,7 +18,6 @@
 #include "umpire/util/AllocationRecord.hpp"
 #include "umpire/util/MPI.hpp"
 #include "umpire/util/io.hpp"
-#include "camp/camp.hpp"
 
 using Resource = camp::resources::Resource;
 

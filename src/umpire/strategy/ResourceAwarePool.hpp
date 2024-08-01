@@ -13,13 +13,13 @@
 #include <tuple>
 #include <unordered_map>
 
+#include "camp/camp.hpp"
+#include "camp/resource.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/PoolCoalesceHeuristic.hpp"
 #include "umpire/strategy/mixins/AlignedAllocation.hpp"
 #include "umpire/util/FixedMallocPool.hpp"
 #include "umpire/util/MemoryResourceTraits.hpp"
-#include "camp/camp.hpp"
-#include "camp/resource.hpp"
 
 using Resource = camp::resources::Resource;
 using Event = camp::resources::Event;
@@ -61,10 +61,10 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
    * coalesce operation
    */
   ResourceAwarePool(const std::string& name, int id, Allocator allocator,
-            const std::size_t first_minimum_pool_allocation_size = s_default_first_block_size,
-            const std::size_t next_minimum_pool_allocation_size = s_default_next_block_size,
-            const std::size_t alignment = s_default_alignment,
-            PoolCoalesceHeuristic<ResourceAwarePool> should_coalesce = percent_releasable_hwm(100)) noexcept;
+                    const std::size_t first_minimum_pool_allocation_size = s_default_first_block_size,
+                    const std::size_t next_minimum_pool_allocation_size = s_default_next_block_size,
+                    const std::size_t alignment = s_default_alignment,
+                    PoolCoalesceHeuristic<ResourceAwarePool> should_coalesce = percent_releasable_hwm(100)) noexcept;
 
   ~ResourceAwarePool();
 
@@ -72,7 +72,7 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
 
   ///////
   void* allocate(std::size_t bytes) override;
-  void* allocate_resource(Resource  r, std::size_t bytes) override;
+  void* allocate_resource(Resource r, std::size_t bytes) override;
   void deallocate_resource(Resource r, void* ptr, std::size_t size) override;
   void deallocate(void* ptr, std::size_t size) override;
   ///////
@@ -147,11 +147,13 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
   };
 
   using PointerMap = std::unordered_map<void*, Chunk*>;
-  //using PendingMap = std::unordered_map<camp::resources::Resource, Chunk*>; //Should this be a vector of chunks? list of chunks?
+  // using PendingMap = std::unordered_map<camp::resources::Resource, Chunk*>; //Should this be a vector of chunks? list
+  // of chunks?
   using PendingMap = std::vector<Chunk*>;
   using SizeMap =
       std::multimap<std::size_t, Chunk*, std::less<std::size_t>, pool_allocator<std::pair<const std::size_t, Chunk*>>>;
-public:
+
+ public:
   struct Chunk {
     Chunk(void* ptr, std::size_t s, std::size_t cs, Resource r) : data{ptr}, size{s}, chunk_size{cs}, m_resource{r}
     {
@@ -167,7 +169,8 @@ public:
     Resource m_resource;
     Event m_event;
   };
-private:
+
+ private:
   PointerMap m_used_map{};
   SizeMap m_free_map{};
   PendingMap m_pending_map{};

@@ -13,12 +13,12 @@
 #include <ostream>
 #include <string>
 
+#include "camp/camp.hpp"
+#include "camp/resource.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/mixins/AllocateNull.hpp"
 #include "umpire/strategy/mixins/Inspector.hpp"
 #include "umpire/util/Platform.hpp"
-#include "camp/camp.hpp"
-#include "camp/resource.hpp"
 
 class AllocatorTest;
 

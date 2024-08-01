@@ -39,7 +39,8 @@ void* AllocationStrategy::allocate_resource(camp::resources::Resource UMPIRE_UNU
   return allocate(bytes);
 }
 
-void AllocationStrategy::deallocate_resource(camp::resources::Resource UMPIRE_UNUSED_ARG(r), void* ptr, std::size_t size)
+void AllocationStrategy::deallocate_resource(camp::resources::Resource UMPIRE_UNUSED_ARG(r), void* ptr,
+                                             std::size_t size)
 {
   deallocate(ptr, size);
 }

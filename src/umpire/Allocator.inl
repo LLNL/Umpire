@@ -53,10 +53,10 @@ inline void* Allocator::thread_safe_allocate(std::size_t bytes)
   return do_allocate(bytes);
 }
 
-//TODO: Do I need a thread safe resource allocate?
+// TODO: Do I need a thread safe resource allocate?
 inline void* Allocator::thread_safe_resource_allocate(camp::resources::Resource const& r, std::size_t bytes)
 {
-  //std::lock_guard<std::mutex> lock(*m_thread_safe_mutex);
+  // std::lock_guard<std::mutex> lock(*m_thread_safe_mutex);
   return do_resource_allocate(r, bytes);
 }
 
@@ -72,10 +72,10 @@ inline void Allocator::thread_safe_deallocate(void* ptr)
   return do_deallocate(ptr);
 }
 
-//TODO: Do I need a thread safe resource deallocate?
+// TODO: Do I need a thread safe resource deallocate?
 inline void Allocator::thread_safe_resource_deallocate(camp::resources::Resource const& r, void* ptr)
 {
-  //std::lock_guard<std::mutex> lock(*m_thread_safe_mutex);
+  // std::lock_guard<std::mutex> lock(*m_thread_safe_mutex);
   return do_resource_deallocate(r, ptr);
 }
 
@@ -121,7 +121,7 @@ inline void* Allocator::do_resource_allocate(camp::resources::Resource const& r,
     registerAllocation(ret, bytes, m_allocator);
   }
 
-  //umpire::event::record<umpire::event::named_allocate>(
+  // umpire::event::record<umpire::event::named_allocate>(
   //    [&](auto& event) { event.name(name).size(bytes).ref((void*)m_allocator).ptr(ret); });
   return ret;
 }
@@ -151,7 +151,7 @@ inline void Allocator::do_deallocate(void* ptr)
 
 inline void Allocator::do_resource_deallocate(camp::resources::Resource const& r, void* ptr)
 {
-  //umpire::event::record<umpire::event::deallocate>([&](auto& event) { event.ref((void*)m_allocator).ptr(ptr); });
+  // umpire::event::record<umpire::event::deallocate>([&](auto& event) { event.ref((void*)m_allocator).ptr(ptr); });
 
   UMPIRE_LOG(Debug, "(" << ptr << ")");
 
@@ -192,7 +192,7 @@ inline void Allocator::deallocate(void* ptr)
   m_thread_safe ? thread_safe_deallocate(ptr) : do_deallocate(ptr);
 }
 
-//TODO: Create thread safe resource deallocate?
+// TODO: Create thread safe resource deallocate?
 inline void Allocator::deallocate(camp::resources::Resource const& r, void* ptr)
 {
   m_thread_safe ? thread_safe_resource_deallocate(r, ptr) : do_resource_deallocate(r, ptr);
