@@ -68,13 +68,13 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource r, std::siz
     for(auto pending_chunk : m_pending_map) {
       if(pending_chunk->m_event.check()) //no longer pending
       {
-        do_deallocate(pending_chunk);
+        do_deallocate(pending_chunk);//TODO: can I erase it from the list then?
       }
       if (pending_chunk->size >= rounded_bytes && pending_chunk->m_resource == r) {
         chunk->size = pending_chunk->size; // is this necessary?
         chunk = pending_chunk;
         chunk->free = false;
-        //Do I add to actual bytes, releasable blocks, total blocks, etc.????
+        //TODO: Do I add to actual bytes, releasable blocks, total blocks, etc.????
         std::size_t bytes_to_use{(m_actual_bytes == 0) ? m_first_minimum_pool_allocation_size
                                                    : m_next_minimum_pool_allocation_size};
         std::size_t size{(rounded_bytes > bytes_to_use) ? rounded_bytes : bytes_to_use};
@@ -242,6 +242,15 @@ void ResourceAwarePool::deallocate_resource(camp::resources::Resource r, void* p
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   auto chunk = (*m_used_map.find(ptr)).second;
 
+  //TODO: if( !chunk) --> isn't this a error to check for?
+  //TODO: trying to implement a check so that if user messes up and tries to deallocate with the wrong resource, we catch it
+  //TODO: Should we just be able to use the ptr to figure out the resource that should be used here? Or will that cause problems?
+  //auto my_r = getResource(ptr);
+  //if(my_r != r)
+  //{
+  //  UMPIRE_ERROR(runtime_error, fmt::format("Called deallocate with incorrect resource type!"));
+  //}
+
   //chunk is now pending
   m_pending_map.push_back(chunk);
   chunk->m_event = r.get_event();
@@ -270,14 +279,14 @@ void ResourceAwarePool::release()
   std::size_t prev_size{m_actual_bytes};
 #endif
 
-  //TODO: Fix me
   //This will check all chunks in m_pending_map and erase the entry if event is complete
-  //for (auto chunk = m_pending_map.begin(); chunk != m_pending_map.end(); chunk++) {
-  //  if((*chunk) != nullptr && (*chunk)->m_event.check()) {
-      //don't i need to insert into the free map?
-  //    m_pending_map.erase(chunk);
-  //  }
-  //}
+  for (auto chunk = m_pending_map.begin(); chunk != m_pending_map.end(); chunk++) {
+    if((*chunk) != nullptr && (*chunk)->m_event.check()) {
+      m_pending_map.erase(chunk);
+      m_free_map.insert(std::make_pair((*chunk)->size, (*chunk))); //Make sure this is correct!
+      (*chunk)->free = true; //Is free up to date everywhere else too?
+    }
+  }
 
   for (auto pair = m_free_map.begin(); pair != m_free_map.end();) {
     auto chunk = (*pair).second;
@@ -362,13 +371,19 @@ Platform ResourceAwarePool::getPlatform() noexcept
 
 camp::resources::Resource ResourceAwarePool::getResource(void* ptr) const
 {
-  auto it = m_used_map.find(ptr);
+  auto it = m_used_map.find(ptr); //check used chunks
   if (it != m_used_map.end()){
     auto chunk = it->second;
     return chunk->m_resource;
   }
-  UMPIRE_ERROR(runtime_error, fmt::format("BANANAS!!"));
-  return camp::resources::Host{};
+  for (auto& chunk : m_pending_map) { //chunk pending chunks
+    if (chunk->data == ptr){
+      return chunk->m_resource;
+    }
+  }
+  //UMPIRE_ERROR(runtime_error, fmt::format("BANANAS!!"));
+  //TODO: if it is free, do we care what resource it has?
+  return camp::resources::Host{}; //If we get here, the chunk is free
 }
 
 MemoryResourceTraits ResourceAwarePool::getTraits() const noexcept
