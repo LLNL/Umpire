@@ -57,9 +57,7 @@ fi
 
 if [[ -n ${module_list} ]]
 then
-    echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    echo "~~~~~ Modules to load: ${module_list}"
-    echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    timed_message "Modules to load: ${module_list}"
     module load ${module_list}
 fi
 
@@ -79,7 +77,7 @@ then
     prefix="${prefix}-${job_unique_id}"
 else
     # We set the prefix in the parent directory so that spack dependencies are not installed inside the source tree.
-    prefix="$(pwd)/../spack-and-build-root"
+    prefix="${project_dir}/../spack-and-build-root"
 fi
 
 echo "Creating directory ${prefix}"
