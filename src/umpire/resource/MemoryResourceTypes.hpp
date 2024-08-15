@@ -18,8 +18,9 @@
 #endif /* UMPIRE_ENABLE_CUDA */
 
 #if defined(UMPIRE_ENABLE_HIP)
-#include <regex>
 #include <hip/hip_runtime.h>
+
+#include <regex>
 #endif /* UMPIRE_ENABLE_HIP */
 
 namespace umpire {
