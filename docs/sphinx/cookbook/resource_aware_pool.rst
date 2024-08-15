@@ -1,8 +1,8 @@
 .. _resource_aware_pool:
 
-===================
-Resource Aware Pool
-===================
+=============================
+Creating a Resource Aware Pool
+=============================
 
 Umpire uses `Camp <https://github.com/LLNL/camp>`_ resources to keep track of "streams of execution". A single "stream of execution" 
 on the device corresponds to a single Camp device resource (e.g. a single cuda stream). 
