@@ -8,7 +8,6 @@
 #define UMPIRE_MemoryResourceTypes_HPP
 
 #include <cstddef>
-#include <regex>
 #include <string>
 
 #include "umpire/config.hpp"
@@ -16,6 +15,8 @@
 
 #if defined(UMPIRE_ENABLE_CUDA)
 #include <cuda_runtime_api.h>
+#else
+#include <regex>
 #endif /* UMPIRE_ENABLE_CUDA */
 
 #if defined(UMPIRE_ENABLE_HIP)
@@ -111,9 +112,6 @@ inline int resource_to_device_id(const std::string& resource)
 #if defined(UMPIRE_ENABLE_CUDA)
   if (resource.find("::") != std::string::npos) {
     device_id = std::stoi(resource.substr(resource.find("::") + 2));
-  } else {
-    // get the device bound to the current process
-    cudaGetDevice(&device_id);
   }
 #else
   const std::regex id_regex{R"(.*::(\d+))", std::regex_constants::ECMAScript | std::regex_constants::optimize};
@@ -121,11 +119,20 @@ inline int resource_to_device_id(const std::string& resource)
 
   if (std::regex_match(resource, m, id_regex)) {
     device_id = std::stoi(m[1]);
-  } else {
-    // get the device bound to the current process
-    hipGetDevice(&device_id);
   }
+#endif
+  else {
+    // get the device bound to the current process
+
+#if defined(UMPIRE_ENABLE_CUDA)
+    cudaGetDevice(&device_id);
 #endif /* UMPIRE_ENABLE_CUDA */
+
+#if defined(UMPIRE_ENABLE_HIP)
+    hipGetDevice(&device_id);
+#endif /* UMPIRE_ENABLE_HIP */
+
+  }
 
   return device_id;
 }
