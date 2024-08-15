@@ -8,6 +8,7 @@
 #define UMPIRE_MemoryResourceTypes_HPP
 
 #include <cstddef>
+#include <regex>
 #include <string>
 
 #include "umpire/config.hpp"
@@ -19,8 +20,6 @@
 
 #if defined(UMPIRE_ENABLE_HIP)
 #include <hip/hip_runtime.h>
-
-#include <regex>
 #endif /* UMPIRE_ENABLE_HIP */
 
 namespace umpire {
