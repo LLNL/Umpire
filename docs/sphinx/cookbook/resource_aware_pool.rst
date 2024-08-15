@@ -15,7 +15,7 @@ While we can have multiple camp resources for the device (e.g. multiple cuda str
 we can only have one resource for the host since the host only has one stream of execution. 
 Since we are dealing with Camp resources, we call this pool strategy the ``ResourceAwarePool``.
 
-Throughout the rest of this documentation, we will use a "camp resource" to refer to a "stream of
+Throughout the rest of this documentation page, we will use a "camp resource" to refer to a "stream of
 execution". If the camp resource is on the device, then we are referring to a device stream such 
 as a cuda stream or hip stream.
 
