@@ -116,7 +116,7 @@ inline int resource_to_device_id(const std::string& resource)
     // get the device bound to the current process
     cudaGetDevice(&device_id);
   }
-#elif defined(UMPIRE_ENABLE_HIP)
+#else
   const std::regex id_regex{R"(.*::(\d+))", std::regex_constants::ECMAScript | std::regex_constants::optimize};
   std::smatch m;
 
