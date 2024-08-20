@@ -241,16 +241,18 @@ void ResourceAwarePool::do_deallocate(Chunk* chunk) noexcept
 void ResourceAwarePool::deallocate_resource(camp::resources::Resource r, void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
+  //UMPIRE_LOG(Debug, "(Resource=" << r << ")");
   auto chunk = (*m_used_map.find(ptr)).second;
 
   // TODO: if( !chunk) --> isn't this a error to check for?
-  // TODO: trying to implement a check so that if user messes up and tries to deallocate with the wrong resource, we
-  // catch it
-  // TODO: Should we just be able to use the ptr to figure out the resource that should be used here? Or will that cause
-  // problems? auto my_r = getResource(ptr); if(my_r != r)
-  //{
-  //  UMPIRE_ERROR(runtime_error, fmt::format("Called deallocate with incorrect resource type!"));
-  //}
+  
+  auto my_r = getResource(ptr);
+  if(my_r != r)
+  {
+    UMPIRE_LOG(Warning, fmt::format("Called deallocate with different resource than what is returned by getResource"));
+                                      // TODO: {}, but getResource returned: {}", r, my_r));
+    UMPIRE_LOG(Debug, "(getResource doesn't match resource passed to deallocate."); //TODO: Resource used=" << r << ")");
+  }
 
   // chunk is now pending
   m_pending_map.push_back(chunk);
