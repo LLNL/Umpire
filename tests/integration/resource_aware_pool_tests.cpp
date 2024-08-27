@@ -5,13 +5,15 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include <stdio.h>
+
 #include <iostream>
+
 #include "camp/camp.hpp"
 #include "gtest/gtest.h"
 #include "umpire/ResourceManager.hpp"
+#include "umpire/Umpire.hpp"
 #include "umpire/config.hpp"
 #include "umpire/strategy/ResourceAwarePool.hpp"
-#include "umpire/Umpire.hpp"
 
 using clock_value_t = long long;
 using namespace camp::resources;
@@ -58,7 +60,7 @@ TEST(ResourceAwarePoolTest, Check_States)
 
   double* ptr = static_cast<double*>(pool.allocate(r1, 1024));
   double* compare_ptr1 = ptr;
-  
+
   EXPECT_EQ(getResource(pool, ptr), r1);
   EXPECT_EQ(getPendingSize(pool), 0);
 
@@ -71,13 +73,13 @@ TEST(ResourceAwarePoolTest, Check_States)
 
   pool.deallocate(ptr);
   EXPECT_EQ(getPendingSize(pool), 1);
-  
+
   ptr = static_cast<double*>(pool.allocate(r2, 2048));
   double* compare_ptr2 = ptr;
- 
+
 #if defined(UMPIRE_ENABLE_DEVICE)
-  EXPECT_NE(compare_ptr1, compare_ptr2); 
+  EXPECT_NE(compare_ptr1, compare_ptr2);
 #else
-  EXPECT_EQ(compare_ptr1, compare_ptr2); 
+  EXPECT_EQ(compare_ptr1, compare_ptr2);
 #endif
 }
