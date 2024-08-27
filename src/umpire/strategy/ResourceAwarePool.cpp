@@ -175,10 +175,9 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource r, std::siz
 
 void ResourceAwarePool::deallocate(void* ptr, std::size_t size)
 {
-  UMPIRE_LOG(Debug,
-             "You shouldn't be calling this function. Creating default Host resource and calling other allocate "
-             "function! BANANAS!");
-  camp::resources::Resource r = camp::resources::Host();
+  UMPIRE_LOG(Warning, "You called deallocate with no resource. Calling deallocate with the resource returned by getResource...");
+
+  auto r = getResource(ptr);
   deallocate_resource(r, ptr, size);
 }
 
@@ -186,7 +185,7 @@ void ResourceAwarePool::do_deallocate(Chunk* chunk) noexcept
 {
   UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, chunk->size);
 
-  UMPIRE_LOG(Debug, "Deallocating data held by " << chunk);
+  UMPIRE_LOG(Debug, "In the do_deallocate function. Deallocating data held by " << chunk);
 
   if (chunk->prev && chunk->prev->free == true) {
     auto prev = chunk->prev;
