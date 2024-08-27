@@ -7,10 +7,10 @@
 #include "umpire/strategy/ResourceAwarePool.hpp"
 
 #include "umpire/Allocator.hpp"
+#include "umpire/event/event.hpp"
 #include "umpire/strategy/PoolCoalesceHeuristic.hpp"
 #include "umpire/strategy/mixins/AlignedAllocation.hpp"
 #include "umpire/util/Macros.hpp"
-#include "umpire/event/event.hpp"
 #include "umpire/util/memory_sanitizers.hpp"
 
 #if defined(UMPIRE_ENABLE_CUDA)
@@ -179,7 +179,7 @@ void ResourceAwarePool::deallocate(void* ptr, std::size_t size)
   auto r = getResource(ptr);
 
   UMPIRE_LOG(Warning, fmt::format("You called deallocate with no resource. Calling deallocate with the resource ",
-                                    "returned by getResource: {}.", camp::resources::to_string(r)));
+                                  "returned by getResource: {}.", camp::resources::to_string(r)));
   deallocate_resource(r, ptr, size);
 }
 
@@ -249,9 +249,12 @@ void ResourceAwarePool::deallocate_resource(camp::resources::Resource r, void* p
 
   auto my_r = getResource(ptr);
   if (my_r != r) {
-    UMPIRE_LOG(Warning, fmt::format("Called deallocate with different resource than what is returned by getResource. Called with {},", 
-                                      "but getResource returned: {}", camp::resources::to_string(r), camp::resources::to_string(my_r)));
-    UMPIRE_LOG(Debug, fmt::format("getResource doesn't match resource passed to deallocate. Resource used: {} .", camp::resources::to_string(r)));
+    UMPIRE_LOG(
+        Warning,
+        fmt::format("Called deallocate with different resource than what is returned by getResource. Called with {},",
+                    "but getResource returned: {}", camp::resources::to_string(r), camp::resources::to_string(my_r)));
+    UMPIRE_LOG(Debug, fmt::format("getResource doesn't match resource passed to deallocate. Resource used: {} .",
+                                  camp::resources::to_string(r)));
   }
 
   // chunk is now pending
