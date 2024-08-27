@@ -4,6 +4,12 @@
 Creating a Resource Aware Pool
 =============================
 
+This recipe describes how to create and use an Umpire ``ResourceAwarePool``. This pool is somewhat advanced
+so we also provide a bit of background on Camp resources which are used to track resources and events.
+
+Camp Resources
+--------------
+
 Umpire uses `Camp <https://github.com/LLNL/camp>`_ resources to keep track of "streams of execution". A single "stream of execution" 
 on the device corresponds to a single Camp device resource (e.g. a single cuda stream). 
 Similarly, when we are executing on the host, this
@@ -19,6 +25,9 @@ Throughout the rest of this documentation page, we will use a "camp resource" to
 execution". If the camp resource is on the device, then we are referring to a device stream such 
 as a cuda stream or hip stream.
 
+Using a Single Resource
+-----------------------
+
 Umpire's strategies such as ``QuickPool`` and ``DynamicPoolList`` work very well
 on the device when we are dealing with a single camp device resource. In the figure below, we have
 the host resource which allocates memory (a1), uses the memory in a kernel (k1), then schedules
@@ -28,7 +37,13 @@ a deallocate (d1). Then, the host immidiately reuses that memory for a different
 
 In this scenario, there is no potential for a data race, since we are dealing with just one cuda stream
 and kernels on a single stream happen sequentially. In other words, this scenario deals with only
-one Camp device resource. However, when dealing with multiple camp device resources
+one Camp device resource. In this type of scenario, there is no need for a ``ResourceAwarePool`` because
+it would behave the same as your typical ``QuickPool``, etc. 
+
+Using Multiple Resources
+------------------------
+
+However, when dealing with multiple camp device resources
 there is a possibility for a data race if we allocate, use, and 
 schedule a deallocation on one stream and then try to reuse that memory immediately on another stream. 
 The figure below depicts that scenario. Note that the overlap in the kernels corresponds to a potential
@@ -52,6 +67,9 @@ Note that if you schedule a deallocate, but then try to reuse that memory on the
 resource, that memory will NOT be labeled pending. It is only when we have scheduled a deallocate
 on one resource and then try to reuse that same memory on a different resource that we have
 the potential for a data race and thus the need for the pending state.
+
+Using a ResourceAwarePool
+-------------------------
 
 In this example, we will review how to use the :class:`umpire::strategy::ResourceAwarePool`
 strategy. You can create a ``ResourceAwarePool`` with the following code:
@@ -91,7 +109,11 @@ To deallocate, use the following code:
 
 .. code-block:: bash
 
-   pool.deallocate(r1, a); //This might change...
+   pool.deallocate(r1, a);
+
+.. note::
+   It can be hard to keep track of which resource corresponds to which pointer. If it is not feasible to keep track
+   of that, you can use the ``getResource(alloc, ptr)`` method where ``alloc`` is an Umpire allocator and ``ptr`` is a pointer. 
 
 Assuming you reallocated memory on ``a`` with ``r2``, you could then launch a second kernel on the second stream. For example:
 
@@ -99,7 +121,8 @@ Assuming you reallocated memory on ``a`` with ``r2``, you could then launch a se
 
    my_other_kernel<<NUM_BLOCKS, BLOCK_SIZE, 0, d2.get_stream()>>>(a, NUM_THREADS);
 
-The ``ResourceAwarePool`` will also be useful for avoiding data races in a single memory space. In the case of a single
+The ``ResourceAwarePool`` will also be useful for avoiding data races in a situation where host and device
+share a single memory space. In the case of a single
 memory space, just having two or more camp resources, whether host or device, will give us the potential for data races
 since memory can be visible by both host and device.
 
