@@ -14,6 +14,7 @@ set (device_allocator_test_depends
 if (UMPIRE_ENABLE_CUDA)
   set (integration_tests_depends
     ${integration_tests_depends}
+    cuda 
     cuda_runtime)
 endif ()
 
