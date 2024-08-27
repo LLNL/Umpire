@@ -175,7 +175,8 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource r, std::siz
 
 void ResourceAwarePool::deallocate(void* ptr, std::size_t size)
 {
-  UMPIRE_LOG(Warning, "You called deallocate with no resource. Calling deallocate with the resource returned by getResource...");
+  UMPIRE_LOG(Warning,
+             "You called deallocate with no resource. Calling deallocate with the resource returned by getResource...");
 
   auto r = getResource(ptr);
   deallocate_resource(r, ptr, size);
