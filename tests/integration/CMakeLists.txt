@@ -153,6 +153,10 @@ blt_add_executable(
   SOURCES resource_aware_pool_tests.cpp
   DEPENDS_ON ${integration_tests_depends})
 
+blt_add_test(
+  NAME resource_aware_pool_tests
+  COMMAND resource_aware_pool_tests)
+
 blt_add_executable(
   NAME operation_tests
   SOURCES operation_tests.cpp
