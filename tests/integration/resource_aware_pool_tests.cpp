@@ -5,13 +5,15 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include <stdio.h>
+
 #include <iostream>
+
 #include "camp/camp.hpp"
 #include "gtest/gtest.h"
 #include "umpire/ResourceManager.hpp"
+#include "umpire/Umpire.hpp"
 #include "umpire/config.hpp"
 #include "umpire/strategy/ResourceAwarePool.hpp"
-#include "umpire/Umpire.hpp"
 
 using namespace camp::resources;
 
