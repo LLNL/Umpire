@@ -131,7 +131,6 @@ inline int resource_to_device_id(const std::string& resource)
 #if defined(UMPIRE_ENABLE_HIP)
     hipGetDevice(&device_id);
 #endif /* UMPIRE_ENABLE_HIP */
-
   }
 
   return device_id;
