@@ -71,7 +71,7 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource r, std::siz
         do_deallocate(pending_chunk); // TODO: can I erase it from the list then?
       }
       if (pending_chunk->size >= rounded_bytes && pending_chunk->m_resource == r) {
-        chunk->size = pending_chunk->size; // is this necessary?
+        //chunk->size = pending_chunk->size; // TODO: Why does this cause failure?
         chunk = pending_chunk;
         chunk->free = false;
         // TODO: Do I add to actual bytes, releasable blocks, total blocks, etc.????
@@ -285,11 +285,15 @@ void ResourceAwarePool::release()
 #endif
 
   // This will check all chunks in m_pending_map and erase the entry if event is complete
-  for (auto chunk = m_pending_map.begin(); chunk != m_pending_map.end(); chunk++) {
-    if ((*chunk) != nullptr && (*chunk)->m_event.check()) {
-      m_pending_map.erase(chunk);
-      m_free_map.insert(std::make_pair((*chunk)->size, (*chunk))); // Make sure this is correct!
-      (*chunk)->free = true;                                       // Is free up to date everywhere else too?
+  for (auto it = m_pending_map.begin(); it != m_pending_map.end();) {
+    auto chunk = (*it);
+    if (chunk != nullptr && chunk->m_event.check()) {
+      m_free_map.insert(std::make_pair(chunk->size, chunk)); // Make sure this is correct!
+      chunk->free = true;                                       // Is free up to date everywhere else too?
+      m_pending_map.erase(it);
+    }
+    else {
+      it++;
     }
   }
 
