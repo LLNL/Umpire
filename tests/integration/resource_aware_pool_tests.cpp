@@ -20,8 +20,7 @@ using namespace camp::resources;
 void host_sleep(int* ptr)
 {
   int i = 0;
-  while (i < 1000000)
-  {
+  while (i < 1000000) {
     int y = i;
     y++;
     i = y;
@@ -56,9 +55,9 @@ std::vector<std::string> get_allocator_strings()
   std::vector<std::string> allocators;
 
   allocators.push_back("DEVICE");
-  //auto& rm = umpire::ResourceManager::getInstance();
-  //for (int id = 0; id < rm.getNumDevices(); id++) {
-    //allocators.push_back(std::string{"DEVICE::" + std::to_string(id)});
+  // auto& rm = umpire::ResourceManager::getInstance();
+  // for (int id = 0; id < rm.getNumDevices(); id++) {
+  // allocators.push_back(std::string{"DEVICE::" + std::to_string(id)});
   //}
 #if defined(UMPIRE_ENABLE_UM)
   allocators.push_back("UM");
@@ -78,8 +77,8 @@ class ResourceAwarePoolTest : public ::testing::TestWithParam<std::string> {
   virtual void SetUp()
   {
     auto& rm = umpire::ResourceManager::getInstance();
-    m_pool = rm.makeAllocator<umpire::strategy::ResourceAwarePool>(
-                                              std::string{"rap-pool-" + GetParam()}, rm.getAllocator(GetParam()));
+    m_pool = rm.makeAllocator<umpire::strategy::ResourceAwarePool>(std::string{"rap-pool-" + GetParam()},
+                                                                   rm.getAllocator(GetParam()));
   }
 
   umpire::Allocator m_pool;
@@ -92,12 +91,12 @@ TEST_P(ResourceAwarePoolTest, Check_States)
 #elif defined(UMPIRE_ENABLE_HIP)
   Hip d1, d2;
 #endif
-  //TODO: openmp offload?
+  // TODO: openmp offload?
 
   Resource r1{d1}, r2{d2};
 
   double* ptr = static_cast<double*>(m_pool.allocate(r1, 1024));
-  
+
   EXPECT_EQ(getResource(m_pool, ptr), r1);
   EXPECT_EQ(getPendingSize(m_pool), 0);
 
@@ -106,16 +105,16 @@ TEST_P(ResourceAwarePoolTest, Check_States)
 #elif defined(UMPIRE_ENABLE_HIP)
   hipLaunchKernelGGL(do_sleep, 1, 32, 0, d1.get_stream(), ptr);
 #endif
-  //TODO: openmp offload?
+  // TODO: openmp offload?
 
   m_pool.deallocate(ptr);
   EXPECT_EQ(getPendingSize(m_pool), 1);
-  
+
   double* ptr2 = static_cast<double*>(m_pool.allocate(r2, 2048));
- 
+
   EXPECT_FALSE(r1 == r2);
-  //EXPECT_EQ(getResource(m_pool, ptr2), r2); //TODO: why is this false???
-  EXPECT_NE(ptr, ptr2); //multiple device resources, possible data race, needs different addr
+  // EXPECT_EQ(getResource(m_pool, ptr2), r2); //TODO: why is this false???
+  EXPECT_NE(ptr, ptr2); // multiple device resources, possible data race, needs different addr
 }
 
 INSTANTIATE_TEST_SUITE_P(ResourceAwarePoolTests, ResourceAwarePoolTest, ::testing::ValuesIn(get_allocator_strings()));
@@ -132,7 +131,7 @@ TEST(ResourceAwarePool_Host_Test, Check_States_Host)
 
   int* ptr = static_cast<int*>(pool.allocate(r1, 1024));
   int* compare_ptr1 = ptr;
-  
+
   EXPECT_EQ(getResource(pool, ptr), r1);
   EXPECT_EQ(getPendingSize(pool), 0);
 
@@ -140,10 +139,10 @@ TEST(ResourceAwarePool_Host_Test, Check_States_Host)
 
   pool.deallocate(ptr);
   EXPECT_EQ(getPendingSize(pool), 1);
-  
+
   ptr = static_cast<int*>(pool.allocate(r2, 2048));
   int* compare_ptr2 = ptr;
 
   EXPECT_TRUE(r1 == r2);
-  EXPECT_EQ(compare_ptr1, compare_ptr2); //only 1 host resource available, no possible data race
+  EXPECT_EQ(compare_ptr1, compare_ptr2); // only 1 host resource available, no possible data race
 }
