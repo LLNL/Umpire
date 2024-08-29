@@ -5,8 +5,8 @@
 #include "camp/camp.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/Umpire.hpp"
-#include "umpire/strategy/ResourceAwarePool.hpp"
 #include "umpire/strategy/QuickPool.hpp"
+#include "umpire/strategy/ResourceAwarePool.hpp"
 
 constexpr int NUM_THREADS = 64;
 
@@ -15,22 +15,22 @@ using namespace camp::resources;
 
 void host_touch_data(double* ptr)
 {
-  for(int i = 0; i < NUM_THREADS; i++) {
+  for (int i = 0; i < NUM_THREADS; i++) {
     ptr[i] = i;
   }
 }
 
 void host_touch_data_again(double* ptr)
 {
-  for(int i = 0; i < NUM_THREADS; i++) {
+  for (int i = 0; i < NUM_THREADS; i++) {
     ptr[i] = 54321;
   }
 }
 
 void host_check_data(double* ptr)
 {
-  for(int i = 0; i < NUM_THREADS; i++) {
-    if(ptr[i] != i) {
+  for (int i = 0; i < NUM_THREADS; i++) {
+    if (ptr[i] != i) {
       ptr[i] = -1;
     }
   }
