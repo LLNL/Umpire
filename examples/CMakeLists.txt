@@ -46,12 +46,7 @@ if (UMPIRE_ENABLE_HIP)
     SOURCES multi_device.cpp
     DEPENDS_ON umpire blt::hip)
 
-  blt_add_executable(
-    NAME rap_test
-    SOURCES rap_test.cpp
-    DEPENDS_ON umpire blt::hip)
-
-  list(APPEND umpire_examples multi_device rap_test)
+  list(APPEND umpire_examples multi_device)
 endif()
 
 blt_add_executable(
@@ -65,6 +60,12 @@ blt_add_executable(
   SOURCES strategy_example.cpp
   DEPENDS_ON ${example_depends})
 list(APPEND umpire_examples strategy_example)
+
+blt_add_executable(
+  NAME rap_example
+  SOURCES rap_example.cpp
+  DEPENDS_ON ${example_depends})
+list(APPEND umpire_examples rap_example)
 
 blt_add_executable(
   NAME allocator
@@ -133,22 +134,15 @@ if (UMPIRE_ENABLE_CUDA)
     SOURCES multi_device.cpp
     DEPENDS_ON umpire cuda)
 
-  blt_add_executable(
-    NAME rap_test 
-    SOURCES rap_test.cpp
-    DEPENDS_ON umpire cuda)
-
   set_source_files_properties(
     multi_device.cpp
-    rap_test.cpp
     PROPERTIES CUDA_SEPARABLE_COMPILATION On)
 
   set_target_properties(
     multi_device
-    rap_test
     PROPERTIES CUDA_SEPARABLE_COMPILATION On)
 
-  list(APPEND umpire_examples multi_device rap_test)
+  list(APPEND umpire_examples multi_device)
 endif()
 
 install(TARGETS ${umpire_examples} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

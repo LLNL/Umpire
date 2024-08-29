@@ -8,7 +8,6 @@
 #include "umpire/strategy/ResourceAwarePool.hpp"
 #include "umpire/strategy/QuickPool.hpp"
 
-constexpr int BLOCK_SIZE = 16;
 constexpr int NUM_THREADS = 64;
 
 using clock_value_t = long long;
@@ -48,6 +47,9 @@ void host_sleep(double* ptr)
   *ptr = i;
   ptr++;
 }
+
+#if defined(UMPIRE_ENABLE_DEVICE)
+constexpr int BLOCK_SIZE = 16;
 
 __device__ void sleep(clock_value_t sleep_cycles)
 {
@@ -92,12 +94,17 @@ __global__ void touch_data_again(double* data, int len)
     data[id] = 8.76543210;
   }
 }
+#endif
 
 int main(int, char**)
 {
   auto& rm = umpire::ResourceManager::getInstance();
+#if defined(UMPIRE_ENABLE_DEVICE)
   auto pool = rm.makeAllocator<umpire::strategy::ResourceAwarePool>("rap-pool", rm.getAllocator("UM"));
-  int NUM_BLOCKS = NUM_THREADS / BLOCK_SIZE;
+  const int NUM_BLOCKS = NUM_THREADS / BLOCK_SIZE;
+#else
+  auto pool = rm.makeAllocator<umpire::strategy::ResourceAwarePool>("rap-pool", rm.getAllocator("HOST"));
+#endif
 
   // Create camp resources
 #if defined(UMPIRE_ENABLE_CUDA)
@@ -126,7 +133,7 @@ int main(int, char**)
   hipLaunchKernelGGL(do_sleep, dim3(NUM_BLOCKS), dim3(BLOCK_SIZE), 0, d1.get_stream());
   hipLaunchKernelGGL(check_data, dim3(NUM_BLOCKS), dim3(BLOCK_SIZE), 0, d1.get_stream(), a, NUM_THREADS);
 #else
-  host_touch_data(a)
+  host_touch_data(a);
   host_sleep(a);
   host_check_data(a);
 #endif
@@ -159,7 +166,11 @@ int main(int, char**)
   for (int i = 0; i < NUM_THREADS; i++) {
     UMPIRE_ASSERT(a[i] != (-1) && "Error: incorrect value!");
   }
+#if defined(UMPIRE_ENABLE_DEVICE)
   UMPIRE_ASSERT(ptr1 != ptr2);
+#else
+  UMPIRE_ASSERT(ptr1 == ptr2);
+#endif
   std::cout << "Kernel succeeded! Expected result returned" << std::endl;
 
   // deallocate and clean up
