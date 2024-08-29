@@ -66,13 +66,14 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource r, std::siz
 
   if (!m_pending_map.empty()) {
     for (auto pending_chunk : m_pending_map) {
-      if (pending_chunk->m_event.check()) // no longer pending
+      if (pending_chunk->free == false && pending_chunk->m_event.check()) // no longer pending
       {
         do_deallocate(pending_chunk); // TODO: can I erase it from the list then?
       }
       if (pending_chunk->size >= rounded_bytes && pending_chunk->m_resource == r) {
         // chunk->size = pending_chunk->size; // TODO: Why does this cause failure?
         chunk = pending_chunk;
+        chunk->m_resource = pending_chunk->m_resource;
         chunk->free = false;
         // TODO: Do I add to actual bytes, releasable blocks, total blocks, etc.????
         std::size_t bytes_to_use{(m_actual_bytes == 0) ? m_first_minimum_pool_allocation_size
@@ -132,6 +133,7 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource r, std::siz
       chunk = new (chunk_storage) Chunk{ret, size, size, r};
     } else {
       chunk = (*best).second;
+      chunk->m_resource = r;
       m_free_map.erase(best);
     }
   }
@@ -216,6 +218,10 @@ void ResourceAwarePool::do_deallocate(Chunk* chunk) noexcept
     chunk->size += next->size;
     chunk->next = next->next;
 
+    //TODO: Double check this
+    //chunk->m_event = next->m_event;
+    //chunk->m_resource = next->m_resource;
+
     if (chunk->next)
       chunk->next->prev = chunk;
 
@@ -235,6 +241,14 @@ void ResourceAwarePool::do_deallocate(Chunk* chunk) noexcept
     m_releasable_bytes += chunk->chunk_size;
   }
 
+  for (auto it = m_pending_map.begin(); it != m_pending_map.end();) {
+    auto my_chunk = (*it);
+    if(my_chunk == chunk) {
+      m_pending_map.erase(it);
+    } else {
+      it++;
+    }
+  }
   chunk->size_map_it = m_free_map.insert(std::make_pair(chunk->size, chunk));
   chunk->free = true;
 }
@@ -287,10 +301,10 @@ void ResourceAwarePool::release()
   // This will check all chunks in m_pending_map and erase the entry if event is complete
   for (auto it = m_pending_map.begin(); it != m_pending_map.end();) {
     auto chunk = (*it);
-    if (chunk != nullptr && chunk->m_event.check()) {
-      m_free_map.insert(std::make_pair(chunk->size, chunk)); // Make sure this is correct!
-      chunk->free = true;                                    // Is free up to date everywhere else too?
-      m_pending_map.erase(it);
+    if (chunk != nullptr && chunk->free == false && chunk->m_event.check()) {
+        m_free_map.insert(std::make_pair(chunk->size, chunk)); // Make sure this is correct!
+        chunk->free = true;                                    // Is free up to date everywhere else too?
+        m_pending_map.erase(it);
     } else {
       it++;
     }
@@ -379,19 +393,20 @@ Platform ResourceAwarePool::getPlatform() noexcept
 
 camp::resources::Resource ResourceAwarePool::getResource(void* ptr) const
 {
-  auto it = m_used_map.find(ptr); // check used chunks
-  if (it != m_used_map.end()) {
-    auto chunk = it->second;
-    return chunk->m_resource;
-  }
   for (auto& chunk : m_pending_map) { // chunk pending chunks
     if (chunk->data == ptr) {
       return chunk->m_resource;
     }
   }
+  auto it = m_used_map.find(ptr); // check used chunks
+  if (it != m_used_map.end()) {
+    auto chunk = it->second;
+    return chunk->m_resource;
+  }
   // UMPIRE_ERROR(runtime_error, fmt::format("BANANAS!!"));
   // TODO: if it is free, do we care what resource it has?
   return camp::resources::Host{}; // If we get here, the chunk is free
+  //TODO: maybe return unknown?
 }
 
 MemoryResourceTraits ResourceAwarePool::getTraits() const noexcept

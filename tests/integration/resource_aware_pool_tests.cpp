@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
@@ -113,8 +113,9 @@ TEST_P(ResourceAwarePoolTest, Check_States)
   double* ptr2 = static_cast<double*>(m_pool.allocate(r2, 2048));
 
   EXPECT_FALSE(r1 == r2);
-  // EXPECT_EQ(getResource(m_pool, ptr2), r2); //TODO: why is this false???
+  EXPECT_EQ(getResource(m_pool, ptr2), r2);
   EXPECT_NE(ptr, ptr2); // multiple device resources, possible data race, needs different addr
+
 }
 
 INSTANTIATE_TEST_SUITE_P(ResourceAwarePoolTests, ResourceAwarePoolTest, ::testing::ValuesIn(get_allocator_strings()));
@@ -138,7 +139,7 @@ TEST(ResourceAwarePool_Host_Test, Check_States_Host)
   host_sleep(ptr);
 
   pool.deallocate(ptr);
-  EXPECT_EQ(getPendingSize(pool), 1);
+  EXPECT_EQ(getPendingSize(pool), 0); //When only using host, there will be no pending chunks
 
   ptr = static_cast<int*>(pool.allocate(r2, 2048));
   int* compare_ptr2 = ptr;
