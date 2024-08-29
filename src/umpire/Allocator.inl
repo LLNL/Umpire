@@ -53,10 +53,9 @@ inline void* Allocator::thread_safe_allocate(std::size_t bytes)
   return do_allocate(bytes);
 }
 
-// TODO: Do I need a thread safe resource allocate?
 inline void* Allocator::thread_safe_resource_allocate(camp::resources::Resource const& r, std::size_t bytes)
 {
-  // std::lock_guard<std::mutex> lock(*m_thread_safe_mutex);
+  std::lock_guard<std::mutex> lock(*m_thread_safe_mutex);
   return do_resource_allocate(r, bytes);
 }
 
@@ -72,10 +71,9 @@ inline void Allocator::thread_safe_deallocate(void* ptr)
   return do_deallocate(ptr);
 }
 
-// TODO: Do I need a thread safe resource deallocate?
 inline void Allocator::thread_safe_resource_deallocate(camp::resources::Resource const& r, void* ptr)
 {
-  // std::lock_guard<std::mutex> lock(*m_thread_safe_mutex);
+  std::lock_guard<std::mutex> lock(*m_thread_safe_mutex);
   return do_resource_deallocate(r, ptr);
 }
 
@@ -116,7 +114,6 @@ inline void* Allocator::do_resource_allocate(camp::resources::Resource const& r,
     ret = m_allocator->allocate_resource(r, bytes);
   }
 
-  // TODO: track the resource?
   if (m_tracking) {
     registerAllocation(ret, bytes, m_allocator);
   }
@@ -192,7 +189,6 @@ inline void Allocator::deallocate(void* ptr)
   m_thread_safe ? thread_safe_deallocate(ptr) : do_deallocate(ptr);
 }
 
-// TODO: Create thread safe resource deallocate?
 inline void Allocator::deallocate(camp::resources::Resource const& r, void* ptr)
 {
   m_thread_safe ? thread_safe_resource_deallocate(r, ptr) : do_resource_deallocate(r, ptr);

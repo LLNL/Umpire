@@ -249,6 +249,7 @@ void ResourceAwarePool::do_deallocate(Chunk* chunk) noexcept
       it++;
     }
   }
+
   chunk->size_map_it = m_free_map.insert(std::make_pair(chunk->size, chunk));
   chunk->free = true;
 }
