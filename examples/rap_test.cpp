@@ -5,8 +5,8 @@
 #include "camp/camp.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/Umpire.hpp"
-#include "umpire/strategy/ResourceAwarePool.hpp"
 #include "umpire/strategy/QuickPool.hpp"
+#include "umpire/strategy/ResourceAwarePool.hpp"
 
 constexpr int BLOCK_SIZE = 16;
 constexpr int NUM_THREADS = 64;
@@ -16,22 +16,22 @@ using namespace camp::resources;
 
 void host_touch_data(double* ptr)
 {
-  for(int i = 0; i < NUM_THREADS; i++) {
+  for (int i = 0; i < NUM_THREADS; i++) {
     ptr[i] = i;
   }
 }
 
 void host_touch_data_again(double* ptr)
 {
-  for(int i = 0; i < NUM_THREADS; i++) {
+  for (int i = 0; i < NUM_THREADS; i++) {
     ptr[i] = 54321;
   }
 }
 
 void host_check_data(double* ptr)
 {
-  for(int i = 0; i < NUM_THREADS; i++) {
-    if(ptr[i] != i) {
+  for (int i = 0; i < NUM_THREADS; i++) {
+    if (ptr[i] != i) {
       ptr[i] = -1;
     }
   }
@@ -126,8 +126,7 @@ int main(int, char**)
   hipLaunchKernelGGL(do_sleep, dim3(NUM_BLOCKS), dim3(BLOCK_SIZE), 0, d1.get_stream());
   hipLaunchKernelGGL(check_data, dim3(NUM_BLOCKS), dim3(BLOCK_SIZE), 0, d1.get_stream(), a, NUM_THREADS);
 #else
-  host_touch_data(a)
-  host_sleep(a);
+  host_touch_data(a) host_sleep(a);
   host_check_data(a);
 #endif
 

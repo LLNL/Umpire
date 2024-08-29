@@ -218,9 +218,9 @@ void ResourceAwarePool::do_deallocate(Chunk* chunk) noexcept
     chunk->size += next->size;
     chunk->next = next->next;
 
-    //TODO: Double check this
-    //chunk->m_event = next->m_event;
-    //chunk->m_resource = next->m_resource;
+    // TODO: Double check this
+    // chunk->m_event = next->m_event;
+    // chunk->m_resource = next->m_resource;
 
     if (chunk->next)
       chunk->next->prev = chunk;
@@ -243,7 +243,7 @@ void ResourceAwarePool::do_deallocate(Chunk* chunk) noexcept
 
   for (auto it = m_pending_map.begin(); it != m_pending_map.end();) {
     auto my_chunk = (*it);
-    if(my_chunk == chunk) {
+    if (my_chunk == chunk) {
       m_pending_map.erase(it);
     } else {
       it++;
@@ -302,9 +302,9 @@ void ResourceAwarePool::release()
   for (auto it = m_pending_map.begin(); it != m_pending_map.end();) {
     auto chunk = (*it);
     if (chunk != nullptr && chunk->free == false && chunk->m_event.check()) {
-        m_free_map.insert(std::make_pair(chunk->size, chunk)); // Make sure this is correct!
-        chunk->free = true;                                    // Is free up to date everywhere else too?
-        m_pending_map.erase(it);
+      m_free_map.insert(std::make_pair(chunk->size, chunk)); // Make sure this is correct!
+      chunk->free = true;                                    // Is free up to date everywhere else too?
+      m_pending_map.erase(it);
     } else {
       it++;
     }
@@ -406,7 +406,7 @@ camp::resources::Resource ResourceAwarePool::getResource(void* ptr) const
   // UMPIRE_ERROR(runtime_error, fmt::format("BANANAS!!"));
   // TODO: if it is free, do we care what resource it has?
   return camp::resources::Host{}; // If we get here, the chunk is free
-  //TODO: maybe return unknown?
+  // TODO: maybe return unknown?
 }
 
 MemoryResourceTraits ResourceAwarePool::getTraits() const noexcept
