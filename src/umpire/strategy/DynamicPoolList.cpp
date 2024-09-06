@@ -186,7 +186,7 @@ PoolCoalesceHeuristic<DynamicPoolList> DynamicPoolList::percent_releasable_hwm(i
     return [=](const strategy::DynamicPoolList& pool) {
       // Calculate threshold in bytes from the percentage
       const std::size_t threshold = static_cast<std::size_t>(f * pool.getActualSize());
-      return pool.getReleasableSize() >= threshold ? pool.getActualHighwaterMark() : 0;
+      return pool.getReleasableSize() > threshold ? pool.getActualHighwaterMark() : 0;
     };
   }
 }
