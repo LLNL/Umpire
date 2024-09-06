@@ -19,7 +19,7 @@ int main(int, char**)
 {
   auto& rm = umpire::ResourceManager::getInstance();
   auto traits{umpire::get_default_resource_traits("SHARED")};
-  traits.size = 1 * 1024 * 1024; // Maximum size of this Allocator
+  traits.size = 1 * 1024 * 1024;                                   // Maximum size of this Allocator
   traits.scope = umpire::MemoryResourceTraits::shared_scope::node; // default
   auto node_allocator{rm.makeResource("SHARED::node_allocator", traits)};
   auto shim{rm.makeAllocator<umpire::strategy::NamingShim>("shim", node_allocator)};
