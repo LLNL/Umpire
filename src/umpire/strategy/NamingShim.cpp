@@ -13,12 +13,11 @@
 namespace umpire {
 namespace strategy {
 
-NamingShim::NamingShim(const std::string& name, int id, Allocator allocator, std::size_t slots)
+NamingShim::NamingShim(const std::string& name, int id, Allocator allocator)
     : AllocationStrategy{name, id, allocator.getAllocationStrategy(), "NamingShim"},
       m_counter{0},
       m_allocator(allocator.getAllocationStrategy())
 {
-  UMPIRE_LOG(Debug, "Creating " << m_slots << "-slot pool.");
 }
 
 NamingShim::~NamingShim()

@@ -15,7 +15,7 @@ namespace strategy {
 
 class NamingShim : public AllocationStrategy {
  public:
-  NamingShim(const std::string& name, int id, Allocator allocator, std::size_t slots);
+  NamingShim(const std::string& name, int id, Allocator allocator);
 
   ~NamingShim();
 
@@ -27,7 +27,6 @@ class NamingShim : public AllocationStrategy {
   MemoryResourceTraits getTraits() const noexcept override;
 
  private:
-  std::unordered_map<void*, std::string> m_names;
   std::size_t m_counter;
   strategy::AllocationStrategy* m_allocator;
 };
