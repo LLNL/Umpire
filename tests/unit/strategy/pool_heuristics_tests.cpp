@@ -116,7 +116,7 @@ TYPED_TEST(PoolHeuristicsTest, PercentReleasableHWM)
     ASSERT_NO_THROW(a.first.deallocate(ptrs[i]););
   }
 
-  ASSERT_EQ(a.second->getActualSize(), a.second->getActualHighwaterMark());
+  ASSERT_EQ(a.second->getActualSize(), a.second->getHighWatermark());
   ASSERT_EQ(a.second->getTotalBlocks(), 2);
   ASSERT_EQ(a.second->getReleasableBlocks(), 1);
 
@@ -183,7 +183,7 @@ TYPED_TEST(PoolHeuristicsTest, BlocksReleasableHWM)
     ASSERT_NO_THROW(a.first.deallocate(ptrs[i]););
   }
 
-  ASSERT_EQ(a.second->getActualSize(), a.second->getActualHighwaterMark());
+  ASSERT_EQ(a.second->getActualSize(), a.second->getHighWatermark());
   ASSERT_EQ(a.second->getTotalBlocks(), 4);
   ASSERT_EQ(a.second->getReleasableBlocks(), 1);
 
