@@ -40,8 +40,9 @@ class DynamicSizePool : private umpire::strategy::mixins::AlignedAllocation {
   struct Block *freeBlocks{nullptr};
 
   // Total size allocated (bytes)
+  std::size_t m_aligned_bytes{0};
+  std::size_t m_aligned_highwatermark{0};
   std::size_t m_actual_bytes{0};
-  std::size_t m_current_size{0};
   std::size_t m_actual_highwatermark{0};
 
   // Minimum size of initial allocation
@@ -320,7 +321,10 @@ class DynamicSizePool : private umpire::strategy::mixins::AlignedAllocation {
     best->next = usedBlocks;
     usedBlocks = best;
 
-    m_current_size += rounded_bytes;
+    m_aligned_bytes += rounded_bytes;
+    if (m_aligned_bytes > m_aligned_highwatermark) {
+      m_aligned_highwatermark = m_aligned_bytes;
+    }
     UMPIRE_UNPOISON_MEMORY_REGION(m_allocator, usedBlocks->data, bytes);
 
     // Return the new pointer
@@ -339,7 +343,7 @@ class DynamicSizePool : private umpire::strategy::mixins::AlignedAllocation {
     if (!curr)
       return;
 
-    m_current_size -= curr->size;
+    m_aligned_bytes -= curr->size;
     UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, curr->size);
 
     UMPIRE_LOG(Debug, "Deallocating data held by " << curr);
@@ -368,14 +372,26 @@ class DynamicSizePool : private umpire::strategy::mixins::AlignedAllocation {
     return m_actual_bytes;
   }
 
+  // TODO: Keep old behaviour with m_aligned_bytes or remove and use definition
+  // from AllocationStrategy which returns m_current_size?
   std::size_t getCurrentSize() const
   {
-    return m_current_size;
+    return m_aligned_bytes;
   }
 
   std::size_t getActualHighwaterMark() const noexcept
   {
     return m_actual_highwatermark;
+  }
+
+  std::size_t getAlignedSize() const noexcept
+  {
+    return m_aligned_bytes;
+  }
+
+  std::size_t getAlignedHighwaterMark() const noexcept
+  {
+    return m_aligned_highwatermark;
   }
 
   std::size_t getBlocksInPool() const

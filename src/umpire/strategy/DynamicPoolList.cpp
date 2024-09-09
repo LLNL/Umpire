@@ -83,6 +83,16 @@ std::size_t DynamicPoolList::getActualHighwaterMark() const noexcept
   return dpa.getActualHighwaterMark();
 }
 
+std::size_t DynamicPoolList::getAlignedSize() const noexcept
+{
+  return dpa.getAlignedSize();
+}
+
+std::size_t DynamicPoolList::getAlignedHighwaterMark() const noexcept
+{
+  return dpa.getAlignedHighwaterMark();
+}
+
 std::size_t DynamicPoolList::getReleasableSize() const noexcept
 {
   std::size_t SparseBlockSize = dpa.getReleasableSize();

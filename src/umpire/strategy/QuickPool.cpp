@@ -127,7 +127,10 @@ void* QuickPool::allocate(std::size_t bytes)
     split_chunk->size_map_it = m_size_map.insert(std::make_pair(remaining, split_chunk));
   }
 
-  m_current_bytes += rounded_bytes;
+  m_aligned_bytes += rounded_bytes;
+  if (m_aligned_bytes > m_aligned_highwatermark) {
+    m_aligned_highwatermark = m_aligned_bytes;
+  }
 
   UMPIRE_UNPOISON_MEMORY_REGION(m_allocator, ret, bytes);
   return ret;
@@ -139,7 +142,7 @@ void QuickPool::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
   auto chunk = (*m_pointer_map.find(ptr)).second;
   chunk->free = true;
 
-  m_current_bytes -= chunk->size;
+  m_aligned_bytes -= chunk->size;
 
   UMPIRE_LOG(Debug, "Deallocating data held by " << chunk);
 
@@ -262,9 +265,11 @@ std::size_t QuickPool::getActualSize() const noexcept
   return m_actual_bytes;
 }
 
+// TODO: Keep old behaviour with m_aligned_bytes or remove and use definition
+// from AllocationStrategy which returns m_current_size?
 std::size_t QuickPool::getCurrentSize() const noexcept
 {
-  return m_current_bytes;
+  return m_aligned_bytes;
 }
 
 std::size_t QuickPool::getReleasableSize() const noexcept
@@ -275,6 +280,16 @@ std::size_t QuickPool::getReleasableSize() const noexcept
 std::size_t QuickPool::getActualHighwaterMark() const noexcept
 {
   return m_actual_highwatermark;
+}
+
+std::size_t QuickPool::getAlignedSize() const noexcept
+{
+  return m_aligned_bytes;
+}
+
+std::size_t QuickPool::getAlignedHighwaterMark() const noexcept
+{
+  return m_aligned_highwatermark;
 }
 
 Platform QuickPool::getPlatform() noexcept

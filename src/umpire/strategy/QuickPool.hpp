@@ -73,6 +73,8 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
   std::size_t getCurrentSize() const noexcept override;
   std::size_t getReleasableSize() const noexcept;
   std::size_t getActualHighwaterMark() const noexcept;
+  std::size_t getAlignedSize() const noexcept;
+  std::size_t getAlignedHighwaterMark() const noexcept;
 
   Platform getPlatform() noexcept override;
 
@@ -163,8 +165,9 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
 
   std::size_t m_total_blocks{0};
   std::size_t m_releasable_blocks{0};
+  std::size_t m_aligned_bytes{0};
+  std::size_t m_aligned_highwatermark{0};
   std::size_t m_actual_bytes{0};
-  std::size_t m_current_bytes{0};
   std::size_t m_releasable_bytes{0};
   std::size_t m_actual_highwatermark{0};
   bool m_is_destructing{false};
