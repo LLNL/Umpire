@@ -361,7 +361,7 @@ PoolCoalesceHeuristic<QuickPool> QuickPool::blocks_releasable(std::size_t nblock
 PoolCoalesceHeuristic<QuickPool> QuickPool::blocks_releasable_hwm(std::size_t nblocks)
 {
   return [=](const strategy::QuickPool& pool) {
-    return pool.getReleasableBlocks() >= nblocks ? pool.getActualHighwaterMark() : 0;
+    return pool.getReleasableBlocks() >= nblocks ? pool.getAlignedHighwaterMark() : 0;
   };
 }
 
@@ -397,14 +397,14 @@ PoolCoalesceHeuristic<QuickPool> QuickPool::percent_releasable_hwm(int percentag
     return [=](const QuickPool& UMPIRE_UNUSED_ARG(pool)) { return 0; };
   } else if (percentage == 100) {
     return [=](const strategy::QuickPool& pool) {
-      return pool.getActualSize() == pool.getReleasableSize() ? pool.getActualHighwaterMark() : 0;
+      return pool.getActualSize() == pool.getReleasableSize() ? pool.getAlignedHighwaterMark() : 0;
     };
   } else {
     float f = (float)((float)percentage / (float)100.0);
     return [=](const strategy::QuickPool& pool) {
       // Calculate threshold in bytes from the percentage
       const std::size_t threshold = static_cast<std::size_t>(f * pool.getActualSize());
-      return pool.getReleasableSize() > threshold ? pool.getActualHighwaterMark() : 0;
+      return pool.getReleasableSize() >= threshold ? pool.getAlignedHighwaterMark() : 0;
     };
   }
 }
