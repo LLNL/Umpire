@@ -9,7 +9,9 @@ should be set to ``On``. Note that you can use IPC Shared Memory with MPI enable
 
 First, to get started with the shared memory allocator, set up the traits. For example:
 
-   ``auto traits{umpire::get_default_resource_traits("SHARED")};``
+   ```
+    auto traits{umpire::get_default_resource_traits("SHARED")};
+   ```
 
 The ``traits`` above is a struct of different properties for your shared allocator. You can
 set the maximum size of the allocator with ``traits.size`` and set the scope of the allocator.
