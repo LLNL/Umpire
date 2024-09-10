@@ -9,22 +9,25 @@ should be set to ``On``. Note that you can use IPC Shared Memory with MPI enable
 
 First, to get started with the shared memory allocator, set up the traits. For example:
 
-.. code:: bash
-  auto traits{umpire::get_default_resource_traits("SHARED")};
+.. code-block:: cpp
+
+   auto traits{umpire::get_default_resource_traits("SHARED")};
 
 The ``traits`` above is a struct of different properties for your shared allocator. You can
 set the maximum size of the allocator with ``traits.size`` and set the scope of the allocator.
 
 For example, you can set the scope to socket:
 
-.. code:: bash
+.. code-block:: cpp
+
    traits.scope = umpire::MemoryResourceTraits::shared_scope::socket;
 
 However, by default the scope will be set to "node".
 
 Next, create the shared memory allocator:
 
-.. code:: bash
+.. code-block:: cpp
+
    auto node_allocator{rm.makeResource("SHARED::node_allocator", traits)};
 
 .. note::
@@ -33,7 +36,8 @@ Next, create the shared memory allocator:
 
 Now you can allocate and deallocate shared memory with:
 
-.. code:: bash
+.. code-block:: cpp
+
    void* ptr{node_allocator.allocate("allocation_name_2", sizeof(uint64_t))};
    ...
    node_allocator.deallocate(ptr);
@@ -52,15 +56,18 @@ which set it apart from other Umpire allocators.
 There are a few helper functions provided in the ``Umpire.hpp`` header that will be useful when working with 
 Shared Memory allocators. For example, you can grab the MPI communicator for a particular Shared Memory allocator with:
 
-.. code:: bash
+.. code-block:: cpp
+
    MPI_Comm shared_allocator_comm = umpire::get_communicator_for_allocator(node_allocator, MPI_COMM_WORLD);
 
 Note that the ``node_allocator`` is the Shared Memory allocator we created above.
 Additionally, we can double check that an allocator has the ``SHARED`` memory resource by asserting:
 
-.. code:: bash
+.. code-block:: cpp
+
    UMPIRE_ASSERT(node_allocator.getAllocationStrategy()->getTraits().resource ==
                 umpire::MemoryResourceTraits::resource_type::shared);
 
 You can see a full example here:
 .. literalinclude:: ../../../examples/cookbook/recipe_shared_memory.cpp
+   :language: cpp
