@@ -5,7 +5,7 @@ Using IPC Shared Memory
 =======================
 
 Umpire supports the use of IPC Shared Memory on the HOST memory resource. To do this, ``UMPIRE_ENABLE_IPC_SHARED_MEMORY`` 
- should be set to ``On``. Note that you can use IPC Shared Memory with MPI enabled or disabled.
+should be set to ``On``. Note that you can use IPC Shared Memory with MPI enabled or disabled.
 
 First, to get started with the shared memory allocator, set up the traits. For example:
 
