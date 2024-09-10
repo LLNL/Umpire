@@ -9,26 +9,20 @@ should be set to ``On``. Note that you can use IPC Shared Memory with MPI enable
 
 First, to get started with the shared memory allocator, set up the traits. For example:
 
-.. code-block:: cpp
-
-   auto traits{umpire::get_default_resource_traits("SHARED")};
+   ``auto traits{umpire::get_default_resource_traits("SHARED")};``
 
 The ``traits`` above is a struct of different properties for your shared allocator. You can
 set the maximum size of the allocator with ``traits.size`` and set the scope of the allocator.
 
 For example, you can set the scope to socket:
 
-.. code-block:: cpp
-
-   traits.scope = umpire::MemoryResourceTraits::shared_scope::socket;
+   ``traits.scope = umpire::MemoryResourceTraits::shared_scope::socket;``
 
 However, by default the scope will be set to "node".
 
 Next, create the shared memory allocator:
 
-.. code-block:: cpp
-
-   auto node_allocator{rm.makeResource("SHARED::node_allocator", traits)};
+   ``auto node_allocator{rm.makeResource("SHARED::node_allocator", traits)};``
 
 .. note::
    The name of the Shared Memory allocators MUST have "SHARED" in the name. This will help
@@ -36,11 +30,9 @@ Next, create the shared memory allocator:
 
 Now you can allocate and deallocate shared memory with:
 
-.. code-block:: cpp
-
-   void* ptr{node_allocator.allocate("allocation_name_2", sizeof(uint64_t))};
+   ``void* ptr{node_allocator.allocate("allocation_name_2", sizeof(uint64_t))};
    ...
-   node_allocator.deallocate(ptr);
+   node_allocator.deallocate(ptr);``
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Important Notes About Shared Memory
@@ -56,17 +48,13 @@ which set it apart from other Umpire allocators.
 There are a few helper functions provided in the ``Umpire.hpp`` header that will be useful when working with 
 Shared Memory allocators. For example, you can grab the MPI communicator for a particular Shared Memory allocator with:
 
-.. code-block:: cpp
-
-   MPI_Comm shared_allocator_comm = umpire::get_communicator_for_allocator(node_allocator, MPI_COMM_WORLD);
+   ``MPI_Comm shared_allocator_comm = umpire::get_communicator_for_allocator(node_allocator, MPI_COMM_WORLD);``
 
 Note that the ``node_allocator`` is the Shared Memory allocator we created above.
 Additionally, we can double check that an allocator has the ``SHARED`` memory resource by asserting:
 
-.. code-block:: cpp
-
-   UMPIRE_ASSERT(node_allocator.getAllocationStrategy()->getTraits().resource ==
-                umpire::MemoryResourceTraits::resource_type::shared);
+   ``UMPIRE_ASSERT(node_allocator.getAllocationStrategy()->getTraits().resource ==
+                umpire::MemoryResourceTraits::resource_type::shared);``
 
 You can see a full example here:
 .. literalinclude:: ../../../examples/cookbook/recipe_shared_memory.cpp
