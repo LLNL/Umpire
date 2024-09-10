@@ -32,7 +32,8 @@ Next, create the shared memory allocator:
 
 .. note::
    The name of the Shared Memory allocators MUST have "SHARED" in the name. This will help
-   Umpire distinguish the allocators as Shared Memory allocators specifically.
+   Umpire distinguish the allocators as Shared Memory allocators. It is also used for discovery 
+   by other ranks on node.
 
 Now you can allocate and deallocate shared memory with:
 
