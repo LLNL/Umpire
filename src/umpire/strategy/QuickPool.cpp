@@ -147,7 +147,7 @@ void QuickPool::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
 
   if (chunk->prev && chunk->prev->free == true) {
     auto prev = chunk->prev;
-    UMPIRE_LOG(Debug, "Removing chunk" << prev << " from size map");
+    UMPIRE_LOG(Debug, "Removing chunk " << prev << " from size map");
 
     m_size_map.erase(prev->size_map_it);
 
@@ -157,7 +157,7 @@ void QuickPool::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
     if (prev->next)
       prev->next->prev = prev;
 
-    UMPIRE_LOG(Debug, "Merging with prev" << prev << " and " << chunk);
+    UMPIRE_LOG(Debug, "Merging with prev " << prev << " and " << chunk);
     UMPIRE_LOG(Debug, "New size: " << prev->size);
 
     m_chunk_pool.deallocate(chunk);
@@ -171,10 +171,10 @@ void QuickPool::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
     if (chunk->next)
       chunk->next->prev = chunk;
 
-    UMPIRE_LOG(Debug, "Merging with next" << chunk << " and " << next);
+    UMPIRE_LOG(Debug, "Merging with next " << chunk << " and " << next);
     UMPIRE_LOG(Debug, "New size: " << chunk->size);
 
-    UMPIRE_LOG(Debug, "Removing chunk" << next << " from size map");
+    UMPIRE_LOG(Debug, "Removing chunk " << next << " from size map");
     m_size_map.erase(next->size_map_it);
 
     m_chunk_pool.deallocate(next);
