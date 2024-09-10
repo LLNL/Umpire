@@ -68,5 +68,6 @@ Additionally, we can double check that an allocator has the ``SHARED`` memory re
   UMPIRE_ASSERT(node_allocator.getAllocationStrategy()->getTraits().resource == umpire::MemoryResourceTraits::resource_type::shared);
 
 You can see a full example here:
+
 .. literalinclude:: ../../../examples/cookbook/recipe_shared_memory.cpp
-  :language: cpp
+   :language: cpp
