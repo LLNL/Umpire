@@ -4,7 +4,11 @@
 Using IPC Shared Memory 
 =======================
 
-Umpire supports the use of IPC Shared Memory on the HOST memory resource. To do this, ``UMPIRE_ENABLE_IPC_SHARED_MEMORY`` 
+Umpire supports the use of Inter-Process Communication (IPC) Shared Memory on the HOST memory resource. IPC Shared Memory refers to 
+the mechanisms that allow processes to communicate with each other and synchronize their actions and involves a method where multiple 
+processes can access a common memory space.
+
+To use Umpire's IPC Shared Memory allocators, the ``UMPIRE_ENABLE_IPC_SHARED_MEMORY`` flag 
 should be set to ``On``. Note that you can use IPC Shared Memory with MPI enabled or disabled.
 
 First, to get started with the shared memory allocator, set up the traits. For example:
@@ -53,6 +57,7 @@ which set it apart from other Umpire allocators.
 1. Once you allocate shared memory, that block of memory is fixed. If you need a bigger size, you will have to create a new one.
 2. If you want to see how much memory is available for a shared memory allocator, use the ``getActualSize()`` function.
 3. File descriptors are used for the shared memory. These files will be under ``/dev/shm``.
+4. Although Umpire does not need to have MPI enabled in order to provide IPC Shared Memory, if users wish to associate shared memory with MPI communicators, Umpire will need to be built with MPI enabled.
 
 There are a few helper functions provided in the ``Umpire.hpp`` header that will be useful when working with 
 Shared Memory allocators. For example, you can grab the MPI communicator for a particular Shared Memory allocator with:
