@@ -80,7 +80,7 @@ strategy. You can create a ``ResourceAwarePool`` with the following code:
    auto pool = rm.makeAllocator<umpire::strategy::ResourceAwarePool>("rap-pool", rm.getAllocator("UM"));
    
 Next, you will want to create camp resources. We use these camp resources to track events
-on the resource. Below is an example of creating a camp resource for two device streams.
+on the resource. Below is an example of creating a camp resource for two device streams and the host.
 
 .. code-block:: bash
 
@@ -96,15 +96,16 @@ Then, to allocate memory with your ``ResourceAwarePool`` you can do the followin
 
    double* a = static_cast<double*>(pool.allocate(r1, NUM_THREADS * sizeof(double)));
 
-When we allocate memory that we intend to use in a kernel launched with the resource, we
-now have to send that resource (``r1``) to the allocate function of the ``ResourceAwarePool``.
-Be sure to launch the kernel using the correct stream. For example:
+Note that there is an extra parameter when using the ``allocate`` function. The first parameter is 
+the resource (``r1``) we want the allocated memory to be associated with. In other words, ``r1`` is
+the device stream we want to launch the kernel on. Next, be sure to launch the kernel using the 
+correct stream. Since we are using Camp resources, we use ``d1`` that we created above. For example:
 
 .. code-block:: bash
 
    my_kernel<<NUM_BLOCKS, BLOCK_SIZE, 0, d1.get_stream()>>>(a, NUM_THREADS);
 
-In the kernel launch above, we are specifying the stream from the Cuda resource we created above.
+The kernel launch specifies the stream from the Cuda resource we created above.
 To deallocate, use the following code:
 
 .. code-block:: bash
@@ -113,14 +114,19 @@ To deallocate, use the following code:
 
 .. note::
    It can be hard to keep track of which resource corresponds to which pointer. If it is not feasible to keep track
-   of that, you can use the ``getResource(alloc, ptr)`` method where ``alloc`` is an Umpire allocator and ``ptr`` is a pointer. 
+   of that, you can call ``pool.deallocate(ptr)`` as usual. However, this method will call ``getResource(ptr)``
+   on the ``ResourceAwarePool`` instance and then call ``pool.deallocate(r, ptr)`` where ``r`` is the resource 
+   returned from the ``getResource`` function call.
 
-Assuming you reallocated memory on ``a`` with ``r2``, you could then launch a second kernel on the second stream. For example:
+Assuming you need to reallocate memory on ``a`` with ``r2``, you could then launch a second kernel with the second stream. For example:
 
 .. code-block:: bash
 
+   double* a = static_cast<double*>(pool.allocate(r2, NUM_THREADS * sizeof(double)));
+   ...
    my_other_kernel<<NUM_BLOCKS, BLOCK_SIZE, 0, d2.get_stream()>>>(a, NUM_THREADS);
 
+Since we are using the ``ResourceAwarePool``, we will not cause a data race from trying to reuse that memory.
 The ``ResourceAwarePool`` will also be useful for avoiding data races in a situation where host and device
 share a single memory space. In the case of a single
 memory space, just having two or more camp resources, whether host or device, will give us the potential for data races
@@ -128,4 +134,4 @@ since memory can be visible by both host and device.
 
 A full example of using the ``ResourceAwarePool`` can be seen below:
 
-.. literalinclude:: ../../../examples/rap_test.cpp
+.. literalinclude:: ../../../examples/rap_example.cpp
