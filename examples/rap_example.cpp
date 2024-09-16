@@ -1,4 +1,5 @@
 #include <stdio.h>
+
 #include <iostream>
 
 #include "camp/camp.hpp"
@@ -89,7 +90,7 @@ int main(int, char**)
 
   UMPIRE_ASSERT(getResource(pool, a) == r2);
 
-  //Use Camp resource to synchronize devices
+  // Use Camp resource to synchronize devices
   r1.get_event().wait();
 
 #if defined(UMPIRE_ENABLE_DEVICE)
