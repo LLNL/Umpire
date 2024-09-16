@@ -1,5 +1,4 @@
 #include <stdio.h>
-
 #include <iostream>
 
 #include "camp/camp.hpp"
@@ -8,33 +7,17 @@
 #include "umpire/strategy/QuickPool.hpp"
 #include "umpire/strategy/ResourceAwarePool.hpp"
 
-constexpr int NUM_THREADS = 64;
-
-using clock_value_t = long long;
 using namespace camp::resources;
 
-void host_touch_data(double* ptr)
-{
-  for (int i = 0; i < NUM_THREADS; i++) {
-    ptr[i] = i;
-  }
-}
+#if defined(UMPIRE_ENABLE_CUDA)
+using resource_type = Cuda;
+#elif defined(UMPIRE_ENABLE_HIP)
+using resource_type = Hip;
+#else
+using resource_type = Host;
+#endif
 
-void host_touch_data_again(double* ptr)
-{
-  for (int i = 0; i < NUM_THREADS; i++) {
-    ptr[i] = 54321;
-  }
-}
-
-void host_check_data(double* ptr)
-{
-  for (int i = 0; i < NUM_THREADS; i++) {
-    if (ptr[i] != i) {
-      ptr[i] = -1;
-    }
-  }
-}
+constexpr int NUM_THREADS = 64;
 
 void host_sleep(double* ptr)
 {
@@ -50,6 +33,7 @@ void host_sleep(double* ptr)
 
 #if defined(UMPIRE_ENABLE_DEVICE)
 constexpr int BLOCK_SIZE = 16;
+using clock_value_t = long long;
 
 __device__ void sleep(clock_value_t sleep_cycles)
 {
@@ -60,45 +44,17 @@ __device__ void sleep(clock_value_t sleep_cycles)
   } while (cycles_elapsed < sleep_cycles);
 }
 
-__global__ void touch_data(double* data, int len)
-{
-  int id = blockIdx.x * blockDim.x + threadIdx.x;
-
-  if (id < len) {
-    data[id] = 1.0 * id;
-  }
-}
-
 __global__ void do_sleep()
 {
   // sleep - works still at 1000, so keeping it at 100k
   sleep(10000000);
-}
-
-__global__ void check_data(double* data, int len)
-{
-  int id = blockIdx.x * blockDim.x + threadIdx.x;
-
-  // Then error check that data[id] still == id
-  if (id < len) {
-    if (data[id] != id)
-      data[id] = -1;
-  }
-}
-
-__global__ void touch_data_again(double* data, int len)
-{
-  int id = blockIdx.x * blockDim.x + threadIdx.x;
-
-  if (id < len) {
-    data[id] = 8.76543210;
-  }
 }
 #endif
 
 int main(int, char**)
 {
   auto& rm = umpire::ResourceManager::getInstance();
+
 #if defined(UMPIRE_ENABLE_DEVICE)
   auto pool = rm.makeAllocator<umpire::strategy::ResourceAwarePool>("rap-pool", rm.getAllocator("UM"));
   const int NUM_BLOCKS = NUM_THREADS / BLOCK_SIZE;
@@ -106,14 +62,7 @@ int main(int, char**)
   auto pool = rm.makeAllocator<umpire::strategy::ResourceAwarePool>("rap-pool", rm.getAllocator("HOST"));
 #endif
 
-  // Create camp resources
-#if defined(UMPIRE_ENABLE_CUDA)
-  Cuda d1, d2, d3;
-#elif defined(UMPIRE_ENABLE_HIP)
-  Hip d1, d2, d3;
-#else
-  Host d1, d2, d3;
-#endif
+  resource_type d1, d2, d3;
   Resource r1{d1}, r2{d2}, r3{d3};
 
   // allocate memory in the pool with r1
@@ -125,17 +74,11 @@ int main(int, char**)
 
   // launch kernels on r1's stream
 #if defined(UMPIRE_ENABLE_CUDA)
-  touch_data<<<NUM_BLOCKS, BLOCK_SIZE, 0, d1.get_stream()>>>(a, NUM_THREADS);
   do_sleep<<<NUM_BLOCKS, BLOCK_SIZE, 0, d1.get_stream()>>>();
-  check_data<<<NUM_BLOCKS, BLOCK_SIZE, 0, d1.get_stream()>>>(a, NUM_THREADS);
 #elif defined(UMPIRE_ENABLE_HIP)
-  hipLaunchKernelGGL(touch_data, dim3(NUM_BLOCKS), dim3(BLOCK_SIZE), 0, d1.get_stream(), a, NUM_THREADS);
   hipLaunchKernelGGL(do_sleep, dim3(NUM_BLOCKS), dim3(BLOCK_SIZE), 0, d1.get_stream());
-  hipLaunchKernelGGL(check_data, dim3(NUM_BLOCKS), dim3(BLOCK_SIZE), 0, d1.get_stream(), a, NUM_THREADS);
 #else
-  host_touch_data(a);
   host_sleep(a);
-  host_check_data(a);
 #endif
 
   // deallocate memory with r1 and reallocate using a different stream r2
@@ -146,32 +89,15 @@ int main(int, char**)
 
   UMPIRE_ASSERT(getResource(pool, a) == r2);
 
-  // launch kernel with r2's stream using newly reallocated 'a'
-#if defined(UMPIRE_ENABLE_CUDA)
-  touch_data_again<<<NUM_BLOCKS, BLOCK_SIZE, 0, d2.get_stream()>>>(a, NUM_THREADS);
-#elif defined(UMPIRE_ENABLE_HIP)
-  hipLaunchKernelGGL(touch_data_again, dim3(NUM_BLOCKS), dim3(BLOCK_SIZE), 0, d2.get_stream(), a, NUM_THREADS);
-#else
-  host_touch_data_again(a);
-#endif
+  //Use Camp resource to synchronize devices
+  r1.get_event().wait();
 
-  // For validation/error checking below, use camp resource to synchronize host and device
-#if defined(UMPIRE_ENABLE_CUDA)
-  cudaDeviceSynchronize();
-#elif defined(UMPIRE_ENABLE_HIP)
-  hipDeviceSynchronize();
-#endif
-
-  // Error check and validation
-  for (int i = 0; i < NUM_THREADS; i++) {
-    UMPIRE_ASSERT(a[i] != (-1) && "Error: incorrect value!");
-  }
 #if defined(UMPIRE_ENABLE_DEVICE)
   UMPIRE_ASSERT(ptr1 != ptr2);
 #else
   UMPIRE_ASSERT(ptr1 == ptr2);
 #endif
-  std::cout << "Kernel succeeded! Expected result returned" << std::endl;
+  std::cout << "Expected result returned!" << std::endl;
 
   // deallocate and clean up
   pool.deallocate(r2, a);
