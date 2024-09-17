@@ -50,7 +50,10 @@ ResourceAwarePool::~ResourceAwarePool()
 void* ResourceAwarePool::allocate(std::size_t UMPIRE_UNUSED_ARG(bytes))
 {
   void* ptr{nullptr};
-  UMPIRE_ERROR(runtime_error, fmt::format("The ResourceAwarePool requires a Camp resource. See https://umpire.readthedocs.io/en/develop/sphinx/cookbook/resource_aware_pool.html for more info."));
+  UMPIRE_ERROR(
+      runtime_error,
+      fmt::format("The ResourceAwarePool requires a Camp resource. See "
+                  "https://umpire.readthedocs.io/en/develop/sphinx/cookbook/resource_aware_pool.html for more info."));
   return ptr;
 }
 
@@ -180,8 +183,10 @@ void ResourceAwarePool::deallocate(void* ptr, std::size_t size)
 {
   auto r = getResource(ptr);
 
-  UMPIRE_LOG(Warning, fmt::format("The ResourceAwarePool requires a Camp resource. You called deallocate with no resource.",
-                                  " Calling deallocate with the resource returned by getResource: {}.", camp::resources::to_string(r)));
+  UMPIRE_LOG(
+      Warning,
+      fmt::format("The ResourceAwarePool requires a Camp resource. You called deallocate with no resource.",
+                  " Calling deallocate with the resource returned by getResource: {}.", camp::resources::to_string(r)));
   deallocate_resource(r, ptr, size);
 }
 

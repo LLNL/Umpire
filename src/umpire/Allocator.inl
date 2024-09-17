@@ -120,7 +120,7 @@ inline void* Allocator::do_resource_allocate(camp::resources::Resource const& r,
 
   // TODO: Add resource to event
   // umpire::event::record<umpire::event::named_allocate>(
-     // [&](auto& event) { event.name(name).size(bytes).ref((void*)m_allocator).ptr(ret); });
+  // [&](auto& event) { event.name(name).size(bytes).ref((void*)m_allocator).ptr(ret); });
   return ret;
 }
 
