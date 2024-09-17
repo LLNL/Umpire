@@ -50,7 +50,7 @@ ResourceAwarePool::~ResourceAwarePool()
 void* ResourceAwarePool::allocate(std::size_t UMPIRE_UNUSED_ARG(bytes))
 {
   void* ptr{nullptr};
-  UMPIRE_ERROR(runtime_error, fmt::format("Don't call this function!"));
+  UMPIRE_ERROR(runtime_error, fmt::format("The ResourceAwarePool requires a Camp resource. See https://umpire.readthedocs.io/en/develop/sphinx/cookbook/resource_aware_pool.html for more info."));
   return ptr;
 }
 
@@ -180,8 +180,8 @@ void ResourceAwarePool::deallocate(void* ptr, std::size_t size)
 {
   auto r = getResource(ptr);
 
-  UMPIRE_LOG(Warning, fmt::format("You called deallocate with no resource. Calling deallocate with the resource ",
-                                  "returned by getResource: {}.", camp::resources::to_string(r)));
+  UMPIRE_LOG(Warning, fmt::format("The ResourceAwarePool requires a Camp resource. You called deallocate with no resource.",
+                                  " Calling deallocate with the resource returned by getResource: {}.", camp::resources::to_string(r)));
   deallocate_resource(r, ptr, size);
 }
 
@@ -241,6 +241,7 @@ void ResourceAwarePool::do_deallocate(Chunk* chunk) noexcept
     m_releasable_bytes += chunk->chunk_size;
   }
 
+  // Removing chunk from pending
   for (auto it = m_pending_map.begin(); it != m_pending_map.end();) {
     auto my_chunk = (*it);
     if (my_chunk == chunk) {
@@ -257,10 +258,8 @@ void ResourceAwarePool::do_deallocate(Chunk* chunk) noexcept
 void ResourceAwarePool::deallocate_resource(camp::resources::Resource r, void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
-  // UMPIRE_LOG(Debug, "(Resource=" << r << ")");
+  UMPIRE_LOG(Debug, "(Resource=" << camp::resources::to_string(r) << ")");
   auto chunk = (*m_used_map.find(ptr)).second;
-
-  // TODO: if( !chunk) --> isn't this a error to check for?
 
   auto my_r = getResource(ptr);
   if (my_r != r) {
@@ -272,7 +271,7 @@ void ResourceAwarePool::deallocate_resource(camp::resources::Resource r, void* p
                                   camp::resources::to_string(r)));
   }
 
-  // chunk is now pending
+  // Chunk is now pending, add to list
   m_pending_map.push_back(chunk);
   chunk->m_event = r.get_event();
 
@@ -303,8 +302,8 @@ void ResourceAwarePool::release()
   for (auto it = m_pending_map.begin(); it != m_pending_map.end();) {
     auto chunk = (*it);
     if (chunk != nullptr && chunk->free == false && chunk->m_event.check()) {
-      m_free_map.insert(std::make_pair(chunk->size, chunk)); // Make sure this is correct!
-      chunk->free = true;                                    // Is free up to date everywhere else too?
+      m_free_map.insert(std::make_pair(chunk->size, chunk));
+      chunk->free = true;
       m_pending_map.erase(it);
     } else {
       it++;
@@ -394,7 +393,7 @@ Platform ResourceAwarePool::getPlatform() noexcept
 
 camp::resources::Resource ResourceAwarePool::getResource(void* ptr) const
 {
-  for (auto& chunk : m_pending_map) { // chunk pending chunks
+  for (auto& chunk : m_pending_map) { // check pending chunks
     if (chunk->data == ptr) {
       return chunk->m_resource;
     }
@@ -404,10 +403,10 @@ camp::resources::Resource ResourceAwarePool::getResource(void* ptr) const
     auto chunk = it->second;
     return chunk->m_resource;
   }
-  // UMPIRE_ERROR(runtime_error, fmt::format("BANANAS!!"));
-  // TODO: if it is free, do we care what resource it has?
-  return camp::resources::Host{}; // If we get here, the chunk is free
-  // TODO: maybe return unknown?
+
+  UMPIRE_ERROR(runtime_error,
+               fmt::format("The pointer {} does not seem to be allocated with the ResourceAwarePool!", ptr));
+  return camp::resources::Host{}; // Function needs a return
 }
 
 MemoryResourceTraits ResourceAwarePool::getTraits() const noexcept
@@ -422,7 +421,7 @@ bool ResourceAwarePool::tracksMemoryUse() const noexcept
 
 std::size_t ResourceAwarePool::getBlocksInPool() const noexcept
 {
-  return m_used_map.size() + m_free_map.size();
+  return m_used_map.size() + m_free_map.size() + m_pending_map.size();
 }
 
 std::size_t ResourceAwarePool::getLargestAvailableBlock() noexcept

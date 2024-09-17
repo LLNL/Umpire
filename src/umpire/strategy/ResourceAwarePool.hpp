@@ -70,12 +70,23 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
 
   ResourceAwarePool(const ResourceAwarePool&) = delete;
 
-  ///////
   void* allocate(std::size_t bytes) override;
+  /*!
+   * \brief Allocate memory with the ResourceAwarePool
+   *
+   * \param r The Camp resource that will own the memory
+   * \param bytes The size in bytes for the allocation
+   */
   void* allocate_resource(Resource r, std::size_t bytes) override;
+  /*!
+   * \brief Deallocate memory with the ResourceAwarePool
+   *
+   * \param r The Camp resource that owns the memory
+   * \param ptr A pointer to the memory allocation
+   * \param bytes The size in bytes for the allocation
+   */
   void deallocate_resource(Resource r, void* ptr, std::size_t size) override;
   void deallocate(void* ptr, std::size_t size) override;
-  ///////
   void release() override;
 
   std::size_t getActualSize() const noexcept override;
