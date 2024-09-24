@@ -37,7 +37,8 @@ class HipConstantMemoryResource : public MemoryResource {
 
   std::size_t m_offset;
   void* m_ptr;
-
+  bool m_initialized;
+  
   std::mutex m_mutex;
 };
 
