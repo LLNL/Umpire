@@ -78,7 +78,7 @@ you will want to access data:
   auto& rm = umpire::ResourceManager::getInstance();
   umpire::Allocator allocator = rm.getAllocator("HOST");
 
-  float* my_data = static_cast<float*>(allocator.allocate(100*sizeof(float));
+  float* my_data = static_cast<float*>(allocator.allocate(100*sizeof(float)));
 
 
 This code grabs the default allocator for the host memory, and uses it to
