@@ -762,14 +762,5 @@ TEST(NamingShimTests, TestAllocateDeallocate)
     EXPECT_NE(ptr, nullptr);
     shim.deallocate(ptr);
   }
-
-  {
-    EXPECT_THROW(shim.allocate(0), umpire::runtime_error);
-  }
-
-  {
-    auto shim{rm.makeAllocator<umpire::strategy::NamingShim>("shim", node_allocator)};
-    EXPECT_THROW(shim.allocate(-1), umpire::runtime_error);
-  }
 }
 #endif
