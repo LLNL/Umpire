@@ -66,7 +66,7 @@ OutputBuffer& s_error_buffer_accessor()
   return buffer;
 }
 
-}  // namespace detail
+} // namespace detail
 
 void initialize_io(const bool enable_log)
 {
