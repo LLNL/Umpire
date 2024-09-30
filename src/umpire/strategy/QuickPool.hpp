@@ -70,7 +70,6 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
   void release() override;
 
   std::size_t getActualSize() const noexcept override;
-  std::size_t getCurrentSize() const noexcept override;
   std::size_t getReleasableSize() const noexcept;
   std::size_t getActualHighwaterMark() const noexcept;
   std::size_t getAlignedSize() const noexcept;

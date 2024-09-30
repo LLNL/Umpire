@@ -265,13 +265,6 @@ std::size_t QuickPool::getActualSize() const noexcept
   return m_actual_bytes;
 }
 
-// TODO: Keep old behaviour with m_aligned_bytes or remove and use definition
-// from AllocationStrategy which returns m_current_size?
-std::size_t QuickPool::getCurrentSize() const noexcept
-{
-  return m_aligned_bytes;
-}
-
 std::size_t QuickPool::getReleasableSize() const noexcept
 {
   return m_releasable_bytes;

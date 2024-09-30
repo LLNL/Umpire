@@ -76,7 +76,6 @@ class DynamicPoolList : public AllocationStrategy {
   std::size_t getTotalBlocks() const noexcept;
 
   std::size_t getActualSize() const noexcept override;
-  std::size_t getCurrentSize() const noexcept override;
   std::size_t getActualHighwaterMark() const noexcept;
   std::size_t getAlignedSize() const noexcept;
   std::size_t getAlignedHighwaterMark() const noexcept;

@@ -64,13 +64,6 @@ std::size_t DynamicPoolList::getTotalBlocks() const noexcept
   return dpa.getTotalBlocks();
 }
 
-std::size_t DynamicPoolList::getCurrentSize() const noexcept
-{
-  std::size_t CurrentSize = dpa.getCurrentSize();
-  UMPIRE_LOG(Debug, "() returning " << CurrentSize);
-  return CurrentSize;
-}
-
 std::size_t DynamicPoolList::getActualSize() const noexcept
 {
   std::size_t ActualSize = dpa.getActualSize();
