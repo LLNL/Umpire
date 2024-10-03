@@ -190,9 +190,10 @@ void ResourceAwarePool::deallocate(void* ptr, std::size_t size)
   deallocate_resource(r, ptr, size);
 }
 
-void ResourceAwarePool::do_deallocate(Chunk* chunk, void* UMPIRE_UNUSED_ARG(ptr)) noexcept
+void ResourceAwarePool::do_deallocate(Chunk* chunk, void* ptr) noexcept
 {
   UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, chunk->size);
+  UMPIRE_USE_VAR(ptr);
 
   UMPIRE_LOG(Debug, "In the do_deallocate function. Deallocating data held by " << chunk);
 
