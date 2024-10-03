@@ -44,7 +44,7 @@ The Umpire mailing list is hosted on Google Groups, and is a great place to ask 
 [Umpire Users Google Group](https://groups.google.com/forum/#!forum/umpire-users)
 
 You can also join our RADIUSS slack group and find the "umpire-users" channel to ask questions.
-To be sent an invite to the channel, email us at [umpire-dev@llnl.gov](mailto:umpire-dev@llnl.gov)
+To be sent an invite to the slack group, email us at [umpire-dev@llnl.gov](mailto:umpire-dev@llnl.gov)
 
 ## Contributions
 
