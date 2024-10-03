@@ -467,6 +467,7 @@ FILE_PATTERNS          += *.md \
                           *.markdown \
                           *.cpp \
                           *.hpp \
+                          *.h \
                           *.dox 
 
 #SAMRAI             = *.[ChIf] \
