@@ -30,8 +30,8 @@ Using a Single Resource
 
 Umpire's strategies such as ``QuickPool`` and ``DynamicPoolList`` work very well
 on the device when we are dealing with a single camp device resource. In the figure below, we have
-the host resource which allocates memory (a_1), uses the memory in a kernel (k_1), then schedules
-a deallocate (d_1). Then, the host immidiately reuses that memory for a different kernel (k_2).
+the host resource which allocates memory (a``_``1), uses the memory in a kernel (k``_``1), then schedules
+a deallocate (d``_``1). Then, the host immidiately reuses that memory for a different kernel (k``_``2).
 
 .. image:: ./single_mem.png
 
@@ -58,9 +58,9 @@ Umpire's ``ResourceAwarePool`` is designed to avoid any potential data races by 
 "aware" of the memory used by another resource. If resource ``r2`` needs to allocate memory, but that
 memory is potentially still being used by another resource, ``r1``,  then ``r2``  will use different 
 memory instead. To do that, the ``ResourceAwarePool`` introduces a "pending" state. As soon as ``r1``
-schedules a deallocation, that memory is marked as _pending_. Only once that pending memory has
-actually been deallocated will it not be marked _pending_ anymore. When ``r2`` needs to reallocate that
-memory, it will first check to see if the memory is still _pending_. If it is NOT _pending_, it will
+schedules a deallocation, that memory is marked as ``_``pending``_``. Only once that pending memory has
+actually been deallocated will it not be marked ``_``pending``_`` anymore. When ``r2`` needs to reallocate that
+memory, it will first check to see if the memory is still ``_``pending``_``. If it is NOT ``_``pending``_``, it will
 reuse that memory, otherwise it will use a different piece of memory instead.
 
 The figure below illustrates the 3 states of a ``ResourceAwarePool``: free, used, and pending.
@@ -68,7 +68,7 @@ The figure below illustrates the 3 states of a ``ResourceAwarePool``: free, used
 .. image:: ./states.png
 
 Note that if you schedule a deallocate, but then try to reuse that memory on the SAME
-resource, that memory will NOT be labeled _pending_. It is only when we have scheduled a deallocate
+resource, that memory will NOT be labeled ``_``pending``_``. It is only when we have scheduled a deallocate
 on one resource and then try to reuse that same memory on a different resource that we have
 the potential for a data race and thus the need for the pending state.
 
@@ -111,8 +111,8 @@ correct stream. Since we are using Camp resources, we use ``d1`` that we created
 
 .. note:: If you lose track of which resource you need to use for the kernel launch, you can call
     ``getResource(a)`` and that will return the resource associated with that pointer. However, be sure
-    to launch the kernel with the underlying (cuda/hip/etc) resource (i.e. d1) not the generic resource
-    (i.e. r1) as there is no ``get_stream()`` function associated with the generic resource.
+    to launch the kernel with the underlying (cuda/hip/etc) resource (i.e. ``d1``) not the generic resource
+    (i.e. ``r1``) as there is no ``get_stream()`` function associated with the generic resource.
 
 The kernel launch specifies the stream from the Cuda resource we created above.
 To deallocate, use the following code:
@@ -138,7 +138,7 @@ Assuming you need to reallocate memory on ``a`` with ``r2``, you could then laun
 Note the use of ``d2`` in this kernel launch since ``d2`` is the underlying (cuda) resource for the generic resource, ``r2``.
 
 Since we are using the ``ResourceAwarePool``, we will not cause a data race from trying to reuse that memory. If the 
-memory is still being used by ``r1`` by the time ``r2`` is requesting it, it will be in a _pending_ state and thus
+memory is still being used by ``r1`` by the time ``r2`` is requesting it, it will be in a ``_``pending``_`` state and thus
 not resued by ``r2``. Instead, ``r2`` will be given a different piece of memory.
 
 The ``ResourceAwarePool`` will also be useful for avoiding data races in a situation where host and device
