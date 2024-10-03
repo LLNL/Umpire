@@ -71,7 +71,7 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource r, std::siz
     for (auto pending_chunk : m_pending_map) {
       if (pending_chunk->free == false && pending_chunk->m_event.check()) // no longer pending
       {
-        do_deallocate(pending_chunk); // TODO: can I erase it from the list then?
+        do_deallocate(pending_chunk, pending_chunk->data); // TODO: can I erase it from the list then?
       }
       if (pending_chunk->size >= rounded_bytes && pending_chunk->m_resource == r) {
         // chunk->size = pending_chunk->size; // TODO: Why does this cause failure?
@@ -190,7 +190,7 @@ void ResourceAwarePool::deallocate(void* ptr, std::size_t size)
   deallocate_resource(r, ptr, size);
 }
 
-void ResourceAwarePool::do_deallocate(Chunk* chunk) noexcept
+void ResourceAwarePool::do_deallocate(Chunk* chunk, void* UMPIRE_UNUSED_ARG(ptr)) noexcept
 {
   UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, chunk->size);
 
@@ -285,7 +285,7 @@ void ResourceAwarePool::deallocate_resource(camp::resources::Resource r, void* p
 
   // Call deallocate logic only for a non-pending chunk
   if (chunk->m_event.check()) {
-    do_deallocate(chunk);
+    do_deallocate(chunk, ptr);
   }
 
   std::size_t suggested_size{m_should_coalesce(*this)};
