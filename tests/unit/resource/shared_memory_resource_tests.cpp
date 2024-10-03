@@ -176,8 +176,8 @@ TEST_F(SharedMemoryTest, UnitTests)
   {
     if (m_rank == 0) {
       for (int loop{0}; loop < 100; loop++) {
-        ASSERT_NO_THROW(
-            allocator.deallocate(allocator.allocate(std::string("AllocLargest"), shmem_state->largest_allocation_size)););
+        ASSERT_NO_THROW(allocator.deallocate(
+            allocator.allocate(std::string("AllocLargest"), shmem_state->largest_allocation_size)););
       }
     }
   }
