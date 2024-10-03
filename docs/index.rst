@@ -30,7 +30,7 @@ Any questions? File an issue on GitHub, or email umpire-dev@llnl.gov
   sphinx/advanced_configuration
   sphinx/cookbook
   sphinx/features
-  doxygen/html/index
+  doxygen/html/index.html
 
 .. toctree::
   :maxdepth: 2
