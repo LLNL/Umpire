@@ -51,8 +51,8 @@ extensions = [
     'exhale'
 ]
 
-#breathe_projects = { 'umpire': "../../build/docs/doxygen/xml/" }
-breathe_projects = { 'umpire': "@CMAKE_CURRENT_BINARY_DIR@/../doxygen/xml/" }
+breathe_projects = { 'umpire': "../../build/docs/doxygen/xml/" }
+#breathe_projects = { 'umpire': "@CMAKE_CURRENT_BINARY_DIR@/../doxygen/xml/" }
 breathe_default_project = "umpire"
 
 exhale_args = {
