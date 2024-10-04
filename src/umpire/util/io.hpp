@@ -29,10 +29,19 @@ const std::string& get_io_output_dir();
 const std::string& get_io_output_basename();
 
 /*!
- * \brief Initialize the streams. This method is called when ResourceManger is
- * initialized. Do not call this manually.
+ * \brief Initialize the streams. This method is called when ResourceManager is
+ * initialized. Most users will not need to call this manually.
+ * \warning This function will capture references to buffers of std::cerr and/or std::cout. If these are using custom
+ * buffers with explicitly-manager lifetime should may need to call this and finalize_io() to control
+ * explicitly initialization/finalization of Umpire I/O.
  */
 void initialize_io(const bool enable_log);
+
+/*!
+ * \brief Counterpart of initialize_io that finalizes the streams and ensures that no live references to the buffers
+ * of standard streams exist. Most users will not need to call this manually.
+ */
+void finalize_io(const bool enable_log);
 
 /*!
  * \brief Synchronize all stream buffers to their respective output sequences.
