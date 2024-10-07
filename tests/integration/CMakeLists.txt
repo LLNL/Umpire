@@ -33,8 +33,8 @@ endif ()
 if (UMPIRE_ENABLE_HIP)
   set (integration_tests_depends
     ${integration_tests_depends}
-    hip 
-    hip_runtime)
+    blt::hip 
+    blt::hip_runtime)
   set (accessibility_test_depends
     ${accessibility_test_depends}
     blt::hip)

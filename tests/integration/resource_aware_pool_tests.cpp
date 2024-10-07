@@ -33,12 +33,24 @@ void host_sleep(int* ptr)
 
 using clock_value_t = long long;
 
+#if defined(UMPIRE_ENABLE_CUDA)
+__device__ clock_value_t my_clock()
+{
+  return clock64();
+}
+#elif defined(UMPIRE_ENABLE_HIP)
+__device__ clock_value_t my_clock()
+{
+  return hipGetClock();
+}
+#endif
+
 __device__ void my_sleep(clock_value_t sleep_cycles)
 {
-  clock_value_t start = clock64();
+  clock_value_t start = my_clock();
   clock_value_t cycles_elapsed;
   do {
-    cycles_elapsed = clock64() - start;
+    cycles_elapsed = my_clock() - start;
   } while (cycles_elapsed < sleep_cycles);
 }
 
