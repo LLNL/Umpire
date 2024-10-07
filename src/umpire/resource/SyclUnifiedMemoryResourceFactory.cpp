@@ -41,7 +41,7 @@ std::unique_ptr<resource::MemoryResource> SyclUnifiedMemoryResourceFactory::crea
     }
   };
 
-  sycl::platform platform(sycl::gpu_selector_v{});
+  sycl::platform platform(sycl::gpu_selector_v());
 
   int device_count = 0; // SYCL multi.device count
   auto const& devices = platform.get_devices();
@@ -76,7 +76,7 @@ MemoryResourceTraits SyclUnifiedMemoryResourceFactory::getDefaultTraits()
 {
   MemoryResourceTraits traits;
 
-  sycl::device syclDev(sycl::gpu_selector_v{});
+  sycl::device syclDev(sycl::gpu_selector_v());
   if (syclDev.is_gpu()) {
     if (syclDev.get_info<sycl::info::device::partition_max_sub_devices>() > 0) {
       auto subDevicesDomainNuma =
