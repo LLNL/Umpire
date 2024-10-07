@@ -32,7 +32,7 @@ void host_sleep(double* ptr)
   ptr++;
 }
 
-#if defined(UMPIRE_ENABLE_DEVICE)
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
 constexpr int BLOCK_SIZE = 16;
 using clock_value_t = long long;
 
@@ -68,7 +68,7 @@ int main(int, char**)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-#if defined(UMPIRE_ENABLE_DEVICE)
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
   auto pool = rm.makeAllocator<umpire::strategy::ResourceAwarePool>("rap-pool", rm.getAllocator("UM"));
   const int NUM_BLOCKS = NUM_THREADS / BLOCK_SIZE;
 #else
@@ -105,7 +105,7 @@ int main(int, char**)
   // Use Camp resource to synchronize devices
   r1.get_event().wait();
 
-#if defined(UMPIRE_ENABLE_DEVICE)
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
   UMPIRE_ASSERT(ptr1 != ptr2);
 #else
   UMPIRE_ASSERT(ptr1 == ptr2);

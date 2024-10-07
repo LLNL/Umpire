@@ -29,7 +29,7 @@ void host_sleep(int* ptr)
   ptr++;
 }
 
-#if defined(UMPIRE_ENABLE_DEVICE)
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
 
 using clock_value_t = long long;
 
