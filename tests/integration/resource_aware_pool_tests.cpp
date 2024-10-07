@@ -160,4 +160,6 @@ TEST(ResourceAwarePool_Host_Test, Check_States_Host)
 
   EXPECT_TRUE(r1 == r2);
   EXPECT_EQ(compare_ptr1, compare_ptr2); // only 1 host resource available, no possible data race
+
+  pool.deallocate(ptr);
 }
