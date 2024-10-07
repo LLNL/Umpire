@@ -36,12 +36,12 @@ std::unique_ptr<resource::MemoryResource> SyclUnifiedMemoryResourceFactory::crea
         std::rethrow_exception(e);
       } catch (sycl::exception const& ex) {
         std::cout << "Caught asynchronous SYCL exception:" << std::endl
-                  << ex.what() << ", OpenCL code: " << ex.get_cl_code() << std::endl;
+                  << ex.what() << ", SYCL code: " << ex.code() << std::endl;
       }
     }
   };
 
-  sycl::platform platform(sycl::gpu_selector{});
+  sycl::platform platform(sycl::gpu_selector_v{});
 
   int device_count = 0; // SYCL multi.device count
   auto const& devices = platform.get_devices();
@@ -76,7 +76,7 @@ MemoryResourceTraits SyclUnifiedMemoryResourceFactory::getDefaultTraits()
 {
   MemoryResourceTraits traits;
 
-  sycl::device syclDev(sycl::gpu_selector{});
+  sycl::device syclDev(sycl::gpu_selector_v{});
   if (syclDev.is_gpu()) {
     if (syclDev.get_info<sycl::info::device::partition_max_sub_devices>() > 0) {
       auto subDevicesDomainNuma =
