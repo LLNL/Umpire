@@ -39,6 +39,8 @@ __device__ clock_value_t my_clock()
   return clock64();
 }
 #elif defined(UMPIRE_ENABLE_HIP)
+#include <hip/hip_runtime.h>
+
 __device__ clock_value_t my_clock()
 {
   return hipGetClock();
