@@ -50,7 +50,10 @@ ResourceAwarePool::~ResourceAwarePool()
 void* ResourceAwarePool::allocate(std::size_t UMPIRE_UNUSED_ARG(bytes))
 {
   void* ptr{nullptr};
-  UMPIRE_ERROR(runtime_error, fmt::format("The ResourceAwarePool requires a Camp resource. See https://umpire.readthedocs.io/en/develop/sphinx/cookbook/resource_aware_pool.html for more info."));
+  UMPIRE_ERROR(
+      runtime_error,
+      fmt::format("The ResourceAwarePool requires a Camp resource. See "
+                  "https://umpire.readthedocs.io/en/develop/sphinx/cookbook/resource_aware_pool.html for more info."));
   return ptr;
 }
 
@@ -68,7 +71,7 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource r, std::siz
     for (auto pending_chunk : m_pending_map) {
       if (pending_chunk->free == false && pending_chunk->m_event.check()) // no longer pending
       {
-        do_deallocate(pending_chunk); // TODO: can I erase it from the list then?
+        do_deallocate(pending_chunk, pending_chunk->data); // TODO: can I erase it from the list then?
       }
       if (pending_chunk->size >= rounded_bytes && pending_chunk->m_resource == r) {
         // chunk->size = pending_chunk->size; // TODO: Why does this cause failure?
@@ -180,14 +183,17 @@ void ResourceAwarePool::deallocate(void* ptr, std::size_t size)
 {
   auto r = getResource(ptr);
 
-  UMPIRE_LOG(Warning, fmt::format("The ResourceAwarePool requires a Camp resource. You called deallocate with no resource.",
-                                  " Calling deallocate with the resource returned by getResource: {}.", camp::resources::to_string(r)));
+  UMPIRE_LOG(
+      Warning,
+      fmt::format("The ResourceAwarePool requires a Camp resource. You called deallocate with no resource.",
+                  " Calling deallocate with the resource returned by getResource: {}.", camp::resources::to_string(r)));
   deallocate_resource(r, ptr, size);
 }
 
-void ResourceAwarePool::do_deallocate(Chunk* chunk) noexcept
+void ResourceAwarePool::do_deallocate(Chunk* chunk, void* ptr) noexcept
 {
   UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, chunk->size);
+  UMPIRE_USE_VAR(ptr);
 
   UMPIRE_LOG(Debug, "In the do_deallocate function. Deallocating data held by " << chunk);
 
@@ -280,7 +286,7 @@ void ResourceAwarePool::deallocate_resource(camp::resources::Resource r, void* p
 
   // Call deallocate logic only for a non-pending chunk
   if (chunk->m_event.check()) {
-    do_deallocate(chunk);
+    do_deallocate(chunk, ptr);
   }
 
   std::size_t suggested_size{m_should_coalesce(*this)};

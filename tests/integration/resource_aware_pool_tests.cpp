@@ -81,6 +81,11 @@ class ResourceAwarePoolTest : public ::testing::TestWithParam<std::string> {
                                                                    rm.getAllocator(GetParam()));
   }
 
+  virtual void TearDown()
+  {
+    m_pool.release();
+  }
+
   umpire::Allocator m_pool;
 };
 
@@ -91,7 +96,6 @@ TEST_P(ResourceAwarePoolTest, Check_States)
 #elif defined(UMPIRE_ENABLE_HIP)
   Hip d1, d2;
 #endif
-  // TODO: openmp offload?
 
   Resource r1{d1}, r2{d2};
 
@@ -105,7 +109,6 @@ TEST_P(ResourceAwarePoolTest, Check_States)
 #elif defined(UMPIRE_ENABLE_HIP)
   hipLaunchKernelGGL(do_sleep, 1, 32, 0, d1.get_stream(), ptr);
 #endif
-  // TODO: openmp offload?
 
   m_pool.deallocate(ptr);
   EXPECT_EQ(getPendingSize(m_pool), 1);

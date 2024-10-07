@@ -275,6 +275,6 @@ std::vector<std::string> get_allocators(bool ignore_shared_memory)
 }
 
 INSTANTIATE_TEST_SUITE_P(Allocators, AllocatorAccessibilityTest, ::testing::ValuesIn(get_allocators(false)));
-INSTANTIATE_TEST_SUITE_P(Pools, PoolAccessibilityTest, ::testing::ValuesIn(get_allocators(false)));
+INSTANTIATE_TEST_SUITE_P(Pools, PoolAccessibilityTest, ::testing::ValuesIn(get_allocators(true)));
 
 // END gtest

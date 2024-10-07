@@ -11,13 +11,6 @@ set (accessibility_test_depends
 set (device_allocator_test_depends
   umpire_device umpire gtest)
 
-if (UMPIRE_ENABLE_CUDA)
-  set (integration_tests_depends
-    ${integration_tests_depends}
-    cuda 
-    cuda_runtime)
-endif ()
-
 if (UMPIRE_ENABLE_OPENMP OR UMPIRE_ENABLE_OPENMP_TARGET)
   set (integration_tests_depends
     ${integration_tests_depends}
@@ -25,6 +18,10 @@ if (UMPIRE_ENABLE_OPENMP OR UMPIRE_ENABLE_OPENMP_TARGET)
 endif ()
 
 if (UMPIRE_ENABLE_CUDA)
+  set (integration_tests_depends
+    ${integration_tests_depends}
+    cuda 
+    cuda_runtime)
   set (accessibility_test_depends
     ${accessibility_test_depends}
     cuda)
@@ -34,6 +31,10 @@ if (UMPIRE_ENABLE_CUDA)
 endif ()
 
 if (UMPIRE_ENABLE_HIP)
+  set (integration_tests_depends
+    ${integration_tests_depends}
+    hip 
+    hip_runtime)
   set (accessibility_test_depends
     ${accessibility_test_depends}
     blt::hip)
