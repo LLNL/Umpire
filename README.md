@@ -1,6 +1,5 @@
 # <img src="https://cdn.rawgit.com/LLNL/Umpire/develop/share/umpire/logo/umpire-logo.png" width="128" valign="middle" alt="Umpire"/>  Umpire v2024.07.0
 
-[![Azure Pipelines Build Status](https://dev.azure.com/davidbeckingsale/Umpire/_apis/build/status/LLNL.Umpire?branchName=develop)](https://dev.azure.com/davidbeckingsale/Umpire/_build/latest?definitionId=1&branchName=develop)
 [![Documentation Status](https://readthedocs.org/projects/umpire/badge/?version=develop)](https://umpire.readthedocs.io/en/develop/?badge=develop)
 
 Umpire is a resource management library that allows the discovery, provision,
