@@ -127,7 +127,10 @@ void* QuickPool::allocate(std::size_t bytes)
     split_chunk->size_map_it = m_size_map.insert(std::make_pair(remaining, split_chunk));
   }
 
-  m_current_bytes += rounded_bytes;
+  m_aligned_bytes += rounded_bytes;
+  if (m_aligned_bytes > m_aligned_highwatermark) {
+    m_aligned_highwatermark = m_aligned_bytes;
+  }
 
   UMPIRE_UNPOISON_MEMORY_REGION(m_allocator, ret, bytes);
   return ret;
@@ -139,7 +142,7 @@ void QuickPool::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
   auto chunk = (*m_pointer_map.find(ptr)).second;
   chunk->free = true;
 
-  m_current_bytes -= chunk->size;
+  m_aligned_bytes -= chunk->size;
 
   UMPIRE_LOG(Debug, "Deallocating data held by " << chunk);
 
@@ -262,11 +265,6 @@ std::size_t QuickPool::getActualSize() const noexcept
   return m_actual_bytes;
 }
 
-std::size_t QuickPool::getCurrentSize() const noexcept
-{
-  return m_current_bytes;
-}
-
 std::size_t QuickPool::getReleasableSize() const noexcept
 {
   return m_releasable_bytes;
@@ -275,6 +273,16 @@ std::size_t QuickPool::getReleasableSize() const noexcept
 std::size_t QuickPool::getActualHighwaterMark() const noexcept
 {
   return m_actual_highwatermark;
+}
+
+std::size_t QuickPool::getAlignedSize() const noexcept
+{
+  return m_aligned_bytes;
+}
+
+std::size_t QuickPool::getAlignedHighwaterMark() const noexcept
+{
+  return m_aligned_highwatermark;
 }
 
 Platform QuickPool::getPlatform() noexcept
@@ -346,7 +354,7 @@ PoolCoalesceHeuristic<QuickPool> QuickPool::blocks_releasable(std::size_t nblock
 PoolCoalesceHeuristic<QuickPool> QuickPool::blocks_releasable_hwm(std::size_t nblocks)
 {
   return [=](const strategy::QuickPool& pool) {
-    return pool.getReleasableBlocks() >= nblocks ? pool.getHighWatermark() : 0;
+    return pool.getReleasableBlocks() >= nblocks ? pool.getAlignedHighwaterMark() : 0;
   };
 }
 
@@ -382,14 +390,14 @@ PoolCoalesceHeuristic<QuickPool> QuickPool::percent_releasable_hwm(int percentag
     return [=](const QuickPool& UMPIRE_UNUSED_ARG(pool)) { return 0; };
   } else if (percentage == 100) {
     return [=](const strategy::QuickPool& pool) {
-      return pool.getActualSize() == pool.getReleasableSize() ? pool.getHighWatermark() : 0;
+      return pool.getActualSize() == pool.getReleasableSize() ? pool.getAlignedHighwaterMark() : 0;
     };
   } else {
     float f = (float)((float)percentage / (float)100.0);
     return [=](const strategy::QuickPool& pool) {
       // Calculate threshold in bytes from the percentage
       const std::size_t threshold = static_cast<std::size_t>(f * pool.getActualSize());
-      return pool.getReleasableSize() >= threshold ? pool.getHighWatermark() : 0;
+      return pool.getReleasableSize() >= threshold ? pool.getAlignedHighwaterMark() : 0;
     };
   }
 }
