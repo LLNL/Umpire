@@ -836,3 +836,29 @@ TEST(AsyncTest, Prefetch)
   alloc.deallocate(array);
 }
 #endif
+
+#if (defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)) && defined(UMPIRE_ENABLE_CONST)
+TEST(ConstDeviceMemoryTest, SetConstDeviceMemory)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto const_allocator = rm.getAllocator("DEVICE_CONST");
+
+  static constexpr int N = 4;
+  static constexpr int BYTESIZE = N * sizeof(int);
+  static constexpr int TEST_VAL = 42;
+
+  auto host_allocator = rm.getAllocator("HOST");
+  int* HOST_DATA = static_cast< int* >(host_allocator.allocate(BYTESIZE));
+  
+  for ( int i = 0; i < N; ++i ) {
+    HOST_DATA[ i ] = TEST_VAL;
+  }
+
+  int* A_d = static_cast< int* >(const_allocator.allocate(BYTESIZE));
+  EXPECT_TRUE(A_d != nullptr);
+  rm.copy(A_d, HOST_DATA, BYTESIZE);
+  
+  host_allocator.deallocate(HOST_DATA);
+  const_allocator.deallocate(A_d);
+}
+#endif 
