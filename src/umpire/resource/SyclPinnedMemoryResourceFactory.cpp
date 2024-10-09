@@ -41,7 +41,7 @@ std::unique_ptr<resource::MemoryResource> SyclPinnedMemoryResourceFactory::creat
     }
   };
 
-  sycl::platform platform(sycl::gpu_selector{});
+  sycl::platform platform(sycl::gpu_selector_v());
 
   int device_count = 0; // SYCL multi.device count
   auto const& devices = platform.get_devices();
