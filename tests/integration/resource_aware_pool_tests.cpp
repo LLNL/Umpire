@@ -33,7 +33,7 @@ TEST(ResourceAwarePool_Host_Test, Check_States_Host)
 {
   auto& rm = umpire::ResourceManager::getInstance();
   auto pool = rm.makeAllocator<umpire::strategy::ResourceAwarePool>("rap-pool-host", rm.getAllocator("HOST"));
-  
+
   Host h1, h2;
   Resource r1{h1}, r2{h2};
   int* ptr = static_cast<int*>(pool.allocate(r1, 1024));
