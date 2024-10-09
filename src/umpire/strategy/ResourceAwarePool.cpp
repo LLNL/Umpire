@@ -209,8 +209,6 @@ void ResourceAwarePool::do_deallocate(Chunk* chunk, void* ptr) noexcept
 
     prev->m_event = chunk->m_event;
     prev->m_resource = chunk->m_resource;
-    // auto res = chunk->m_resource.get();
-    // res.reset();
 
     if (prev->next)
       prev->next->prev = prev;
@@ -228,8 +226,8 @@ void ResourceAwarePool::do_deallocate(Chunk* chunk, void* ptr) noexcept
     chunk->next = next->next;
 
     // TODO: Double check this
-    // chunk->m_event = next->m_event;
-    // chunk->m_resource = next->m_resource;
+    chunk->m_event = next->m_event;
+    chunk->m_resource = next->m_resource;
 
     if (chunk->next)
       chunk->next->prev = chunk;
