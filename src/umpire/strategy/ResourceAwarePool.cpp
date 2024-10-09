@@ -198,7 +198,6 @@ void ResourceAwarePool::do_deallocate(Chunk* chunk, void* ptr) noexcept
 
   UMPIRE_LOG(Debug, "In the do_deallocate function. Deallocating data held by " << chunk);
 
-
   if (chunk->prev && chunk->prev->free == true) {
     auto prev = chunk->prev;
     UMPIRE_LOG(Debug, "Removing chunk" << prev << " from size map");
@@ -210,8 +209,8 @@ void ResourceAwarePool::do_deallocate(Chunk* chunk, void* ptr) noexcept
 
     prev->m_event = chunk->m_event;
     prev->m_resource = chunk->m_resource;
-    //auto res = chunk->m_resource.get();
-    //res.reset();
+    // auto res = chunk->m_resource.get();
+    // res.reset();
 
     if (prev->next)
       prev->next->prev = prev;
