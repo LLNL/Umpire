@@ -194,6 +194,7 @@ void ResourceAwarePool::do_deallocate(Chunk* chunk, void* ptr) noexcept
 {
   UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, chunk->size);
   UMPIRE_USE_VAR(ptr);
+  chunk->free = true;
 
   UMPIRE_LOG(Debug, "In the do_deallocate function. Deallocating data held by " << chunk);
 
@@ -261,7 +262,6 @@ void ResourceAwarePool::do_deallocate(Chunk* chunk, void* ptr) noexcept
   }
 
   chunk->size_map_it = m_free_map.insert(std::make_pair(chunk->size, chunk));
-  chunk->free = true;
 }
 
 void ResourceAwarePool::deallocate_resource(camp::resources::Resource r, void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
