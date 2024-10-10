@@ -216,6 +216,7 @@ void ResourceAwarePool::do_deallocate(Chunk* chunk, void* ptr) noexcept
     UMPIRE_LOG(Debug, "Merging with prev" << prev << " and " << chunk);
     UMPIRE_LOG(Debug, "New size: " << prev->size);
 
+    chunk->~Chunk(); //manually call destructor
     m_chunk_pool.deallocate(chunk);
     chunk = prev;
   }
@@ -225,7 +226,6 @@ void ResourceAwarePool::do_deallocate(Chunk* chunk, void* ptr) noexcept
     chunk->size += next->size;
     chunk->next = next->next;
 
-    // TODO: Double check this
     chunk->m_event = next->m_event;
     chunk->m_resource = next->m_resource;
 
@@ -238,6 +238,7 @@ void ResourceAwarePool::do_deallocate(Chunk* chunk, void* ptr) noexcept
     UMPIRE_LOG(Debug, "Removing chunk" << next << " from size map");
     m_free_map.erase(next->size_map_it);
 
+    next->~Chunk(); //manually call destructor
     m_chunk_pool.deallocate(next);
   }
 
@@ -340,6 +341,7 @@ void ResourceAwarePool::release()
         }
       }
 
+      chunk->~Chunk(); //manually call destructor
       m_chunk_pool.deallocate(chunk);
       pair = m_free_map.erase(pair);
     } else {
