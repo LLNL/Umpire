@@ -36,7 +36,7 @@ TEST(ResourceAwarePool_Host_Test, Check_States_Host)
 
   Resource r1{Host{}}, r2{Host{}};
   int* ptr = static_cast<int*>(pool.allocate(r1, 1024));
-   int* compare_ptr1 = ptr;
+  int* compare_ptr1 = ptr;
 
   EXPECT_EQ(getResource(pool, ptr), r1);
   EXPECT_EQ(getPendingSize(pool), 0);
@@ -46,7 +46,6 @@ TEST(ResourceAwarePool_Host_Test, Check_States_Host)
   pool.deallocate(r1, ptr);
   EXPECT_EQ(getPendingSize(pool), 0); // When only using host, there will be no pending chunks
 
-  
   ptr = static_cast<int*>(pool.allocate(r2, 2048));
   int* compare_ptr2 = ptr;
 
@@ -54,7 +53,6 @@ TEST(ResourceAwarePool_Host_Test, Check_States_Host)
   EXPECT_EQ(compare_ptr1, compare_ptr2); // only 1 host resource available, no possible data race
 
   pool.deallocate(r2, ptr);
-  
 }
 
 #if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
