@@ -24,6 +24,8 @@ class NamedAllocationStrategy : public AllocationStrategy {
 
   MemoryResourceTraits getTraits() const noexcept override;
 
+  bool treatAsPassthrough() const noexcept override;
+
  protected:
   strategy::AllocationStrategy* m_allocator;
 };

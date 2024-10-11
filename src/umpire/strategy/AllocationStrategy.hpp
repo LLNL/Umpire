@@ -130,6 +130,8 @@ class AllocationStrategy {
 
   bool isTracked() const noexcept;
 
+  virtual bool treatAsPassthrough() const noexcept;
+
   std::size_t m_current_size{0};
   std::size_t m_high_watermark{0};
   std::size_t m_allocation_count{0};
