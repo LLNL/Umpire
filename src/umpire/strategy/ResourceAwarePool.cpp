@@ -263,7 +263,8 @@ void ResourceAwarePool::deallocate_resource(camp::resources::Resource r, void* p
 
   auto my_r = getResource(ptr);
   if (my_r != r) {
-    UMPIRE_ERROR(runtime_error,
+    UMPIRE_ERROR(
+        runtime_error,
         fmt::format("Called deallocate with different resource than what is returned by getResource. Called with {},",
                     "but getResource returned: {}", camp::resources::to_string(r), camp::resources::to_string(my_r)));
   }
