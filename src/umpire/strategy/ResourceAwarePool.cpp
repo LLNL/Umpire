@@ -67,30 +67,25 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource r, std::siz
 
   if (!m_pending_map.empty()) {
     for (auto pending_chunk : m_pending_map) {
-      if (pending_chunk->free == false && pending_chunk->m_event.check()) // no longer pending
-      {
-        do_deallocate(pending_chunk, pending_chunk->data); // TODO: can I erase it from the list then?
-      }
+  UMPIRE_LOG(Debug, "IM in the IF statement for pending AND i'm about to check m_resource");
       if (pending_chunk->size >= rounded_bytes && pending_chunk->m_resource == r) {
-        // chunk->size = pending_chunk->size; // TODO: Why does this cause failure?
+  UMPIRE_LOG(Debug, "IM in the IF statement for pending but i'm doing something for reusing on same resource");
         chunk = pending_chunk;
         chunk->m_resource = pending_chunk->m_resource;
         chunk->free = false;
-        // TODO: Do I add to actual bytes, releasable blocks, total blocks, etc.????
-        std::size_t bytes_to_use{(m_actual_bytes == 0) ? m_first_minimum_pool_allocation_size
-                                                       : m_next_minimum_pool_allocation_size};
-        std::size_t size{(rounded_bytes > bytes_to_use) ? rounded_bytes : bytes_to_use};
-        m_actual_bytes += size;
-        m_releasable_bytes += size;
-        m_releasable_blocks++;
-        m_total_blocks++;
-        m_actual_highwatermark = (m_actual_bytes > m_actual_highwatermark) ? m_actual_bytes : m_actual_highwatermark;
         break;
+      }
+  UMPIRE_LOG(Debug, "IM in the IF statement for pending but am about to check the event............");
+      if (pending_chunk->free == false && pending_chunk->m_event.check()) // no longer pending
+      {
+  UMPIRE_LOG(Debug, "IM in the IF statement for pending AND i'm about to do a do_deallocate");
+        do_deallocate(pending_chunk, pending_chunk->data); // TODO: can I erase it from the list then?
       }
     }
   }
 
   if (chunk == nullptr) {
+  UMPIRE_LOG(Debug, "CHUNK IS NULL still actually.........");
     if (best == m_free_map.end()) {
       std::size_t bytes_to_use{(m_actual_bytes == 0) ? m_first_minimum_pool_allocation_size
                                                      : m_next_minimum_pool_allocation_size};
