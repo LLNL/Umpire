@@ -67,25 +67,25 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource r, std::siz
 
   if (!m_pending_map.empty()) {
     for (auto pending_chunk : m_pending_map) {
-  UMPIRE_LOG(Debug, "IM in the IF statement for pending AND i'm about to check m_resource");
+      UMPIRE_LOG(Debug, "IM in the IF statement for pending AND i'm about to check m_resource");
       if (pending_chunk->size >= rounded_bytes && pending_chunk->m_resource == r) {
-  UMPIRE_LOG(Debug, "IM in the IF statement for pending but i'm doing something for reusing on same resource");
+        UMPIRE_LOG(Debug, "IM in the IF statement for pending but i'm doing something for reusing on same resource");
         chunk = pending_chunk;
         chunk->m_resource = pending_chunk->m_resource;
         chunk->free = false;
         break;
       }
-  UMPIRE_LOG(Debug, "IM in the IF statement for pending but am about to check the event............");
+      UMPIRE_LOG(Debug, "IM in the IF statement for pending but am about to check the event............");
       if (pending_chunk->free == false && pending_chunk->m_event.check()) // no longer pending
       {
-  UMPIRE_LOG(Debug, "IM in the IF statement for pending AND i'm about to do a do_deallocate");
+        UMPIRE_LOG(Debug, "IM in the IF statement for pending AND i'm about to do a do_deallocate");
         do_deallocate(pending_chunk, pending_chunk->data); // TODO: can I erase it from the list then?
       }
     }
   }
 
   if (chunk == nullptr) {
-  UMPIRE_LOG(Debug, "CHUNK IS NULL still actually.........");
+    UMPIRE_LOG(Debug, "CHUNK IS NULL still actually.........");
     if (best == m_free_map.end()) {
       std::size_t bytes_to_use{(m_actual_bytes == 0) ? m_first_minimum_pool_allocation_size
                                                      : m_next_minimum_pool_allocation_size};
