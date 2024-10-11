@@ -35,7 +35,7 @@ void check(double* a, double* b, double* c)
   for (int i = 0; i < NUM; i++) {
     if(b[i] != i) {std::cerr << "Kernel error occurred with b: " << b[i] << " at " << i << std::endl;}
     if(c[i] != i) {std::cerr << "Kernel error occurred with c: " << c[i] << " at " << i << std::endl;}
-    if(a[i] != (b[i] + alpha * c[i])) {std::cerr << "Kernel error occurred with a: " << a[i] << " at " << i << std::endl;}
+    if(a[i] != (b[i] + alpha * c[i])) {std::cerr << "Kernel error occurred with a: " << a[i] << " instead of: " << (b[i] + alpha * c[i]) << " at " << i << std::endl;}
   }
 }
 
@@ -47,9 +47,6 @@ int main(int, char**)
   Hip d1, d2;
   Resource r1{d1}, r2{d2};
 
-  int* d_e;
-  hipMalloc(&d_e, sizeof(int));
-
   for(int i = 0; i < 5; i++) {
     double* a = static_cast<double*>(pool.allocate(r1, NUM * sizeof(double)));
     double* b = static_cast<double*>(pool.allocate(r1, NUM * sizeof(double)));
@@ -58,7 +55,7 @@ int main(int, char**)
     hipLaunchKernelGGL(init, dim3(NUM_BLOCKS), dim3(4), 0, d1.get_stream(), b, c);
     hipDeviceSynchronize();
     hipLaunchKernelGGL(body, dim3(NUM_BLOCKS), dim3(4), 0, d1.get_stream(), a, b, c);
-  
+
     pool.deallocate(a);
     pool.deallocate(b);
     pool.deallocate(c);
@@ -71,15 +68,16 @@ int main(int, char**)
     hipDeviceSynchronize();
     hipLaunchKernelGGL(body, dim3(NUM_BLOCKS), dim3(4), 0, d2.get_stream(), a, b, c);
 
-    hipLaunchKernelGGL(check, dim3(NUM_BLOCKS), dim3(4), 0, d2.get_stream(), a, b, c, d_e);
+    hipDeviceSynchronize();
     check(a, b, c);
 
     pool.deallocate(a);
     pool.deallocate(b);
     pool.deallocate(c);
+
   }
 
-  pool.release();
+  //pool.release();
   return 0;
 }
   
