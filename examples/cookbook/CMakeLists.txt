@@ -27,11 +27,19 @@ if (UMPIRE_ENABLE_NUMA)
 endif ()
 
 if (UMPIRE_ENABLE_IPC_SHARED_MEMORY)
+  if (UMPIRE_ENABLE_MPI)
+    blt_add_executable(
+      NAME recipe_shared_memory
+      SOURCES recipe_shared_memory.cpp
+      DEPENDS_ON ${cookbook_depends})
+    list(APPEND umpire_cookbooks recipe_shared_memory)
+  endif()
+
   blt_add_executable(
-    NAME recipe_shared_memory
-    SOURCES recipe_shared_memory.cpp
+    NAME recipe_naming_shim
+    SOURCES recipe_naming_shim.cpp
     DEPENDS_ON ${cookbook_depends})
-  list(APPEND umpire_cookbooks recipe_shared_memory)
+  list(APPEND umpire_cookbooks recipe_naming_shim)
 endif()
 
 if (UMPIRE_ENABLE_CUDA)

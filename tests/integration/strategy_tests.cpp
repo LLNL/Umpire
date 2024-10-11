@@ -18,6 +18,7 @@
 #include "umpire/strategy/MixedPool.hpp"
 #include "umpire/strategy/MonotonicAllocationStrategy.hpp"
 #include "umpire/strategy/NamedAllocationStrategy.hpp"
+#include "umpire/strategy/NamingShim.hpp"
 #include "umpire/strategy/QuickPool.hpp"
 #include "umpire/strategy/SizeLimiter.hpp"
 #include "umpire/strategy/SlotPool.hpp"
@@ -743,3 +744,23 @@ TEST(AlignedAllocator, BadAlignment)
       },
       umpire::runtime_error);
 }
+
+#if defined(UMPIRE_ENABLE_IPC_SHARED_MEMORY)
+TEST(NamingShimTests, TestAllocateDeallocate)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto traits{umpire::get_default_resource_traits("SHARED")};
+  traits.size = 1 * 1024 * 1024;
+  traits.scope = umpire::MemoryResourceTraits::shared_scope::node;
+
+  auto node_allocator{rm.makeResource("SHARED::shim_allocator", traits)};
+
+  auto shim{rm.makeAllocator<umpire::strategy::NamingShim>("shim", node_allocator)};
+  {
+    void* ptr = shim.allocate(1024);
+    EXPECT_NE(ptr, nullptr);
+    shim.deallocate(ptr);
+  }
+}
+#endif
