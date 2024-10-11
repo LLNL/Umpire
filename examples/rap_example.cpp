@@ -1,5 +1,4 @@
 #include <stdio.h>
-
 #include <iostream>
 
 #include "camp/camp.hpp"
@@ -68,8 +67,9 @@ int main(int, char**)
   auto pool = rm.makeAllocator<umpire::strategy::ResourceAwarePool>("rap-pool", rm.getAllocator("HOST"));
 #endif
 
-  resource_type d1, d2, d3;
-  Resource r1{d1}, r2{d2}, r3{d3};
+  // Create camp resources for RAP
+  resource_type d1, d2;
+  Resource r1{d1}, r2{d2};
 
   // allocate memory in the pool with r1
   double* a = static_cast<double*>(pool.allocate(r1, NUM_THREADS * sizeof(double)));
@@ -89,14 +89,14 @@ int main(int, char**)
 
   // deallocate memory with r1 and reallocate using a different stream r2
   pool.deallocate(r1, a);
-
   a = static_cast<double*>(pool.allocate(r2, NUM_THREADS * sizeof(double)));
   double* ptr2 = a;
 
+  // Make sure resource was correctly tracked
   UMPIRE_ASSERT(getResource(pool, a) == r2);
 
   // Use Camp resource to synchronize devices
-  r1.get_event().wait();
+  r2.get_event().wait();
 
 #if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
   UMPIRE_ASSERT(ptr1 != ptr2);

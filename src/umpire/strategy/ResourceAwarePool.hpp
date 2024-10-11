@@ -96,6 +96,9 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
   std::size_t getPendingSize() const noexcept;
 
   Platform getPlatform() noexcept override;
+  /*!
+   * \brief get the (generic) camp resource associated with a ptr
+   */
   Resource getResource(void* ptr) const;
 
   MemoryResourceTraits getTraits() const noexcept override;

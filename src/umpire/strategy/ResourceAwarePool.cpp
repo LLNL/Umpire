@@ -65,8 +65,6 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource r, std::siz
 
   Chunk* chunk{nullptr};
 
-  // auto pending_chunks_exist = m_pending_map.find(r);
-
   if (!m_pending_map.empty()) {
     for (auto pending_chunk : m_pending_map) {
       if (pending_chunk->free == false && pending_chunk->m_event.check()) // no longer pending
@@ -270,12 +268,9 @@ void ResourceAwarePool::deallocate_resource(camp::resources::Resource r, void* p
 
   auto my_r = getResource(ptr);
   if (my_r != r) {
-    UMPIRE_LOG(
-        Warning,
+    UMPIRE_ERROR(runtime_error,
         fmt::format("Called deallocate with different resource than what is returned by getResource. Called with {},",
                     "but getResource returned: {}", camp::resources::to_string(r), camp::resources::to_string(my_r)));
-    UMPIRE_LOG(Debug, fmt::format("getResource doesn't match resource passed to deallocate. Resource used: {} .",
-                                  camp::resources::to_string(r)));
   }
 
   // Chunk is now pending, add to list
