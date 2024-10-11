@@ -50,7 +50,7 @@ Now you can allocate and deallocate shared memory with:
 .. note::
    A name is required in order to allocate memory with IPC Shared Memory allocators. However, if that isn't feasible, you
    can instead use the :class:`umpire::strategy::NamingShim` strategy. This allows you to call allocate with only 1 argument
-   for the size in bytes. Check out the `example <https://github.com/LLNL/Umpire/blob/feature/nameless-shared-shim/examples/cookbook/recipe_naming_shim.cpp>`_. 
+   for the size in bytes. Check out the `example <https://github.com/LLNL/Umpire/blob/feature/nameless-shared-shim/examples/cookbook/recipe_naming_shim.cpp>`_ 
    to learn more.
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
