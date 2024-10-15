@@ -51,6 +51,8 @@ class AllocationStrategy {
 
   void* allocate_internal(std::size_t bytes);
 
+  void* allocate_named_internal(const std::string& name, std::size_t bytes);
+
   void deallocate_internal(void* ptr, std::size_t size = 0);
 
   /*!
