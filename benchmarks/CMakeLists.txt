@@ -17,6 +17,13 @@ blt_add_executable(
   SOURCES allocator_stress_test.cpp
   DEPENDS_ON ${stress_test_depends})
 
+if (UMPIRE_ENABLE_HIP)
+  blt_add_executable(
+    NAME resource_aware_pool_stress_test
+    SOURCES resource_aware_pool_stress_test.cpp
+    DEPENDS_ON umpire blt::hip blt::hip_runtime)
+endif()
+
 if (UMPIRE_ENABLE_DEVICE_ALLOCATOR)
   if (UMPIRE_ENABLE_CUDA)
   blt_add_executable(

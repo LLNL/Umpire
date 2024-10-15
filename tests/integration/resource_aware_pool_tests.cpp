@@ -141,7 +141,7 @@ TEST_P(ResourceAwarePoolTest, Check_States)
   hipLaunchKernelGGL(do_sleep, 1, 32, 0, d1.get_stream(), ptr);
 #endif
 
-  m_pool.deallocate(ptr);
+  m_pool.deallocate(r1, ptr);
   EXPECT_EQ(getPendingSize(m_pool), 1);
 
   double* ptr2 = static_cast<double*>(m_pool.allocate(r2, 2048));
