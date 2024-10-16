@@ -17,6 +17,8 @@
 using resource_type = camp::resources::Cuda;
 #elif defined(UMPIRE_ENABLE_HIP)
 using resource_type = camp::resources::Hip;
+#else
+using resource_type = camp::resources::Host;
 #endif
 
 namespace umpire {
@@ -66,26 +68,29 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource r, std::siz
   Chunk* chunk{nullptr};
 
   if (!m_pending_map.empty()) {
-    for (auto pending_chunk : m_pending_map) {
-  UMPIRE_LOG(Debug, "IM in the IF statement for pending AND i'm about to check m_resource");
+    for (auto it = m_pending_map.begin(); it != m_pending_map.end();) {
+      auto pending_chunk = (*it);
+
       if (pending_chunk->size >= rounded_bytes && pending_chunk->m_resource == r) {
-  UMPIRE_LOG(Debug, "IM in the IF statement for pending but i'm doing something for reusing on same resource");
         chunk = pending_chunk;
+        //m_chunk_pool.allocate();
         chunk->m_resource = pending_chunk->m_resource;
+        chunk->m_event = pending_chunk->m_event;
         chunk->free = false;
+        (*it) = chunk; //TODO double check
         break;
       }
-  UMPIRE_LOG(Debug, "IM in the IF statement for pending but am about to check the event............");
+
       if (pending_chunk->free == false && pending_chunk->m_event.check()) // no longer pending
       {
-  UMPIRE_LOG(Debug, "IM in the IF statement for pending AND i'm about to do a do_deallocate");
-        do_deallocate(pending_chunk, pending_chunk->data); // TODO: can I erase it from the list then?
+        m_pending_map.erase(it); //TODO: double check
+        do_deallocate(pending_chunk, pending_chunk->data);
       }
+      it++;
     }
   }
 
   if (chunk == nullptr) {
-  UMPIRE_LOG(Debug, "CHUNK IS NULL still actually.........");
     if (best == m_free_map.end()) {
       std::size_t bytes_to_use{(m_actual_bytes == 0) ? m_first_minimum_pool_allocation_size
                                                      : m_next_minimum_pool_allocation_size};
@@ -164,6 +169,7 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource r, std::siz
 
     chunk->size = rounded_bytes;
     split_chunk->size_map_it = m_free_map.insert(std::make_pair(remaining, split_chunk));
+    split_chunk->free = true;
   }
 
   m_current_bytes += rounded_bytes;
@@ -178,8 +184,7 @@ void ResourceAwarePool::deallocate(void* ptr, std::size_t size)
 
   UMPIRE_LOG(
       Warning,
-      fmt::format("The ResourceAwarePool requires a Camp resource. You called deallocate with no resource.",
-                  " Calling deallocate with the resource returned by getResource: {}.", camp::resources::to_string(r)));
+      fmt::format("The ResourceAwarePool requires a Camp resource. Calling deallocate with: {}.", camp::resources::to_string(r)));
   deallocate_resource(r, ptr, size);
 }
 

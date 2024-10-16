@@ -51,29 +51,39 @@ int main(int, char**)
     double* a = static_cast<double*>(pool.allocate(r1, NUM * sizeof(double)));
     double* b = static_cast<double*>(pool.allocate(r1, NUM * sizeof(double)));
     double* c = static_cast<double*>(pool.allocate(r1, NUM * sizeof(double)));
+std::cout<<"Made it past allocation1"<<std::endl;
 
     hipLaunchKernelGGL(init, dim3(NUM_BLOCKS), dim3(4), 0, d1.get_stream(), b, c);
+std::cout<<"Made it past init kernel"<<std::endl;
     hipDeviceSynchronize();
     hipLaunchKernelGGL(body, dim3(NUM_BLOCKS), dim3(4), 0, d1.get_stream(), a, b, c);
+std::cout<<"Made it past kernel launch1"<<std::endl;
 
     pool.deallocate(a);
     pool.deallocate(b);
     pool.deallocate(c);
+std::cout<<"Made it past deallocation1"<<std::endl;
 
     a = static_cast<double*>(pool.allocate(r2, NUM * sizeof(double)));
     b = static_cast<double*>(pool.allocate(r2, NUM * sizeof(double)));
     c = static_cast<double*>(pool.allocate(r2, NUM * sizeof(double)));
+std::cout<<"Made it past allocation2"<<std::endl;
 
     hipLaunchKernelGGL(init, dim3(NUM_BLOCKS), dim3(4), 0, d2.get_stream(), b, c);
     hipDeviceSynchronize();
     hipLaunchKernelGGL(body, dim3(NUM_BLOCKS), dim3(4), 0, d2.get_stream(), a, b, c);
+std::cout<<"Made it past kernel launch2"<<std::endl;
 
     hipDeviceSynchronize();
     check(a, b, c);
+std::cout<<"Made it past the check"<<std::endl;
 
     pool.deallocate(a);
+std::cout<<"Made it past deallocation of a"<<std::endl;
     pool.deallocate(b);
+std::cout<<"Made it past deallocation of b"<<std::endl;
     pool.deallocate(c);
+std::cout<<"Made it past deallocation2"<<std::endl;
 
   }
 
