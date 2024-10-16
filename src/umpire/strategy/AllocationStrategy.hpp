@@ -12,8 +12,12 @@
 #include <ostream>
 #include <string>
 
+#include "camp/camp.hpp"
+#include "camp/resource.hpp"
 #include "umpire/util/MemoryResourceTraits.hpp"
 #include "umpire/util/Platform.hpp"
+
+using Resource = camp::resources::Resource;
 
 namespace umpire {
 
@@ -155,6 +159,7 @@ class AllocationStrategy {
    * \return Pointer to start of allocated bytes.
    */
   virtual void* allocate(std::size_t bytes) = 0;
+  virtual void* allocate_resource(camp::resources::Resource r, std::size_t bytes);
   virtual void* allocate_named(const std::string& name, std::size_t bytes);
 
   /*!
@@ -163,6 +168,7 @@ class AllocationStrategy {
    * \param ptr Pointer to free.
    */
   virtual void deallocate(void* ptr, std::size_t size = 0) = 0;
+  virtual void deallocate_resource(camp::resources::Resource r, void* ptr, std::size_t size = 0);
 };
 
 } // end of namespace strategy
