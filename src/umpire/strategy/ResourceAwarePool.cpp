@@ -73,17 +73,17 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource r, std::siz
 
       if (pending_chunk->size >= rounded_bytes && pending_chunk->m_resource == r) {
         chunk = pending_chunk;
-        //m_chunk_pool.allocate();
+        // m_chunk_pool.allocate();
         chunk->m_resource = pending_chunk->m_resource;
         chunk->m_event = pending_chunk->m_event;
         chunk->free = false;
-        (*it) = chunk; //TODO double check
+        (*it) = chunk; // TODO double check
         break;
       }
 
       if (pending_chunk->free == false && pending_chunk->m_event.check()) // no longer pending
       {
-        m_pending_map.erase(it); //TODO: double check
+        m_pending_map.erase(it); // TODO: double check
         do_deallocate(pending_chunk, pending_chunk->data);
       }
       it++;
@@ -182,9 +182,8 @@ void ResourceAwarePool::deallocate(void* ptr, std::size_t size)
 {
   auto r = getResource(ptr);
 
-  UMPIRE_LOG(
-      Warning,
-      fmt::format("The ResourceAwarePool requires a Camp resource. Calling deallocate with: {}.", camp::resources::to_string(r)));
+  UMPIRE_LOG(Warning, fmt::format("The ResourceAwarePool requires a Camp resource. Calling deallocate with: {}.",
+                                  camp::resources::to_string(r)));
   deallocate_resource(r, ptr, size);
 }
 
