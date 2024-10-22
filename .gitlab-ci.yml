@@ -84,7 +84,7 @@ stages:
 trigger-chai:
   stage: multi-project
   rules:
-    - if: $CI_COMMIT_BRANCH == $MP_BRANCH
+    - if: $CI_COMMIT_BRANCH == $MP_BRANCH && $MULTI_PROJECT != "OFF"
       when: on_success
     - when: never
   variables:
