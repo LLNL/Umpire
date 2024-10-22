@@ -8,7 +8,10 @@
 #define UMPIRE_HipMallocManagedAllocator_HPP
 
 #include "hip/hip_runtime_api.h"
+#include "umpire/alloc/HipAllocator.hpp"
+#include "umpire/config.hpp"
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/Platform.hpp"
 #include "umpire/util/error.hpp"
 
 namespace umpire {
@@ -18,7 +21,9 @@ namespace alloc {
  * \brief Uses hipMallocManaged and hipFree to allocate and deallocate
  *        unified memory on AMD GPUs.
  */
-struct HipMallocManagedAllocator {
+struct HipMallocManagedAllocator : HipAllocator {
+  using HipAllocator::HipAllocator;
+
   /*!
    * \brief Allocate bytes of memory using hipMallocManaged.
    *
@@ -43,6 +48,23 @@ struct HipMallocManagedAllocator {
                                                 hipGetErrorString(error)));
       }
     }
+
+#ifdef UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY
+    if (m_granularity == MemoryResourceTraits::granularity_type::coarse_grained) {
+      int device;
+
+      ::hipGetDevice(&device);
+
+      UMPIRE_LOG(Debug, "::hipMemAdvise(hipMemAdviseSetCoarseGrain)");
+      auto error = ::hipMemAdvise(ptr, bytes, hipMemAdviseSetCoarseGrain, device);
+
+      if (error != hipSuccess) {
+        UMPIRE_ERROR(runtime_error,
+                     fmt::format("hipMemAdvise( src_ptr = {}, length = {}, device = {}) failed with error: {}", ptr,
+                                 bytes, device, hipGetErrorString(error)));
+      }
+    }
+#endif // UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY
 
     return ptr;
   }

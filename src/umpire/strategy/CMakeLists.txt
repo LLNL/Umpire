@@ -16,6 +16,7 @@ set (umpire_strategy_headers
   MixedPool.hpp
   MonotonicAllocationStrategy.hpp
   NamedAllocationStrategy.hpp
+  NamingShim.hpp
   PoolCoalesceHeuristic.hpp
   QuickPool.hpp
   SizeLimiter.hpp
@@ -48,6 +49,7 @@ set (umpire_strategy_sources
   mixins/Inspector.cpp
   MonotonicAllocationStrategy.cpp
   NamedAllocationStrategy.cpp
+  NamingShim.cpp
   QuickPool.cpp
   SizeLimiter.cpp
   SlotPool.cpp
