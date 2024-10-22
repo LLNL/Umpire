@@ -95,6 +95,13 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
   std::size_t getActualHighwaterMark() const noexcept;
   std::size_t getPendingSize() const noexcept;
 
+  int getNumUsed();
+  int getNumFree();
+  int getNumPending();
+  void printFree();
+  void printUsed();
+  void printPending();
+
   Platform getPlatform() noexcept override;
   /*!
    * \brief get the (generic) camp resource associated with a ptr
@@ -203,6 +210,7 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
   std::size_t m_releasable_bytes{0};
   std::size_t m_actual_highwatermark{0};
   bool m_is_destructing{false};
+  bool m_is_coalescing{false};
 };
 
 std::ostream& operator<<(std::ostream& out, umpire::strategy::PoolCoalesceHeuristic<ResourceAwarePool>&);

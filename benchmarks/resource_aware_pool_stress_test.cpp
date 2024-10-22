@@ -44,10 +44,12 @@ int main(int, char**)
   auto& rm = umpire::ResourceManager::getInstance();
   auto pool = rm.makeAllocator<umpire::strategy::ResourceAwarePool>("rap-pool", rm.getAllocator("UM"));
 
-  Hip d1, d2;
-  Resource r1{d1}, r2{d2};
+  Hip d1;
+  Resource r1{d1};
+  hipError_t error;
 
   for(int i = 0; i < 5; i++) {
+std::cout<<"NEW ITERATION"<<std::endl;
     double* a = static_cast<double*>(pool.allocate(r1, NUM * sizeof(double)));
     double* b = static_cast<double*>(pool.allocate(r1, NUM * sizeof(double)));
     double* c = static_cast<double*>(pool.allocate(r1, NUM * sizeof(double)));
@@ -56,33 +58,46 @@ std::cout<<"Made it past allocation1"<<std::endl;
     hipLaunchKernelGGL(init, dim3(NUM_BLOCKS), dim3(4), 0, d1.get_stream(), b, c);
 std::cout<<"Made it past init kernel"<<std::endl;
     hipDeviceSynchronize();
+std::cout<<"Made it past sync"<<std::endl;
+    // Check for errors
+    error = hipGetLastError();
+    if (error != hipSuccess) {
+        std::cerr << "HIP error: " << hipGetErrorString(error) << std::endl;
+        // Handle the error (e.g., cleanup, exit)
+    }
     hipLaunchKernelGGL(body, dim3(NUM_BLOCKS), dim3(4), 0, d1.get_stream(), a, b, c);
 std::cout<<"Made it past kernel launch1"<<std::endl;
 
-    pool.deallocate(a);
-    pool.deallocate(b);
-    pool.deallocate(c);
+    pool.deallocate(r1, a);
+    pool.deallocate(r1, b);
+    pool.deallocate(r1, c);
 std::cout<<"Made it past deallocation1"<<std::endl;
 
-    a = static_cast<double*>(pool.allocate(r2, NUM * sizeof(double)));
-    b = static_cast<double*>(pool.allocate(r2, NUM * sizeof(double)));
-    c = static_cast<double*>(pool.allocate(r2, NUM * sizeof(double)));
+    a = static_cast<double*>(pool.allocate(r1, NUM * sizeof(double)));
+    b = static_cast<double*>(pool.allocate(r1, NUM * sizeof(double)));
+    c = static_cast<double*>(pool.allocate(r1, NUM * sizeof(double)));
 std::cout<<"Made it past allocation2"<<std::endl;
 
-    hipLaunchKernelGGL(init, dim3(NUM_BLOCKS), dim3(4), 0, d2.get_stream(), b, c);
+    hipLaunchKernelGGL(init, dim3(NUM_BLOCKS), dim3(4), 0, d1.get_stream(), b, c);
     hipDeviceSynchronize();
-    hipLaunchKernelGGL(body, dim3(NUM_BLOCKS), dim3(4), 0, d2.get_stream(), a, b, c);
+    // Check for errors
+    error = hipGetLastError();
+    if (error != hipSuccess) {
+        std::cerr << "HIP error: " << hipGetErrorString(error) << std::endl;
+        // Handle the error (e.g., cleanup, exit)
+    }
+    hipLaunchKernelGGL(body, dim3(NUM_BLOCKS), dim3(4), 0, d1.get_stream(), a, b, c);
 std::cout<<"Made it past kernel launch2"<<std::endl;
 
     hipDeviceSynchronize();
     check(a, b, c);
 std::cout<<"Made it past the check"<<std::endl;
 
-    pool.deallocate(a);
+    pool.deallocate(r1, a);
 std::cout<<"Made it past deallocation of a"<<std::endl;
-    pool.deallocate(b);
+    pool.deallocate(r1, b);
 std::cout<<"Made it past deallocation of b"<<std::endl;
-    pool.deallocate(c);
+    pool.deallocate(r1, c);
 std::cout<<"Made it past deallocation2"<<std::endl;
 
   }
