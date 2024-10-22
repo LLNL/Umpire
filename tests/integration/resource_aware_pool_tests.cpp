@@ -44,7 +44,7 @@ TEST(ResourceAwarePool_Host_Test, Check_States_Host)
   host_sleep(ptr);
 
   pool.deallocate(r1, ptr);
-  //EXPECT_EQ(getPendingSize(pool), 0); // When only using host, there will be no pending chunks
+  // EXPECT_EQ(getPendingSize(pool), 0); // When only using host, there will be no pending chunks
 
   ptr = static_cast<int*>(pool.allocate(r2, 2048));
   int* compare_ptr2 = ptr;

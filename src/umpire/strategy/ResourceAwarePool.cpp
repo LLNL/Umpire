@@ -76,25 +76,25 @@ int ResourceAwarePool::getNumPending()
 
 void ResourceAwarePool::printFree()
 {
-  for (auto pair = m_free_map.begin(); pair != m_free_map.end();pair++) {
+  for (auto pair = m_free_map.begin(); pair != m_free_map.end(); pair++) {
     auto chunk = (*pair).second;
-    std::cout<<"Free map pointer is: "<<chunk->data<<std::endl;
+    std::cout << "Free map pointer is: " << chunk->data << std::endl;
   }
 }
 
 void ResourceAwarePool::printUsed()
 {
-  for(auto it = m_used_map.begin(); it != m_used_map.end(); it++) {
+  for (auto it = m_used_map.begin(); it != m_used_map.end(); it++) {
     auto chunk = it->second;
-    std::cout<<"-- Used map pointer is: "<<chunk->data<<std::endl;
+    std::cout << "-- Used map pointer is: " << chunk->data << std::endl;
   }
 }
 
 void ResourceAwarePool::printPending()
 {
-  for (auto it = m_pending_map.begin(); it != m_pending_map.end();it++) {
+  for (auto it = m_pending_map.begin(); it != m_pending_map.end(); it++) {
     auto pending_chunk = (*it);
-    std::cout<<"-_- Pending map pointer is: "<<pending_chunk->data<<std::endl;
+    std::cout << "-_- Pending map pointer is: " << pending_chunk->data << std::endl;
   }
 }
 
@@ -104,11 +104,12 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource r, std::siz
   const std::size_t rounded_bytes{aligned_round_up(bytes)};
   const auto& best = m_free_map.lower_bound(rounded_bytes);
 
-std::cout<<"In allocate_resource"<<std::endl;
-std::cout<<"Used: "<<getNumUsed()<<"--- Free: "<<getNumFree()<<"--- and Pending: "<<getNumPending()<<std::endl;
-printFree();
-printUsed();
-printPending();
+  std::cout << "In allocate_resource" << std::endl;
+  std::cout << "Used: " << getNumUsed() << "--- Free: " << getNumFree() << "--- and Pending: " << getNumPending()
+            << std::endl;
+  printFree();
+  printUsed();
+  printPending();
 
   Chunk* chunk{nullptr};
 
@@ -130,20 +131,24 @@ printPending();
       if (pending_chunk->free == false && pending_chunk->m_event.check()) // no longer pending
       {
         do_deallocate(pending_chunk, pending_chunk->data);
-        std::cout<<"pending chunk just do_deallocated, ptr value is " <<pending_chunk->data<<std::endl;
-        if(pending_chunk == nullptr) std::cout<<"it is null too!!!!"<<std::endl;
-        else std::cout<<"the pending chunk is not null - where does it go?"<<std::endl;
+        std::cout << "pending chunk just do_deallocated, ptr value is " << pending_chunk->data << std::endl;
+        if (pending_chunk == nullptr)
+          std::cout << "it is null too!!!!" << std::endl;
+        else
+          std::cout << "the pending chunk is not null - where does it go?" << std::endl;
       }
       it++;
     }
-std::cout<<"In allocate_resource, i removed "<<chunk->data<<" from pending and am about to put in used"<<std::endl;
+    std::cout << "In allocate_resource, i removed " << chunk->data << " from pending and am about to put in used"
+              << std::endl;
   }
 
-std::cout<<"In allocate_resource"<<std::endl;
-std::cout<<"Used: "<<getNumUsed()<<"--- Free: "<<getNumFree()<<"--- and Pending: "<<getNumPending()<<std::endl;
-printFree();
-printUsed();
-printPending();
+  std::cout << "In allocate_resource" << std::endl;
+  std::cout << "Used: " << getNumUsed() << "--- Free: " << getNumFree() << "--- and Pending: " << getNumPending()
+            << std::endl;
+  printFree();
+  printUsed();
+  printPending();
   if (chunk == nullptr) {
     if (best == m_free_map.end()) {
       std::size_t bytes_to_use{(m_actual_bytes == 0) ? m_first_minimum_pool_allocation_size
@@ -203,12 +208,13 @@ printPending();
 
   void* ret = chunk->data;
   m_used_map.insert(std::make_pair(ret, chunk));
-std::cout<<"In allocate_resource"<<std::endl;
-std::cout<<"i inserted into used this pointer: " <<ret<<std::endl;
-std::cout<<"Used: "<<getNumUsed()<<"--- Free: "<<getNumFree()<<"--- and Pending: "<<getNumPending()<<std::endl;
-printFree();
-printUsed();
-printPending();
+  std::cout << "In allocate_resource" << std::endl;
+  std::cout << "i inserted into used this pointer: " << ret << std::endl;
+  std::cout << "Used: " << getNumUsed() << "--- Free: " << getNumFree() << "--- and Pending: " << getNumPending()
+            << std::endl;
+  printFree();
+  printUsed();
+  printPending();
 
   chunk->free = false;
 
@@ -235,11 +241,12 @@ printPending();
   m_current_bytes += rounded_bytes;
 
   UMPIRE_UNPOISON_MEMORY_REGION(m_allocator, ret, bytes);
-std::cout<<"In allocate_resource"<<std::endl;
-std::cout<<"Used: "<<getNumUsed()<<"--- Free: "<<getNumFree()<<"--- and Pending: "<<getNumPending()<<std::endl;
-printFree();
-printUsed();
-printPending();
+  std::cout << "In allocate_resource" << std::endl;
+  std::cout << "Used: " << getNumUsed() << "--- Free: " << getNumFree() << "--- and Pending: " << getNumPending()
+            << std::endl;
+  printFree();
+  printUsed();
+  printPending();
   return ret;
 }
 
@@ -271,11 +278,12 @@ void ResourceAwarePool::do_deallocate(Chunk* chunk, void* ptr) noexcept
 
   UMPIRE_LOG(Debug, "In the do_deallocate function. Deallocating data held by " << chunk);
 
-std::cout<<"In do_deallocate, looking to deallocate ptr: "<<ptr<<" and chunk: " <<chunk<< std::endl;
-std::cout<<"Used: "<<getNumUsed()<<"--- Free: "<<getNumFree()<<"--- and Pending: "<<getNumPending()<<std::endl;
-printFree();
-printUsed();
-printPending();
+  std::cout << "In do_deallocate, looking to deallocate ptr: " << ptr << " and chunk: " << chunk << std::endl;
+  std::cout << "Used: " << getNumUsed() << "--- Free: " << getNumFree() << "--- and Pending: " << getNumPending()
+            << std::endl;
+  printFree();
+  printUsed();
+  printPending();
 
   if (chunk->prev && chunk->prev->free == true) {
     auto prev = chunk->prev;
@@ -331,25 +339,28 @@ printPending();
 
   chunk->size_map_it = m_free_map.insert(std::make_pair(chunk->size, chunk));
 
-std::cout<<"In do_deallocate"<<std::endl;
-std::cout<<"Used: "<<getNumUsed()<<"--- Free: "<<getNumFree()<<"--- and Pending: "<<getNumPending()<<std::endl;
-printFree();
-printUsed();
-printPending();
+  std::cout << "In do_deallocate" << std::endl;
+  std::cout << "Used: " << getNumUsed() << "--- Free: " << getNumFree() << "--- and Pending: " << getNumPending()
+            << std::endl;
+  printFree();
+  printUsed();
+  printPending();
 }
 
 void ResourceAwarePool::deallocate_resource(camp::resources::Resource r, void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
-  UMPIRE_LOG(Debug, "(Resource=" << camp::resources::to_string(r) << ")" << "and coalescing is " << m_is_coalescing);
+  UMPIRE_LOG(Debug, "(Resource=" << camp::resources::to_string(r) << ")"
+                                 << "and coalescing is " << m_is_coalescing);
   auto chunk = (*m_used_map.find(ptr)).second;
 
-std::cout<<"In deallocate_resource"<<std::endl;
-std::cout<<"i am looking for this pointer: " <<ptr<<std::endl;
-std::cout<<"Used: "<<getNumUsed()<<"--- Free: "<<getNumFree()<<"--- and Pending: "<<getNumPending()<<std::endl;
-printFree();
-printUsed();
-printPending();
+  std::cout << "In deallocate_resource" << std::endl;
+  std::cout << "i am looking for this pointer: " << ptr << std::endl;
+  std::cout << "Used: " << getNumUsed() << "--- Free: " << getNumFree() << "--- and Pending: " << getNumPending()
+            << std::endl;
+  printFree();
+  printUsed();
+  printPending();
 
   auto my_r = getResource(ptr);
   if (my_r != r) {
@@ -368,11 +379,12 @@ printPending();
   m_used_map.erase(ptr);
   m_current_bytes -= chunk->size;
 
-std::cout<<"In deallocate_resource"<<std::endl;
-std::cout<<"Used: "<<getNumUsed()<<"--- Free: "<<getNumFree()<<"--- and Pending: "<<getNumPending()<<std::endl;
-printFree();
-printUsed();
-printPending();
+  std::cout << "In deallocate_resource" << std::endl;
+  std::cout << "Used: " << getNumUsed() << "--- Free: " << getNumFree() << "--- and Pending: " << getNumPending()
+            << std::endl;
+  printFree();
+  printUsed();
+  printPending();
 
   // Call deallocate logic only for a non-pending chunk
   if (chunk->m_event.check()) {
@@ -385,28 +397,30 @@ printPending();
     do_coalesce(suggested_size);
   }
 
-std::cout<<"In deallocate_resource"<<std::endl;
-std::cout<<"Used: "<<getNumUsed()<<"--- Free: "<<getNumFree()<<"--- and Pending: "<<getNumPending()<<std::endl;
-printFree();
-printUsed();
-printPending();
+  std::cout << "In deallocate_resource" << std::endl;
+  std::cout << "Used: " << getNumUsed() << "--- Free: " << getNumFree() << "--- and Pending: " << getNumPending()
+            << std::endl;
+  printFree();
+  printUsed();
+  printPending();
 }
 
 void ResourceAwarePool::release()
 {
   UMPIRE_LOG(Debug, "() " << m_free_map.size() << " chunks in free map, m_is_destructing set to " << m_is_destructing);
-std::cout<<"In release"<<std::endl;
-std::cout<<"Used: "<<getNumUsed()<<"--- Free: "<<getNumFree()<<"--- and Pending: "<<getNumPending()<<std::endl;
-printFree();
-printUsed();
-printPending();
+  std::cout << "In release" << std::endl;
+  std::cout << "Used: " << getNumUsed() << "--- Free: " << getNumFree() << "--- and Pending: " << getNumPending()
+            << std::endl;
+  printFree();
+  printUsed();
+  printPending();
 
 #if defined(UMPIRE_ENABLE_BACKTRACE)
   std::size_t prev_size{m_actual_bytes};
 #endif
 
   // This will check all chunks in m_pending_map and erase the entry if event is complete
-  //for (auto it = m_pending_map.begin(); it != m_pending_map.end();) {
+  // for (auto it = m_pending_map.begin(); it != m_pending_map.end();) {
   //  auto chunk = (*it);
   //  if (chunk != nullptr && chunk->free == false && chunk->m_event.check()) {
   //    m_free_map.insert(std::make_pair(chunk->size, chunk));
@@ -448,11 +462,12 @@ printPending();
       ++pair;
     }
   }
-std::cout<<"In release"<<std::endl;
-std::cout<<"Used: "<<getNumUsed()<<"--- Free: "<<getNumFree()<<"--- and Pending: "<<getNumPending()<<std::endl;
-printFree();
-printUsed();
-printPending();
+  std::cout << "In release" << std::endl;
+  std::cout << "Used: " << getNumUsed() << "--- Free: " << getNumFree() << "--- and Pending: " << getNumPending()
+            << std::endl;
+  printFree();
+  printUsed();
+  printPending();
 
 #if defined(UMPIRE_ENABLE_BACKTRACE)
   if (prev_size > m_actual_bytes) {
@@ -578,11 +593,12 @@ void ResourceAwarePool::do_coalesce(std::size_t suggested_size) noexcept
     }
   }
   m_is_coalescing = false;
-std::cout<<"In coalesce"<<std::endl;
-std::cout<<"Used: "<<getNumUsed()<<"--- Free: "<<getNumFree()<<"--- and Pending: "<<getNumPending()<<std::endl;
-printFree();
-printUsed();
-printPending();
+  std::cout << "In coalesce" << std::endl;
+  std::cout << "Used: " << getNumUsed() << "--- Free: " << getNumFree() << "--- and Pending: " << getNumPending()
+            << std::endl;
+  printFree();
+  printUsed();
+  printPending();
 }
 
 PoolCoalesceHeuristic<ResourceAwarePool> ResourceAwarePool::blocks_releasable(std::size_t nblocks)
