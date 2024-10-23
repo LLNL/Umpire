@@ -301,16 +301,16 @@ void ResourceAwarePool::release()
 
   //TODO:
   // This will check all chunks in m_pending_map and erase the entry if event is complete
-  // for (auto it = m_pending_map.begin(); it != m_pending_map.end();) {
-  //  auto chunk = (*it);
-  //  if (chunk != nullptr && chunk->free == false && chunk->m_event.check()) {
-  //    m_free_map.insert(std::make_pair(chunk->size, chunk));
-  //    chunk->free = true;
-  //    m_pending_map.erase(it);
-  //  } else {
-  //    it++;
-  //  }
-  //}
+  for (auto it = m_pending_map.begin(); it != m_pending_map.end();) {
+    auto chunk = (*it);
+    if (chunk != nullptr && chunk->free == false && chunk->m_event.check()) {
+      m_free_map.insert(std::make_pair(chunk->size, chunk));
+      chunk->free = true;
+      m_pending_map.erase(it);
+    } else {
+      it++;
+    }
+  }
 
   for (auto pair = m_free_map.begin(); pair != m_free_map.end();) {
     auto chunk = (*pair).second;
