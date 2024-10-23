@@ -9,7 +9,8 @@
 
 using namespace camp::resources;
 
-constexpr int NUM = 32;
+constexpr int ITER = 5;
+constexpr double NUM = 32.0;
 constexpr double alpha = 3.14;
 const int NUM_BLOCKS = NUM / 4;
 
@@ -44,65 +45,39 @@ int main(int, char**)
   auto& rm = umpire::ResourceManager::getInstance();
   auto pool = rm.makeAllocator<umpire::strategy::ResourceAwarePool>("rap-pool", rm.getAllocator("UM"));
 
-  Hip d1;
-  Resource r1{d1};
-  hipError_t error;
+  Hip d1, d2;
+  Resource r1{d1}, r2{d2};
 
-  for(int i = 0; i < 5; i++) {
-std::cout<<"NEW ITERATION"<<std::endl;
+  for(int i = 0; i < ITER; i++) {
     double* a = static_cast<double*>(pool.allocate(r1, NUM * sizeof(double)));
     double* b = static_cast<double*>(pool.allocate(r1, NUM * sizeof(double)));
     double* c = static_cast<double*>(pool.allocate(r1, NUM * sizeof(double)));
-std::cout<<"Made it past allocation1"<<std::endl;
 
     hipLaunchKernelGGL(init, dim3(NUM_BLOCKS), dim3(4), 0, d1.get_stream(), b, c);
-std::cout<<"Made it past init kernel"<<std::endl;
     hipDeviceSynchronize();
-std::cout<<"Made it past sync"<<std::endl;
-    // Check for errors
-    error = hipGetLastError();
-    if (error != hipSuccess) {
-        std::cerr << "HIP error: " << hipGetErrorString(error) << std::endl;
-        // Handle the error (e.g., cleanup, exit)
-    }
     hipLaunchKernelGGL(body, dim3(NUM_BLOCKS), dim3(4), 0, d1.get_stream(), a, b, c);
-std::cout<<"Made it past kernel launch1"<<std::endl;
 
     pool.deallocate(r1, a);
     pool.deallocate(r1, b);
     pool.deallocate(r1, c);
-std::cout<<"Made it past deallocation1"<<std::endl;
 
-    a = static_cast<double*>(pool.allocate(r1, NUM * sizeof(double)));
-    b = static_cast<double*>(pool.allocate(r1, NUM * sizeof(double)));
-    c = static_cast<double*>(pool.allocate(r1, NUM * sizeof(double)));
-std::cout<<"Made it past allocation2"<<std::endl;
+    a = static_cast<double*>(pool.allocate(r2, NUM * sizeof(double)));
+    b = static_cast<double*>(pool.allocate(r2, NUM * sizeof(double)));
+    c = static_cast<double*>(pool.allocate(r2, NUM * sizeof(double)));
 
-    hipLaunchKernelGGL(init, dim3(NUM_BLOCKS), dim3(4), 0, d1.get_stream(), b, c);
+    hipLaunchKernelGGL(init, dim3(NUM_BLOCKS), dim3(4), 0, d2.get_stream(), b, c);
     hipDeviceSynchronize();
-    // Check for errors
-    error = hipGetLastError();
-    if (error != hipSuccess) {
-        std::cerr << "HIP error: " << hipGetErrorString(error) << std::endl;
-        // Handle the error (e.g., cleanup, exit)
-    }
-    hipLaunchKernelGGL(body, dim3(NUM_BLOCKS), dim3(4), 0, d1.get_stream(), a, b, c);
-std::cout<<"Made it past kernel launch2"<<std::endl;
+    hipLaunchKernelGGL(body, dim3(NUM_BLOCKS), dim3(4), 0, d2.get_stream(), a, b, c);
 
     hipDeviceSynchronize();
     check(a, b, c);
-std::cout<<"Made it past the check"<<std::endl;
 
-    pool.deallocate(r1, a);
-std::cout<<"Made it past deallocation of a"<<std::endl;
-    pool.deallocate(r1, b);
-std::cout<<"Made it past deallocation of b"<<std::endl;
-    pool.deallocate(r1, c);
-std::cout<<"Made it past deallocation2"<<std::endl;
+    pool.deallocate(r2, a);
+    pool.deallocate(r2, b);
+    pool.deallocate(r2, c);
 
   }
 
-  //pool.release();
   return 0;
 }
   
