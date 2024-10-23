@@ -3,10 +3,11 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
+#include "umpire/strategy/ResourceAwarePool.hpp"
+
 #include "umpire/Allocator.hpp"
 #include "umpire/event/event.hpp"
 #include "umpire/strategy/PoolCoalesceHeuristic.hpp"
-#include "umpire/strategy/ResourceAwarePool.hpp"
 #include "umpire/strategy/mixins/AlignedAllocation.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/memory_sanitizers.hpp"
@@ -258,8 +259,7 @@ void ResourceAwarePool::deallocate_resource(camp::resources::Resource r, void* p
   auto chunk = (*m_used_map.find(ptr)).second;
 
   if (chunk == nullptr) {
-    UMPIRE_ERROR(runtime_error,
-               fmt::format("The chunk can't be found! Called deallocate with ptr: {}", ptr));
+    UMPIRE_ERROR(runtime_error, fmt::format("The chunk can't be found! Called deallocate with ptr: {}", ptr));
   }
 
   auto my_r = getResource(ptr);
@@ -299,7 +299,7 @@ void ResourceAwarePool::release()
   std::size_t prev_size{m_actual_bytes};
 #endif
 
-  //TODO:
+  // TODO:
   // This will check all chunks in m_pending_map and erase the entry if event is complete
   for (auto it = m_pending_map.begin(); it != m_pending_map.end();) {
     auto chunk = (*it);
@@ -409,12 +409,15 @@ camp::resources::Resource ResourceAwarePool::getResource(void* ptr) const
   for (auto pair = m_free_map.begin(); pair != m_free_map.end(); pair++) {
     auto chunk = (*pair).second;
     if (chunk->data == ptr) {
-      UMPIRE_LOG(Warning, 
-                 fmt::format("Ptr {} corresponded to a free chunk in the ResourceAwarePool, so the resource may no longer be valid...", ptr));
+      UMPIRE_LOG(
+          Warning,
+          fmt::format(
+              "Ptr {} corresponded to a free chunk in the ResourceAwarePool, so the resource may no longer be valid...",
+              ptr));
       return chunk->m_resource;
     }
   }
-  
+
   UMPIRE_ERROR(runtime_error,
                fmt::format("The pointer {} does not seem to be allocated with the ResourceAwarePool!", ptr));
 
