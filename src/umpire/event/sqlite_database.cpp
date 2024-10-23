@@ -99,6 +99,25 @@ void sqlite_database::insert(const named_allocate& e)
   UMP_SQ3_EXE(m_database, buffer, NULL, 0);
 }
 
+void sqlite_database::insert(const allocate_resource& e)
+{
+  char buffer[512];
+
+  sprintf(buffer,
+          "INSERT INTO EVENTS VALUES(json('"
+          R"({"category":"operation","name":"allocate_resource")"
+          R"(,"numeric_args":{"size":%ld})"
+          R"(,"string_args":{"allocator_ref":"%p","pointer":"%p","resource":"%p"})"
+          R"(,"tags":{"replay":"true"})"
+          R"(,"timestamp":%lld})"
+          "'));",
+          e.size, e.ref, e.ptr, e.res,
+          static_cast<long long>(
+              std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count()));
+
+  UMP_SQ3_EXE(m_database, buffer, NULL, 0);
+}
+
 void sqlite_database::insert(const deallocate& e)
 {
   char buffer[512];
@@ -111,6 +130,24 @@ void sqlite_database::insert(const deallocate& e)
           R"(,"timestamp":%lld})"
           "'));",
           e.ref, e.ptr,
+          static_cast<long long>(
+              std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count()));
+
+  UMP_SQ3_EXE(m_database, buffer, NULL, 0);
+}
+
+void sqlite_database::insert(const deallocate_resource& e)
+{
+  char buffer[512];
+
+  sprintf(buffer,
+          "INSERT INTO EVENTS VALUES(json('"
+          R"({"category":"operation","name":"deallocate")"
+          R"(,"string_args":{"allocator_ref":"%p","pointer":"%p", "resource":"%p"})"
+          R"(,"tags":{"replay":"true"})"
+          R"(,"timestamp":%lld})"
+          "'));",
+          e.ref, e.ptr, e.res,
           static_cast<long long>(
               std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count()));
 

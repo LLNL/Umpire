@@ -80,7 +80,15 @@ void quest_database::insert(const named_allocate&)
 {
 }
 
+void quest_database::insert(const allocate_resource&)
+{
+}
+
 void quest_database::insert(const deallocate&)
+{
+}
+
+void quest_database::insert(const deallocate_resource&)
 {
 }
 
