@@ -148,7 +148,8 @@ inline void Allocator::do_deallocate(void* ptr)
 
 inline void Allocator::do_resource_deallocate(camp::resources::Resource const& r, void* ptr)
 {
-  umpire::event::record<umpire::event::deallocate_resource>([&](auto& event) { event.ref((void*)m_allocator).ptr(ptr).res(r); });
+  umpire::event::record<umpire::event::deallocate_resource>(
+      [&](auto& event) { event.ref((void*)m_allocator).ptr(ptr).res(r); });
 
   UMPIRE_LOG(Debug, "(" << ptr << ")");
 
