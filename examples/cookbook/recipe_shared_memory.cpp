@@ -81,7 +81,7 @@ int main(int ac, char** av)
   //
   // Allocate shared memory
   //
-  void* ptr{node_allocator.allocate("allocation_name_2", sizeof(uint64_t))};
+  void* ptr{node_allocator.allocate(std::string{"allocation_name_2"}, sizeof(uint64_t))};
   uint64_t* data{static_cast<uint64_t*>(ptr)};
 
   if (shared_rank == foreman_rank)
