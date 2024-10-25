@@ -20,7 +20,9 @@ namespace event {
 struct event;
 struct allocate;
 struct named_allocate;
+struct allocate_resource;
 struct deallocate;
+struct deallocate_resource;
 
 class sqlite_database : public event_store {
  public:
@@ -29,7 +31,9 @@ class sqlite_database : public event_store {
   virtual void insert(const event& e) override final;
   virtual void insert(const allocate& e) override final;
   virtual void insert(const named_allocate& e) override final;
+  virtual void insert(const allocate_resource& e) override final;
   virtual void insert(const deallocate& e) override final;
+  virtual void insert(const deallocate_resource& e) override final;
 
   std::vector<event> get_events() override final;
 

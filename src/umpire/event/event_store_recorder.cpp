@@ -33,7 +33,17 @@ void event_store_recorder::record(const named_allocate& e)
   m_database->insert(e);
 }
 
+void event_store_recorder::record(const allocate_resource& e)
+{
+  m_database->insert(e);
+}
+
 void event_store_recorder::record(const deallocate& e)
+{
+  m_database->insert(e);
+}
+
+void event_store_recorder::record(const deallocate_resource& e)
 {
   m_database->insert(e);
 }

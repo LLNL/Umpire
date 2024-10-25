@@ -13,6 +13,8 @@
 #include <ostream>
 #include <string>
 
+#include "camp/camp.hpp"
+#include "camp/resource.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/mixins/AllocateNull.hpp"
 #include "umpire/strategy/mixins/Inspector.hpp"
@@ -64,6 +66,8 @@ class Allocator : private strategy::mixins::Inspector, strategy::mixins::Allocat
    */
   inline void* allocate(std::size_t bytes);
 
+  inline void* allocate(Resource const& r, std::size_t bytes);
+
   inline void* allocate(const std::string& name, std::size_t bytes);
 
   /*!
@@ -78,6 +82,8 @@ class Allocator : private strategy::mixins::Inspector, strategy::mixins::Allocat
    * \param ptr Pointer to free (If nullptr, it will be ignored.)
    */
   inline void deallocate(void* ptr);
+
+  inline void deallocate(Resource const& r, void* ptr);
 
   /*!
    * \brief Release any and all unused memory held by this Allocator.
@@ -213,11 +219,15 @@ class Allocator : private strategy::mixins::Inspector, strategy::mixins::Allocat
    */
   inline void* thread_safe_allocate(std::size_t bytes);
   inline void* thread_safe_named_allocate(const std::string& name, std::size_t bytes);
+  inline void* thread_safe_resource_allocate(camp::resources::Resource const& r, std::size_t bytes);
   inline void thread_safe_deallocate(void* ptr);
+  inline void thread_safe_resource_deallocate(camp::resources::Resource const& r, void* ptr);
 
   inline void* do_allocate(std::size_t bytes);
+  inline void* do_resource_allocate(camp::resources::Resource const& r, std::size_t bytes);
   inline void* do_named_allocate(const std::string& name, std::size_t bytes);
   inline void do_deallocate(void* ptr);
+  inline void do_resource_deallocate(camp::resources::Resource const& r, void* ptr);
 
   bool m_thread_safe{false};
   std::mutex* m_thread_safe_mutex{nullptr};

@@ -17,7 +17,7 @@ int main(int, char**)
   auto allocator = rm.getAllocator("HOST");
   std::vector<void*> allocations;
 
-  allocations.push_back(allocator.allocate("My Allocation Name", 100));
+  allocations.push_back(allocator.allocate(std::string{"My Allocation Name"}, 100));
   allocations.push_back(allocator.allocate(1024));
 
   for (auto ptr : allocations) {

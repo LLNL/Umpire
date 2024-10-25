@@ -16,7 +16,9 @@ namespace event {
 
 struct allocate;
 struct named_allocate;
+struct allocate_resource;
 struct deallocate;
+struct deallocate_resource;
 struct event;
 
 class event_store_recorder {
@@ -26,7 +28,9 @@ class event_store_recorder {
   void record(const event& e);
   void record(const allocate& e);
   void record(const named_allocate& e);
+  void record(const allocate_resource& e);
   void record(const deallocate& e);
+  void record(const deallocate_resource& e);
 
  private:
   event_store* m_database;

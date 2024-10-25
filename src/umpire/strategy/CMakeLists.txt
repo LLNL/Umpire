@@ -19,6 +19,7 @@ set (umpire_strategy_headers
   NamingShim.hpp
   PoolCoalesceHeuristic.hpp
   QuickPool.hpp
+  ResourceAwarePool.hpp
   SizeLimiter.hpp
   SlotPool.hpp
   StdAllocator.hpp
@@ -51,6 +52,7 @@ set (umpire_strategy_sources
   NamedAllocationStrategy.cpp
   NamingShim.cpp
   QuickPool.cpp
+  ResourceAwarePool.cpp
   SizeLimiter.cpp
   SlotPool.cpp
   ThreadSafeAllocator.cpp)

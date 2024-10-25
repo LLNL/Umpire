@@ -10,6 +10,7 @@
 #include <iostream>
 #include <string>
 
+#include "camp/camp.hpp"
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/config.hpp"
@@ -17,6 +18,8 @@
 #include "umpire/util/AllocationRecord.hpp"
 #include "umpire/util/MPI.hpp"
 #include "umpire/util/io.hpp"
+
+using Resource = camp::resources::Resource;
 
 namespace umpire {
 
@@ -188,6 +191,10 @@ MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm);
 
 void register_external_allocation(void* ptr, util::AllocationRecord record);
 util::AllocationRecord deregister_external_allocation(void* ptr);
+
+Resource getResource(Allocator a, void* ptr);
+
+std::size_t getPendingSize(Allocator a);
 
 /*!
  * \brief Attempt to coalesce Allocator a, return true if a coalesce was performed.

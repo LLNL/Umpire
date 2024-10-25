@@ -64,6 +64,20 @@ void json_file_store::insert(const named_allocate& e)
               std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count()));
 }
 
+void json_file_store::insert(const allocate_resource& e)
+{
+  fprintf(m_fstream,
+          R"({"category":"operation","name":"allocate_resource")"
+          R"(,"numeric_args":{"size":%ld})"
+          R"(,"string_args":{"allocator_ref":"%p","pointer":"%p","resource":"%s"})"
+          R"(,"tags":{"replay":"true"})"
+          R"(,"timestamp":%lld})"
+          "\n",
+          e.size, e.ref, e.ptr, e.res.c_str(),
+          static_cast<long long>(
+              std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count()));
+}
+
 void json_file_store::insert(const deallocate& e)
 {
   fprintf(m_fstream,
@@ -73,6 +87,19 @@ void json_file_store::insert(const deallocate& e)
           R"(,"timestamp":%lld})"
           "\n",
           e.ref, e.ptr,
+          static_cast<long long>(
+              std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count()));
+}
+
+void json_file_store::insert(const deallocate_resource& e)
+{
+  fprintf(m_fstream,
+          R"({"category":"operation","name":"deallocate_resource")"
+          R"(,"string_args":{"allocator_ref":"%p","pointer":"%p", "resource":"%s"})"
+          R"(,"tags":{"replay":"true"})"
+          R"(,"timestamp":%lld})"
+          "\n",
+          e.ref, e.ptr, e.res.c_str(),
           static_cast<long long>(
               std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count()));
 }
