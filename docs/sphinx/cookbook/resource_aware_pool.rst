@@ -30,7 +30,7 @@ Using a Single Resource
 
 Umpire's strategies such as ``QuickPool`` and ``DynamicPoolList`` work very well
 on the device when we are dealing with a single camp device resource. In the figure below, we have
-the host resource which allocates memory (a``_``1), uses the memory in a kernel (k``_``1), then schedules
+the host resource which allocates memory (a\ :sub:`1`\), uses the memory in a kernel (k\ :sub:`1`\1), then schedules
 a deallocate (d``_``1). Then, the host immidiately reuses that memory for a different kernel (k``_``2).
 
 .. image:: ./single_mem.png
