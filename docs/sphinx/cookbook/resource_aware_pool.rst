@@ -36,7 +36,7 @@ a deallocate (d``_``1). Then, the host immidiately reuses that memory for a diff
 .. image:: ./single_mem.png
 
 In this scenario, there is no potential for a data race, since we are dealing with just one cuda stream
-and kernels on a single stream happen sequentially. In other words, this scenario deals with only
+and kernels on a single stream execute sequentially. In other words, this scenario deals with only
 one Camp device resource. In this type of scenario, there is no need for a ``ResourceAwarePool`` because
 it would behave the same as your typical ``QuickPool``.
 
