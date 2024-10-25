@@ -23,7 +23,7 @@ namespace camp {
 namespace resources {
 inline namespace v1 {
 
-inline std::string to_string(camp::resources::Resource& r)
+inline std::string to_string(const camp::resources::Resource& r)
 {
   switch (r.get_platform()) {
     case camp::resources::Platform::cuda:
@@ -94,7 +94,7 @@ struct allocate_resource {
   std::size_t size;
   void* ref;
   void* ptr;
-  camp::resources::Resource res;
+  std::string res;
   std::chrono::time_point<std::chrono::system_clock> timestamp{std::chrono::system_clock::now()};
 };
 
@@ -107,7 +107,7 @@ struct deallocate {
 struct deallocate_resource {
   void* ref;
   void* ptr;
-  camp::resources::Resource res;
+  std::string res;
   std::chrono::time_point<std::chrono::system_clock> timestamp{std::chrono::system_clock::now()};
 };
 
@@ -319,7 +319,7 @@ class builder<allocate_resource> {
     return *this;
   }
 
-  builder& res(camp::resources::Resource res)
+  builder& res(const std::string& res)
   {
     e.res = res;
     return *this;
@@ -375,7 +375,7 @@ class builder<deallocate_resource> {
     return *this;
   }
 
-  builder& res(camp::resources::Resource res)
+  builder& res(const std::string& res)
   {
     e.res = res;
     return *this;

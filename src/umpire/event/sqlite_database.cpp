@@ -107,7 +107,7 @@ void sqlite_database::insert(const allocate_resource& e)
           "INSERT INTO EVENTS VALUES(json('"
           R"({"category":"operation","name":"allocate_resource")"
           R"(,"numeric_args":{"size":%ld})"
-          R"(,"string_args":{"allocator_ref":"%p","pointer":"%p","resource":"%p"})"
+          R"(,"string_args":{"allocator_ref":"%p","pointer":"%p","resource":"%s"})"
           R"(,"tags":{"replay":"true"})"
           R"(,"timestamp":%lld})"
           "'));",
@@ -143,7 +143,7 @@ void sqlite_database::insert(const deallocate_resource& e)
   sprintf(buffer,
           "INSERT INTO EVENTS VALUES(json('"
           R"({"category":"operation","name":"deallocate")"
-          R"(,"string_args":{"allocator_ref":"%p","pointer":"%p", "resource":"%p"})"
+          R"(,"string_args":{"allocator_ref":"%p","pointer":"%p", "resource":"%s"})"
           R"(,"tags":{"replay":"true"})"
           R"(,"timestamp":%lld})"
           "'));",

@@ -119,7 +119,7 @@ inline void* Allocator::do_resource_allocate(camp::resources::Resource const& r,
   }
 
   umpire::event::record<umpire::event::allocate_resource>(
-      [&](auto& event) { event.size(bytes).ref((void*)m_allocator).ptr(ret).res(r); });
+      [&](auto& event) { event.size(bytes).ref((void*)m_allocator).ptr(ret).res(camp::resources::to_string(r)); });
   return ret;
 }
 
@@ -149,7 +149,7 @@ inline void Allocator::do_deallocate(void* ptr)
 inline void Allocator::do_resource_deallocate(camp::resources::Resource const& r, void* ptr)
 {
   umpire::event::record<umpire::event::deallocate_resource>(
-      [&](auto& event) { event.ref((void*)m_allocator).ptr(ptr).res(r); });
+      [&](auto& event) { event.ref((void*)m_allocator).ptr(ptr).res(camp::resources::to_string(r)); });
 
   UMPIRE_LOG(Debug, "(" << ptr << ")");
 
