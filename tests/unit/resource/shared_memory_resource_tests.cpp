@@ -23,6 +23,11 @@
 #include "umpire/resource/HostSharedMemoryResource.hpp"
 #include "umpire/util/MemoryResourceTraits.hpp"
 
+////////////////////////////////////////////////////////
+// How to run this test:
+//
+///////////////////////////////////////////////////////
+
 namespace {
 struct SharedMemoryState {
   std::size_t largest_allocation_size;
@@ -30,6 +35,7 @@ struct SharedMemoryState {
   std::size_t num_allocations;
   std::size_t allocation_sizes[1];
 };
+
 const std::string shmem_state_name{"SharedMemoryState"};
 SharedMemoryState* shmem_state{nullptr};
 
