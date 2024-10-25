@@ -20,7 +20,9 @@ namespace event {
 struct event;
 struct allocate;
 struct named_allocate;
+struct allocate_resource;
 struct deallocate;
+struct deallocate_resource;
 
 class json_file_store : public event_store {
  public:
@@ -29,7 +31,9 @@ class json_file_store : public event_store {
   virtual void insert(const event& e);
   virtual void insert(const allocate& e);
   virtual void insert(const named_allocate& e);
+  virtual void insert(const allocate_resource& e);
   virtual void insert(const deallocate& e);
+  virtual void insert(const deallocate_resource& e);
 
   virtual std::vector<event> get_events();
 

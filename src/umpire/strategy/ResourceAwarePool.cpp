@@ -3,7 +3,6 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-
 #include "umpire/strategy/ResourceAwarePool.hpp"
 
 #include "umpire/Allocator.hpp"
@@ -12,12 +11,6 @@
 #include "umpire/strategy/mixins/AlignedAllocation.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/memory_sanitizers.hpp"
-
-#if defined(UMPIRE_ENABLE_CUDA)
-using resource_type = camp::resources::Cuda;
-#elif defined(UMPIRE_ENABLE_HIP)
-using resource_type = camp::resources::Hip;
-#endif
 
 namespace umpire {
 namespace strategy {
@@ -66,26 +59,29 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource r, std::siz
   Chunk* chunk{nullptr};
 
   if (!m_pending_map.empty()) {
-    for (auto pending_chunk : m_pending_map) {
-      UMPIRE_LOG(Debug, "IM in the IF statement for pending AND i'm about to check m_resource");
-      if (pending_chunk->size >= rounded_bytes && pending_chunk->m_resource == r) {
-        UMPIRE_LOG(Debug, "IM in the IF statement for pending but i'm doing something for reusing on same resource");
+    for (auto it = m_pending_map.begin(); it != m_pending_map.end();) {
+      auto pending_chunk = (*it);
+
+      if (pending_chunk->size >= rounded_bytes && pending_chunk->m_resource == r) { // reusing chunk with same resource
         chunk = pending_chunk;
         chunk->m_resource = pending_chunk->m_resource;
+        chunk->m_event = pending_chunk->m_event;
         chunk->free = false;
+        m_pending_map.erase(it);
         break;
       }
-      UMPIRE_LOG(Debug, "IM in the IF statement for pending but am about to check the event............");
-      if (pending_chunk->free == false && pending_chunk->m_event.check()) // no longer pending
+
+      if (pending_chunk->free == false && pending_chunk->m_event.check()) // reuse no-longer-pending chunk
       {
-        UMPIRE_LOG(Debug, "IM in the IF statement for pending AND i'm about to do a do_deallocate");
-        do_deallocate(pending_chunk, pending_chunk->data); // TODO: can I erase it from the list then?
+        do_deallocate(pending_chunk, pending_chunk->data);
+        break;
       }
+
+      it++;
     }
   }
 
   if (chunk == nullptr) {
-    UMPIRE_LOG(Debug, "CHUNK IS NULL still actually.........");
     if (best == m_free_map.end()) {
       std::size_t bytes_to_use{(m_actual_bytes == 0) ? m_first_minimum_pool_allocation_size
                                                      : m_next_minimum_pool_allocation_size};
@@ -164,6 +160,7 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource r, std::siz
 
     chunk->size = rounded_bytes;
     split_chunk->size_map_it = m_free_map.insert(std::make_pair(remaining, split_chunk));
+    split_chunk->free = true;
   }
 
   m_current_bytes += rounded_bytes;
@@ -176,10 +173,9 @@ void ResourceAwarePool::deallocate(void* ptr, std::size_t size)
 {
   auto r = getResource(ptr);
 
-  UMPIRE_LOG(
-      Warning,
-      fmt::format("The ResourceAwarePool requires a Camp resource. You called deallocate with no resource.",
-                  " Calling deallocate with the resource returned by getResource: {}.", camp::resources::to_string(r)));
+  UMPIRE_LOG(Warning, fmt::format("The ResourceAwarePool requires a Camp resource. Calling deallocate with: {}.",
+                                  camp::resources::to_string(r)));
+
   deallocate_resource(r, ptr, size);
 }
 
@@ -189,12 +185,22 @@ void ResourceAwarePool::do_deallocate(Chunk* chunk, void* ptr) noexcept
   UMPIRE_USE_VAR(ptr);
   chunk->free = true;
 
+  // Removing chunk from pending
+  for (auto it = m_pending_map.begin(); it != m_pending_map.end();) {
+    auto my_chunk = (*it);
+    if (my_chunk == chunk) {
+      m_pending_map.erase(it);
+    } else {
+      it++;
+    }
+  }
+
   UMPIRE_LOG(Debug, "In the do_deallocate function. Deallocating data held by " << chunk);
 
   if (chunk->prev && chunk->prev->free == true) {
     auto prev = chunk->prev;
-    UMPIRE_LOG(Debug, "Removing chunk" << prev << " from size map");
 
+    UMPIRE_LOG(Debug, "Removing chunk" << prev << " from free map");
     m_free_map.erase(prev->size_map_it);
 
     prev->size += chunk->size;
@@ -216,6 +222,10 @@ void ResourceAwarePool::do_deallocate(Chunk* chunk, void* ptr) noexcept
 
   if (chunk->next && chunk->next->free == true) {
     auto next = chunk->next;
+
+    UMPIRE_LOG(Debug, "Removing chunk" << next << " from free map");
+    m_free_map.erase(next->size_map_it);
+
     chunk->size += next->size;
     chunk->next = next->next;
 
@@ -228,9 +238,6 @@ void ResourceAwarePool::do_deallocate(Chunk* chunk, void* ptr) noexcept
     UMPIRE_LOG(Debug, "Merging with next" << chunk << " and " << next);
     UMPIRE_LOG(Debug, "New size: " << chunk->size);
 
-    UMPIRE_LOG(Debug, "Removing chunk" << next << " from size map");
-    m_free_map.erase(next->size_map_it);
-
     next->~Chunk(); // manually call destructor
     m_chunk_pool.deallocate(next);
   }
@@ -242,16 +249,6 @@ void ResourceAwarePool::do_deallocate(Chunk* chunk, void* ptr) noexcept
     m_releasable_bytes += chunk->chunk_size;
   }
 
-  // Removing chunk from pending
-  for (auto it = m_pending_map.begin(); it != m_pending_map.end();) {
-    auto my_chunk = (*it);
-    if (my_chunk == chunk) {
-      m_pending_map.erase(it);
-    } else {
-      it++;
-    }
-  }
-
   chunk->size_map_it = m_free_map.insert(std::make_pair(chunk->size, chunk));
 }
 
@@ -260,6 +257,10 @@ void ResourceAwarePool::deallocate_resource(camp::resources::Resource r, void* p
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   UMPIRE_LOG(Debug, "(Resource=" << camp::resources::to_string(r) << ")");
   auto chunk = (*m_used_map.find(ptr)).second;
+
+  if (chunk == nullptr) {
+    UMPIRE_ERROR(runtime_error, fmt::format("The chunk can't be found! Called deallocate with ptr: {}", ptr));
+  }
 
   auto my_r = getResource(ptr);
   if (my_r != r) {
@@ -271,7 +272,9 @@ void ResourceAwarePool::deallocate_resource(camp::resources::Resource r, void* p
 
   // Chunk is now pending, add to list
   m_pending_map.push_back(chunk);
-  chunk->m_event = r.get_event();
+  if (m_is_coalescing == false) {
+    chunk->m_event = r.get_event();
+  }
 
   m_used_map.erase(ptr);
   m_current_bytes -= chunk->size;
@@ -296,6 +299,7 @@ void ResourceAwarePool::release()
   std::size_t prev_size{m_actual_bytes};
 #endif
 
+  // TODO:
   // This will check all chunks in m_pending_map and erase the entry if event is complete
   for (auto it = m_pending_map.begin(); it != m_pending_map.end();) {
     auto chunk = (*it);
@@ -402,9 +406,21 @@ camp::resources::Resource ResourceAwarePool::getResource(void* ptr) const
     auto chunk = it->second;
     return chunk->m_resource;
   }
+  for (auto pair = m_free_map.begin(); pair != m_free_map.end(); pair++) {
+    auto chunk = (*pair).second;
+    if (chunk->data == ptr) {
+      UMPIRE_LOG(
+          Warning,
+          fmt::format(
+              "Ptr {} corresponded to a free chunk in the ResourceAwarePool, so the resource may no longer be valid...",
+              ptr));
+      return chunk->m_resource;
+    }
+  }
 
   UMPIRE_ERROR(runtime_error,
                fmt::format("The pointer {} does not seem to be allocated with the ResourceAwarePool!", ptr));
+
   return camp::resources::Host{}; // Function needs a return
 }
 
@@ -449,6 +465,7 @@ void ResourceAwarePool::coalesce() noexcept
 void ResourceAwarePool::do_coalesce(std::size_t suggested_size) noexcept
 {
   if (m_free_map.size() > 1) {
+    m_is_coalescing = true;
     UMPIRE_LOG(Debug, "()");
     release();
     std::size_t size_post{getActualSize()};
@@ -462,6 +479,7 @@ void ResourceAwarePool::do_coalesce(std::size_t suggested_size) noexcept
       deallocate_resource(r, ptr, alloc_size);
     }
   }
+  m_is_coalescing = false;
 }
 
 PoolCoalesceHeuristic<ResourceAwarePool> ResourceAwarePool::blocks_releasable(std::size_t nblocks)

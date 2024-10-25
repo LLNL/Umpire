@@ -16,14 +16,18 @@ namespace event {
 struct event;
 struct allocate;
 struct named_allocate;
+struct allocate_resource;
 struct deallocate;
+struct deallocate_resource;
 
 class event_store {
  public:
   virtual void insert(const event& e) = 0;
   virtual void insert(const allocate& e) = 0;
   virtual void insert(const named_allocate& e) = 0;
+  virtual void insert(const allocate_resource& e) = 0;
   virtual void insert(const deallocate& e) = 0;
+  virtual void insert(const deallocate_resource& e) = 0;
 
   virtual std::vector<event> get_events() = 0;
 };
