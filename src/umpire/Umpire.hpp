@@ -194,11 +194,11 @@ util::AllocationRecord deregister_external_allocation(void* ptr);
 
 /*!
  * \brief Returns the Camp resource associated with a particular allocation
- * 
+ *
  * \param Umpire allocator which was used to allocate the data
  * \param Pointer which was used for the allocation
  *
- * \return Camp resource associated with the allocation *assuming the Allocator 
+ * \return Camp resource associated with the allocation *assuming the Allocator
  * passed in is a ResourceAwarePool strategy and the allocation is either used or pending*
  */
 Resource getResource(Allocator a, void* ptr);
@@ -207,7 +207,7 @@ Resource getResource(Allocator a, void* ptr);
  * \brief Returns the current number of pending chunks associated with the pool. The
  * pending chunks are those that have been scheduled to deallocate but may or may not
  * have actually been deallocated yet.
- * 
+ *
  * \param Umpire allocator with ResourceAwarePool strategy
  *
  * \return Number of pending chunks in the ResourceAwarePool
