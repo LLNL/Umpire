@@ -54,8 +54,6 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource r, std::siz
 {
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ")");
   const std::size_t rounded_bytes{aligned_round_up(bytes)};
-  const auto& best = m_free_map.lower_bound(rounded_bytes);
-
   Chunk* chunk{nullptr};
 
   if (!m_pending_map.empty()) {
@@ -80,6 +78,8 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource r, std::siz
       it++;
     }
   }
+
+  const auto& best = m_free_map.lower_bound(rounded_bytes);
 
   if (chunk == nullptr) {
     if (best == m_free_map.end()) {
@@ -270,8 +270,6 @@ void ResourceAwarePool::deallocate_resource(camp::resources::Resource r, void* p
                     "but getResource returned: {}", camp::resources::to_string(r), camp::resources::to_string(my_r)));
   }
 
-  // Chunk is now pending, add to list
-  m_pending_map.push_back(chunk);
   if (m_is_coalescing == false) {
     chunk->m_event = r.get_event();
   }
@@ -282,6 +280,9 @@ void ResourceAwarePool::deallocate_resource(camp::resources::Resource r, void* p
   // Call deallocate logic only for a non-pending chunk
   if (chunk->m_event.check()) {
     do_deallocate(chunk, ptr);
+  } else {
+    // Chunk is now pending, add to list
+    m_pending_map.push_back(chunk);
   }
 
   std::size_t suggested_size{m_should_coalesce(*this)};
@@ -473,7 +474,10 @@ void ResourceAwarePool::do_coalesce(std::size_t suggested_size) noexcept
     if (size_post < suggested_size) {
       std::size_t alloc_size{suggested_size - size_post};
 
+      // The coalesce will only ever happen on free chunks, so we use default Host resource
+      // Once the chunk is reallocated the resource will be reset.
       camp::resources::Resource r = camp::resources::Host().get_default();
+
       UMPIRE_LOG(Debug, "coalescing " << alloc_size << " bytes.");
       auto ptr = allocate_resource(r, alloc_size);
       deallocate_resource(r, ptr, alloc_size);
