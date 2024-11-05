@@ -70,34 +70,25 @@ int main(int, char**)
 
   // Create camp resources for RAP
   resource_type d1, d2;
-  Resource r1{d1}, r2{d2};
 
   // allocate memory in the pool with r1
-  double* a = static_cast<double*>(pool.allocate(r1, NUM_THREADS * sizeof(double)));
+  double* a = static_cast<double*>(pool.allocate(d1, NUM_THREADS * sizeof(double)));
   double* ptr1 = a;
 
-  // Make sure resource was correctly tracked
-  UMPIRE_ASSERT(getResource(pool, a) == r1);
-
   // launch kernels on r1's stream
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
   do_sleep<<<NUM_BLOCKS, BLOCK_SIZE, 0, d1.get_stream()>>>();
-#elif defined(UMPIRE_ENABLE_HIP)
-  hipLaunchKernelGGL(do_sleep, dim3(NUM_BLOCKS), dim3(BLOCK_SIZE), 0, d1.get_stream());
 #else
   host_sleep(a);
 #endif
 
   // deallocate memory with r1 and reallocate using a different stream r2
-  pool.deallocate(r1, a);
-  a = static_cast<double*>(pool.allocate(r2, NUM_THREADS * sizeof(double)));
+  pool.deallocate(d1, a); // Deallocate using resource
+  a = static_cast<double*>(pool.allocate(d2, NUM_THREADS * sizeof(double)));
   double* ptr2 = a;
 
-  // Make sure resource was correctly tracked
-  UMPIRE_ASSERT(getResource(pool, a) == r2);
-
   // Use Camp resource to synchronize devices
-  r2.get_event().wait();
+  d2.get_event().wait();
 
 #if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
   UMPIRE_ASSERT(ptr1 != ptr2);
@@ -106,7 +97,6 @@ int main(int, char**)
 #endif
   std::cout << "Expected result returned!" << std::endl;
 
-  // deallocate and clean up
-  pool.deallocate(r2, a);
+  pool.deallocate(a); // Deallocation with no resource included
   return 0;
 }
