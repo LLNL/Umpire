@@ -365,7 +365,7 @@ std::size_t ResourceAwarePool::getTotalBlocks() const noexcept
   return m_total_blocks;
 }
 
-std::size_t ResourceAwarePool::getPendingSize() const noexcept
+std::size_t ResourceAwarePool::getNumPending() const noexcept
 {
   return m_pending_map.size();
 }

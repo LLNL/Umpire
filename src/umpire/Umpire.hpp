@@ -194,6 +194,7 @@ util::AllocationRecord deregister_external_allocation(void* ptr);
 
 /*!
  * \brief Returns the Camp resource associated with a particular allocation
+ * **This function is used mainly for testing purposes.**
  *
  * \param Umpire allocator which was used to allocate the data
  * \param Pointer which was used for the allocation
@@ -204,15 +205,14 @@ util::AllocationRecord deregister_external_allocation(void* ptr);
 Resource getResource(Allocator a, void* ptr);
 
 /*!
- * \brief Returns the current number of pending chunks associated with the pool. The
- * pending chunks are those that have been scheduled to deallocate but may or may not
- * have actually been deallocated yet.
+ * \brief Returns the number of pending chunks associated with a ResourceAwarePool Allocator
+ * **This function is used mainly for testing purposes.**
  *
- * \param Umpire allocator with ResourceAwarePool strategy
+ * \param Umpire ResourceAwarePool allocator
  *
- * \return Number of pending chunks in the ResourceAwarePool
+ * \return Number of currently pending chunks in the ResourceAwarePool
  */
-std::size_t getPendingSize(Allocator a);
+std::size_t getNumPending(Allocator a);
 
 /*!
  * \brief Attempt to coalesce Allocator a, return true if a coalesce was performed.

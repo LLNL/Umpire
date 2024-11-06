@@ -20,6 +20,7 @@
 #include "umpire/strategy/mixins/AlignedAllocation.hpp"
 #include "umpire/util/FixedMallocPool.hpp"
 #include "umpire/util/MemoryResourceTraits.hpp"
+#include "umpire/Umpire.hpp"
 
 using Resource = camp::resources::Resource;
 using Event = camp::resources::Event;
@@ -70,7 +71,15 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
 
   ResourceAwarePool(const ResourceAwarePool&) = delete;
 
+  // Granting the gtest function access to private methods below
+  friend camp::resources::Resource umpire::getResource(Allocator a, void* ptr);
+  friend std::size_t umpire::getNumPending(Allocator a);
+
+  // Allocate function needed since we inherit from AllocationStrategy.
+  // If this method is called, it will be an error (Need to call allocate_resource
+  // with a Camp resource instead).
   void* allocate(std::size_t bytes) override;
+
   /*!
    * \brief Allocate memory with the ResourceAwarePool
    *
@@ -78,6 +87,7 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
    * \param bytes The size in bytes for the allocation
    */
   void* allocate_resource(Resource r, std::size_t bytes) override;
+
   /*!
    * \brief Deallocate memory with the ResourceAwarePool
    *
@@ -86,6 +96,12 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
    * \param bytes The size in bytes for the allocation
    */
   void deallocate_resource(Resource r, void* ptr, std::size_t size) override;
+
+  /*!
+   * \brief Deallocate function will call private getResource function
+   * to get the resource associated with teh pointer and then call deallocate_resource
+   * above.
+   */
   void deallocate(void* ptr, std::size_t size) override;
   void release() override;
 
@@ -93,23 +109,9 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
   std::size_t getCurrentSize() const noexcept override;
   std::size_t getReleasableSize() const noexcept;
   std::size_t getActualHighwaterMark() const noexcept;
-  std::size_t getPendingSize() const noexcept;
-
-  int getNumUsed();
-  int getNumFree();
-  int getNumPending();
-  void printFree();
-  void printUsed();
-  void printPending();
 
   Platform getPlatform() noexcept override;
-  /*!
-   * \brief get the (generic) camp resource associated with a ptr
-   */
-  Resource getResource(void* ptr) const;
-
   MemoryResourceTraits getTraits() const noexcept override;
-
   bool tracksMemoryUse() const noexcept override;
 
   /*!
@@ -168,11 +170,22 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
   };
 
   using PointerMap = std::unordered_map<void*, Chunk*>;
-  // using PendingMap = std::unordered_map<camp::resources::Resource, Chunk*>; //Should this be a vector of chunks? list
-  // of chunks?
   using PendingMap = std::vector<Chunk*>;
   using SizeMap =
       std::multimap<std::size_t, Chunk*, std::less<std::size_t>, pool_allocator<std::pair<const std::size_t, Chunk*>>>;
+
+ protected:
+  /*!
+   * \brief Get the camp resource associated with a ptr
+   *
+   * \param ptr The pointer to data allocated with a ResourceAwarePool
+   */
+  Resource getResource(void* ptr) const;
+
+  /*!
+   * \brief Get the number of Pending chunks in the pool.
+   */
+  std::size_t getNumPending() const noexcept;
 
  public:
   struct Chunk {

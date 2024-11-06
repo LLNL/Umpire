@@ -289,6 +289,8 @@ util::AllocationRecord deregister_external_allocation(void* ptr)
 
 Resource getResource(Allocator a, void* ptr)
 {
+  UMPIRE_LOG(Warning, "This function will return a generic Camp resource which is not comparable to a specific Camp resource!");
+
   auto s = a.getAllocationStrategy();
   strategy::ResourceAwarePool* rap{dynamic_cast<strategy::ResourceAwarePool*>(s)};
 
@@ -299,7 +301,7 @@ Resource getResource(Allocator a, void* ptr)
   return rap->getResource(ptr);
 }
 
-std::size_t getPendingSize(Allocator a)
+std::size_t getNumPending(Allocator a)
 {
   auto s = a.getAllocationStrategy();
   strategy::ResourceAwarePool* rap{dynamic_cast<strategy::ResourceAwarePool*>(s)};
@@ -308,7 +310,7 @@ std::size_t getPendingSize(Allocator a)
     UMPIRE_ERROR(runtime_error, fmt::format("Allocator \"{}\" is not a ResourceAwarePool!", a.getName()));
   }
 
-  return rap->getPendingSize();
+  return rap->getNumPending();
 }
 
 bool try_coalesce(Allocator a)

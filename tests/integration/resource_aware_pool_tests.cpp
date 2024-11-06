@@ -17,6 +17,21 @@
 
 using namespace camp::resources;
 
+#if defined(UMPIRE_ENABLE_CUDA)
+  using resource_type = Cuda;
+#elif defined(UMPIRE_ENABLE_HIP)
+  using resource_type = Hip;
+#endif
+
+std::string unique_name()
+{
+  static int unique_name_id{0};
+  std::stringstream ss;
+
+  ss << "_Unique_Name_" << unique_name_id++;
+  return ss.str();
+}
+
 void host_sleep(int* ptr)
 {
   int i = 0;
@@ -39,19 +54,18 @@ TEST(ResourceAwarePool_Host_Test, Check_States_Host)
   int* compare_ptr1 = ptr;
 
   EXPECT_EQ(getResource(pool, ptr), r1);
-  EXPECT_EQ(getPendingSize(pool), 0);
+  EXPECT_EQ(getNumPending(pool), 0);
 
   host_sleep(ptr);
 
   pool.deallocate(r1, ptr);
-  // EXPECT_EQ(getPendingSize(pool), 0); // When only using host, there will be no pending chunks
+  EXPECT_EQ(getNumPending(pool), 0); // When only using host, there will be no pending chunks
 
-  ptr = static_cast<int*>(pool.allocate(r2, 2048));
+  ptr = static_cast<int*>(pool.allocate(r2, 1024));
   int* compare_ptr2 = ptr;
 
   EXPECT_TRUE(r1 == r2);
   EXPECT_EQ(compare_ptr1, compare_ptr2); // only 1 host resource available, no possible data race
-
   pool.deallocate(r2, ptr);
 }
 
@@ -108,7 +122,7 @@ class ResourceAwarePoolTest : public ::testing::TestWithParam<std::string> {
   virtual void SetUp()
   {
     auto& rm = umpire::ResourceManager::getInstance();
-    m_pool = rm.makeAllocator<umpire::strategy::ResourceAwarePool>(std::string{"rap-pool-" + GetParam()},
+    m_pool = rm.makeAllocator<umpire::strategy::ResourceAwarePool>(std::string{"rap-pool-" + GetParam() + unique_name()},
                                                                    rm.getAllocator(GetParam()));
   }
 
@@ -122,33 +136,41 @@ class ResourceAwarePoolTest : public ::testing::TestWithParam<std::string> {
 
 TEST_P(ResourceAwarePoolTest, Check_States)
 {
-#if defined(UMPIRE_ENABLE_CUDA)
-  Cuda d1, d2;
-#elif defined(UMPIRE_ENABLE_HIP)
-  Hip d1, d2;
-#endif
-
+  resource_type d1, d2;
   Resource r1{d1}, r2{d2};
 
   double* ptr = static_cast<double*>(m_pool.allocate(r1, 1024));
 
   EXPECT_EQ(getResource(m_pool, ptr), r1);
-  EXPECT_EQ(getPendingSize(m_pool), 0);
+  EXPECT_EQ(getNumPending(m_pool), 0);
 
-#if defined(UMPIRE_ENABLE_CUDA)
   do_sleep<<<1, 32, 0, d1.get_stream()>>>(ptr);
-#elif defined(UMPIRE_ENABLE_HIP)
-  hipLaunchKernelGGL(do_sleep, 1, 32, 0, d1.get_stream(), ptr);
-#endif
 
   m_pool.deallocate(r1, ptr);
-  EXPECT_EQ(getPendingSize(m_pool), 1);
 
-  double* ptr2 = static_cast<double*>(m_pool.allocate(r2, 2048));
+  EXPECT_EQ(getNumPending(m_pool), 1);
+
+  double* ptr2 = static_cast<double*>(m_pool.allocate(r2, 1024));
 
   EXPECT_FALSE(r1 == r2);
   EXPECT_EQ(getResource(m_pool, ptr2), r2);
   EXPECT_NE(ptr, ptr2); // multiple device resources, possible data race, needs different addr
+}
+
+TEST_P(ResourceAwarePoolTest, ExplicitSync)
+{
+  resource_type d1, d2;
+
+  double* ptr = static_cast<double*>(m_pool.allocate(d1, 1024));
+
+  do_sleep<<<1, 32, 0, d1.get_stream()>>>(ptr);
+
+  m_pool.deallocate(d1, ptr);
+  d1.get_event().wait(); // explicitly sync the device streams (camp resources)
+  double* ptr2 = static_cast<double*>(m_pool.allocate(d2, 1024));
+
+  EXPECT_FALSE(d1 == d2);
+  EXPECT_EQ(ptr, ptr2); // multiple device resources, but with explicit sync, ptr is same
 }
 
 INSTANTIATE_TEST_SUITE_P(ResourceAwarePoolTests, ResourceAwarePoolTest, ::testing::ValuesIn(get_allocator_strings()));
