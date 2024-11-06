@@ -164,11 +164,13 @@ TEST_P(ResourceAwarePoolTest, ExplicitSync)
   double* ptr = static_cast<double*>(m_pool.allocate(d1, 1024));
 
   do_sleep<<<1, 32, 0, d1.get_stream()>>>(ptr);
+  EXPECT_EQ(getResource(m_pool, ptr), Resource{d1});
 
   m_pool.deallocate(d1, ptr);
   d1.get_event().wait(); // explicitly sync the device streams (camp resources)
   double* ptr2 = static_cast<double*>(m_pool.allocate(d2, 1024));
 
+  EXPECT_EQ(getResource(m_pool, ptr2), Resource{d2});
   EXPECT_FALSE(d1 == d2);
   EXPECT_EQ(ptr, ptr2); // multiple device resources, but with explicit sync, ptr is same
 }

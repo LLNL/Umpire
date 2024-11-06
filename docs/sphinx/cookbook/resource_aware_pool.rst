@@ -21,6 +21,33 @@ While we can have multiple camp resources for the device (e.g. multiple cuda str
 we can only have one resource for the host because the host only has one stream of execution. 
 Since we are dealing with Camp resources, we call this pool strategy the ``ResourceAwarePool``.
 
+Generic vs. Specific Camp Resources
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Camp has two different types of Resources: generic and specific. A specific resource is created with:
+
+.. code-block:: bash
+   camp::resources::Cuda c1;
+
+This will create a Cuda (specific) resource. With ``c1`` we can call different methods like ``get_platform()``
+or ``get_stream()``. Parts of Umpire such as the Operations use these camp methods under the hood. On the
+other hand, a generic resource is created with:
+
+.. code-block:: bash
+   camp::resources::Resource r{c1};
+
+This way of creating a generic resource uses the specific resource created above, ``c1``, to constuct it.
+We can also create a generic resource with:
+
+.. code-blcok:: bash
+   camp::resources::Resource r{camp::resources::Cuda()};
+
+The ``ResourceAwarePool`` stores a generic camp resource, but since the compiler can implicitly convert a 
+specific resource to a generic resource and vice versa, you can use either kind of resource 
+with the ``ResourceAwarePool`` methods. The catch is that only the specific resource (``c1``) has a
+method like ``get_stream()`` which would be needed when launching kernels - so we will be using the
+specific resource in the examples below.
+
 Throughout the rest of this documentation page, we will use a "camp resource" to refer to a "stream of
 execution". If the camp resource is on the device, then we are referring to a device stream such 
 as a cuda stream or hip stream.
@@ -57,20 +84,17 @@ data race.
 Umpire's ``ResourceAwarePool`` is designed to avoid any potential data races by making the resources
 "aware" of the memory used by another resource. If resource ``r2`` needs to allocate memory, but that
 memory is potentially still being used by another resource, ``r1``,  then ``r2``  will use different 
-memory instead. To do that, the ``ResourceAwarePool`` introduces a "pending" state. As soon as ``r1``
-schedules a deallocation, that memory is marked as ``_``pending``_``. Only once that pending memory has
-actually been deallocated will it not be marked ``_``pending``_`` anymore. When ``r2`` needs to reallocate that
-memory, it will first check to see if the memory is still ``_``pending``_``. If it is NOT ``_``pending``_``, it will
-reuse that memory, otherwise it will use a different piece of memory instead.
+memory instead. To do that, the ``ResourceAwarePool`` introduces a "pending" state.
+
+As soon as ``r1`` schedules a deallocation, that memory is marked as ``_``pending``_`` and is only available 
+for use by ``r1``. When the deallocation is complete, the ``_``pending``_`` marker is cleared, making that memory 
+available for use by other resources. So when ``r2`` needs an allocation, it first checks to see if the memory 
+is still ``_``pending``_``. If it is NOT ``_``pending``_``, it will reuse that memory, otherwise it will use a 
+different piece of memory instead.
 
 The figure below illustrates the 3 states of a ``ResourceAwarePool``: free, used, and pending.
 
 .. image:: ./states.png
-
-Note that if you schedule a deallocate, but then try to reuse that memory on the SAME
-resource, that memory will NOT be labeled ``_``pending``_``. It is only when we have scheduled a deallocate
-on one resource and then try to reuse that same memory on a different resource that we have
-the potential for a data race and thus the need for the pending state.
 
 Using a ResourceAwarePool
 -------------------------
@@ -90,18 +114,17 @@ on the resource. Below is an example of creating a camp resource for two device 
 
    using namespace camp::resources;
    ...
-   Cuda d1, d2; //create Cuda resources, d1 for stream1, d2 for stream2
-   Host h1; //create a Host resource
-   Resource r1{d1}, r2{d2}, r3{h1}; //Initialize the Camp resources
+   Cuda d1, d2; //create (specific) Cuda resources, d1 for stream1, d2 for stream2
+   Host h1; //create a (specific) Host resource
 
 Then, to allocate memory with your ``ResourceAwarePool`` you can do the following:
 
 .. code-block:: bash
 
-   double* a = static_cast<double*>(pool.allocate(r1, NUM_THREADS * sizeof(double)));
+   double* a = static_cast<double*>(pool.allocate(d1, NUM_THREADS * sizeof(double)));
 
 Note that there is an extra parameter when using the ``allocate`` function. The first parameter is 
-the resource (``r1``) we want the allocated memory to be associated with. In other words, ``r1`` is
+the resource (``d1``) we want the allocated memory to be associated with. In other words, ``d1`` is
 the device stream we want to launch the kernel on which will use that memory. Next, be sure to launch the kernel using the 
 correct stream. Since we are using Camp resources, we use ``d1`` that we created above. For example:
 
@@ -109,37 +132,30 @@ correct stream. Since we are using Camp resources, we use ``d1`` that we created
 
    my_kernel<<NUM_BLOCKS, BLOCK_SIZE, 0, d1.get_stream()>>>(a, NUM_THREADS);
 
-.. note:: If you lose track of which resource you need to use for the kernel launch, you can call
-    ``getResource(a)`` and that will return the resource associated with that pointer. However, be sure
-    to launch the kernel with the underlying (cuda/hip/etc) resource (i.e. ``d1``) not the generic resource
-    (i.e. ``r1``) as there is no ``get_stream()`` function associated with the generic resource.
-
 The kernel launch specifies the stream from the Cuda resource we created above.
 To deallocate, use the following code:
 
 .. code-block:: bash
 
-   pool.deallocate(r1, a);
+   pool.deallocate(d1, a);
 
 .. note::
    It can be hard to keep track of which resource corresponds to which pointer. If it is not feasible to keep track
-   of that, you can call ``pool.deallocate(ptr)`` as usual. However, this method will call ``getResource(ptr)``
-   on the ``ResourceAwarePool`` instance and then call ``pool.deallocate(r, ptr)`` where ``r`` is the resource 
-   returned from the ``getResource`` function call. 
+   of that, you can call ``pool.deallocate(ptr)`` as usual. However, this method will call the private ``getResource(ptr)``
+   method on the ``ResourceAwarePool`` instance and then call the correct deallocate_resource method. It is recommended to
+   include a resource with the deallocate method if possible.
 
-Assuming you need to reallocate memory on ``a`` with ``r2``, you could then launch a second kernel with the second stream. For example:
+Assuming you need to reallocate memory on ``a`` with ``d2``, you could then launch a second kernel with the second stream. For example:
 
 .. code-block:: bash
 
-   a = static_cast<double*>(pool.allocate(r2, NUM_THREADS * sizeof(double)));
+   a = static_cast<double*>(pool.allocate(d2, NUM_THREADS * sizeof(double)));
    ...
    my_other_kernel<<NUM_BLOCKS, BLOCK_SIZE, 0, d2.get_stream()>>>(a, NUM_THREADS);
 
-Note the use of ``d2`` in this kernel launch since ``d2`` is the underlying (cuda) resource for the generic resource, ``r2``.
-
 Since we are using the ``ResourceAwarePool``, we will not cause a data race from trying to reuse that memory. If the 
-memory is still being used by ``r1`` by the time ``r2`` is requesting it, it will be in a ``_``pending``_`` state and thus
-not resued by ``r2``. Instead, ``r2`` will be given a different piece of memory.
+memory is still being used by ``d1`` by the time ``d2`` is requesting it, it will be in a ``_``pending``_`` state and thus
+not resued by ``d2``. Instead, ``d2`` will be given a different piece of memory.
 
 The ``ResourceAwarePool`` will also be useful for avoiding data races in a situation where host and device
 share a single memory space. In the case of a single memory space, just having two or more camp resources, 
