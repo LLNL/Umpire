@@ -10,6 +10,12 @@
 
 using namespace camp::resources;
 
+#if defined(UMPIRE_ENABLE_CUDA)
+using resource_type = Cuda;
+#elif defined(UMPIRE_ENABLE_HIP)
+using resource_type = Hip;
+#endif
+
 constexpr int ITER = 5;
 constexpr int NUM = 2048;
 const int NUM_PER_BLOCK = 256;
@@ -72,19 +78,19 @@ void QuickPool_check(umpire::Allocator quick_pool)
   bool error{false};
 
   // Create hip streams
-  hipStream_t s1, s2;
-  hipStreamCreate(&s1); hipStreamCreate(&s2);
+  auto s1 = resource_type().get_stream();
+  auto s2 = resource_type().get_stream();
 
   double* a = static_cast<double*>(quick_pool.allocate(NUM * sizeof(double)));
 
-  hipLaunchKernelGGL(touch_data, dim3(NUM_BLOCKS), dim3(NUM_PER_BLOCK), 0, s1, a);
-  hipLaunchKernelGGL(do_sleep, dim3(NUM_BLOCKS), dim3(NUM_PER_BLOCK), 0, s1);
-  hipLaunchKernelGGL(check_data, dim3(NUM_BLOCKS), dim3(NUM_PER_BLOCK), 0, s1, a);
+  touch_data<<<NUM_BLOCKS, NUM_PER_BLOCK, 0, s1>>>(a);
+  do_sleep<<<NUM_BLOCKS, NUM_PER_BLOCK, 0, s1>>>();
+  check_data<<<NUM_BLOCKS, NUM_PER_BLOCK, 0, s1>>>(a);
 
   quick_pool.deallocate(a);
   a = static_cast<double*>(quick_pool.allocate(NUM * sizeof(double)));
 
-  hipLaunchKernelGGL(touch_data_again, dim3(NUM_BLOCKS), dim3(NUM_PER_BLOCK), 0, s2, a);
+  touch_data_again<<<NUM_BLOCKS, NUM_PER_BLOCK, 0, s2>>>(a);
 
   double* b = static_cast<double*>(quick_pool.allocate(NUM * sizeof(double)));
   rm.copy(b, a);
@@ -105,13 +111,12 @@ void QuickPool_check(umpire::Allocator quick_pool)
 
   quick_pool.deallocate(a);
   rm.deallocate(b);
-  hipStreamDestroy(s1); hipStreamDestroy(s2);
 }
 
 void ResourceAwarePool_check(umpire::Allocator rap_pool)
 {
   // Create hip resources
-  Hip d1, d2;
+  resource_type d1, d2;
   Resource r1{d1}, r2{d2};
 
   // ResourceAwarePool checks
@@ -121,14 +126,14 @@ void ResourceAwarePool_check(umpire::Allocator rap_pool)
   for(int i = 0; i < ITER; i++) {
     double* a = static_cast<double*>(rap_pool.allocate(r1, NUM * sizeof(double)));
 
-    hipLaunchKernelGGL(touch_data, dim3(NUM_BLOCKS), dim3(NUM_PER_BLOCK), 0, d1.get_stream(), a);
-    hipLaunchKernelGGL(do_sleep, dim3(NUM_BLOCKS), dim3(NUM_PER_BLOCK), 0, d1.get_stream());
-    hipLaunchKernelGGL(check_data, dim3(NUM_BLOCKS), dim3(NUM_PER_BLOCK), 0, d1.get_stream(), a);
+    touch_data<<<NUM_BLOCKS, NUM_PER_BLOCK, 0, d1.get_stream()>>>(a);
+    do_sleep<<<NUM_BLOCKS, NUM_PER_BLOCK, 0, d1.get_stream()>>>();
+    check_data<<<NUM_BLOCKS, NUM_PER_BLOCK, 0, d1.get_stream()>>>(a);
 
     rap_pool.deallocate(r1, a);
     a = static_cast<double*>(rap_pool.allocate(r2, NUM * sizeof(double)));
 
-    hipLaunchKernelGGL(touch_data_again, dim3(NUM_BLOCKS), dim3(NUM_PER_BLOCK), 0, d2.get_stream(), a);
+    touch_data_again<<<NUM_BLOCKS, NUM_PER_BLOCK, 0, d2.get_stream()>>>(a);
 
     double* b = static_cast<double*>(rap_pool.allocate(r2, NUM * sizeof(double)));
     rm.copy(b, a);
