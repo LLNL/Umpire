@@ -15,12 +15,12 @@
 
 #include "camp/camp.hpp"
 #include "camp/resource.hpp"
+#include "umpire/Umpire.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/PoolCoalesceHeuristic.hpp"
 #include "umpire/strategy/mixins/AlignedAllocation.hpp"
 #include "umpire/util/FixedMallocPool.hpp"
 #include "umpire/util/MemoryResourceTraits.hpp"
-#include "umpire/Umpire.hpp"
 
 using Resource = camp::resources::Resource;
 using Event = camp::resources::Event;
