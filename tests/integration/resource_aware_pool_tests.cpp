@@ -18,9 +18,9 @@
 using namespace camp::resources;
 
 #if defined(UMPIRE_ENABLE_CUDA)
-  using resource_type = Cuda;
+using resource_type = Cuda;
 #elif defined(UMPIRE_ENABLE_HIP)
-  using resource_type = Hip;
+using resource_type = Hip;
 #endif
 
 std::string unique_name()
@@ -122,8 +122,8 @@ class ResourceAwarePoolTest : public ::testing::TestWithParam<std::string> {
   virtual void SetUp()
   {
     auto& rm = umpire::ResourceManager::getInstance();
-    m_pool = rm.makeAllocator<umpire::strategy::ResourceAwarePool>(std::string{"rap-pool-" + GetParam() + unique_name()},
-                                                                   rm.getAllocator(GetParam()));
+    m_pool = rm.makeAllocator<umpire::strategy::ResourceAwarePool>(
+        std::string{"rap-pool-" + GetParam() + unique_name()}, rm.getAllocator(GetParam()));
   }
 
   virtual void TearDown()
