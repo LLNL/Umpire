@@ -33,7 +33,7 @@ __device__ void sleep(clock_value_t sleep_cycles)
 
 __global__ void do_sleep()
 {
-  // sleep - works still at 1000, so keeping it at 100k
+  // Sleep in kernel in order to replicate data race
   sleep(100000000);
 }
 
