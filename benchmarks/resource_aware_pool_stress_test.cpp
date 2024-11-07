@@ -93,6 +93,7 @@ void QuickPool_check(umpire::Allocator quick_pool)
   touch_data_again<<<NUM_BLOCKS, NUM_PER_BLOCK, 0, s2>>>(a);
 
   double* b = static_cast<double*>(quick_pool.allocate(NUM * sizeof(double)));
+  resource_type().get_event().wait();
   rm.copy(b, a);
   b = static_cast<double*>(rm.move(b, rm.getAllocator("HOST")));
 
@@ -136,6 +137,7 @@ void ResourceAwarePool_check(umpire::Allocator rap_pool)
     touch_data_again<<<NUM_BLOCKS, NUM_PER_BLOCK, 0, d2.get_stream()>>>(a);
 
     double* b = static_cast<double*>(rap_pool.allocate(r2, NUM * sizeof(double)));
+    r2.get_event().wait();
     rm.copy(b, a);
     b = static_cast<double*>(rm.move(b, rm.getAllocator("HOST")));
 

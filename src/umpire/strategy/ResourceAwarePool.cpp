@@ -57,25 +57,18 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource r, std::siz
   Chunk* chunk{nullptr};
 
   if (!m_pending_list.empty()) {
-    for (auto it = m_pending_list.begin(); it != m_pending_list.end();) {
+    for (auto it = m_pending_list.begin(); it != m_pending_list.end(); it++) {
       auto pending_chunk = (*it);
-
       if (pending_chunk->size >= rounded_bytes && pending_chunk->m_resource == r) { // reusing chunk with same resource
         chunk = pending_chunk;
-        chunk->m_resource = pending_chunk->m_resource;
-        chunk->m_event = pending_chunk->m_event;
         chunk->free = false;
         m_pending_list.erase(it);
         break;
       }
-
-      if (pending_chunk->free == false && pending_chunk->m_event.check()) // reuse no-longer-pending chunk
-      {
+      if (pending_chunk->free == false && pending_chunk->m_event.check()) { // reuse no-longer-pending chunk
         do_deallocate(pending_chunk, pending_chunk->data);
         break;
       }
-
-      it++;
     }
   }
 
