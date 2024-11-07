@@ -56,8 +56,8 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource r, std::siz
   const std::size_t rounded_bytes{aligned_round_up(bytes)};
   Chunk* chunk{nullptr};
 
-  if (!m_pending_map.empty()) {
-    for (auto it = m_pending_map.begin(); it != m_pending_map.end();) {
+  if (!m_pending_list.empty()) {
+    for (auto it = m_pending_list.begin(); it != m_pending_list.end();) {
       auto pending_chunk = (*it);
 
       if (pending_chunk->size >= rounded_bytes && pending_chunk->m_resource == r) { // reusing chunk with same resource
@@ -65,7 +65,7 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource r, std::siz
         chunk->m_resource = pending_chunk->m_resource;
         chunk->m_event = pending_chunk->m_event;
         chunk->free = false;
-        m_pending_map.erase(it);
+        m_pending_list.erase(it);
         break;
       }
 
@@ -189,10 +189,10 @@ void ResourceAwarePool::do_deallocate(Chunk* chunk, void* ptr) noexcept
   chunk->free = true;
 
   // Removing chunk from pending
-  for (auto it = m_pending_map.begin(); it != m_pending_map.end();) {
+  for (auto it = m_pending_list.begin(); it != m_pending_list.end();) {
     auto my_chunk = (*it);
     if (my_chunk == chunk) {
-      m_pending_map.erase(it);
+      it = m_pending_list.erase(it);
     } else {
       it++;
     }
@@ -285,7 +285,7 @@ void ResourceAwarePool::deallocate_resource(camp::resources::Resource r, void* p
     do_deallocate(chunk, ptr);
   } else {
     // Chunk is now pending, add to list
-    m_pending_map.push_back(chunk);
+    m_pending_list.push_back(chunk);
   }
 
   std::size_t suggested_size{m_should_coalesce(*this)};
@@ -303,17 +303,12 @@ void ResourceAwarePool::release()
   std::size_t prev_size{m_actual_bytes};
 #endif
 
-  // TODO:
-  // This will check all chunks in m_pending_map and erase the entry if event is complete
-  for (auto it = m_pending_map.begin(); it != m_pending_map.end();) {
+  for (auto it = m_pending_list.begin(); it != m_pending_list.end();) {
     auto chunk = (*it);
-    if (chunk != nullptr && chunk->free == false && chunk->m_event.check()) {
-      m_free_map.insert(std::make_pair(chunk->size, chunk));
-      chunk->free = true;
-      m_pending_map.erase(it);
-    } else {
-      it++;
-    }
+    chunk->m_event.wait();
+    chunk->free = true;
+    m_free_map.insert(std::make_pair(chunk->size, chunk));
+    it = m_pending_list.erase(it);
   }
 
   for (auto pair = m_free_map.begin(); pair != m_free_map.end();) {
@@ -370,7 +365,7 @@ std::size_t ResourceAwarePool::getTotalBlocks() const noexcept
 
 std::size_t ResourceAwarePool::getNumPending() const noexcept
 {
-  return m_pending_map.size();
+  return m_pending_list.size();
 }
 
 std::size_t ResourceAwarePool::getActualSize() const noexcept
@@ -405,7 +400,7 @@ Platform ResourceAwarePool::getPlatform() noexcept
 
 camp::resources::Resource ResourceAwarePool::getResource(void* ptr) const
 {
-  for (auto& chunk : m_pending_map) { // check pending chunks
+  for (auto& chunk : m_pending_list) { // check pending chunks
     if (chunk->data == ptr) {
       return chunk->m_resource;
     }
@@ -445,7 +440,7 @@ bool ResourceAwarePool::tracksMemoryUse() const noexcept
 
 std::size_t ResourceAwarePool::getBlocksInPool() const noexcept
 {
-  return m_used_map.size() + m_free_map.size() + m_pending_map.size();
+  return m_used_map.size() + m_free_map.size() + m_pending_list.size();
 }
 
 std::size_t ResourceAwarePool::getLargestAvailableBlock() noexcept

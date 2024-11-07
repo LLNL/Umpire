@@ -71,7 +71,7 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
 
   ResourceAwarePool(const ResourceAwarePool&) = delete;
 
-  // Granting the gtest function access to private methods below
+  // Granting the Umpire free function access to private methods below for testing
   friend camp::resources::Resource umpire::getResource(Allocator a, void* ptr);
   friend std::size_t umpire::getNumPending(Allocator a);
 
@@ -176,7 +176,7 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
   };
 
   using PointerMap = std::unordered_map<void*, Chunk*>;
-  using PendingMap = std::vector<Chunk*>;
+  using PendingList = std::list<Chunk*>;
   using SizeMap =
       std::multimap<std::size_t, Chunk*, std::less<std::size_t>, pool_allocator<std::pair<const std::size_t, Chunk*>>>;
 
@@ -213,7 +213,7 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
  private:
   PointerMap m_used_map{};
   SizeMap m_free_map{};
-  PendingMap m_pending_map{};
+  PendingList m_pending_list{};
 
   util::FixedMallocPool m_chunk_pool{sizeof(Chunk)};
 

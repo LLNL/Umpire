@@ -134,7 +134,7 @@ class ResourceAwarePoolTest : public ::testing::TestWithParam<std::string> {
   umpire::Allocator m_pool;
 };
 
-TEST_P(ResourceAwarePoolTest, Check_States)
+TEST_P(ResourceAwarePoolTest, CheckStates)
 {
   resource_type d1, d2;
   Resource r1{d1}, r2{d2};
@@ -162,9 +162,9 @@ TEST_P(ResourceAwarePoolTest, ExplicitSync)
   resource_type d1, d2;
 
   double* ptr = static_cast<double*>(m_pool.allocate(d1, 1024));
+  EXPECT_EQ(getResource(m_pool, ptr), Resource{d1});
 
   do_sleep<<<1, 32, 0, d1.get_stream()>>>(ptr);
-  EXPECT_EQ(getResource(m_pool, ptr), Resource{d1});
 
   m_pool.deallocate(d1, ptr);
   d1.get_event().wait(); // explicitly sync the device streams (camp resources)
@@ -173,6 +173,22 @@ TEST_P(ResourceAwarePoolTest, ExplicitSync)
   EXPECT_EQ(getResource(m_pool, ptr2), Resource{d2});
   EXPECT_FALSE(d1 == d2);
   EXPECT_EQ(ptr, ptr2); // multiple device resources, but with explicit sync, ptr is same
+}
+
+TEST_P(ResourceAwarePoolTest, ReleaseCheck)
+{
+  resource_type d1;
+
+  double* ptr = static_cast<double*>(m_pool.allocate(d1, 1024));
+  EXPECT_EQ(getResource(m_pool, ptr), Resource{d1});
+
+  do_sleep<<<1, 32, 0, d1.get_stream()>>>(ptr);
+
+  m_pool.deallocate(d1, ptr);
+  EXPECT_EQ(getNumPending(m_pool), 1);
+
+  m_pool.release();
+  EXPECT_EQ(getNumPending(m_pool), 0);
 }
 
 INSTANTIATE_TEST_SUITE_P(ResourceAwarePoolTests, ResourceAwarePoolTest, ::testing::ValuesIn(get_allocator_strings()));
