@@ -287,7 +287,7 @@ util::AllocationRecord deregister_external_allocation(void* ptr)
   return rm.deregisterAllocation(ptr);
 }
 
-Resource getResource(Allocator a, void* ptr)
+camp::resources::Resource get_resource(Allocator a, void* ptr)
 {
   UMPIRE_LOG(Warning,
              "This function will return a generic Camp resource which is not comparable to a specific Camp resource!");
@@ -302,7 +302,7 @@ Resource getResource(Allocator a, void* ptr)
   return rap->getResource(ptr);
 }
 
-std::size_t getNumPending(Allocator a)
+std::size_t get_num_pending(Allocator a)
 {
   auto s = a.getAllocationStrategy();
   strategy::ResourceAwarePool* rap{dynamic_cast<strategy::ResourceAwarePool*>(s)};

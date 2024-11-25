@@ -19,8 +19,6 @@
 #include "umpire/util/MPI.hpp"
 #include "umpire/util/io.hpp"
 
-using Resource = camp::resources::Resource;
-
 namespace umpire {
 
 inline void initialize(
@@ -202,7 +200,7 @@ util::AllocationRecord deregister_external_allocation(void* ptr);
  * \return Camp resource associated with the allocation *assuming the Allocator
  * passed in is a ResourceAwarePool strategy and the allocation is either used or pending*
  */
-Resource getResource(Allocator a, void* ptr);
+camp::resources::Resource get_resource(Allocator a, void* ptr);
 
 /*!
  * \brief Returns the number of pending chunks associated with a ResourceAwarePool Allocator
@@ -212,7 +210,7 @@ Resource getResource(Allocator a, void* ptr);
  *
  * \return Number of currently pending chunks in the ResourceAwarePool
  */
-std::size_t getNumPending(Allocator a);
+std::size_t get_num_pending(Allocator a);
 
 /*!
  * \brief Attempt to coalesce Allocator a, return true if a coalesce was performed.
