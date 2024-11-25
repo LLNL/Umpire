@@ -190,7 +190,7 @@ void ResourceAwarePool::do_deallocate(Chunk* chunk, void* ptr) noexcept
       it++;
     }
   }
-  
+
   UMPIRE_LOG(Debug, "In the do_deallocate function. Deallocating data held by " << chunk);
 
   if (chunk->prev && chunk->prev->free == true) {
