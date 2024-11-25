@@ -59,13 +59,13 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource r, std::siz
   if (!m_pending_list.empty()) {
     for (auto it = m_pending_list.begin(); it != m_pending_list.end(); it++) {
       auto pending_chunk = (*it);
-      if (pending_chunk->size >= rounded_bytes && pending_chunk->m_resource == r) { // reusing chunk with same resource
+      if (pending_chunk->size >= rounded_bytes && pending_chunk->resource == r) { // reusing chunk with same resource
         chunk = pending_chunk;
         chunk->free = false;
         m_pending_list.erase(it);
         break;
       }
-      if (pending_chunk->free == false && pending_chunk->m_event.check()) { // reuse no-longer-pending chunk
+      if (pending_chunk->free == false && pending_chunk->event.check()) { // reuse no-longer-pending chunk
         do_deallocate(pending_chunk, pending_chunk->data);
         break;
       }
@@ -118,7 +118,7 @@ void* ResourceAwarePool::allocate_resource(camp::resources::Resource r, std::siz
       chunk = new (chunk_storage) Chunk{ret, size, size, r};
     } else {
       chunk = (*best).second;
-      chunk->m_resource = r;
+      chunk->resource = r;
       m_free_map.erase(best);
     }
   }
@@ -202,8 +202,8 @@ void ResourceAwarePool::do_deallocate(Chunk* chunk, void* ptr) noexcept
     prev->size += chunk->size;
     prev->next = chunk->next;
 
-    prev->m_event = chunk->m_event;
-    prev->m_resource = chunk->m_resource;
+    prev->event = chunk->event;
+    prev->resource = chunk->resource;
 
     if (prev->next)
       prev->next->prev = prev;
@@ -225,8 +225,8 @@ void ResourceAwarePool::do_deallocate(Chunk* chunk, void* ptr) noexcept
     chunk->size += next->size;
     chunk->next = next->next;
 
-    chunk->m_event = next->m_event;
-    chunk->m_resource = next->m_resource;
+    chunk->event = next->event;
+    chunk->resource = next->resource;
 
     if (chunk->next)
       chunk->next->prev = chunk;
@@ -258,7 +258,7 @@ void ResourceAwarePool::deallocate_resource(camp::resources::Resource r, void* p
     UMPIRE_ERROR(runtime_error, fmt::format("The chunk can't be found! Called deallocate with ptr: {}", ptr));
   }
 
-  auto my_r = getResource(ptr);
+  auto my_r = chunk->resource;
   if (my_r != r) {
     UMPIRE_ERROR(
         runtime_error,
@@ -267,14 +267,14 @@ void ResourceAwarePool::deallocate_resource(camp::resources::Resource r, void* p
   }
 
   if (m_is_coalescing == false) {
-    chunk->m_event = r.get_event();
+    chunk->event = r.get_event();
   }
 
   m_used_map.erase(ptr);
   m_aligned_bytes -= chunk->size;
 
   // Call deallocate logic only for a non-pending chunk
-  if (chunk->m_event.check()) {
+  if (chunk->event.check()) {
     do_deallocate(chunk, ptr);
   } else {
     // Chunk is now pending, add to list
@@ -298,7 +298,7 @@ void ResourceAwarePool::release()
 
   for (auto it = m_pending_list.begin(); it != m_pending_list.end();) {
     auto chunk = (*it);
-    chunk->m_event.wait();
+    chunk->event.wait();
     chunk->free = true;
     m_free_map.insert(std::make_pair(chunk->size, chunk));
     it = m_pending_list.erase(it);
@@ -395,13 +395,13 @@ camp::resources::Resource ResourceAwarePool::getResource(void* ptr) const
 {
   for (auto& chunk : m_pending_list) { // check pending chunks
     if (chunk->data == ptr) {
-      return chunk->m_resource;
+      return chunk->resource;
     }
   }
   auto it = m_used_map.find(ptr); // check used chunks
   if (it != m_used_map.end()) {
     auto chunk = it->second;
-    return chunk->m_resource;
+    return chunk->resource;
   }
   for (auto pair = m_free_map.begin(); pair != m_free_map.end(); pair++) {
     auto chunk = (*pair).second;
@@ -411,7 +411,7 @@ camp::resources::Resource ResourceAwarePool::getResource(void* ptr) const
           fmt::format(
               "Ptr {} corresponded to a free chunk in the ResourceAwarePool, so the resource may no longer be valid...",
               ptr));
-      return chunk->m_resource;
+      return chunk->resource;
     }
   }
 

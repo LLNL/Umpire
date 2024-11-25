@@ -66,7 +66,7 @@ class Allocator : private strategy::mixins::Inspector, strategy::mixins::Allocat
    */
   inline void* allocate(std::size_t bytes);
 
-  inline void* allocate(Resource const& r, std::size_t bytes);
+  inline void* allocate(camp::resources::Resource const& r, std::size_t bytes);
 
   inline void* allocate(const std::string& name, std::size_t bytes);
 
@@ -83,7 +83,7 @@ class Allocator : private strategy::mixins::Inspector, strategy::mixins::Allocat
    */
   inline void deallocate(void* ptr);
 
-  inline void deallocate(Resource const& r, void* ptr);
+  inline void deallocate(camp::resources::Resource const& r, void* ptr);
 
   /*!
    * \brief Release any and all unused memory held by this Allocator.

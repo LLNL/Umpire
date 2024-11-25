@@ -72,8 +72,8 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
   ResourceAwarePool(const ResourceAwarePool&) = delete;
 
   // Granting the Umpire free function access to private methods below for testing
-  friend camp::resources::Resource umpire::getResource(Allocator a, void* ptr);
-  friend std::size_t umpire::getNumPending(Allocator a);
+  friend camp::resources::Resource umpire::get_resource(Allocator a, void* ptr);
+  friend std::size_t umpire::get_num_pending(Allocator a);
 
   // Allocate function needed since we inherit from AllocationStrategy.
   // If this method is called, it will be an error (Need to call allocate_resource
@@ -195,7 +195,7 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
 
  public:
   struct Chunk {
-    Chunk(void* ptr, std::size_t s, std::size_t cs, Resource r) : data{ptr}, size{s}, chunk_size{cs}, m_resource{r}
+    Chunk(void* ptr, std::size_t s, std::size_t cs, Resource r) : data{ptr}, size{s}, chunk_size{cs}, resource{r}
     {
     }
 
@@ -206,8 +206,8 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
     Chunk* prev{nullptr};
     Chunk* next{nullptr};
     SizeMap::iterator size_map_it;
-    Resource m_resource;
-    Event m_event;
+    Resource resource;
+    Event event;
   };
 
  private:
