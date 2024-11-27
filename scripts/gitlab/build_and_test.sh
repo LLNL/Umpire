@@ -167,6 +167,12 @@ fi
 hostconfig=$(basename ${hostconfig_path})
 echo "[Information]: Found hostconfig ${hostconfig_path}"
 
+# Create a copy of the hostconfig file with extension readable in GitLab UI (only in CI).
+if [[ -n ${job_unique_id} ]]
+then
+    cp ${hostconfig_path} ${project_dir}/${hostconfig}.txt
+fi
+
 # Build Directory
 # When using /dev/shm, we use prefix for both spack builds and source build, unless BUILD_ROOT was defined
 build_root=${BUILD_ROOT:-"${prefix}"}
