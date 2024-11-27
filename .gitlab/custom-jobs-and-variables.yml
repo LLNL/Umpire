@@ -68,6 +68,8 @@ variables:
 # See Umpire for an example (export junit test reports).
 .custom_job:
   artifacts:
+    paths:
+      - *.cmake
     reports:
       junit: junit.xml
 
