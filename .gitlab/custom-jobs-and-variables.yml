@@ -69,7 +69,7 @@ variables:
 .custom_job:
   artifacts:
     paths:
-      - ./*.cmake.txt
+      - ./*.cmake
     reports:
       junit: junit.xml
 
