@@ -68,10 +68,12 @@ variables:
 # See Umpire for an example (export junit test reports).
 .custom_job:
   artifacts:
-    paths:
-      - ./*.cmake
     reports:
       junit: junit.xml
+    name:
+      - ${CI_PROJECT_NAME}-${CI_MACHINE}-${CI_JOB_NAME}-${CI_PIPELINE_ID}
+    paths:
+      - ./*.cmake
 
 .reproducer_vars:
   script:
