@@ -146,7 +146,7 @@ TEST_P(ResourceAwarePoolTest, CheckStates)
 
   do_sleep<<<1, 32, 0, d1.get_stream()>>>(ptr);
 
-  EXPECT_THROW(m_pool.deallocate(ptr, r2));
+  EXPECT_THROW(m_pool.deallocate(ptr, r2), umpire::runtime_error);
   EXPECT_NO_THROW(m_pool.deallocate(ptr, r1));
 
   EXPECT_EQ(get_num_pending(m_pool), 1);
