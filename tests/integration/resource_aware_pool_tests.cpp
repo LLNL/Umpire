@@ -50,7 +50,7 @@ TEST(ResourceAwarePool_Host_Test, Check_States_Host)
   auto pool = rm.makeAllocator<umpire::strategy::ResourceAwarePool>("rap-pool-host", rm.getAllocator("HOST"));
 
   Resource r1{Host{}}, r2{Host{}};
-  int* ptr = static_cast<int*>(pool.allocate(r1, 1024));
+  int* ptr = static_cast<int*>(pool.allocate(1024, r1));
   int* compare_ptr1 = ptr;
 
   EXPECT_EQ(get_resource(pool, ptr), r1);
@@ -58,15 +58,15 @@ TEST(ResourceAwarePool_Host_Test, Check_States_Host)
 
   host_sleep(ptr);
 
-  pool.deallocate(r1, ptr);
+  pool.deallocate(ptr, r1);
   EXPECT_EQ(get_num_pending(pool), 0); // When only using host, there will be no pending chunks
 
-  ptr = static_cast<int*>(pool.allocate(r2, 1024));
+  ptr = static_cast<int*>(pool.allocate(1024, r2));
   int* compare_ptr2 = ptr;
 
   EXPECT_TRUE(r1 == r2);
   EXPECT_EQ(compare_ptr1, compare_ptr2); // only 1 host resource available, no possible data race
-  pool.deallocate(r2, ptr);
+  pool.deallocate(ptr, r2);
 }
 
 #if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
@@ -139,18 +139,18 @@ TEST_P(ResourceAwarePoolTest, CheckStates)
   resource_type d1, d2;
   Resource r1{d1}, r2{d2};
 
-  double* ptr = static_cast<double*>(m_pool.allocate(r1, 1024));
+  double* ptr = static_cast<double*>(m_pool.allocate(1024, r1));
 
   EXPECT_EQ(get_resource(m_pool, ptr), r1);
   EXPECT_EQ(get_num_pending(m_pool), 0);
 
   do_sleep<<<1, 32, 0, d1.get_stream()>>>(ptr);
 
-  m_pool.deallocate(r1, ptr);
+  m_pool.deallocate(ptr, r1);
 
   EXPECT_EQ(get_num_pending(m_pool), 1);
 
-  double* ptr2 = static_cast<double*>(m_pool.allocate(r2, 1024));
+  double* ptr2 = static_cast<double*>(m_pool.allocate(1024, r2));
 
   EXPECT_FALSE(r1 == r2);
   EXPECT_EQ(get_resource(m_pool, ptr2), r2);
@@ -161,14 +161,14 @@ TEST_P(ResourceAwarePoolTest, ExplicitSync)
 {
   resource_type d1, d2;
 
-  double* ptr = static_cast<double*>(m_pool.allocate(d1, 1024));
+  double* ptr = static_cast<double*>(m_pool.allocate(1024, d1));
   EXPECT_EQ(get_resource(m_pool, ptr), Resource{d1});
 
   do_sleep<<<1, 32, 0, d1.get_stream()>>>(ptr);
 
-  m_pool.deallocate(d1, ptr);
+  m_pool.deallocate(ptr, d1);
   d1.get_event().wait(); // explicitly sync the device streams (camp resources)
-  double* ptr2 = static_cast<double*>(m_pool.allocate(d2, 1024));
+  double* ptr2 = static_cast<double*>(m_pool.allocate(1024, d2));
 
   EXPECT_EQ(get_resource(m_pool, ptr2), Resource{d2});
   EXPECT_FALSE(d1 == d2);
@@ -179,12 +179,12 @@ TEST_P(ResourceAwarePoolTest, ReleaseCheck)
 {
   resource_type d1;
 
-  double* ptr = static_cast<double*>(m_pool.allocate(d1, 1024));
+  double* ptr = static_cast<double*>(m_pool.allocate(1024, d1));
   EXPECT_EQ(get_resource(m_pool, ptr), Resource{d1});
 
   do_sleep<<<1, 32, 0, d1.get_stream()>>>(ptr);
 
-  m_pool.deallocate(d1, ptr);
+  m_pool.deallocate(ptr, d1);
   EXPECT_EQ(get_num_pending(m_pool), 1);
 
   m_pool.release();

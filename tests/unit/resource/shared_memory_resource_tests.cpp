@@ -125,7 +125,7 @@ class SharedMemoryTest : public ::testing::Test {
 
     while (allocation_size != 0) {
       try {
-        ptr = allocator.allocate(std::string("AllocLargest"), allocation_size);
+        ptr = allocator.allocate("AllocLargest", allocation_size);
         break;
       } catch (...) {
         allocation_size--;
@@ -169,7 +169,7 @@ TEST_F(SharedMemoryTest, UnitTests)
   MPI_Barrier(MPI_COMM_WORLD);
   {
     std::size_t allocation_size{m_segment_size + 1};
-    ASSERT_THROW(allocator.allocate(std::string("AllocTooMuch"), allocation_size), umpire::runtime_error);
+    ASSERT_THROW(allocator.allocate("AllocTooMuch", allocation_size), umpire::runtime_error);
   }
 
   MPI_Barrier(MPI_COMM_WORLD);
@@ -177,7 +177,7 @@ TEST_F(SharedMemoryTest, UnitTests)
     if (m_rank == 0) {
       for (int loop{0}; loop < 100; loop++) {
         ASSERT_NO_THROW(allocator.deallocate(
-            allocator.allocate(std::string("AllocLargest"), shmem_state->largest_allocation_size)););
+            allocator.allocate("AllocLargest", shmem_state->largest_allocation_size)););
       }
     }
   }

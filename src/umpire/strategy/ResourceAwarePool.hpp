@@ -86,7 +86,7 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
    * \param r The Camp resource that will own the memory
    * \param bytes The size in bytes for the allocation
    */
-  void* allocate_resource(Resource r, std::size_t bytes) override;
+  void* allocate_resource(std::size_t bytes, camp::resources::Resource r) override;
 
   /*!
    * \brief Deallocate memory with the ResourceAwarePool
@@ -95,7 +95,7 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
    * \param ptr A pointer to the memory allocation
    * \param bytes The size in bytes for the allocation
    */
-  void deallocate_resource(Resource r, void* ptr, std::size_t size) override;
+  void deallocate_resource(void* ptr, camp::resources::Resource r, std::size_t size) override;
 
   /*!
    * \brief Deallocate function will call private getResource function

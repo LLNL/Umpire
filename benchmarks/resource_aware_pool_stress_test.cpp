@@ -125,18 +125,18 @@ void ResourceAwarePool_check(umpire::Allocator rap_pool)
   bool error{false};
 
   for(int i = 0; i < ITER; i++) {
-    double* a = static_cast<double*>(rap_pool.allocate(r1, NUM * sizeof(double)));
+    double* a = static_cast<double*>(rap_pool.allocate(NUM * sizeof(double), r1));
 
     touch_data<<<NUM_BLOCKS, NUM_PER_BLOCK, 0, d1.get_stream()>>>(a);
     do_sleep<<<NUM_BLOCKS, NUM_PER_BLOCK, 0, d1.get_stream()>>>();
     check_data<<<NUM_BLOCKS, NUM_PER_BLOCK, 0, d1.get_stream()>>>(a);
 
-    rap_pool.deallocate(r1, a);
-    a = static_cast<double*>(rap_pool.allocate(r2, NUM * sizeof(double)));
+    rap_pool.deallocate(a, r1);
+    a = static_cast<double*>(rap_pool.allocate(NUM * sizeof(double), r2));
 
     touch_data_again<<<NUM_BLOCKS, NUM_PER_BLOCK, 0, d2.get_stream()>>>(a);
 
-    double* b = static_cast<double*>(rap_pool.allocate(r2, NUM * sizeof(double)));
+    double* b = static_cast<double*>(rap_pool.allocate(NUM * sizeof(double), r2));
     r2.get_event().wait();
     rm.copy(b, a);
     b = static_cast<double*>(rm.move(b, rm.getAllocator("HOST")));
@@ -154,7 +154,7 @@ void ResourceAwarePool_check(umpire::Allocator rap_pool)
       std::cout << "Kernel succeeded! Expected result returned" << std::endl;
     }
 
-    rap_pool.deallocate(r2, a);
+    rap_pool.deallocate(a, r2);
     rm.deallocate(b);
     error = false; // reset to find any new errors in next iter
   }

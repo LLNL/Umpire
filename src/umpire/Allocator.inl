@@ -53,10 +53,10 @@ inline void* Allocator::thread_safe_allocate(std::size_t bytes)
   return do_allocate(bytes);
 }
 
-inline void* Allocator::thread_safe_resource_allocate(camp::resources::Resource const& r, std::size_t bytes)
+inline void* Allocator::thread_safe_resource_allocate(std::size_t bytes, camp::resources::Resource const& r)
 {
   std::lock_guard<std::mutex> lock(*m_thread_safe_mutex);
-  return do_resource_allocate(r, bytes);
+  return do_resource_allocate(bytes, r);
 }
 
 inline void* Allocator::thread_safe_named_allocate(const std::string& name, std::size_t bytes)
@@ -71,10 +71,10 @@ inline void Allocator::thread_safe_deallocate(void* ptr)
   return do_deallocate(ptr);
 }
 
-inline void Allocator::thread_safe_resource_deallocate(camp::resources::Resource const& r, void* ptr)
+inline void Allocator::thread_safe_resource_deallocate(void* ptr, camp::resources::Resource const& r)
 {
   std::lock_guard<std::mutex> lock(*m_thread_safe_mutex);
-  return do_resource_deallocate(r, ptr);
+  return do_resource_deallocate(ptr, r);
 }
 
 inline void* Allocator::do_named_allocate(const std::string& name, std::size_t bytes)
@@ -100,7 +100,7 @@ inline void* Allocator::do_named_allocate(const std::string& name, std::size_t b
   return ret;
 }
 
-inline void* Allocator::do_resource_allocate(camp::resources::Resource const& r, std::size_t bytes)
+inline void* Allocator::do_resource_allocate(std::size_t bytes, camp::resources::Resource const& r)
 {
   void* ret = nullptr;
 
@@ -111,7 +111,7 @@ inline void* Allocator::do_resource_allocate(camp::resources::Resource const& r,
   if (0 == bytes) {
     ret = allocateNull();
   } else {
-    ret = m_allocator->allocate_resource(r, bytes);
+    ret = m_allocator->allocate_resource(bytes, r);
   }
 
   if (m_tracking) {
@@ -146,7 +146,7 @@ inline void Allocator::do_deallocate(void* ptr)
   }
 }
 
-inline void Allocator::do_resource_deallocate(camp::resources::Resource const& r, void* ptr)
+inline void Allocator::do_resource_deallocate(void* ptr, camp::resources::Resource const& r)
 {
   umpire::event::record<umpire::event::deallocate_resource>(
       [&](auto& event) { event.ref((void*)m_allocator).ptr(ptr).res(camp::resources::to_string(r)); });
@@ -160,11 +160,11 @@ inline void Allocator::do_resource_deallocate(camp::resources::Resource const& r
     if (m_tracking) {
       auto record = deregisterAllocation(ptr, m_allocator);
       if (!deallocateNull(ptr)) {
-        m_allocator->deallocate_resource(r, ptr, record.size);
+        m_allocator->deallocate_resource(ptr, r, record.size);
       }
     } else {
       if (!deallocateNull(ptr)) {
-        m_allocator->deallocate_resource(r, ptr);
+        m_allocator->deallocate_resource(ptr, r);
       }
     }
   }
@@ -175,9 +175,9 @@ inline void* Allocator::allocate(std::size_t bytes)
   return m_thread_safe ? thread_safe_allocate(bytes) : do_allocate(bytes);
 }
 
-inline void* Allocator::allocate(camp::resources::Resource const& r, std::size_t bytes)
+inline void* Allocator::allocate(std::size_t bytes, camp::resources::Resource const& r)
 {
-  return m_thread_safe ? thread_safe_resource_allocate(r, bytes) : do_resource_allocate(r, bytes);
+  return m_thread_safe ? thread_safe_resource_allocate(bytes, r) : do_resource_allocate(bytes, r);
 }
 
 inline void* Allocator::allocate(const std::string& name, std::size_t bytes)
@@ -190,9 +190,9 @@ inline void Allocator::deallocate(void* ptr)
   m_thread_safe ? thread_safe_deallocate(ptr) : do_deallocate(ptr);
 }
 
-inline void Allocator::deallocate(camp::resources::Resource const& r, void* ptr)
+inline void Allocator::deallocate(void* ptr, camp::resources::Resource const& r)
 {
-  m_thread_safe ? thread_safe_resource_deallocate(r, ptr) : do_resource_deallocate(r, ptr);
+  m_thread_safe ? thread_safe_resource_deallocate(ptr, r) : do_resource_deallocate(ptr, r);
 }
 
 } // end of namespace umpire

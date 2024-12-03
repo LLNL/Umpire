@@ -50,7 +50,7 @@ void* ResourceAwarePool::allocate(std::size_t UMPIRE_UNUSED_ARG(bytes))
   return ptr;
 }
 
-void* ResourceAwarePool::allocate_resource(camp::resources::Resource r, std::size_t bytes)
+void* ResourceAwarePool::allocate_resource(std::size_t bytes, camp::resources::Resource r)
 {
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ")");
   const std::size_t rounded_bytes{aligned_round_up(bytes)};
@@ -172,7 +172,7 @@ void ResourceAwarePool::deallocate(void* ptr, std::size_t size)
   UMPIRE_LOG(Warning, fmt::format("The ResourceAwarePool requires a Camp resource. Calling deallocate with: {}.",
                                   camp::resources::to_string(r)));
 
-  deallocate_resource(r, ptr, size);
+  deallocate_resource(ptr, r, size);
 }
 
 void ResourceAwarePool::do_deallocate(Chunk* chunk, void* ptr) noexcept
@@ -248,7 +248,7 @@ void ResourceAwarePool::do_deallocate(Chunk* chunk, void* ptr) noexcept
   chunk->size_map_it = m_free_map.insert(std::make_pair(chunk->size, chunk));
 }
 
-void ResourceAwarePool::deallocate_resource(camp::resources::Resource r, void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
+void ResourceAwarePool::deallocate_resource(void* ptr, camp::resources::Resource r, std::size_t UMPIRE_UNUSED_ARG(size))
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   UMPIRE_LOG(Debug, "(Resource=" << camp::resources::to_string(r) << ")");
@@ -475,8 +475,8 @@ void ResourceAwarePool::do_coalesce(std::size_t suggested_size) noexcept
       camp::resources::Resource r = camp::resources::Host().get_default();
 
       UMPIRE_LOG(Debug, "coalescing " << alloc_size << " bytes.");
-      auto ptr = allocate_resource(r, alloc_size);
-      deallocate_resource(r, ptr, alloc_size);
+      auto ptr = allocate_resource(alloc_size, r);
+      deallocate_resource(ptr, r, alloc_size);
     }
   }
   m_is_coalescing = false;

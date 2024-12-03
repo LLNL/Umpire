@@ -32,7 +32,7 @@ size_t* do_allocate(umpire::Allocator* alloc, size_t size)
   size_t* data;
 
   if (alloc->getAllocationStrategy()->getTraits().resource == umpire::MemoryResourceTraits::resource_type::shared) {
-    data = static_cast<size_t*>(alloc->allocate(std::string{"named_allocation"}, size * sizeof(size_t)));
+    data = static_cast<size_t*>(alloc->allocate("named_allocation", size * sizeof(size_t)));
   } else {
     data = static_cast<size_t*>(alloc->allocate(size * sizeof(size_t)));
   }

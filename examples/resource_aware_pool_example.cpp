@@ -71,20 +71,20 @@ int main(int, char**)
   // Create camp resources for RAP
   resource_type d1, d2;
 
-  // allocate memory in the pool with r1
-  double* a = static_cast<double*>(pool.allocate(d1, NUM_THREADS * sizeof(double)));
+  // allocate memory in the pool with d1
+  double* a = static_cast<double*>(pool.allocate(NUM_THREADS * sizeof(double), d1));
   double* ptr1 = a;
 
-  // launch kernels on r1's stream
+  // launch kernels on d1's stream
 #if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
   do_sleep<<<NUM_BLOCKS, BLOCK_SIZE, 0, d1.get_stream()>>>();
 #else
   host_sleep(a);
 #endif
 
-  // deallocate memory with r1 and reallocate using a different stream r2
-  pool.deallocate(d1, a); // Deallocate using resource
-  a = static_cast<double*>(pool.allocate(d2, NUM_THREADS * sizeof(double)));
+  // deallocate memory with d1 and reallocate using a different stream d2
+  pool.deallocate(a, d1); // Deallocate using resource
+  a = static_cast<double*>(pool.allocate(NUM_THREADS * sizeof(double), d2));
   double* ptr2 = a;
 
   // Use Camp resource to synchronize devices
