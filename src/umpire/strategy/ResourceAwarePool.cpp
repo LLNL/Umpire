@@ -40,14 +40,13 @@ ResourceAwarePool::~ResourceAwarePool()
   release();
 }
 
-void* ResourceAwarePool::allocate(std::size_t UMPIRE_UNUSED_ARG(bytes))
+void* ResourceAwarePool::allocate(std::size_t bytes)
 {
-  void* ptr{nullptr};
-  UMPIRE_ERROR(
-      runtime_error,
+  UMPIRE_LOG(Warning,
       fmt::format("The ResourceAwarePool requires a Camp resource. See "
                   "https://umpire.readthedocs.io/en/develop/sphinx/cookbook/resource_aware_pool.html for more info."));
-  return ptr;
+
+  return allocate_resource(bytes, camp::resources::Host().get_default());
 }
 
 void* ResourceAwarePool::allocate_resource(std::size_t bytes, camp::resources::Resource r)
@@ -262,8 +261,8 @@ void ResourceAwarePool::deallocate_resource(void* ptr, camp::resources::Resource
   if (my_r != r) {
     UMPIRE_ERROR(
         runtime_error,
-        fmt::format("Called deallocate with different resource than what is returned by getResource. Called with {},",
-                    "but getResource returned: {}", camp::resources::to_string(r), camp::resources::to_string(my_r)));
+        fmt::format("Called deallocate with a different resource than what was expected. Called with {},",
+                    "but expected: {}", camp::resources::to_string(r), camp::resources::to_string(my_r)));
   }
 
   if (m_is_coalescing == false) {
@@ -415,10 +414,10 @@ camp::resources::Resource ResourceAwarePool::getResource(void* ptr) const
     }
   }
 
-  UMPIRE_ERROR(runtime_error,
-               fmt::format("The pointer {} does not seem to be allocated with the ResourceAwarePool!", ptr));
+  UMPIRE_LOG(Warning, fmt::format("The pointer {} does not seem to be associated with the ResourceAwarePool."
+                                   "Returning the default Host resource...", ptr));
 
-  return camp::resources::Host{}; // Function needs a return
+  return camp::resources::Host().get_default(); // Returning a default resource for the ResourceAwarePool
 }
 
 MemoryResourceTraits ResourceAwarePool::getTraits() const noexcept
