@@ -121,9 +121,9 @@ Then, to allocate memory with your ``ResourceAwarePool`` you can do the followin
 
 .. code-block:: bash
 
-   double* a = static_cast<double*>(pool.allocate(d1, NUM_THREADS * sizeof(double)));
+   double* a = static_cast<double*>(pool.allocate(NUM_THREADS * sizeof(double), d1));
 
-Note that there is an extra parameter when using the ``allocate`` function. The first parameter is 
+Note that there is an extra parameter when using the ``allocate`` function. The second parameter is 
 the resource (``d1``) we want the allocated memory to be associated with. In other words, ``d1`` is
 the device stream we want to launch the kernel on which will use that memory. Next, be sure to launch the kernel using the 
 correct stream. Since we are using Camp resources, we use ``d1`` that we created above. For example:
@@ -137,19 +137,19 @@ To deallocate, use the following code:
 
 .. code-block:: bash
 
-   pool.deallocate(d1, a);
+   pool.deallocate(a, d1);
 
 .. note::
    It can be hard to keep track of which resource corresponds to which pointer. If it is not feasible to keep track
    of that, you can call ``pool.deallocate(ptr)`` as usual. However, this method will call the private ``getResource(ptr)``
-   method on the ``ResourceAwarePool`` instance and then call the correct deallocate_resource method. It is recommended to
-   include a resource with the deallocate method if possible.
+   method on the ``ResourceAwarePool`` instance and then call the deallocate method with the correct resource. 
+   Because of this overhead, it is recommended to include a resource with the deallocate method if possible.
 
 Assuming you need to reallocate memory on ``a`` with ``d2``, you could then launch a second kernel with the second stream. For example:
 
 .. code-block:: bash
 
-   a = static_cast<double*>(pool.allocate(d2, NUM_THREADS * sizeof(double)));
+   a = static_cast<double*>(pool.allocate(NUM_THREADS * sizeof(double), d2));
    ...
    my_other_kernel<<NUM_BLOCKS, BLOCK_SIZE, 0, d2.get_stream()>>>(a, NUM_THREADS);
 
