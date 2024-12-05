@@ -75,34 +75,41 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
   friend camp::resources::Resource umpire::get_resource(Allocator a, void* ptr);
   friend std::size_t umpire::get_num_pending(Allocator a);
 
-  // Allocate function needed since we inherit from AllocationStrategy.
-  // If this method is called, it will be an error (Need to call allocate_resource
-  // with a Camp resource instead).
+  /*!
+   * \brief If this method is called, it will log a warning message and call allocate with the default Host resource.
+   * (Need to call allocate with a Camp resource instead).
+   */
   void* allocate(std::size_t bytes) override;
 
   /*!
    * \brief Allocate memory with the ResourceAwarePool
    *
-   * \param r The Camp resource that will own the memory
    * \param bytes The size in bytes for the allocation
+   * \param r The Camp resource that will own the memory
    */
   void* allocate_resource(std::size_t bytes, camp::resources::Resource r) override;
 
   /*!
    * \brief Deallocate memory with the ResourceAwarePool
    *
-   * \param r The Camp resource that owns the memory
    * \param ptr A pointer to the memory allocation
+   * \param r The Camp resource that owns the memory
    * \param bytes The size in bytes for the allocation
    */
   void deallocate_resource(void* ptr, camp::resources::Resource r, std::size_t size) override;
 
   /*!
    * \brief Deallocate function will call private getResource function
-   * to get the resource associated with teh pointer and then call deallocate_resource
+   * to get the resource associated with the pointer and then call deallocate_resource
    * above.
    */
   void deallocate(void* ptr, std::size_t size) override;
+
+  /*!
+   * \brief Release function will first check to see if there are any finished
+   * pending chunks and then release both the finished pending chunks and the free chunks.
+   * It will only wait for a pending chunk to finish if we are destructing the pool.
+   */
   void release() override;
 
   std::size_t getActualSize() const noexcept override;
@@ -182,14 +189,14 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
 
  protected:
   /*!
-   * \brief Get the camp resource associated with a ptr
+   * \brief Get the camp resource associated with a ptr. This function is meant for internal use within the class and for testing.
    *
    * \param ptr The pointer to data allocated with a ResourceAwarePool
    */
   Resource getResource(void* ptr) const;
 
   /*!
-   * \brief Get the number of Pending chunks in the pool.
+   * \brief Get the number of Pending chunks in the pool. This function is meant for testing.
    */
   std::size_t getNumPending() const noexcept;
 

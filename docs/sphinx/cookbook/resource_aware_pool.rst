@@ -125,8 +125,13 @@ Then, to allocate memory with your ``ResourceAwarePool`` you can do the followin
 
 Note that there is an extra parameter when using the ``allocate`` function. The second parameter is 
 the resource (``d1``) we want the allocated memory to be associated with. In other words, ``d1`` is
-the device stream we want to launch the kernel on which will use that memory. Next, be sure to launch the kernel using the 
-correct stream. Since we are using Camp resources, we use ``d1`` that we created above. For example:
+the device stream we want to launch the kernel on which will use that memory. 
+
+.. note::
+   If allocate is called with no resource, then it will use the default Camp Host resource.
+
+Next, be sure to launch the kernel using the correct stream. 
+Since we are using Camp resources, we use ``d1`` that we created above. For example:
 
 .. code-block:: bash
 

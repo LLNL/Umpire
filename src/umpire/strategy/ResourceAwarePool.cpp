@@ -45,7 +45,8 @@ void* ResourceAwarePool::allocate(std::size_t bytes)
   UMPIRE_LOG(
       Warning,
       fmt::format("The ResourceAwarePool requires a Camp resource. See "
-                  "https://umpire.readthedocs.io/en/develop/sphinx/cookbook/resource_aware_pool.html for more info."));
+                  "https://umpire.readthedocs.io/en/develop/sphinx/cookbook/resource_aware_pool.html for more info."
+                  "Calling allocate with the default Host resource..."));
 
   return allocate_resource(bytes, camp::resources::Host().get_default());
 }
@@ -258,11 +259,10 @@ void ResourceAwarePool::deallocate_resource(void* ptr, camp::resources::Resource
     UMPIRE_ERROR(runtime_error, fmt::format("The chunk can't be found! Called deallocate with ptr: {}", ptr));
   }
 
-  auto my_r = chunk->resource;
-  if (my_r != r) {
+  if (chunk->resource != r) {
     UMPIRE_ERROR(runtime_error,
-                 fmt::format("Called deallocate with a different resource than what was expected. Called with {},",
-                             "but expected: {}", camp::resources::to_string(r), camp::resources::to_string(my_r)));
+                 fmt::format("Called deallocate with a different resource than what was expected. Called with: {} but expected: {}",
+                             camp::resources::to_string(r), camp::resources::to_string(chunk->resource)));
   }
 
   if (m_is_coalescing == false) {
@@ -297,10 +297,16 @@ void ResourceAwarePool::release()
 
   for (auto it = m_pending_list.begin(); it != m_pending_list.end();) {
     auto chunk = (*it);
-    chunk->event.wait();
-    chunk->free = true;
-    m_free_map.insert(std::make_pair(chunk->size, chunk));
-    it = m_pending_list.erase(it);
+    if(m_is_destructing) { // If we are destructing, wait for all deallocations to occur
+      chunk->event.wait();
+    }
+    if (chunk != nullptr && chunk->free == false && chunk->event.check()) { // Otherwise, move all finished pending chunks to free map to be released
+      m_free_map.insert(std::make_pair(chunk->size, chunk));
+      chunk->free = true;
+      it = m_pending_list.erase(it);
+    } else {
+      it++;
+    }
   }
 
   for (auto pair = m_free_map.begin(); pair != m_free_map.end();) {
