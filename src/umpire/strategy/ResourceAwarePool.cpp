@@ -66,10 +66,6 @@ void* ResourceAwarePool::allocate_resource(std::size_t bytes, camp::resources::R
         m_pending_list.erase(it);
         break;
       }
-      if (pending_chunk->free == false && pending_chunk->event.check()) { // reuse no-longer-pending chunk
-        do_deallocate(pending_chunk, pending_chunk->data);
-        break;
-      }
     }
   }
 
@@ -457,6 +453,16 @@ void ResourceAwarePool::coalesce() noexcept
   umpire::event::record([&](auto& event) {
     event.name("coalesce").category(event::category::operation).tag("allocator_name", getName()).tag("replay", "true");
   });
+
+  if (!m_pending_list.empty()) {
+    for (auto it = m_pending_list.begin(); it != m_pending_list.end(); it++) {
+      auto pending_chunk = (*it);
+      if (pending_chunk->free == false && pending_chunk->event.check()) { // a pending chunk is finished...
+        do_deallocate(pending_chunk, pending_chunk->data);
+        break;
+      }
+    }
+  }
 
   std::size_t suggested_size{m_should_coalesce(*this)};
   if (0 != suggested_size) {
