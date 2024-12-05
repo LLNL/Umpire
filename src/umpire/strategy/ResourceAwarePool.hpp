@@ -189,7 +189,8 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
 
  protected:
   /*!
-   * \brief Get the camp resource associated with a ptr. This function is meant for internal use within the class and for testing.
+   * \brief Get the camp resource associated with a ptr. This function is meant for internal use within the class and
+   * for testing.
    *
    * \param ptr The pointer to data allocated with a ResourceAwarePool
    */
