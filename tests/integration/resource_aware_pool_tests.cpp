@@ -173,7 +173,7 @@ TEST_P(ResourceAwarePoolTest, ExplicitSync)
 
   EXPECT_EQ(get_resource(m_pool, ptr2), Resource{d2});
   EXPECT_FALSE(d1 == d2);
-  //EXPECT_EQ(ptr, ptr2); // multiple device resources, but with explicit sync, ptr is same
+  // EXPECT_EQ(ptr, ptr2); // multiple device resources, but with explicit sync, ptr is same
 }
 
 TEST_P(ResourceAwarePoolTest, ReleaseCheck)
