@@ -15,10 +15,45 @@
 #include <utility>
 
 #include "camp/camp.hpp"
+#include "camp/resource.hpp"
 #include "umpire/event/recorder_factory.hpp"
 #include "umpire/util/Macros.hpp"
 
+namespace camp {
+namespace resources {
+inline namespace v1 {
+
+inline std::string to_string(const camp::resources::Resource& r)
+{
+  switch (r.get_platform()) {
+    case camp::resources::Platform::cuda:
+      return "camp::resource::Cuda";
+      break;
+    case camp::resources::Platform::hip:
+      return "camp::resource::Hip";
+      break;
+    case camp::resources::Platform::host:
+      return "camp::resource::Host";
+      break;
+    case camp::resources::Platform::omp_target:
+      return "camp::resource::OmpTarget";
+      break;
+    case camp::resources::Platform::sycl:
+      return "camp::resource::Sycl";
+      break;
+    case camp::resources::Platform::undefined:
+      return "camp::resource::Undefined";
+  }
+
+  return "unkown resource";
+}
+
+} // namespace v1
+} // namespace resources
+} // namespace camp
+
 namespace umpire {
+
 namespace event {
 
 namespace {
@@ -55,9 +90,24 @@ struct named_allocate {
   std::chrono::time_point<std::chrono::system_clock> timestamp{std::chrono::system_clock::now()};
 };
 
+struct allocate_resource {
+  std::size_t size;
+  void* ref;
+  void* ptr;
+  std::string res;
+  std::chrono::time_point<std::chrono::system_clock> timestamp{std::chrono::system_clock::now()};
+};
+
 struct deallocate {
   void* ref;
   void* ptr;
+  std::chrono::time_point<std::chrono::system_clock> timestamp{std::chrono::system_clock::now()};
+};
+
+struct deallocate_resource {
+  void* ref;
+  void* ptr;
+  std::string res;
   std::chrono::time_point<std::chrono::system_clock> timestamp{std::chrono::system_clock::now()};
 };
 
@@ -249,6 +299,43 @@ class builder<named_allocate> {
 };
 
 template <>
+class builder<allocate_resource> {
+ public:
+  builder& size(std::size_t size)
+  {
+    e.size = size;
+    return *this;
+  }
+
+  builder& ref(void* ref)
+  {
+    e.ref = ref;
+    return *this;
+  }
+
+  builder& ptr(void* ptr)
+  {
+    e.ptr = ptr;
+    return *this;
+  }
+
+  builder& res(const std::string& res)
+  {
+    e.res = res;
+    return *this;
+  }
+
+  template <typename Recorder = decltype(recorder_factory::get_recorder())>
+  void record(Recorder r = recorder_factory::get_recorder())
+  {
+    r.record(e);
+  }
+
+ private:
+  allocate_resource e;
+};
+
+template <>
 class builder<deallocate> {
  public:
   builder& ref(void* ref)
@@ -271,6 +358,37 @@ class builder<deallocate> {
 
  private:
   deallocate e;
+};
+
+template <>
+class builder<deallocate_resource> {
+ public:
+  builder& ref(void* ref)
+  {
+    e.ref = ref;
+    return *this;
+  }
+
+  builder& ptr(void* ptr)
+  {
+    e.ptr = ptr;
+    return *this;
+  }
+
+  builder& res(const std::string& res)
+  {
+    e.res = res;
+    return *this;
+  }
+
+  template <typename Recorder = decltype(recorder_factory::get_recorder())>
+  void record(Recorder r = recorder_factory::get_recorder())
+  {
+    r.record(e);
+  }
+
+ private:
+  deallocate_resource e;
 };
 
 template <typename Lambda>

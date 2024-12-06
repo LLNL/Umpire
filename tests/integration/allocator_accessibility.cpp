@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -131,7 +131,7 @@ class AllocatorAccessibilityTest : public ::testing::TestWithParam<std::string> 
 
     if (rm.getAllocator(GetParam()).getAllocationStrategy()->getTraits().resource ==
         umpire::MemoryResourceTraits::resource_type::shared) {
-      umpire::MemoryResourceTraits traits(umpire::get_default_resource_traits("SHARED"));
+      umpire::MemoryResourceTraits traits{umpire::get_default_resource_traits("SHARED")};
 
       traits.size = 1 * 1024 * 1024; // Maximum size of this Allocator
 

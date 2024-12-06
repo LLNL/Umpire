@@ -21,6 +21,7 @@
 #include "umpire/resource/MemoryResource.hpp"
 #include "umpire/strategy/DynamicPoolList.hpp"
 #include "umpire/strategy/QuickPool.hpp"
+#include "umpire/strategy/ResourceAwarePool.hpp"
 #include "umpire/util/wrap_allocator.hpp"
 
 #if !defined(_MSC_VER)
@@ -284,6 +285,33 @@ util::AllocationRecord deregister_external_allocation(void* ptr)
 
   auto& rm = umpire::ResourceManager::getInstance();
   return rm.deregisterAllocation(ptr);
+}
+
+camp::resources::Resource get_resource(Allocator a, void* ptr)
+{
+  UMPIRE_LOG(Warning,
+             "This function will return a generic Camp resource which is not comparable to a specific Camp resource!");
+
+  auto s = a.getAllocationStrategy();
+  strategy::ResourceAwarePool* rap{dynamic_cast<strategy::ResourceAwarePool*>(s)};
+
+  if (!rap) {
+    UMPIRE_ERROR(runtime_error, fmt::format("Allocator \"{}\" is not a ResourceAwarePool!", a.getName()));
+  }
+
+  return rap->getResource(ptr);
+}
+
+std::size_t get_num_pending(Allocator a)
+{
+  auto s = a.getAllocationStrategy();
+  strategy::ResourceAwarePool* rap{dynamic_cast<strategy::ResourceAwarePool*>(s)};
+
+  if (!rap) {
+    UMPIRE_ERROR(runtime_error, fmt::format("Allocator \"{}\" is not a ResourceAwarePool!", a.getName()));
+  }
+
+  return rap->getNumPending();
 }
 
 bool try_coalesce(Allocator a)
