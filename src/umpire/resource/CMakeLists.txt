@@ -74,6 +74,19 @@ if(UMPIRE_ENABLE_IPC_SHARED_MEMORY)
   )
 endif()
 
+if(UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
+  set( umpire_resource_headers
+    HostMpi3SharedmemoryResource.hpp
+    HostMpi3SharedmemoryResourceFactory.hpp)
+
+  set( umpire_resource_sources
+    HostMpi3SharedmemoryResource.cpp
+    HostMpi3SharedmemoryResourceFactory.cpp)
+
+  set( umpire_resource_depends
+    mpi)
+endif()
+
 if (UMPIRE_ENABLE_CUDA)
   set (umpire_resource_headers
     ${umpire_resource_headers}
