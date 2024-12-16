@@ -20,7 +20,7 @@ namespace alloc {
  */
 struct SyclPinnedAllocator {
   /*!
-   * \Brief Allocate bytes of memory using SYCL malloc_host
+   * \brief Allocate bytes of memory using SYCL malloc_host
    *
    * \param size Number of bytes to allocate.
    * \param queue_t SYCL queue for providing information on device and context

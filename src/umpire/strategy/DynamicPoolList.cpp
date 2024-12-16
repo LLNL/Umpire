@@ -64,13 +64,6 @@ std::size_t DynamicPoolList::getTotalBlocks() const noexcept
   return dpa.getTotalBlocks();
 }
 
-std::size_t DynamicPoolList::getCurrentSize() const noexcept
-{
-  std::size_t CurrentSize = dpa.getCurrentSize();
-  UMPIRE_LOG(Debug, "() returning " << CurrentSize);
-  return CurrentSize;
-}
-
 std::size_t DynamicPoolList::getActualSize() const noexcept
 {
   std::size_t ActualSize = dpa.getActualSize();
@@ -81,6 +74,16 @@ std::size_t DynamicPoolList::getActualSize() const noexcept
 std::size_t DynamicPoolList::getActualHighwaterMark() const noexcept
 {
   return dpa.getActualHighwaterMark();
+}
+
+std::size_t DynamicPoolList::getAlignedSize() const noexcept
+{
+  return dpa.getAlignedSize();
+}
+
+std::size_t DynamicPoolList::getAlignedHighwaterMark() const noexcept
+{
+  return dpa.getAlignedHighwaterMark();
 }
 
 std::size_t DynamicPoolList::getReleasableSize() const noexcept
@@ -143,7 +146,7 @@ PoolCoalesceHeuristic<DynamicPoolList> DynamicPoolList::blocks_releasable(std::s
 PoolCoalesceHeuristic<DynamicPoolList> DynamicPoolList::blocks_releasable_hwm(std::size_t nblocks)
 {
   return [=](const strategy::DynamicPoolList& pool) {
-    return pool.getReleasableBlocks() >= nblocks ? pool.getHighWatermark() : 0;
+    return pool.getReleasableBlocks() >= nblocks ? pool.getAlignedHighwaterMark() : 0;
   };
 }
 
@@ -178,14 +181,15 @@ PoolCoalesceHeuristic<DynamicPoolList> DynamicPoolList::percent_releasable_hwm(i
   if (percentage == 0) {
     return [=](const DynamicPoolList& UMPIRE_UNUSED_ARG(pool)) { return 0; };
   } else if (percentage == 100) {
-    return
-        [=](const strategy::DynamicPoolList& pool) { return pool.getCurrentSize() == 0 ? pool.getHighWatermark() : 0; };
+    return [=](const strategy::DynamicPoolList& pool) {
+      return pool.getCurrentSize() == 0 ? pool.getAlignedHighwaterMark() : 0;
+    };
   } else {
     float f = (float)((float)percentage / (float)100.0);
     return [=](const strategy::DynamicPoolList& pool) {
       // Calculate threshold in bytes from the percentage
       const std::size_t threshold = static_cast<std::size_t>(f * pool.getActualSize());
-      return pool.getReleasableSize() >= threshold ? pool.getHighWatermark() : 0;
+      return pool.getReleasableSize() >= threshold ? pool.getAlignedHighwaterMark() : 0;
     };
   }
 }

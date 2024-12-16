@@ -1,9 +1,7 @@
-# <img src="https://cdn.rawgit.com/LLNL/Umpire/develop/share/umpire/logo/umpire-logo.png" width="128" valign="middle" alt="Umpire"/>  Umpire v2024.02.1
+# <img src="https://cdn.rawgit.com/LLNL/Umpire/develop/share/umpire/logo/umpire-logo.png" width="128" valign="middle" alt="Umpire"/>  Umpire v2024.07.0
 
-[![Travis Build Status](https://travis-ci.com/LLNL/Umpire.svg?branch=develop)](https://travis-ci.com/LLNL/Umpire)
-[![Azure Pipelines Build Status](https://dev.azure.com/davidbeckingsale/Umpire/_apis/build/status/LLNL.Umpire?branchName=develop)](https://dev.azure.com/davidbeckingsale/Umpire/_build/latest?definitionId=1&branchName=develop)
 [![Documentation Status](https://readthedocs.org/projects/umpire/badge/?version=develop)](https://umpire.readthedocs.io/en/develop/?badge=develop)
-[![codecov](https://codecov.io/gh/LLNL/Umpire/branch/develop/graph/badge.svg)](https://codecov.io/gh/LLNL/Umpire) [![Join the chat at https://gitter.im/LLNL/Umpire](https://badges.gitter.im/LLNL/Umpire.svg)](https://gitter.im/LLNL/Umpire?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Github Actions Build Status](https://github.com/LLNL/Umpire/actions/workflows/build.yml/badge.svg)](https://github.com/LLNL/Umpire/actions/workflows/build.yml)
 
 Umpire is a resource management library that allows the discovery, provision,
 and management of memory on machines with multiple memory devices like NUMA and GPUs.
@@ -38,10 +36,15 @@ If you have build problems, we have comprehensive [build system documentation](h
 
 Umpire is an open-source project, and we welcome contributions from the community.
 
-## Mailing List
+You can also start an issue for a [bug report](https://github.com/LLNL/Umpire/issues/new?assignees=&labels=&projects=&template=bug_report.md) or [feature request](https://github.com/LLNL/Umpire/issues/new?assignees=&labels=&projects=&template=feature_request.md).
+
+## Mailing List and Slack
 
 The Umpire mailing list is hosted on Google Groups, and is a great place to ask questions:
-- [Umpire Users Google Group](https://groups.google.com/forum/#!forum/umpire-users)
+[Umpire Users Google Group](https://groups.google.com/forum/#!forum/umpire-users)
+
+You can also join our RADIUSS slack group and find the "umpire-users" channel to ask questions.
+To be sent an invite to the slack group, email us at [umpire-dev@llnl.gov](mailto:umpire-dev@llnl.gov)
 
 ## Contributions
 

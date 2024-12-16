@@ -34,6 +34,29 @@ void* AllocationStrategy::allocate_named(const std::string& UMPIRE_UNUSED_ARG(na
   return allocate(bytes);
 }
 
+void* AllocationStrategy::allocate_resource(std::size_t bytes, camp::resources::Resource UMPIRE_UNUSED_ARG(r))
+{
+  return allocate(bytes);
+}
+
+void AllocationStrategy::deallocate_resource(void* ptr, camp::resources::Resource UMPIRE_UNUSED_ARG(r),
+                                             std::size_t size)
+{
+  deallocate(ptr, size);
+}
+
+void* AllocationStrategy::allocate_named_internal(const std::string& name, std::size_t bytes)
+{
+  m_current_size += bytes;
+  m_allocation_count++;
+
+  if (m_current_size > m_high_watermark) {
+    m_high_watermark = m_current_size;
+  }
+
+  return allocate_named(name, bytes);
+}
+
 void AllocationStrategy::deallocate_internal(void* ptr, std::size_t size)
 {
   m_current_size -= size;

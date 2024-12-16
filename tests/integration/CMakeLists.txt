@@ -11,12 +11,6 @@ set (accessibility_test_depends
 set (device_allocator_test_depends
   umpire_device umpire gtest)
 
-if (UMPIRE_ENABLE_CUDA)
-  set (integration_tests_depends
-    ${integration_tests_depends}
-    cuda_runtime)
-endif ()
-
 if (UMPIRE_ENABLE_OPENMP OR UMPIRE_ENABLE_OPENMP_TARGET)
   set (integration_tests_depends
     ${integration_tests_depends}
@@ -24,6 +18,10 @@ if (UMPIRE_ENABLE_OPENMP OR UMPIRE_ENABLE_OPENMP_TARGET)
 endif ()
 
 if (UMPIRE_ENABLE_CUDA)
+  set (integration_tests_depends
+    ${integration_tests_depends}
+    cuda 
+    cuda_runtime)
   set (accessibility_test_depends
     ${accessibility_test_depends}
     cuda)
@@ -33,6 +31,10 @@ if (UMPIRE_ENABLE_CUDA)
 endif ()
 
 if (UMPIRE_ENABLE_HIP)
+  set (integration_tests_depends
+    ${integration_tests_depends}
+    blt::hip 
+    blt::hip_runtime)
   set (accessibility_test_depends
     ${accessibility_test_depends}
     blt::hip)
@@ -146,6 +148,15 @@ target_include_directories(
 blt_add_test(
   NAME strategy_tests
   COMMAND strategy_tests)
+
+blt_add_executable(
+  NAME resource_aware_pool_tests
+  SOURCES resource_aware_pool_tests.cpp
+  DEPENDS_ON ${integration_tests_depends})
+
+blt_add_test(
+  NAME resource_aware_pool_tests
+  COMMAND resource_aware_pool_tests)
 
 blt_add_executable(
   NAME operation_tests

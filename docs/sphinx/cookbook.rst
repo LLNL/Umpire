@@ -25,8 +25,10 @@ that have introspection disabled for improved performance, and applying CUDA
    cookbook/get_largest_available_block_in_pool.rst
    cookbook/coalesce_pool.rst
    cookbook/pinned_pool.rst
+   cookbook/resource_aware_pool.rst
    cookbook/plot_allocations.rst
    cookbook/mixed_pool.rst
    cookbook/thread_safe.rst
    cookbook/file_allocation.rst
+   cookbook/shared_memory.rst
    cookbook/strategy_name.rst

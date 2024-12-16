@@ -13,7 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: ./.github/actions/abi-compat
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v4
       with:
         name: ABI Compatibility Report
         path: compat_reports/umpire/3.0.0_to_4.0.0/compat_report.html
