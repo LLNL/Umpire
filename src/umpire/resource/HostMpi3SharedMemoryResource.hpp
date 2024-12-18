@@ -12,14 +12,13 @@
 #include <map>
 
 #include "umpire/resource/MemoryResource.hpp"
-#include "umpire/util/Platform.hpp"
 
 namespace umpire {
 namespace resource {
 
 class HostMpi3SharedMemoryResource : public MemoryResource {
  public:
-  HostMpi3SharedMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits);
+  HostMpi3SharedMemoryResource(const std::string& name, int id, MemoryResourceTraits traits);
 
   ~HostMpi3SharedMemoryResource();
 
@@ -30,11 +29,6 @@ class HostMpi3SharedMemoryResource : public MemoryResource {
   void deallocate(void* ptr, std::size_t size) override;
 
   std::size_t getActualSize() const noexcept override;
-
-  bool isAccessibleFrom(Platform p) noexcept override;
-  Platform getPlatform() noexcept override;
- protected:
-  Platform m_platform;
 
  private:
   MPI_comm m_shared_comm;

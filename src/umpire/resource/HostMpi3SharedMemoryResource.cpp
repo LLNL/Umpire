@@ -15,9 +15,9 @@
 namespace umpire {
 namespace resource {
 
-HostMpi3SharedMemoryResource::HostMpi3SharedMemoryResource(Platform platform, const std::string& name, int id,
+HostMpi3SharedMemoryResource::HostMpi3SharedMemoryResource(const std::string& name, int id,
                                                    MemoryResourceTraits traits)
-    : MemoryResource{name, id, traits}, m_platform{platform}, pimpl{new impl{name, traits.size}}
+    : MemoryResource{name, id, traits} 
 {
   MPI_comm_split(MPI_COMM_WORLD, MPI_COMM_TYPE_SHARED, IGNORE_KEY, MPI_INFO_NULL, &m_shared_comm);
   MPI_comm_rank(m_shared_comm, &m_local_rank);
@@ -36,7 +36,7 @@ void* HostMpi3SharedMemoryResource::allocate(std::size_t bytes)
   int disp{sizeof(char)};
 
   MPI_Win_allocate_shared(size, disp, MPI_INFO_NULL, m_shared_comm, &ptr, &win)
-  m_shared_windows[ptr] = win;
+;
 
   return ptr;
 }
@@ -58,11 +58,6 @@ bool HostMpi3SharedMemoryResource::isAccessibleFrom(Platform p) noexcept
     return true;
   else // TODO: check this
     return false;
-}
-
-Platform HostMpi3SharedMemoryResource::getPlatform() noexcept
-{
-  return m_platform;
 }
 
 } // end of namespace resource
