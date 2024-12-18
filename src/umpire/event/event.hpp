@@ -7,6 +7,7 @@
 #ifndef UMPIRE_event_HPP
 #define UMPIRE_event_HPP
 
+#include <cstdlib>
 #include <cstdint>
 #include <map>
 #include <sstream>
@@ -57,9 +58,9 @@ namespace umpire {
 namespace event {
 
 namespace {
-static const char* replay_env{getenv("UMPIRE_REPLAY")};
+static const char* replay_env{std::getenv("UMPIRE_REPLAY")};
 static const bool enable_replay{(replay_env != NULL)};
-static const char* event_env{getenv("UMPIRE_EVENTS")};
+static const char* event_env{std::getenv("UMPIRE_EVENTS")};
 static const bool enable_event{(event_env != NULL)};
 static const bool event_build_enabled{enable_replay || enable_event};
 } // namespace

@@ -7,8 +7,8 @@
 
 #include "umpire/util/io.hpp"
 
-#include <stdlib.h> // for getenv()
 
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <ostream>
