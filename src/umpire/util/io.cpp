@@ -7,7 +7,6 @@
 
 #include "umpire/util/io.hpp"
 
-
 #include <cstdlib>
 #include <fstream>
 #include <iostream>

@@ -7,8 +7,8 @@
 #ifndef UMPIRE_event_HPP
 #define UMPIRE_event_HPP
 
-#include <cstdlib>
 #include <cstdint>
+#include <cstdlib>
 #include <map>
 #include <sstream>
 #include <string>
