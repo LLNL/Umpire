@@ -66,10 +66,26 @@ blt_add_executable(
   NAME resource_aware_pool_example
   SOURCES resource_aware_pool_example.cpp
   DEPENDS_ON ${example_depends} cuda)
+blt_add_executable(
+  NAME rap_exp
+  SOURCES rap_exp.cpp
+  DEPENDS_ON ${example_depends} cuda)
+blt_add_executable(
+  NAME qp_exp
+  SOURCES qp_exp.cpp
+  DEPENDS_ON ${example_depends} cuda)
 elseif (UMPIRE_ENABLE_HIP)
 blt_add_executable(
   NAME resource_aware_pool_example
   SOURCES resource_aware_pool_example.cpp
+  DEPENDS_ON ${example_depends} blt::hip)
+blt_add_executable(
+  NAME rap_exp
+  SOURCES rap_exp.cpp
+  DEPENDS_ON ${example_depends} blt::hip)
+blt_add_executable(
+  NAME qp_exp
+  SOURCES qp_exp.cpp
   DEPENDS_ON ${example_depends} blt::hip)
 else()
 blt_add_executable(
@@ -77,7 +93,7 @@ blt_add_executable(
   SOURCES resource_aware_pool_example.cpp
   DEPENDS_ON ${example_depends})
 endif()
-list(APPEND umpire_examples resource_aware_pool_example)
+list(APPEND umpire_examples resource_aware_pool_example rap_exp qp_exp)
 
 blt_add_executable(
   NAME allocator
