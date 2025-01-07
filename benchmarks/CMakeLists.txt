@@ -141,6 +141,15 @@ if (UMPIRE_ENABLE_BENCHMARKS)
     COMMAND copy_benchmarks)
 
   blt_add_executable(
+    NAME rap_benchmark
+    SOURCES rap_benchmark.cpp
+    DEPENDS_ON ${benchmark_depends} blt::hip blt::hip_runtime)
+
+  blt_add_benchmark(
+    NAME rap_benchmark
+    COMMAND rap_benchmark)
+
+  blt_add_executable(
     NAME inspector_benchmarks
     SOURCES inspector_benchmarks.cpp
     DEPENDS_ON ${benchmark_depends})
