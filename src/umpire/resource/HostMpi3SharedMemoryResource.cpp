@@ -19,13 +19,14 @@ HostMpi3SharedMemoryResource::HostMpi3SharedMemoryResource(const std::string& na
                                                    MemoryResourceTraits traits)
     : MemoryResource{name, id, traits} 
 {
-  MPI_comm_split(MPI_COMM_WORLD, MPI_COMM_TYPE_SHARED, IGNORE_KEY, MPI_INFO_NULL, &m_shared_comm);
-  MPI_comm_rank(m_shared_comm, &m_local_rank);
+  constexpr int IGNORE_KEY{0};
+  MPI_Comm_split_type(MPI_COMM_WORLD, MPI_COMM_TYPE_SHARED, IGNORE_KEY, MPI_INFO_NULL, &m_shared_comm);
+  MPI_Comm_rank(m_shared_comm, &m_local_rank);
 }
 
 HostMpi3SharedMemoryResource::~HostMpi3SharedMemoryResource()
 {
-  MPI_Comm_free(m_shared_comm);
+  MPI_Comm_free(&m_shared_comm);
 }
 
 void* HostMpi3SharedMemoryResource::allocate(std::size_t bytes)
@@ -35,8 +36,7 @@ void* HostMpi3SharedMemoryResource::allocate(std::size_t bytes)
   MPI_Aint size = (m_local_rank != 0) ? 0 : bytes;
   int disp{sizeof(char)};
 
-  MPI_Win_allocate_shared(size, disp, MPI_INFO_NULL, m_shared_comm, &ptr, &win)
-;
+  MPI_Win_allocate_shared(size, disp, MPI_INFO_NULL, m_shared_comm, &ptr, &win) ;
 
   return ptr;
 }
@@ -45,9 +45,9 @@ void HostMpi3SharedMemoryResource::deallocate(void* ptr, std::size_t)
 {
   auto window = m_shared_windows.find(ptr);
   if (window != m_shared_windows.end()) {
-    MPI_Win_free(window.second);
+    MPI_Win_free( &(window->second));
   } else {
-    UMPIRE_ERROR(umpire::unknown_pointer_error, fmt::fmt(
+    UMPIRE_ERROR(umpire::unknown_pointer_error, "");
   }
 }
 
@@ -58,6 +58,11 @@ bool HostMpi3SharedMemoryResource::isAccessibleFrom(Platform p) noexcept
     return true;
   else // TODO: check this
     return false;
+}
+
+Platform HostMpi3SharedMemoryResource::getPlatform() noexcept
+{
+  return Platform::host;
 }
 
 } // end of namespace resource

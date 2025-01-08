@@ -84,6 +84,7 @@ if(UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
     HostMpi3SharedmemoryResourceFactory.cpp)
 
   set( umpire_resource_depends
+  ${umpire_resource_depends}
     mpi)
 endif()
 

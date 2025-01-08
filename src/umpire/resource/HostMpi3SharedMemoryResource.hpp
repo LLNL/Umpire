@@ -11,7 +11,10 @@
 #include <string>
 #include <map>
 
+#include "mpi.h"
+
 #include "umpire/resource/MemoryResource.hpp"
+#include "umpire/util/Platform.hpp"
 
 namespace umpire {
 namespace resource {
@@ -30,8 +33,12 @@ class HostMpi3SharedMemoryResource : public MemoryResource {
 
   std::size_t getActualSize() const noexcept override;
 
+  bool isAccessibleFrom(Platform p) noexcept override;
+
+  Platform getPlatform() noexcept override;
+
  private:
-  MPI_comm m_shared_comm;
+  MPI_Comm m_shared_comm;
   int m_local_rank;
   std::map<void*, MPI_Win> m_shared_windows;
 };
