@@ -7,12 +7,11 @@
 #ifndef __Host_Shared_Memory_Resource_HPP
 #define __Host_Shared_Memory_Resource_HPP
 
+#include <map>
 #include <memory>
 #include <string>
-#include <map>
 
 #include "mpi.h"
-
 #include "umpire/resource/MemoryResource.hpp"
 #include "umpire/util/Platform.hpp"
 
