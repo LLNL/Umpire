@@ -76,12 +76,14 @@ endif()
 
 if(UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
   set( umpire_resource_headers
-    HostMpi3SharedmemoryResource.hpp
-    HostMpi3SharedmemoryResourceFactory.hpp)
+    ${umpire_resource_headers}
+    HostMpi3SharedMemoryResource.hpp
+    HostMpi3SharedMemoryResourceFactory.hpp)
 
   set( umpire_resource_sources
-    HostMpi3SharedmemoryResource.cpp
-    HostMpi3SharedmemoryResourceFactory.cpp)
+    ${umpire_resource_sources}
+    HostMpi3SharedMemoryResource.cpp
+    HostMpi3SharedMemoryResourceFactory.cpp)
 
   set( umpire_resource_depends
   ${umpire_resource_depends}
