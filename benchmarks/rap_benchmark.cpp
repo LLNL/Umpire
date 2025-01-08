@@ -1,9 +1,15 @@
-#include <benchmark/benchmark.h>
-#include <umpire/ResourceManager.hpp>
-#include <umpire/strategy/ResourceAwarePool.hpp>
-#include <umpire/strategy/QuickPool.hpp>
+#include <stdio.h>
+#include <math.h>
+#include <iostream>
+
+#include <thread>
+#include <chrono>
+
 #include "camp/camp.hpp"
-#include <vector>
+#include "umpire/ResourceManager.hpp"
+#include "umpire/Umpire.hpp"
+#include "umpire/strategy/ResourceAwarePool.hpp"
+#include "umpire/strategy/QuickPool.hpp"
 
 #if defined(UMPIRE_ENABLE_CUDA)
 using resource_type = camp::resources::Cuda;
@@ -11,79 +17,151 @@ using resource_type = camp::resources::Cuda;
 using resource_type = camp::resources::Hip;
 #endif
 
-// Define the number of allocations and resources
-const int N = 100; // Number of allocations
-const int M = 4;   // Number of camp resources
+constexpr int NUM_ALLOC = 100;
+const int NUM_RES = 4;
+constexpr int SIZE = 1 << 21;
+const int NUM_PER_BLOCK = 256;
+const int NUM_BLOCKS = SIZE/NUM_PER_BLOCK;
 
-// Define the size of each allocation
-const size_t ALLOCATION_SIZE = 1024 * 1024; // 1 MB
+__global__ void touch_data(double* data, int i)
+{
+  int id = blockIdx.x * blockDim.x + threadIdx.x;
 
-// Dummy kernel function (assuming CUDA is available)
-__global__ void dummy_kernel(double* data) {
-  size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-  if (idx < ALLOCATION_SIZE) {
-    data[idx] = idx;
+  if (id < SIZE) {
+    data[id] = id + i;
   }
 }
 
-// RAP Benchmark function
-static void BM_ResourceAwarePoolAllocations(benchmark::State& state) {
-  static int unique_id = 0;
+int main(int, char**)
+{
   auto& rm = umpire::ResourceManager::getInstance();
-  auto rap_pool = rm.makeAllocator<umpire::strategy::ResourceAwarePool>("rap-pool" + std::to_string(unique_id++), rm.getAllocator("UM"));
+  auto rap_pool = rm.makeAllocator<umpire::strategy::ResourceAwarePool>("rap-pool", rm.getAllocator("UM"));
+  auto qp_pool = rm.makeAllocator<umpire::strategy::QuickPool>("qp-pool", rm.getAllocator("UM"));
+  double* a;
 
   // Create camp resources for device streams
-  std::vector<resource_type> my_resources(M);
+  std::vector<resource_type> resources(NUM_RES);
 
-  for (auto _ : state) {
-    std::vector<double*> my_allocations(N);
+  std::cout<<"Timing " << NUM_ALLOC << " allocations and " << NUM_RES << " resources with the QuickPool ...."<<std::endl;
+  std::chrono::duration<double> duration_total[NUM_ALLOC];
+  std::chrono::duration<double> this_duration_total[NUM_ALLOC];
+  std::chrono::time_point<std::chrono::high_resolution_clock> my_start, my_end;
 
-    // Perform N allocations across M resources
-    for (int i = 0; i < N; ++i) {
-      int ri = i % M;
-      my_allocations[i] = static_cast<double*>(rap_pool.allocate(ALLOCATION_SIZE * sizeof(double), my_resources[ri]));
-
-      // Optionally launch a dummy kernel to simulate work
-      dummy_kernel<<<4096, 256, 0, my_resources[ri].get_stream()>>>(my_allocations[i]);
+  for (int r = 0; r < NUM_RES; r++) {
+    for (int i = 0; i < NUM_ALLOC; i++) {
+      auto start_total = std::chrono::high_resolution_clock::now();
+      a = static_cast<double*>(qp_pool.allocate(SIZE * sizeof(double)));
+      touch_data<<<NUM_BLOCKS, NUM_PER_BLOCK, 0, resources[r].get_stream()>>>(a, i);
+      qp_pool.deallocate(a);
+      auto end_total = std::chrono::high_resolution_clock::now();
+      duration_total[i] = end_total - start_total;
     }
 
-    // Deallocate all allocations
-    for (int i = 0; i < N; ++i) {
-      rap_pool.deallocate(my_allocations[i]);
+    // Calculate average, max, and min durations
+    double total_duration = 0.0;
+    for (const auto& duration : duration_total) {
+      total_duration += duration.count();
     }
+    double average_duration = total_duration / NUM_ALLOC;
+
+    auto min_duration = *std::min_element(duration_total, duration_total + NUM_ALLOC);
+    auto max_duration = *std::max_element(duration_total, duration_total + NUM_ALLOC);
+
+    std::cout << "Resource " << r << " statistics:" << std::endl;
+    std::cout << "Average execution time: " << (average_duration * 1000.0) << " milliseconds" << std::endl;
+    std::cout << "Minimum execution time: " << (min_duration.count() * 1000.0) << " milliseconds" << std::endl;
+    std::cout << "Maximum execution time: " << (max_duration.count() * 1000.0) << " milliseconds" << std::endl;
   }
-}
 
-// QP Benchmark function
-static void BM_QuickPoolAllocations(benchmark::State& state) {
-  static int unique_id = 0;
-  auto& rm = umpire::ResourceManager::getInstance();
-  auto qp_pool = rm.makeAllocator<umpire::strategy::QuickPool>("qp-pool" + std::to_string(unique_id++), rm.getAllocator("UM"));
+  std::cout<< std::endl;
+  std::cout<<"Timing " << NUM_ALLOC << " allocations ACROSS " << NUM_RES << " resources with the QuickPool ...."<<std::endl;
 
-  // Create camp resources for device streams
-  std::vector<resource_type> my_resources(M);
+  {
+    for (int i = 0; i < NUM_ALLOC; i++) {
+      int ri = i % NUM_RES;
 
-  for (auto _ : state) {
-    std::vector<double*> my_allocations(N);
-
-    // Perform N allocations across M resources
-    for (int i = 0; i < N; ++i) {
-      int ri = i % M;
-      my_allocations[i] = static_cast<double*>(qp_pool.allocate(ALLOCATION_SIZE * sizeof(double)));
-
-      // Optionally launch a dummy kernel to simulate work
-      dummy_kernel<<<4096, 256, 0, my_resources[ri].get_stream()>>>(my_allocations[i]);
+      my_start = std::chrono::high_resolution_clock::now();
+      a = static_cast<double*>(qp_pool.allocate(SIZE * sizeof(double)));
+      touch_data<<<NUM_BLOCKS, NUM_PER_BLOCK, 0, resources[ri].get_stream()>>>(a, i);
+      qp_pool.deallocate(a);
+      my_end = std::chrono::high_resolution_clock::now();
+      this_duration_total[i] = my_end - my_start;
     }
 
-    // Deallocate all allocations
-    for (int i = 0; i < N; ++i) {
-      qp_pool.deallocate(my_allocations[i]);
+    // Calculate average, max, and min durations
+    double total_duration = 0.0;
+    for (const auto& duration : this_duration_total) {
+      total_duration += duration.count();
     }
+    double average_duration = total_duration / NUM_ALLOC;
+
+    auto min_duration = *std::min_element(duration_total, duration_total + NUM_ALLOC);
+    auto max_duration = *std::max_element(duration_total, duration_total + NUM_ALLOC);
+
+    std::cout << "Average execution time: " << (average_duration * 1000.0) << " milliseconds" << std::endl;
+    std::cout << "Minimum execution time: " << (min_duration.count() * 1000.0) << " milliseconds" << std::endl;
+    std::cout << "Maximum execution time: " << (max_duration.count() * 1000.0) << " milliseconds" << std::endl;
   }
+
+  std::cout<< std::endl;
+  std::cout<<"Timing " << NUM_ALLOC << " allocations and " << NUM_RES << " resources with the ResourceAwarePool ...."<<std::endl;
+
+  for (int r = 0; r < NUM_RES; r++) {
+    for (int i = 0; i < NUM_ALLOC; i++) {
+      auto start_total = std::chrono::high_resolution_clock::now();
+      a = static_cast<double*>(rap_pool.allocate(SIZE * sizeof(double), resources[r]));
+      touch_data<<<NUM_BLOCKS, NUM_PER_BLOCK, 0, resources[r].get_stream()>>>(a, i);
+      rap_pool.deallocate(a);
+      auto end_total = std::chrono::high_resolution_clock::now();
+      duration_total[i] = end_total - start_total;
+    }
+
+    // Calculate average, max, and min durations
+    double total_duration = 0.0;
+    for (const auto& duration : duration_total) {
+      total_duration += duration.count();
+    }
+    double average_duration = total_duration / NUM_ALLOC;
+
+    auto min_duration = *std::min_element(duration_total, duration_total + NUM_ALLOC);
+    auto max_duration = *std::max_element(duration_total, duration_total + NUM_ALLOC);
+
+    std::cout << "Resource " << r << " statistics:" << std::endl;
+    std::cout << "Average execution time: " << (average_duration * 1000.0) << " milliseconds" << std::endl;
+    std::cout << "Minimum execution time: " << (min_duration.count() * 1000.0) << " milliseconds" << std::endl;
+    std::cout << "Maximum execution time: " << (max_duration.count() * 1000.0) << " milliseconds" << std::endl;
+  }
+
+  std::cout<< std::endl;
+  std::cout<<"Timing " << NUM_ALLOC << " allocations ACROSS " << NUM_RES << " resources with the ResourceAwarePool ...."<<std::endl;
+
+  {
+    for (int i = 0; i < NUM_ALLOC; i++) {
+      int ri = i % NUM_RES;
+
+      my_start = std::chrono::high_resolution_clock::now();
+      a = static_cast<double*>(rap_pool.allocate(SIZE * sizeof(double), resources[ri]));
+      touch_data<<<NUM_BLOCKS, NUM_PER_BLOCK, 0, resources[ri].get_stream()>>>(a, i);
+      rap_pool.deallocate(a);
+      my_end = std::chrono::high_resolution_clock::now();
+      this_duration_total[i] = my_end - my_start;
+    }
+
+    // Calculate average, max, and min durations
+    double total_duration = 0.0;
+    for (const auto& duration : this_duration_total) {
+      total_duration += duration.count();
+    }
+    double average_duration = total_duration / NUM_ALLOC;
+
+    auto min_duration = *std::min_element(duration_total, duration_total + NUM_ALLOC);
+    auto max_duration = *std::max_element(duration_total, duration_total + NUM_ALLOC);
+
+    std::cout << "Average execution time: " << (average_duration * 1000.0) << " milliseconds" << std::endl;
+    std::cout << "Minimum execution time: " << (min_duration.count() * 1000.0) << " milliseconds" << std::endl;
+    std::cout << "Maximum execution time: " << (max_duration.count() * 1000.0) << " milliseconds" << std::endl;
+  }
+
+  return 0;
 }
-
-// Register the benchmark
-BENCHMARK(BM_ResourceAwarePoolAllocations)->Unit(benchmark::kMillisecond);
-BENCHMARK(BM_QuickPoolAllocations)->Unit(benchmark::kMillisecond);
-
-BENCHMARK_MAIN();
+  
