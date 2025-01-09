@@ -150,6 +150,15 @@ if (UMPIRE_ENABLE_BENCHMARKS)
     COMMAND rap_benchmark)
 
   blt_add_executable(
+    NAME rap_longkernel_benchmark
+    SOURCES rap_longkernel_benchmark.cpp
+    DEPENDS_ON ${benchmark_depends} blt::hip blt::hip_runtime)
+
+  blt_add_benchmark(
+    NAME rap_longkernel_benchmark
+    COMMAND rap_longkernel_benchmark)
+
+  blt_add_executable(
     NAME inspector_benchmarks
     SOURCES inspector_benchmarks.cpp
     DEPENDS_ON ${benchmark_depends})
