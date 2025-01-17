@@ -10,6 +10,7 @@
 #include "umpire/strategy/QuickPool.hpp"
 #include "umpire/strategy/SizeLimiter.hpp"
 #include "umpire/util/Macros.hpp"
+#include "umpire/Umpire.hpp"
 
 int main(int, char**)
 {
@@ -18,14 +19,29 @@ int main(int, char**)
       rm.makeAllocator<umpire::strategy::SizeLimiter>("size_limited_alloc", rm.getAllocator("HOST"), 1024);
 
   auto pool = rm.makeAllocator<umpire::strategy::QuickPool>("pool", size_limited_alloc, 64, 64);
+  void* data;
 
   // This will throw an exception because the pool is limited to 1024 bytes.
   std::cout << "Attempting to allocate 2098 bytes..." << std::endl;
   try {
-    void* data = pool.allocate(2048);
+    data = pool.allocate(2048);
     UMPIRE_USE_VAR(data);
   } catch (...) {
     std::cout << "Exception caught! Pool is limited to 1024 bytes." << std::endl;
+  }
+  std::cout << "The total amount of memory used was: " << umpire::get_total_memory_usage() << std::endl;
+
+  std::cout << "Attempting to allocate 512 bytes..." << std::endl;
+  try {
+    data = pool.allocate(512);
+    UMPIRE_USE_VAR(data);
+  } catch (...) {
+    std::cout << "Exception caught! Pool is limited to 1024 bytes." << std::endl;
+  }
+  std::cout << "The total amount of memory used was: " << umpire::get_total_memory_usage() << std::endl;
+
+  if (data != nullptr) {
+    pool.deallocate(data);
   }
 
   return 0;
