@@ -173,12 +173,17 @@ void mark_event(const std::string& event)
       [&](auto& e) { e.name("event").category(event::category::metadata).arg("name", event).tag("replay", "true"); });
 }
 
-std::size_t get_total_memory_usage()
+std::size_t get_total_memory_allocated()
 {
   auto& rm = umpire::ResourceManager::getInstance();
   std::size_t total_memory{0};
 
   for (auto s : rm.getResourceNames()) {
+    umpire::Allocator alloc = rm.getAllocator(s);
+    total_memory += alloc.getActualSize();
+  }
+
+  for (auto s : rm.m_shared_allocators_by_name) {
     umpire::Allocator alloc = rm.getAllocator(s);
     total_memory += alloc.getActualSize();
   }

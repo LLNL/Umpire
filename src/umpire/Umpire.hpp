@@ -165,7 +165,7 @@ void mark_event(const std::string& event);
 /*!
  * \brief Get the total umpire memory usage in bytes across all memory resources
  */
-std::size_t get_total_memory_usage();
+std::size_t get_total_memory_allocated();
 
 /*!
  * \brief Get memory usage of device device_id, using appropriate underlying

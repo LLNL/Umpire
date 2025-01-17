@@ -155,6 +155,10 @@ Allocator ResourceManager::makeResource(const std::string& name, MemoryResourceT
     traits.granularity = MemoryResourceTraits::granularity_type::fine_grained;
   }
 
+  if (name.find("SHARED") != std::string::npos) {
+    m_shared_allocators_by_name.push_back(name);
+  }
+
   std::unique_ptr<strategy::AllocationStrategy> allocator{registry.makeMemoryResource(name, getNextId(), traits)};
   allocator->setTracking(traits.tracking);
 

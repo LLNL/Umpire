@@ -29,7 +29,7 @@ int main(int, char**)
   } catch (...) {
     std::cout << "Exception caught! Pool is limited to 1024 bytes." << std::endl;
   }
-  std::cout << "The total amount of memory used was: " << umpire::get_total_memory_usage() << std::endl;
+  std::cout << "The total amount of memory used was: " << umpire::get_total_memory_allocated() << std::endl;
 
   std::cout << "Attempting to allocate 512 bytes..." << std::endl;
   try {
@@ -38,7 +38,7 @@ int main(int, char**)
   } catch (...) {
     std::cout << "Exception caught! Pool is limited to 1024 bytes." << std::endl;
   }
-  std::cout << "The total amount of memory used was: " << umpire::get_total_memory_usage() << std::endl;
+  std::cout << "The total amount of memory used was: " << umpire::get_total_memory_allocated() << std::endl;
 
   if (data != nullptr) {
     pool.deallocate(data);

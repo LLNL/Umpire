@@ -328,6 +328,7 @@ class ResourceManager {
   util::AllocationMap m_allocations;
 
   std::list<std::unique_ptr<strategy::AllocationStrategy>> m_allocators;
+  std::vector<std::string> m_shared_allocators_by_name;
 
   std::unordered_map<int, strategy::AllocationStrategy*> m_allocators_by_id;
   std::unordered_map<std::string, strategy::AllocationStrategy*> m_allocators_by_name;
@@ -347,6 +348,7 @@ class ResourceManager {
   friend std::vector<util::AllocationRecord> get_allocator_records(Allocator);
   friend strategy::ZeroByteHandler;
   friend strategy::mixins::AllocateNull;
+  friend std::size_t get_total_memory_allocated();
 };
 
 } // end namespace umpire
