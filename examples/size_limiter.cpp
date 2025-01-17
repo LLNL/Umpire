@@ -7,10 +7,10 @@
 #include <iostream>
 
 #include "umpire/ResourceManager.hpp"
+#include "umpire/Umpire.hpp"
 #include "umpire/strategy/QuickPool.hpp"
 #include "umpire/strategy/SizeLimiter.hpp"
 #include "umpire/util/Macros.hpp"
-#include "umpire/Umpire.hpp"
 
 int main(int, char**)
 {
