@@ -17,6 +17,7 @@
 #include "umpire/config.hpp"
 #include "umpire/resource/HostSharedMemoryResource.hpp"
 #include "umpire/util/MemoryResourceTraits.hpp"
+#include "umpire/strategy/NamedAllocationStrategy.hpp"
 
 //
 // For debugging purposes, this program uses the number of command line
@@ -58,6 +59,8 @@ int main(int ac, char** av)
   //
   auto node_allocator{rm.makeResource("SHARED::node_allocator", traits)};
 
+  auto named_node_allocator{rm.makeAllocator<umpire::strategy::NamedAllocationStrategy>("My Node Allocator", node_allocator)};
+
   //
   // Resource of this allocator is SHARED
   //
@@ -82,6 +85,7 @@ int main(int ac, char** av)
   // Allocate shared memory
   //
   void* ptr{node_allocator.allocate("allocation_name_2", sizeof(uint64_t))};
+  void* ptr2{named_node_allocator.allocate("allocation two", 1024 )};
   uint64_t* data{static_cast<uint64_t*>(ptr)};
 
   if (shared_rank == foreman_rank)
@@ -98,6 +102,7 @@ int main(int ac, char** av)
   UMPIRE_ASSERT(*data == 0xDEADBEEF);
 
   node_allocator.deallocate(ptr);
+  named_node_allocator.deallocate(ptr2);
 
   if (use_mpi) {
     MPI_Finalize();
