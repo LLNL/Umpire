@@ -22,7 +22,7 @@ void* NamedAllocationStrategy::allocate(std::size_t bytes)
   return m_allocator->allocate_internal(bytes);
 }
 
-void* NamedAllocationStrategy::allocate_named(std::string name, std::size_t bytes)
+void* NamedAllocationStrategy::allocate_named(const std::string& name, std::size_t bytes)
 {
   return m_allocator->allocate_named_internal(name, bytes);
 }
