@@ -31,10 +31,12 @@ void* HostMpi3SharedMemoryResource::allocate(std::size_t bytes)
 {
   void* ptr;
   MPI_Win win;
-  MPI_Aint size = (m_local_rank != 0) ? 0 : bytes;
+  MPI_Aint local_size = (m_local_rank != 0) ? 0 : bytes;
+  MPI_Aint size = bytes;
   int disp{sizeof(char)};
 
-  MPI_Win_allocate_shared(size, disp, MPI_INFO_NULL, m_shared_comm, &ptr, &win);
+  MPI_Win_allocate_shared(local_size, disp, MPI_INFO_NULL, m_shared_comm, &ptr, &win);
+  MPI_Win_shared_query(win, 0, &size, &disp, ptr);
 
   return ptr;
 }
