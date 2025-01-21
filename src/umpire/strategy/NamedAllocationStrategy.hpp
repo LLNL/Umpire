@@ -18,6 +18,7 @@ class NamedAllocationStrategy : public AllocationStrategy {
   NamedAllocationStrategy(const std::string& name, int id, Allocator allocator);
 
   void* allocate(std::size_t bytes) override;
+  void* allocate_named(const std::string& name, std::size_t bytes) override;
   void deallocate(void* ptr, std::size_t size) override;
 
   Platform getPlatform() noexcept override;
