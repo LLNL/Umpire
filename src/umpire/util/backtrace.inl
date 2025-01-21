@@ -41,7 +41,7 @@ bool backtrace_enabled()
   static bool initialized{false};
 
   if (!initialized) {
-    const char* enval{getenv("UMPIRE_BACKTRACE")};
+    const char* enval{std::getenv("UMPIRE_BACKTRACE")};
     if (enval) {
       std::string env_str{enval};
       std::transform(env_str.begin(), env_str.end(), env_str.begin(), ::toupper);
