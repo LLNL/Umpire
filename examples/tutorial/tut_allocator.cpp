@@ -32,7 +32,7 @@ int main(int, char**)
   std::cout << "Created an add-on allocator of size " << addon_allocator.getCurrentSize() << " using the "
             << allocator.getName() << " allocator." << std::endl;
 
-  std::cout << "The total amount of memory used was: " << umpire::get_total_memory_allocated() << std::endl;
+  std::cout << "The total amount of memory used was: " << umpire::get_total_bytes_allocated() << std::endl;
 
   // _sphinx_tag_tut_deallocate_start
   allocator.deallocate(data);

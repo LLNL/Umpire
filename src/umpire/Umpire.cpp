@@ -173,7 +173,7 @@ void mark_event(const std::string& event)
       [&](auto& e) { e.name("event").category(event::category::metadata).arg("name", event).tag("replay", "true"); });
 }
 
-std::size_t get_total_memory_allocated()
+std::size_t get_total_bytes_allocated()
 {
   auto& rm = umpire::ResourceManager::getInstance();
   std::size_t total_memory{0};
