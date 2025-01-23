@@ -26,5 +26,6 @@ int main(int, char**)
 
   void* ptr = shim.allocate(1024);
   std::cout << "Ptr = " << ptr << std::endl;
+  std::cout << "Total Memory Allocated: " << umpire::get_total_bytes_allocated() << std::endl;
   shim.deallocate(ptr);
 }
