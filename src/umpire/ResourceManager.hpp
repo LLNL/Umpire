@@ -101,6 +101,17 @@ class ResourceManager {
   std::vector<std::string> getResourceNames();
 
   /*!
+   * \brief Get the names for existing SHARED Allocator names, if any.
+   *
+   * The SHARED memory resource only indicates whether or not these SHARED allocators
+   * exist. Since SHARED allocators are made at runtime, this function will actually 
+   * find the specific name of each SHARED allocator and return it.
+   *
+   * \return A vector of strings with the available SHARED allocator names.
+   */
+  std::vector<std::string> getSharedAllocNames();
+
+  /*!
    * \brief Set the default Allocator.
    *
    * The default Allocator is used whenever an Allocator is required and one
@@ -348,7 +359,6 @@ class ResourceManager {
   friend std::vector<util::AllocationRecord> get_allocator_records(Allocator);
   friend strategy::ZeroByteHandler;
   friend strategy::mixins::AllocateNull;
-  friend std::size_t get_total_memory_allocated();
 };
 
 } // end namespace umpire
