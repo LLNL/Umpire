@@ -33,7 +33,7 @@ Logger::Logger() noexcept
       m_is_enabled{false, false, false, false}
 {
   message::Level level{defaultLevel};
-  const char* enval = getenv(env_name);
+  const char* enval = std::getenv(env_name);
 
   if (enval) {
     for (int i = 0; i < message::Num_Levels; ++i) {

@@ -64,7 +64,7 @@ ResourceManager::ResourceManager()
 {
   UMPIRE_LOG(Debug, "() entering");
 
-  const char* env_enable_log{getenv("UMPIRE_LOG_LEVEL")};
+  const char* env_enable_log{std::getenv("UMPIRE_LOG_LEVEL")};
   const bool enable_log{env_enable_log != nullptr};
 
   util::initialize_io(enable_log);
