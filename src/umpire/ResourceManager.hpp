@@ -104,7 +104,7 @@ class ResourceManager {
    * \brief Get the names for existing SHARED Allocator names, if any.
    *
    * The SHARED memory resource only indicates whether or not these SHARED allocators
-   * exist. Since SHARED allocators are made at runtime, this function will actually 
+   * exist. Since SHARED allocators are made at runtime, this function will actually
    * find the specific name of each SHARED allocator and return it.
    *
    * \return A vector of strings with the available SHARED allocator names.
