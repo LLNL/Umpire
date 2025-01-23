@@ -272,10 +272,10 @@ std::vector<std::string> ResourceManager::getResourceNames()
   return registry.getResourceNames();
 }
 
-std::vector<std::string> ResourceManager::getSharedAllocNames()
+std::vector<std::string> ResourceManager::getSharedAllocatorNames()
 {
   if (m_shared_allocator_names.size() == 0) {
-    UMPIRE_LOG(Debug, "Called getSharedAllocNames, but there are none. Returning empty vector.");
+    UMPIRE_LOG(Debug, "Called getSharedAllocatorNames, but there are none. Returning empty vector.");
     return std::vector<std::string>(); // Return an empty vector of strings
   }
 

@@ -183,7 +183,7 @@ std::size_t get_total_bytes_allocated()
     total_memory += alloc.getActualSize();
   }
 
-  for (auto s : rm.getSharedAllocNames()) {
+  for (auto s : rm.getSharedAllocatorNames()) {
     umpire::Allocator alloc = rm.getAllocator(s);
     total_memory += alloc.getActualSize();
   }

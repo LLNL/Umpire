@@ -109,7 +109,7 @@ class ResourceManager {
    *
    * \return A vector of strings with the available SHARED allocator names.
    */
-  std::vector<std::string> getSharedAllocNames();
+  std::vector<std::string> getSharedAllocatorNames();
 
   /*!
    * \brief Set the default Allocator.
