@@ -37,6 +37,7 @@ void* HostMpi3SharedMemoryResource::allocate(std::size_t bytes)
 
   MPI_Win_allocate_shared(local_size, disp, MPI_INFO_NULL, m_shared_comm, &ptr, &win);
   MPI_Win_shared_query(win, 0, &size, &disp, ptr);
+  m_shared_windows[ptr] = win;
 
   return ptr;
 }
@@ -46,6 +47,7 @@ void HostMpi3SharedMemoryResource::deallocate(void* ptr, std::size_t)
   auto window = m_shared_windows.find(ptr);
   if (window != m_shared_windows.end()) {
     MPI_Win_free(&(window->second));
+    m_shared_windows.erase(window);
   } else {
     UMPIRE_ERROR(umpire::unknown_pointer_error, "");
   }
