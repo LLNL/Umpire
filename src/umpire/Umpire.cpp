@@ -173,6 +173,24 @@ void mark_event(const std::string& event)
       [&](auto& e) { e.name("event").category(event::category::metadata).arg("name", event).tag("replay", "true"); });
 }
 
+std::size_t get_total_bytes_allocated()
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  std::size_t total_memory{0};
+
+  for (auto s : rm.getResourceNames()) {
+    umpire::Allocator alloc = rm.getAllocator(s);
+    total_memory += alloc.getActualSize();
+  }
+
+  for (auto s : rm.getSharedAllocatorNames()) {
+    umpire::Allocator alloc = rm.getAllocator(s);
+    total_memory += alloc.getActualSize();
+  }
+
+  return total_memory;
+}
+
 std::size_t get_device_memory_usage(int device_id)
 {
 #if defined(UMPIRE_ENABLE_CUDA)

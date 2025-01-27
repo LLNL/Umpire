@@ -155,6 +155,10 @@ Allocator ResourceManager::makeResource(const std::string& name, MemoryResourceT
     traits.granularity = MemoryResourceTraits::granularity_type::fine_grained;
   }
 
+  if (name.find("SHARED") != std::string::npos) {
+    m_shared_allocator_names.push_back(name);
+  }
+
   std::unique_ptr<strategy::AllocationStrategy> allocator{registry.makeMemoryResource(name, getNextId(), traits)};
   allocator->setTracking(traits.tracking);
 
@@ -266,6 +270,16 @@ std::vector<std::string> ResourceManager::getResourceNames()
   resource::MemoryResourceRegistry& registry{resource::MemoryResourceRegistry::getInstance()};
 
   return registry.getResourceNames();
+}
+
+std::vector<std::string> ResourceManager::getSharedAllocatorNames()
+{
+  if (m_shared_allocator_names.size() == 0) {
+    UMPIRE_LOG(Debug, "Called getSharedAllocatorNames, but there are none. Returning empty vector.");
+    return std::vector<std::string>(); // Return an empty vector of strings
+  }
+
+  return m_shared_allocator_names;
 }
 
 void ResourceManager::setDefaultAllocator(Allocator allocator) noexcept

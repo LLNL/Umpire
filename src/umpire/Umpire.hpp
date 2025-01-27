@@ -163,6 +163,11 @@ std::size_t get_process_memory_usage_hwm();
 void mark_event(const std::string& event);
 
 /*!
+ * \brief Get the total umpire memory usage in bytes across all memory resources
+ */
+std::size_t get_total_bytes_allocated();
+
+/*!
  * \brief Get memory usage of device device_id, using appropriate underlying
  * vendor API.
  */
