@@ -40,6 +40,12 @@ if (UMPIRE_ENABLE_IPC_SHARED_MEMORY)
     SOURCES recipe_naming_shim.cpp
     DEPENDS_ON ${cookbook_depends})
   list(APPEND umpire_cookbooks recipe_naming_shim)
+
+  blt_add_executable(
+    NAME recipe_shared_memory_no_op.cpp
+    SOURCES recipe_shared_memory_no_op.cpp
+    DEPENDS_ON ${cookbook_depends})
+  list(APPEND umpire_cookbooks recipe_shared_memory_no_op.cpp)
 endif()
 
 if (UMPIRE_ENABLE_CUDA)

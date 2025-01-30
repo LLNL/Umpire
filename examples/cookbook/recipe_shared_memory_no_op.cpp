@@ -19,11 +19,10 @@ int main(int, char**)
 
   // allocations needed by the sample problem
   void* ptr = no_op_alloc.allocate(1024);
-  const int size_needed = no_op_alloc.getActualSize(); // Get total amount of memory used
+  no_op_alloc.deallocate(ptr);
   ////////////////////////////////////
 
-  std::cout << "The actual size is: " << size_needed << std::endl;
-  std::cout << "The hwm size is: " << no_op_alloc.getHighWatermark() << std::endl;
+  const int size_needed = no_op_alloc.getActualSize(); // Get total amount of memory used
 
   auto size_limited_alloc =
       rm.makeAllocator<umpire::strategy::SizeLimiter>("size_limited_alloc", rm.getAllocator("HOST"), size_needed);
@@ -32,7 +31,7 @@ int main(int, char**)
 
   std::cout << "Attempting to allocate the exact amount of bytes needed for the sample problem..." << std::endl;
   try {
-    void* data = pool.allocate(1024);
+    void* data = pool.allocate(size_needed);
     UMPIRE_USE_VAR(data);
     std::cout << "SUCCESS!" << std::endl;
   } catch (...) {
