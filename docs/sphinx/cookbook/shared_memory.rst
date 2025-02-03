@@ -78,7 +78,7 @@ Note that the ``node_allocator`` is the Shared Memory allocator we created above
 .. warning::
    If you use the ``umpire::get_communicators_for_allocator(...)`` helper function then you MUST
    also call ``umpire::cleanup_cached_communicators()`` function before you call ``MPI_Finalize()``
-   in order to avoid any memory leaks.
+   in order to avoid memory leaks.
 
 Additionally, we can double check that an allocator has the ``SHARED`` memory resource by asserting:
 
