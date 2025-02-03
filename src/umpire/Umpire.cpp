@@ -255,10 +255,16 @@ void* find_pointer_from_name(Allocator allocator, const std::string& name)
 }
 
 #if defined(UMPIRE_ENABLE_MPI)
-MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm)
-{
+namespace {
   static std::map<int, MPI_Comm> cached_communicators{};
 
+  std::map<int, MPI_Comm>& get_cached_communicators() {
+    return cached_communicators;
+  }
+}
+
+MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm)
+{
   MPI_Comm c;
   auto scope = a.getAllocationStrategy()->getTraits().scope;
   int id = a.getId();
@@ -276,6 +282,15 @@ MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm)
   }
 
   return c;
+}
+
+void cleanup_cached_communicators()
+{
+  std::map<int, MPI_Comm>& comm = get_cached_communicators();
+
+  for(auto c : comm) {
+    MPI_Comm_free(&c.second);
+  }
 }
 #endif
 

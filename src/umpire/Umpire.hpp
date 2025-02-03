@@ -189,7 +189,14 @@ umpire::MemoryResourceTraits get_default_resource_traits(const std::string& name
 void* find_pointer_from_name(Allocator allocator, const std::string& name);
 
 #if defined(UMPIRE_ENABLE_MPI)
+/*!
+ * \brief Return the MPI communicator for a shared memory allocator.
+ *
+ * NOTE: Using this function will REQUIRE users to call the
+ * cleanup_cached_communicators() function to avoid memory leaks.
+ */
 MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm);
+void cleanup_cached_communicators();
 #endif
 
 void register_external_allocation(void* ptr, util::AllocationRecord record);
