@@ -106,6 +106,7 @@ int main(int ac, char** av)
   named_node_allocator.deallocate(ptr2);
 
   if (use_mpi) {
+    umpire::cleanup_cached_communicators(); // Frees the shared_allocator_comm created above
     MPI_Finalize();
   }
 
