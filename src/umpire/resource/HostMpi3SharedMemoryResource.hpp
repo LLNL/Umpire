@@ -26,11 +26,7 @@ class HostMpi3SharedMemoryResource : public MemoryResource {
 
   void* allocate(std::size_t bytes) override;
 
-  void* allocate_named(const std::string& name, std::size_t bytes) override;
-
   void deallocate(void* ptr, std::size_t size) override;
-
-  std::size_t getActualSize() const noexcept override;
 
   bool isAccessibleFrom(Platform p) noexcept override;
 

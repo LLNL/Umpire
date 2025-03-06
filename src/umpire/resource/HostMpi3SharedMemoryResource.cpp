@@ -24,7 +24,8 @@ HostMpi3SharedMemoryResource::HostMpi3SharedMemoryResource(const std::string& na
 
 HostMpi3SharedMemoryResource::~HostMpi3SharedMemoryResource()
 {
-  MPI_Comm_free(&m_shared_comm);
+  // TODO: Add finalize routine for cleanup pre MPI_Finalize
+  // MPI_Comm_free(&m_shared_comm);
 }
 
 void* HostMpi3SharedMemoryResource::allocate(std::size_t bytes)
@@ -33,10 +34,10 @@ void* HostMpi3SharedMemoryResource::allocate(std::size_t bytes)
   MPI_Win win;
   MPI_Aint local_size = (m_local_rank != 0) ? 0 : bytes;
   MPI_Aint size = bytes;
-  int disp{sizeof(char)};
+  int disp{sizeof(unsigned char)};
 
   MPI_Win_allocate_shared(local_size, disp, MPI_INFO_NULL, m_shared_comm, &ptr, &win);
-  MPI_Win_shared_query(win, 0, &size, &disp, ptr);
+  MPI_Win_shared_query(win, 0, &size, &disp, &ptr);
   m_shared_windows[ptr] = win;
 
   return ptr;

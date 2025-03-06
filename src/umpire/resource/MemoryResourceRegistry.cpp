@@ -15,6 +15,10 @@
 #include "umpire/resource/HostSharedMemoryResourceFactory.hpp"
 #endif
 
+#if defined(UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
+#include "umpire/resource/HostMpi3SharedMemoryResourceFactory.hpp"
+#endif
+
 #if defined(UMPIRE_ENABLE_DEVELOPER_BENCHMARKS)
 #include "umpire/resource/NoOpResourceFactory.hpp"
 #endif
@@ -94,6 +98,11 @@ MemoryResourceRegistry::MemoryResourceRegistry() : m_allocator_factories()
 
 #if defined(UMPIRE_ENABLE_IPC_SHARED_MEMORY)
   registerMemoryResource(util::make_unique<resource::HostSharedMemoryResourceFactory>());
+  m_resource_names.push_back("SHARED");
+#endif
+
+#if defined(UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
+  registerMemoryResource(util::make_unique<resource::HostMpi3SharedMemoryResourceFactory>());
   m_resource_names.push_back("SHARED");
 #endif
 
