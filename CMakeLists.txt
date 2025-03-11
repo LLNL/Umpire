@@ -140,7 +140,7 @@ if (WIN32)
     Windows builds require the FileSystem to be enabled \
     and the C/C++ standard to be set to 17 or higher. \
     Please re-configure with UMPIRE_ENABLE_FILESYSTEM=ON, \
-    with BLT_CXX_STD=c++17 and CMAKE_CXX_STANDARD=17 or greater.")
+    with BLT_CXX_STD=c++17 or greater.")
   endif()
 endif()
 
