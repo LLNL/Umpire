@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -19,6 +19,7 @@ set (umpire_strategy_headers
   NamingShim.hpp
   PoolCoalesceHeuristic.hpp
   QuickPool.hpp
+  ResourceAwarePool.hpp
   SizeLimiter.hpp
   SlotPool.hpp
   StdAllocator.hpp
@@ -51,6 +52,7 @@ set (umpire_strategy_sources
   NamedAllocationStrategy.cpp
   NamingShim.cpp
   QuickPool.cpp
+  ResourceAwarePool.cpp
   SizeLimiter.cpp
   SlotPool.cpp
   ThreadSafeAllocator.cpp)
