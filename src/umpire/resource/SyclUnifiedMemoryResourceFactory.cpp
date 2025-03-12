@@ -36,12 +36,13 @@ std::unique_ptr<resource::MemoryResource> SyclUnifiedMemoryResourceFactory::crea
         std::rethrow_exception(e);
       } catch (sycl::exception const& ex) {
         std::cout << "Caught asynchronous SYCL exception:" << std::endl
-                  << ex.what() << ", SYCL code: " << ex.code() << std::endl;
+                  << ex.what() << ", SYCL code: " << ex.code().value() << std::endl;
       }
     }
   };
 
-  sycl::platform platform(sycl::gpu_selector_v());
+  sycl::queue queue{sycl::gpu_selector_v};
+  sycl::platform platform = queue.get_device().get_platform();
 
   int device_count = 0; // SYCL multi.device count
   auto const& devices = platform.get_devices();
