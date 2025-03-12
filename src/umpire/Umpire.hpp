@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -10,6 +10,7 @@
 #include <iostream>
 #include <string>
 
+#include "camp/camp.hpp"
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/config.hpp"
@@ -162,6 +163,11 @@ std::size_t get_process_memory_usage_hwm();
 void mark_event(const std::string& event);
 
 /*!
+ * \brief Get the total umpire memory usage in bytes across all memory resources
+ */
+std::size_t get_total_bytes_allocated();
+
+/*!
  * \brief Get memory usage of device device_id, using appropriate underlying
  * vendor API.
  */
@@ -183,11 +189,40 @@ umpire::MemoryResourceTraits get_default_resource_traits(const std::string& name
 void* find_pointer_from_name(Allocator allocator, const std::string& name);
 
 #if defined(UMPIRE_ENABLE_MPI)
+/*!
+ * \brief Return the MPI communicator for a shared memory allocator.
+ *
+ * NOTE: Using this function will REQUIRE users to call the
+ * cleanup_cached_communicators() function to avoid memory leaks.
+ */
 MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm);
+void cleanup_cached_communicators();
 #endif
 
 void register_external_allocation(void* ptr, util::AllocationRecord record);
 util::AllocationRecord deregister_external_allocation(void* ptr);
+
+/*!
+ * \brief Returns the Camp resource associated with a particular allocation
+ * **This function is used mainly for testing purposes.**
+ *
+ * \param Umpire allocator which was used to allocate the data
+ * \param Pointer which was used for the allocation
+ *
+ * \return Camp resource associated with the allocation *assuming the Allocator
+ * passed in is a ResourceAwarePool strategy and the allocation is either used or pending*
+ */
+camp::resources::Resource get_resource(Allocator a, void* ptr);
+
+/*!
+ * \brief Returns the number of pending chunks associated with a ResourceAwarePool Allocator
+ * **This function is used mainly for testing purposes.**
+ *
+ * \param Umpire ResourceAwarePool allocator
+ *
+ * \return Number of currently pending chunks in the ResourceAwarePool
+ */
+std::size_t get_num_pending(Allocator a);
 
 /*!
  * \brief Attempt to coalesce Allocator a, return true if a coalesce was performed.

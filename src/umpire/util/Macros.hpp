@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -36,7 +36,7 @@
       plog = axom::slic::Logger::getActiveLogger();                                                     \
       axom::slic::message::Level level;                                                                 \
       level = axom::slic::message::Level::Error;                                                        \
-      char* enval = getenv(env_name.c_str());                                                           \
+      char* enval = std::getenv(env_name.c_str());                                                      \
       if (enval != NULL) {                                                                              \
         for (int i = 0; i < axom::slic::message::Level::Num_Levels; ++i) {                              \
           if (strcasecmp(enval, axom::slic::message::MessageLevelName[i].c_str()) == 0) {               \

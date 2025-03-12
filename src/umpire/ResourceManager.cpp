@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -64,7 +64,7 @@ ResourceManager::ResourceManager()
 {
   UMPIRE_LOG(Debug, "() entering");
 
-  const char* env_enable_log{getenv("UMPIRE_LOG_LEVEL")};
+  const char* env_enable_log{std::getenv("UMPIRE_LOG_LEVEL")};
   const bool enable_log{env_enable_log != nullptr};
 
   util::initialize_io(enable_log);
@@ -153,6 +153,10 @@ Allocator ResourceManager::makeResource(const std::string& name, MemoryResourceT
 
   if (name.find("::FINE") != std::string::npos) {
     traits.granularity = MemoryResourceTraits::granularity_type::fine_grained;
+  }
+
+  if (name.find("SHARED") != std::string::npos) {
+    m_shared_allocator_names.push_back(name);
   }
 
   std::unique_ptr<strategy::AllocationStrategy> allocator{registry.makeMemoryResource(name, getNextId(), traits)};
@@ -266,6 +270,16 @@ std::vector<std::string> ResourceManager::getResourceNames()
   resource::MemoryResourceRegistry& registry{resource::MemoryResourceRegistry::getInstance()};
 
   return registry.getResourceNames();
+}
+
+std::vector<std::string> ResourceManager::getSharedAllocatorNames()
+{
+  if (m_shared_allocator_names.size() == 0) {
+    UMPIRE_LOG(Debug, "Called getSharedAllocatorNames, but there are none. Returning empty vector.");
+    return std::vector<std::string>(); // Return an empty vector of strings
+  }
+
+  return m_shared_allocator_names;
 }
 
 void ResourceManager::setDefaultAllocator(Allocator allocator) noexcept

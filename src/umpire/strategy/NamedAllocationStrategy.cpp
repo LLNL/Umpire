@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -20,6 +20,11 @@ NamedAllocationStrategy::NamedAllocationStrategy(const std::string& name, int id
 void* NamedAllocationStrategy::allocate(std::size_t bytes)
 {
   return m_allocator->allocate_internal(bytes);
+}
+
+void* NamedAllocationStrategy::allocate_named(const std::string& name, std::size_t bytes)
+{
+  return m_allocator->allocate_named_internal(name, bytes);
 }
 
 void NamedAllocationStrategy::deallocate(void* ptr, std::size_t size)

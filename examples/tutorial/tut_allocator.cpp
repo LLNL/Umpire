@@ -1,11 +1,12 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
+#include "umpire/Umpire.hpp"
 
 int main(int, char**)
 {
@@ -30,6 +31,8 @@ int main(int, char**)
 
   std::cout << "Created an add-on allocator of size " << addon_allocator.getCurrentSize() << " using the "
             << allocator.getName() << " allocator." << std::endl;
+
+  std::cout << "The total amount of memory used was: " << umpire::get_total_bytes_allocated() << std::endl;
 
   // _sphinx_tag_tut_deallocate_start
   allocator.deallocate(data);

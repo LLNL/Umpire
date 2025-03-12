@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -45,6 +45,7 @@ if (UMPIRE_ENABLE_HIP)
     NAME multi_device
     SOURCES multi_device.cpp
     DEPENDS_ON umpire blt::hip)
+
   list(APPEND umpire_examples multi_device)
 endif()
 
@@ -59,6 +60,24 @@ blt_add_executable(
   SOURCES strategy_example.cpp
   DEPENDS_ON ${example_depends})
 list(APPEND umpire_examples strategy_example)
+
+if (UMPIRE_ENABLE_CUDA)
+blt_add_executable(
+  NAME resource_aware_pool_example
+  SOURCES resource_aware_pool_example.cpp
+  DEPENDS_ON ${example_depends} cuda)
+elseif (UMPIRE_ENABLE_HIP)
+blt_add_executable(
+  NAME resource_aware_pool_example
+  SOURCES resource_aware_pool_example.cpp
+  DEPENDS_ON ${example_depends} blt::hip)
+else()
+blt_add_executable(
+  NAME resource_aware_pool_example
+  SOURCES resource_aware_pool_example.cpp
+  DEPENDS_ON ${example_depends})
+endif()
+list(APPEND umpire_examples resource_aware_pool_example)
 
 blt_add_executable(
   NAME allocator

@@ -47,6 +47,12 @@ Now you can allocate and deallocate shared memory with:
    ...
    node_allocator.deallocate(ptr);
 
+.. note::
+   A name is required in order to allocate memory with IPC Shared Memory allocators. However, if that isn't feasible, you
+   can instead use the :class:`umpire::strategy::NamingShim` strategy. This allows you to call allocate with only 1 argument
+   for the size in bytes. Check out the `example <https://github.com/LLNL/Umpire/blob/feature/nameless-shared-shim/examples/cookbook/recipe_naming_shim.cpp>`_ 
+   to learn more.
+
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Important Notes About Shared Memory
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -58,6 +64,7 @@ which set it apart from other Umpire allocators.
 2. If you want to see how much memory is available for a shared memory allocator, use the ``getActualSize()`` function.
 3. File descriptors are used for the shared memory. These files will be under ``/dev/shm``.
 4. Although Umpire does not need to have MPI enabled in order to provide IPC Shared Memory, if users wish to associate shared memory with MPI communicators, Umpire will need to be built with MPI enabled.
+5. It most likely won't make sense to use memory pools with a shared memory allocator. The way shared memory allocators are implemented makes them already kind of pool-like. Since you have to give them a size when you create them, that is basically the "chunk" of memory you have to work with. Then, the shared memory allocator will manage that chunk for you. Therefore, we *do not* recommend that you use pools on top of shared memory allocators.
 
 There are a few helper functions provided in the ``Umpire.hpp`` header that will be useful when working with 
 Shared Memory allocators. For example, you can grab the MPI communicator for a particular Shared Memory allocator with:
@@ -67,6 +74,12 @@ Shared Memory allocators. For example, you can grab the MPI communicator for a p
    MPI_Comm shared_allocator_comm = umpire::get_communicator_for_allocator(node_allocator, MPI_COMM_WORLD);
 
 Note that the ``node_allocator`` is the Shared Memory allocator we created above.
+
+.. warning::
+   If you use the ``umpire::get_communicators_for_allocator(...)`` helper function then you MUST
+   also call ``umpire::cleanup_cached_communicators()`` function before you call ``MPI_Finalize()``
+   in order to avoid memory leaks.
+
 Additionally, we can double check that an allocator has the ``SHARED`` memory resource by asserting:
 
 .. code-block:: cpp

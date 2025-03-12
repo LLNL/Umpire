@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -20,7 +20,7 @@ namespace alloc {
  */
 struct SyclPinnedAllocator {
   /*!
-   * \Brief Allocate bytes of memory using SYCL malloc_host
+   * \brief Allocate bytes of memory using SYCL malloc_host
    *
    * \param size Number of bytes to allocate.
    * \param queue_t SYCL queue for providing information on device and context
