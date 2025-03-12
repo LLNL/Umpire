@@ -77,7 +77,7 @@ MemoryResourceTraits SyclUnifiedMemoryResourceFactory::getDefaultTraits()
 {
   MemoryResourceTraits traits;
 
-  sycl::device syclDev(sycl::gpu_selector_v());
+  sycl::device syclDev(sycl::gpu_selector_v);
   if (syclDev.is_gpu()) {
     if (syclDev.get_info<sycl::info::device::partition_max_sub_devices>() > 0) {
       auto subDevicesDomainNuma =
