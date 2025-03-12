@@ -36,7 +36,7 @@ std::unique_ptr<resource::MemoryResource> SyclUnifiedMemoryResourceFactory::crea
         std::rethrow_exception(e);
       } catch (sycl::exception const& ex) {
         std::cout << "Caught asynchronous SYCL exception:" << std::endl
-                  << ex.what() << ", SYCL code: " << ex.code().value() << std::endl;
+                  << ex.what() << ", OpenCL code: " << ex.code().value() << std::endl;
       }
     }
   };
