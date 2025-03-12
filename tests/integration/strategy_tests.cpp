@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -761,6 +761,24 @@ TEST(NamingShimTests, TestAllocateDeallocate)
     void* ptr = shim.allocate(1024);
     EXPECT_NE(ptr, nullptr);
     shim.deallocate(ptr);
+  }
+}
+
+TEST(NamedAllocatorTest, ForwardName)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto traits{umpire::get_default_resource_traits("SHARED")};
+  traits.size = 1 * 1024 * 1024;
+  traits.scope = umpire::MemoryResourceTraits::shared_scope::node;
+
+  auto node_allocator{rm.makeResource("SHARED::allocator_for_named_test", traits)};
+
+  auto allocator{rm.makeAllocator<umpire::strategy::NamedAllocationStrategy>("shared named alloc", node_allocator)};
+  {
+    void* ptr = allocator.allocate("test", 1024);
+    EXPECT_NE(ptr, nullptr);
+    allocator.deallocate(ptr);
   }
 }
 #endif

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -99,6 +99,17 @@ class ResourceManager {
    * \return The available resource names.
    */
   std::vector<std::string> getResourceNames();
+
+  /*!
+   * \brief Get the names for existing SHARED Allocator names, if any.
+   *
+   * The SHARED memory resource only indicates whether or not these SHARED allocators
+   * exist. Since SHARED allocators are made at runtime, this function will actually
+   * find the specific name of each SHARED allocator and return it.
+   *
+   * \return A vector of strings with the available SHARED allocator names.
+   */
+  std::vector<std::string> getSharedAllocatorNames();
 
   /*!
    * \brief Set the default Allocator.
@@ -328,6 +339,7 @@ class ResourceManager {
   util::AllocationMap m_allocations;
 
   std::list<std::unique_ptr<strategy::AllocationStrategy>> m_allocators;
+  std::vector<std::string> m_shared_allocator_names;
 
   std::unordered_map<int, strategy::AllocationStrategy*> m_allocators_by_id;
   std::unordered_map<std::string, strategy::AllocationStrategy*> m_allocators_by_name;

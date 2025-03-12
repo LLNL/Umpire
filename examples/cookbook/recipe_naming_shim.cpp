@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -26,5 +26,6 @@ int main(int, char**)
 
   void* ptr = shim.allocate(1024);
   std::cout << "Ptr = " << ptr << std::endl;
+  std::cout << "Total Memory Allocated: " << umpire::get_total_bytes_allocated() << std::endl;
   shim.deallocate(ptr);
 }

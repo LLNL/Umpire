@@ -7,7 +7,7 @@ then
 fi
 
 ###############################################################################
-# Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -203,10 +203,6 @@ then
         cmake_options="-DBLT_MPI_COMMAND_APPEND:STRING=--overlap"
     fi
 
-    if [[ "${truehostname}" == "corona" || "${truehostname}" == "tioga" ]]
-    then
-        module unload rocm
-    fi
     $cmake_exe \
       -C ${hostconfig_path} \
       ${cmake_options} \
