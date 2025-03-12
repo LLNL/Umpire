@@ -961,7 +961,8 @@ int ResourceManager::getNumDevices() const
 #elif defined(UMPIRE_ENABLE_HIP)
   hipGetDeviceCount(&device_count);
 #elif defined(UMPIRE_ENABLE_SYCL)
-  sycl::platform platform(sycl::gpu_selector{});
+  sycl::queue queue{sycl::gpu_selector_v};
+  sycl::platform platform = queue.get_device().get_platform();
 
   auto devices = platform.get_devices();
   for (auto& device : devices) {
