@@ -7,6 +7,7 @@
 #ifndef UMPIRE_event_HPP
 #define UMPIRE_event_HPP
 
+#include <chrono>
 #include <cstdint>
 #include <cstdlib>
 #include <map>
