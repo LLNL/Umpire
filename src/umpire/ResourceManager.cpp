@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -961,7 +961,8 @@ int ResourceManager::getNumDevices() const
 #elif defined(UMPIRE_ENABLE_HIP)
   hipGetDeviceCount(&device_count);
 #elif defined(UMPIRE_ENABLE_SYCL)
-  sycl::platform platform(sycl::gpu_selector{});
+  sycl::queue queue{sycl::gpu_selector_v};
+  sycl::platform platform = queue.get_device().get_platform();
 
   auto devices = platform.get_devices();
   for (auto& device : devices) {
