@@ -36,6 +36,7 @@ ibm_clang_14_0_5_mpi_shmem_memleak:
     SPEC: "~shared +asan +tools tests=basic +ipc_shmem +mpi %clang@=14.0.5.ibm.gcc.8.3.1 cxxflags==-fsanitize=address ^spectrum-mpi"
     ASAN_OPTIONS: "detect_leaks=1"
     LSAN_OPTIONS: "suppressions=/usr/workspace/umdev/MyASan.supp"
+    LASSEN_JOB_ALLOC: "1 -W 20 -q pci"
   extends: .job_on_lassen
 
 ibm_clang_14_0_5_mpi:
