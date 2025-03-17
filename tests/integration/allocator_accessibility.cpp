@@ -15,6 +15,10 @@
 #include "umpire/strategy/QuickPool.hpp"
 #include "umpire/util/MemoryResourceTraits.hpp"
 
+#if defined(UMPIRE_ENABLE_MPI)
+#include <mpi.h>
+#endif
+
 namespace {
 const size_t allocation_size = 42;
 
@@ -276,5 +280,23 @@ std::vector<std::string> get_allocators(bool ignore_shared_memory)
 
 INSTANTIATE_TEST_SUITE_P(Allocators, AllocatorAccessibilityTest, ::testing::ValuesIn(get_allocators(false)));
 INSTANTIATE_TEST_SUITE_P(Pools, PoolAccessibilityTest, ::testing::ValuesIn(get_allocators(true)));
+
+#if defined(UMPIRE_ENABLE_MPI)
+int main(int argc, char* argv[])
+{
+  int result = 0;
+
+  ::testing::InitGoogleTest(&argc, argv);
+
+  MPI_Init(&argc, &argv);
+
+
+  result = RUN_ALL_TESTS();
+
+  MPI_Finalize();
+
+  return result;
+}
+#endif
 
 // END gtest
