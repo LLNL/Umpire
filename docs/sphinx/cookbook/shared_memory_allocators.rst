@@ -1,8 +1,8 @@
 .. _shared_memory_allocators_recipe:
 
-========================
-Shared Memory Allocators
-========================
+==============================
+Using Shared Memory Allocators
+==============================
 
 Umpire provides two different kinds of Shared Memory capabilities.
 First, Umpire provides Inter-Process Communication (IPC) Shared Memory
