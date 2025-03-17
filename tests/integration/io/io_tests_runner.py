@@ -68,8 +68,12 @@ def run_io_test(test_env, file_uid, expect_logging):
     if expect_logging:
         cmd_args.append('--enable-logging')
 
+    env = os.environ.copy()
+    #TODO: toss4 slurm only?
+    env.pop('PMI_FD')
+
     test_program = subprocess.Popen(cmd_args,
-            env=dict(os.environ, **test_env),
+            env=dict(env, **test_env),
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             shell=False)
@@ -81,6 +85,8 @@ def run_io_test(test_env, file_uid, expect_logging):
 
     if ecode != 0:
         print("{RED}[   ERROR]{END} Unexpected exit code {ecode} from io_test".format(ecode=ecode, **formatters))
+        for line in error:
+            print(line)
         errors = 1
     else:
         check_output('stderr', error, b'testing error stream')
