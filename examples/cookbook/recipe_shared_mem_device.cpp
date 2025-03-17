@@ -34,10 +34,10 @@ int main(int, char**)
   auto shim{rm.makeAllocator<umpire::strategy::NamingShim>("shim", node_allocator)};
 
   double* ptr = static_cast<double*>(shim.allocate(4096*sizeof(double)));
-  hipError_t err = hipHostRegister(ptr, 4096*sizeof(double), hipHostRegisterDefault);
-  if (err != hipSuccess) {
-    std::cerr << "Error registering host memory: " << err << std::endl;
-  }
+  //hipError_t err = hipHostRegister(ptr, 4096*sizeof(double), hipHostRegisterDefault);
+  //if (err != hipSuccess) {
+  //  std::cerr << "Error registering host memory: " << err << std::endl;
+  //}
 
   touch_data<<<16, 256>>>(ptr, 4096);
 
