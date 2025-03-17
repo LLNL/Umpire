@@ -70,7 +70,7 @@ def run_io_test(test_env, file_uid, expect_logging):
 
     env = os.environ.copy()
     #TODO: toss4 slurm only?
-    env.pop('PMI_FD')
+    env.pop('PMI_FD', None)
 
     test_program = subprocess.Popen(cmd_args,
             env=dict(env, **test_env),
