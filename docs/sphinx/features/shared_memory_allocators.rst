@@ -12,7 +12,7 @@ Memory provide a convenient way to share memory across nodes/sockets,
 each type has a few unique characteristics and usage details which
 will be outlined in this section of the documentation.
 
-This :doc:`cookbook recipe <cookbook/shared_memory_allocators>` shows how to use both the IPC and MPI3 Shared Memory allocators.
+This :doc:`cookbook recipe <../cookbook/shared_memory_allocators>` shows how to use both the IPC and MPI3 Shared Memory allocators.
 
 Important Notes About Shared Memory Allocators
 ----------------------------------------------
