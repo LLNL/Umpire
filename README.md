@@ -1,4 +1,4 @@
-# <img src="https://cdn.rawgit.com/LLNL/Umpire/develop/share/umpire/logo/umpire-logo.png" width="128" valign="middle" alt="Umpire"/>  Umpire v2024.07.0
+# <img src="https://cdn.rawgit.com/LLNL/Umpire/develop/share/umpire/logo/umpire-logo.png" width="128" valign="middle" alt="Umpire"/>  Umpire v2025.03.0
 
 [![Documentation Status](https://readthedocs.org/projects/umpire/badge/?version=develop)](https://umpire.readthedocs.io/en/develop/?badge=develop)
 [![Github Actions Build Status](https://github.com/LLNL/Umpire/actions/workflows/build.yml/badge.svg)](https://github.com/LLNL/Umpire/actions/workflows/build.yml)

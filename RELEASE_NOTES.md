@@ -1,3 +1,25 @@
+# v2025.03.0
+
+## New Features
+
+- Added a ResourceAwarePool which allows memory from the same pool to be used (1) across multiple device streams and (2) in a single memory space environment without the potential to cause data races.
+
+- Added MPI3 Shared Memory Allocators which uses MPI3 capabilities for Shared Memory.
+
+- Added a `NamingShim` strategy to allow users to allocate IPC shared memory without providing a name.
+
+## Bug Fixes
+
+- Fixed a minor memory leak when using IPC Shared Memory Allocators.
+
+## Improvements
+
+- A `get_total_bytes_allocated` function was implemented which returns the total amount of bytes allocated with Umpire allocators.
+
+- Additional documentation for Shared Memory Allocators was created and reorganized.
+
+- Additional documentation on requirements for Windows builds was added to the cmake.
+
 # v2024.07.0
 
 ## Changes Impacting Builds
