@@ -848,17 +848,17 @@ TEST(ConstDeviceMemoryTest, SetConstDeviceMemory)
   static constexpr int TEST_VAL = 42;
 
   auto host_allocator = rm.getAllocator("HOST");
-  int* HOST_DATA = static_cast< int* >(host_allocator.allocate(BYTESIZE));
-  
-  for ( int i = 0; i < N; ++i ) {
-    HOST_DATA[ i ] = TEST_VAL;
+  int* HOST_DATA = static_cast<int*>(host_allocator.allocate(BYTESIZE));
+
+  for (int i = 0; i < N; ++i) {
+    HOST_DATA[i] = TEST_VAL;
   }
 
-  int* A_d = static_cast< int* >(const_allocator.allocate(BYTESIZE));
+  int* A_d = static_cast<int*>(const_allocator.allocate(BYTESIZE));
   EXPECT_TRUE(A_d != nullptr);
   rm.copy(A_d, HOST_DATA, BYTESIZE);
-  
+
   host_allocator.deallocate(HOST_DATA);
   const_allocator.deallocate(A_d);
 }
-#endif 
+#endif

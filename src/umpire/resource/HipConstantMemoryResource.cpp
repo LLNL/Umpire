@@ -14,7 +14,7 @@
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/error.hpp"
 
-static constexpr int MAX_CONST_MEM_SIZE = 64 * 1024; 
+static constexpr int MAX_CONST_MEM_SIZE = 64 * 1024;
 __constant__ static char s_umpire_internal_device_constant_memory[MAX_CONST_MEM_SIZE];
 
 namespace umpire {
