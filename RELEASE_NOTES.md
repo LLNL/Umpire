@@ -16,6 +16,8 @@
 
 - A `get_total_bytes_allocated` function was implemented which returns the total amount of bytes allocated with Umpire allocators.
 
+- The `NamedAllocationStrategy` can now be used with IPC Shared Memory Allocators.
+
 - Additional documentation for Shared Memory Allocators was created and reorganized.
 
 - Additional documentation on requirements for Windows builds was added to the cmake.
