@@ -157,7 +157,7 @@ if (UMPIRE_ENABLE_IPC_SHARED_MEMORY)
     umpire INTERFACE Threads::Threads -lrt 
   )
 else()
-  message(STATUS "Host Shared Memory Disabled")
+  message(STATUS "IPC Shared Memory Disabled")
 endif()
 
 if (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP)

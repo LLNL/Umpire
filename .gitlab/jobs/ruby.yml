@@ -49,3 +49,8 @@ gcc_10_3_1_ipc_no_mpi:
   variables:
     SPEC: "~shared +ipc_shmem tests=basic %gcc@=10.3.1"
   extends: .job_on_ruby
+
+gcc_10_3_1_mpi3_shmem:
+  variables:
+    SPEC: "~shared +mpi3_shmem +mpi tests=basic %gcc@=10.3.1 ^mvapich2"
+  extends: .job_on_ruby

@@ -38,6 +38,18 @@ if(UMPIRE_ENABLE_IPC_SHARED_MEMORY AND UMPIRE_ENABLE_MPI)
     NUM_MPI_TASKS 4)
 endif()
 
+if (UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
+  blt_add_executable(
+    NAME mpi3_shared_memory_resource_tests
+    SOURCES mpi3_shared_memory_resource_tests.cpp
+    DEPENDS_ON ${resource_depends})
+
+  umpire_add_test_with_mpi(
+    NAME mpi3_shared_memory_resource_tests
+    COMMAND mpi3_shared_memory_resource_tests
+    NUM_MPI_TASKS 4)
+endif ()
+
 if (UMPIRE_ENABLE_GMOCK)
   blt_add_executable(
     NAME resource_tests
