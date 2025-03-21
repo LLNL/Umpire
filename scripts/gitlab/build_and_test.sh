@@ -189,7 +189,13 @@ then
     echo ""
     timed_message "Cleaning working directory"
 
+    # Map CPU core allocations
+    declare -A core_counts=(["lassen"]=40 ["ruby"]=28 ["poodle"]=28 ["corona"]=32 ["rzansel"]=48 ["tioga"]=32)
+
     # If building, then delete everything first
+    # NOTE: 'cmake --build . -j core_counts' attempts to reduce individual build resources.
+    #       If core_counts does not contain hostname, then will default to '-j ', which should
+    #       use max cores.
     rm -rf ${build_dir} 2>/dev/null
     mkdir -p ${build_dir} && cd ${build_dir}
 
@@ -208,7 +214,7 @@ then
       ${cmake_options} \
       -DCMAKE_INSTALL_PREFIX=${install_dir} \
       ${project_dir}
-    if ! $cmake_exe --build . -j
+    if ! $cmake_exe --build . -j ${core_counts[$truehostname]}
     then
         echo "[Error]: Compilation failed, building with verbose output..."
         timed_message "Re-building with --verbose"
@@ -249,7 +255,7 @@ then
         echo "[Error]: No tests were found" && exit 1
     fi
 
-    timed_message "Preparing testing xml reports for export"
+    timed_message "Preparing tests xml reports for export"
     tree Testing
     xsltproc -o junit.xml ${project_dir}/blt/tests/ctest-to-junit.xsl Testing/*/Test.xml
     mv junit.xml ${project_dir}/junit.xml
@@ -288,10 +294,3 @@ fi
 cd ${project_dir}
 
 timed_message "Build and test completed"
-echo "~~~~~ To reproduce this build on ${truehostname}:"
-echo ""
-echo " git checkout `git rev-parse HEAD` && git submodule update --init --recursive"
-echo ""
-echo "SPACK_DISABLE_LOCAL_CONFIG=\"\" SPACK_USER_CACHE_PATH=\"ci_spack_cache\" python3 scripts/uberenv/uberenv.py --prefix=/tmp/\$(whoami)/uberenv --spec=\"${spec}\""
-echo ""
-echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
