@@ -34,7 +34,7 @@ variables:
 # Use the service user workspace. Solves permission issues, stores everything
 # at the same location whoever triggers a pipeline.
   CUSTOM_CI_BUILDS_DIR: /usr/workspace/umdev/gitlab-runner
-# Optimize submodules usage: only fetch the ones we need.
+# Submodules: We don't need to fetch dependencies handled by Spack.
   GIT_SUBMODULE_STRATEGY: normal
   GIT_SUBMODULE_DEPTH: 1
   GIT_SUBMODULE_UPDATE_FLAGS: --jobs 2

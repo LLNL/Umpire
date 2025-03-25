@@ -52,3 +52,23 @@ rocmcc_5_7_1_hip_openmp_device_alloc:
   variables:
     SPEC: "~shared +fortran +openmp +rocm +device_alloc tests=basic amdgpu_target=gfx90a %rocmcc@=5.7.1 ^hip@5.7.1"
   extends: .job_on_tioga
+
+gcc_rocmcc_6_3_1_hip_openmp_device_alloc:
+  variables:
+    SPEC: "~shared +fortran +openmp +rocm +device_alloc tests=basic amdgpu_target=gfx90a %gcc@=12.2.1 ^hip@6.3.1"
+  extends: .job_on_tioga
+
+gcc_rocmcc_6_2_4_hip_openmp_device_alloc:
+  variables:
+    SPEC: "~shared +fortran +openmp +rocm +device_alloc tests=basic amdgpu_target=gfx90a %gcc@=12.2.1 ^hip@6.2.4"
+  extends: .job_on_tioga
+
+gcc_rocmcc_6_1_2_hip_openmp_device_alloc:
+  variables:
+    SPEC: "~shared +fortran +openmp +rocm +device_alloc tests=basic amdgpu_target=gfx90a %gcc@=12.2.1 ^hip@6.1.2"
+  extends: .job_on_tioga
+
+gcc_rocmcc_5_7_1_hip_openmp_device_alloc:
+  variables:
+    SPEC: "~shared +fortran +openmp +rocm +device_alloc tests=basic amdgpu_target=gfx90a %gcc@=12.2.1 ^hip@5.7.1"
+  extends: .job_on_tioga
