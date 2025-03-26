@@ -145,6 +145,15 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
   std::size_t getReleasableBlocks() const noexcept;
   std::size_t getTotalBlocks() const noexcept;
 
+  /*!
+   * \brief By default, the Release function releases only free
+   * chunks of memory. If users set release_pending to true,
+   * then the release function will release both free and pending
+   * chunks of memory. If release_pending is set to true, the  
+   * release function will take longer.
+   */
+  void setReleasePending(bool val) noexcept;
+
   void coalesce() noexcept;
   void do_coalesce(std::size_t suggested_size) noexcept;
 
@@ -239,6 +248,7 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
   std::size_t m_aligned_highwatermark{0};
   bool m_is_destructing{false};
   bool m_is_coalescing{false};
+  bool m_release_pending{false};
 };
 
 std::ostream& operator<<(std::ostream& out, umpire::strategy::PoolCoalesceHeuristic<ResourceAwarePool>&);

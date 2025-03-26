@@ -285,6 +285,11 @@ void ResourceAwarePool::deallocate_resource(void* ptr, camp::resources::Resource
   }
 }
 
+void ResourceAwarePool::setReleasePending(bool val) noexcept
+{
+  m_release_pending = val;
+}
+
 void ResourceAwarePool::release()
 {
   UMPIRE_LOG(Debug, "() " << m_free_map.size() << " chunks in free map, m_is_destructing set to " << m_is_destructing);
@@ -298,13 +303,24 @@ void ResourceAwarePool::release()
     if (m_is_destructing) { // If we are destructing, wait for all deallocations to occur
       chunk->event.wait();
     }
-    if (chunk != nullptr && chunk->free == false &&
-        chunk->event.check()) { // Otherwise, move all finished pending chunks to free map to be released
-      m_free_map.insert(std::make_pair(chunk->size, chunk));
-      chunk->free = true;
-      it = m_pending_list.erase(it);
+    if (m_release_pending) { // Need to wait for pending chunks
+      if (chunk != nullptr && chunk->free == false) {
+        chunk->event.wait(); // Wait for all pending chunks then move to free map to be released
+        m_free_map.insert(std::make_pair(chunk->size, chunk));
+        chunk->free = true;
+        it = m_pending_list.erase(it);
+      } else {
+        it++;
+      }
     } else {
-      it++;
+      if (chunk != nullptr && chunk->free == false &&
+        chunk->event.check()) { // Move all finished pending chunks to free map to be released
+        m_free_map.insert(std::make_pair(chunk->size, chunk));
+        chunk->free = true;
+        it = m_pending_list.erase(it);
+      } else {
+        it++;
+      }
     }
   }
 
