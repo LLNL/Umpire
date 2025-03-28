@@ -9,6 +9,8 @@
 
 #include <functional>
 #include <map>
+#include <optional>
+#include <vector>
 #include <memory>
 #include <tuple>
 #include <unordered_map>
@@ -183,7 +185,8 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
   };
 
   using PointerMap = std::unordered_map<void*, Chunk*>;
-  using PendingList = std::list<Chunk*>;
+  //using PendingMap = std::unordered_map<Resource, std::vector<Chunk*>>;
+  using PendingMap = std::map<std::optional<Resource>, std::vector<Chunk*>>;
   using SizeMap =
       std::multimap<std::size_t, Chunk*, std::less<std::size_t>, pool_allocator<std::pair<const std::size_t, Chunk*>>>;
 
@@ -221,7 +224,9 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
  private:
   PointerMap m_used_map{};
   SizeMap m_free_map{};
-  PendingList m_pending_list{};
+  PendingMap m_pending_map{};
+  //std::unique_ptr<PendingMap> m_pending_map;
+  //PendingMap m_pending_map{camp::resources::Host().get_default(), std::vector<Chunk*>()};
 
   util::FixedMallocPool m_chunk_pool{sizeof(Chunk)};
 
