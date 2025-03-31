@@ -34,6 +34,16 @@ struct op_caller<1, Op > {
       Op<resource::hip_platform>::exec(src, args...);
     }
 #endif
+#if defined(UMPIRE_ENABLE_SYCL)
+    else if (p == camp::resources::Platform::sycl) {
+      Op<op::sycl_platform>::exec(src, args...);
+    }
+#endif
+#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
+    else if (p == camp::resources::Platform::omp_target) {
+      Op<op::openmp_target_platform>::exec(src, args...);
+    }
+#endif
   }
 };
 
@@ -75,6 +85,24 @@ struct op_caller<2, Op> {
       Op<resource::host_platform, resource::hip_platform>::exec(src, dst, args...);
     } else if (p1 == camp::resources::Platform::hip && p2 == camp::resources::Platform::host) {
       Op<resource::hip_platform, resource::host_platform>::exec(src, dst, args...);
+    }
+#endif
+#if defined(UMPIRE_ENABLE_SYCL)
+    if (p1 == p2 && (p1 == camp::resources::Platform::sycl)) {
+      Op<op::sycl_platform, op::sycl_platform>::exec(src, dst, args...);
+    } else if (p1 == camp::resources::Platform::host && p2 == camp::resources::Platform::sycl) {
+      Op<resource::host_platform, op::sycl_platform>::exec(src, dst, args...);
+    } else if (p1 == camp::resources::Platform::sycl && p2 == camp::resources::Platform::host) {
+      Op<op::sycl_platform, resource::host_platform>::exec(src, dst, args...);
+    }
+#endif
+#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
+    if (p1 == p2 && (p1 == camp::resources::Platform::omp_target)) {
+      Op<op::openmp_target_platform, op::openmp_target_platform>::exec(src, dst, args...);
+    } else if (p1 == camp::resources::Platform::host && p2 == camp::resources::Platform::omp_target) {
+      Op<resource::host_platform, op::openmp_target_platform>::exec(src, dst, args...);
+    } else if (p1 == camp::resources::Platform::omp_target && p2 == camp::resources::Platform::host) {
+      Op<op::openmp_target_platform, resource::host_platform>::exec(src, dst, args...);
     }
 #endif
   }
@@ -123,6 +151,24 @@ camp::resources::EventProxy<camp::resources::Resource> copy(T* src, T* dst, camp
       return op::copy<resource::hip_platform, resource::host_platform>::exec(src, dst, len, ctx);
     }
 #endif
+#if defined(UMPIRE_ENABLE_SYCL)
+    if (p1 == p2 && (p1 == camp::resources::Platform::sycl)) {
+      return op::copy<op::sycl_platform, op::sycl_platform>::exec(src, dst, len, ctx);
+    } else if (p1 == camp::resources::Platform::host && p2 == camp::resources::Platform::sycl) {
+      return op::copy<resource::host_platform, op::sycl_platform>::exec(src, dst, len, ctx);
+    } else if (p1 == camp::resources::Platform::sycl && p2 == camp::resources::Platform::host) {
+      return op::copy<op::sycl_platform, resource::host_platform>::exec(src, dst, len, ctx);
+    }
+#endif
+#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
+    if (p1 == p2 && (p1 == camp::resources::Platform::omp_target)) {
+      return op::copy<op::openmp_target_platform, op::openmp_target_platform>::exec(src, dst, len, ctx);
+    } else if (p1 == camp::resources::Platform::host && p2 == camp::resources::Platform::omp_target) {
+      return op::copy<resource::host_platform, op::openmp_target_platform>::exec(src, dst, len, ctx);
+    } else if (p1 == camp::resources::Platform::omp_target && p2 == camp::resources::Platform::host) {
+      return op::copy<op::openmp_target_platform, resource::host_platform>::exec(src, dst, len, ctx);
+    }
+#endif
     
     UMPIRE_ERROR(runtime_error, 
                  fmt::format("Unknown platforms for copy: src={}, dst={}", 
@@ -154,6 +200,16 @@ camp::resources::EventProxy<camp::resources::Resource> memset(T* src, int v, cam
 #if defined(UMPIRE_ENABLE_HIP)
     else if (p == camp::resources::Platform::hip) {
       return op::memset<resource::hip_platform>::exec(src, v, len, ctx);
+    }
+#endif
+#if defined(UMPIRE_ENABLE_SYCL)
+    else if (p == camp::resources::Platform::sycl) {
+      return op::memset<op::sycl_platform>::exec(src, v, len, ctx);
+    }
+#endif
+#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
+    else if (p == camp::resources::Platform::omp_target) {
+      return op::memset<op::openmp_target_platform>::exec(src, v, len, ctx);
     }
 #endif
     

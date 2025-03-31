@@ -724,6 +724,10 @@ void* ResourceManager::reallocate_impl(void* current_ptr, std::size_t new_size, 
       //   new_ptr = umpire::reallocate<resource::cuda_platform>(current_ptr, new_size);
       // } else if (platform == Platform::hip) {
       //   new_ptr = umpire::reallocate<resource::hip_platform>(current_ptr, new_size);
+      // } else if (platform == Platform::sycl) {
+      //   new_ptr = umpire::reallocate<op::sycl_platform>(current_ptr, new_size);
+      // } else if (platform == Platform::omp_target) {
+      //   new_ptr = umpire::reallocate<op::openmp_target_platform>(current_ptr, new_size);
       // }
     }
   }
@@ -800,6 +804,16 @@ void* ResourceManager::reallocate_impl(void* current_ptr, std::size_t new_size, 
       //   // new_ptr = ...
       // } else if (platform == Platform::hip) {
       //   // Similar pattern for HIP
+      //   auto proxy = umpire::reallocate(static_cast<void*>(current_ptr), new_size, ctx);
+      //   proxy.wait();
+      //   // new_ptr = ...
+      // } else if (platform == Platform::sycl) {
+      //   // Similar pattern for SYCL
+      //   auto proxy = umpire::reallocate(static_cast<void*>(current_ptr), new_size, ctx);
+      //   proxy.wait();
+      //   // new_ptr = ...
+      // } else if (platform == Platform::omp_target) {
+      //   // Similar pattern for OpenMP Target
       //   auto proxy = umpire::reallocate(static_cast<void*>(current_ptr), new_size, ctx);
       //   proxy.wait();
       //   // new_ptr = ...
@@ -914,6 +928,8 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::prefetch
     return umpire::prefetch<resource::cuda_platform>(static_cast<void*>(ptr), device, ctx, size);
   } else if (platform == Platform::hip) {
     return umpire::prefetch<resource::hip_platform>(static_cast<void*>(ptr), device, ctx, size);
+  } else if (platform == Platform::sycl) {
+    return umpire::prefetch<op::sycl_platform>(static_cast<void*>(ptr), device, ctx, size);
   } else {
     UMPIRE_ERROR(runtime_error, 
                  fmt::format("Prefetch not supported for platform: {}", 
