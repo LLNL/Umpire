@@ -42,6 +42,8 @@
 #include "umpire/util/sycl_compat.hpp"
 #endif
 
+#include "umpire/op.hpp"
+
 static const char* s_null_resource_name{"__umpire_internal_null"};
 static const char* s_zero_byte_pool_name{"__umpire_internal_0_byte_pool"};
 
@@ -571,7 +573,7 @@ void ResourceManager::copy(void* dst_ptr, void* src_ptr, std::size_t size)
 {
   UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", dst_ptr=" << dst_ptr << ", size=" << size << ")");
 
-  auto& op_registry = op::MemoryOperationRegistry::getInstance();
+  //auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
   auto src_alloc_record = m_allocations.find(src_ptr);
   std::ptrdiff_t src_offset = static_cast<char*>(src_ptr) - static_cast<char*>(src_alloc_record->ptr);
@@ -585,29 +587,27 @@ void ResourceManager::copy(void* dst_ptr, void* src_ptr, std::size_t size)
     size = src_size;
   }
 
-  umpire::event::record([&](auto& event) {
-    event.name("copy")
-        .category(event::category::operation)
-        .arg("src", src_ptr)
-        .arg("dst", dst_ptr)
-        .arg("src_offset", src_offset)
-        .arg("dst_offset", dst_offset)
-        .arg("size", size)
-        .arg("src_allocator_ref", (void*)src_alloc_record->strategy)
-        .arg("dst_allocator_ref", (void*)dst_alloc_record->strategy)
-        .tag("src_allocator_name", src_alloc_record->strategy->getName())
-        .tag("dst_allocator_name", dst_alloc_record->strategy->getName())
-        .tag("replay", "true");
-  });
+  //umpire::event::record([&](auto& event) {
+  //  event.name("copy")
+  //      .category(event::category::operation)
+  //      .arg("src", src_ptr)
+  //      .arg("dst", dst_ptr)
+  //      .arg("src_offset", src_offset)
+  //      .arg("dst_offset", dst_offset)
+  //      .arg("size", size)
+  //      .arg("src_allocator_ref", (void*)src_alloc_record->strategy)
+  //      .arg("dst_allocator_ref", (void*)dst_alloc_record->strategy)
+  //      .tag("src_allocator_name", src_alloc_record->strategy->getName())
+  //      .tag("dst_allocator_name", dst_alloc_record->strategy->getName())
+  //      .tag("replay", "true");
+  //});
 
   if (size > dst_size) {
     UMPIRE_ERROR(runtime_error,
                  fmt::format("Not enough space in destination to copy {} bytes into {} bytes", size, dst_size));
   }
 
-  auto op = op_registry.find("COPY", src_alloc_record->strategy, dst_alloc_record->strategy);
-
-  op->transform(src_ptr, &dst_ptr, src_alloc_record, dst_alloc_record, size);
+  umpire::copy(src_ptr, dst_ptr, size);
 }
 
 camp::resources::EventProxy<camp::resources::Resource> ResourceManager::copy(void* dst_ptr, void* src_ptr,
@@ -685,9 +685,10 @@ void ResourceManager::memset(void* ptr, int value, std::size_t length)
     UMPIRE_ERROR(runtime_error, fmt::format("Cannot memset over the end of allocation: {} -> {}", length, size));
   }
 
-  auto op = op_registry.find("MEMSET", alloc_record->strategy, alloc_record->strategy);
+  //auto op = op_registry.find("MEMSET", alloc_record->strategy, alloc_record->strategy);
 
-  op->apply(ptr, alloc_record, value, length);
+  //op->apply(ptr, alloc_record, value, length);
+  umpire::memset(ptr, value, length);
 }
 
 camp::resources::EventProxy<camp::resources::Resource> ResourceManager::memset(void* ptr, int value,
