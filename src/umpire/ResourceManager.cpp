@@ -392,8 +392,6 @@ void ResourceManager::copy(void* dst_ptr, void* src_ptr, std::size_t size)
 {
   UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", dst_ptr=" << dst_ptr << ", size=" << size << ")");
 
-  //auto& op_registry = op::MemoryOperationRegistry::getInstance();
-
   auto src_alloc_record = m_allocations.find(src_ptr);
   std::ptrdiff_t src_offset = static_cast<char*>(src_ptr) - static_cast<char*>(src_alloc_record->ptr);
   std::size_t src_size = src_alloc_record->size - src_offset;
@@ -406,27 +404,28 @@ void ResourceManager::copy(void* dst_ptr, void* src_ptr, std::size_t size)
     size = src_size;
   }
 
-  //umpire::event::record([&](auto& event) {
-  //  event.name("copy")
-  //      .category(event::category::operation)
-  //      .arg("src", src_ptr)
-  //      .arg("dst", dst_ptr)
-  //      .arg("src_offset", src_offset)
-  //      .arg("dst_offset", dst_offset)
-  //      .arg("size", size)
-  //      .arg("src_allocator_ref", (void*)src_alloc_record->strategy)
-  //      .arg("dst_allocator_ref", (void*)dst_alloc_record->strategy)
-  //      .tag("src_allocator_name", src_alloc_record->strategy->getName())
-  //      .tag("dst_allocator_name", dst_alloc_record->strategy->getName())
-  //      .tag("replay", "true");
-  //});
+  umpire::event::record([&](auto& event) {
+    event.name("copy")
+        .category(event::category::operation)
+        .arg("src", src_ptr)
+        .arg("dst", dst_ptr)
+        .arg("src_offset", src_offset)
+        .arg("dst_offset", dst_offset)
+        .arg("size", size)
+        .arg("src_allocator_ref", (void*)src_alloc_record->strategy)
+        .arg("dst_allocator_ref", (void*)dst_alloc_record->strategy)
+        .tag("src_allocator_name", src_alloc_record->strategy->getName())
+        .tag("dst_allocator_name", dst_alloc_record->strategy->getName())
+        .tag("replay", "true");
+  });
 
   if (size > dst_size) {
     UMPIRE_ERROR(runtime_error,
                  fmt::format("Not enough space in destination to copy {} bytes into {} bytes", size, dst_size));
   }
 
-  umpire::copy(src_ptr, dst_ptr, size);
+  // Use the template-based copy operation
+  umpire::copy(static_cast<void*>(src_ptr), static_cast<void*>(dst_ptr), size);
 }
 
 camp::resources::EventProxy<camp::resources::Resource> ResourceManager::copy(void* dst_ptr, void* src_ptr,
@@ -434,8 +433,6 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::copy(voi
                                                                              std::size_t size)
 {
   UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", dst_ptr=" << dst_ptr << ", size=" << size << ")");
-
-  auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
   auto src_alloc_record = m_allocations.find(src_ptr);
   std::ptrdiff_t src_offset = static_cast<char*>(src_ptr) - static_cast<char*>(src_alloc_record->ptr);
@@ -469,16 +466,18 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::copy(voi
     UMPIRE_ERROR(runtime_error, fmt::format("Not enough resource in destination for copy: {} -> {}", size, dst_size));
   }
 
-  auto op = op_registry.find("COPY", src_alloc_record->strategy, dst_alloc_record->strategy);
-
-  return op->transform_async(src_ptr, &dst_ptr, src_alloc_record, dst_alloc_record, size, ctx);
+  // Use the template-based async copy operation directly
+  return umpire::copy(static_cast<void*>(src_ptr), static_cast<void*>(dst_ptr), ctx, size);
+  
+  // If there are issues with the template-based implementation, fall back to the class-based one:
+  // auto& op_registry = op::MemoryOperationRegistry::getInstance();
+  // auto op = op_registry.find("COPY", src_alloc_record->strategy, dst_alloc_record->strategy);
+  // return op->transform_async(src_ptr, &dst_ptr, src_alloc_record, dst_alloc_record, size, ctx);
 }
 
 void ResourceManager::memset(void* ptr, int value, std::size_t length)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ", value=" << value << ", length=" << length << ")");
-
-  auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
   auto alloc_record = m_allocations.find(ptr);
 
@@ -504,10 +503,8 @@ void ResourceManager::memset(void* ptr, int value, std::size_t length)
     UMPIRE_ERROR(runtime_error, fmt::format("Cannot memset over the end of allocation: {} -> {}", length, size));
   }
 
-  //auto op = op_registry.find("MEMSET", alloc_record->strategy, alloc_record->strategy);
-
-  //op->apply(ptr, alloc_record, value, length);
-  umpire::memset(ptr, value, length);
+  // Use the template-based memset operation
+  umpire::memset(static_cast<void*>(ptr), value, length);
 }
 
 camp::resources::EventProxy<camp::resources::Resource> ResourceManager::memset(void* ptr, int value,
@@ -515,8 +512,6 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::memset(v
                                                                                std::size_t length)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ", value=" << value << ", length=" << length << ")");
-
-  auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
   auto alloc_record = m_allocations.find(ptr);
 
@@ -543,9 +538,13 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::memset(v
     UMPIRE_ERROR(runtime_error, fmt::format("Cannot memset over the end of allocation: {} -> {}", length, size));
   }
 
-  auto op = op_registry.find("MEMSET", alloc_record->strategy, alloc_record->strategy);
-
-  return op->apply_async(ptr, alloc_record, value, length, ctx);
+  // Use the template-based async memset operation directly
+  return umpire::memset(static_cast<void*>(ptr), value, ctx, length);
+  
+  // If there are issues with the template-based implementation, fall back to the class-based one:
+  // auto& op_registry = op::MemoryOperationRegistry::getInstance();
+  // auto op = op_registry.find("MEMSET", alloc_record->strategy, alloc_record->strategy);
+  // return op->apply_async(ptr, alloc_record, value, length, ctx);
 }
 
 void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size)
@@ -697,14 +696,17 @@ void* ResourceManager::reallocate_impl(void* current_ptr, std::size_t new_size, 
       alloc.deallocate(current_ptr);
       new_ptr = alloc.allocate(new_size);
     } else {
-      auto& op_registry = op::MemoryOperationRegistry::getInstance();
-
+      // Check for offset pointer
       if (current_ptr != alloc_record->ptr) {
         UMPIRE_ERROR(runtime_error,
                      fmt::format("Cannot reallocate an offset ptr (ptr={}, base={})", current_ptr, alloc_record->ptr));
       }
-
+      
+      // During transition we need to use the MemoryOperationRegistry for the actual reallocation
+      // since our template-based implementation doesn't have access to the allocation records
+      auto& op_registry = op::MemoryOperationRegistry::getInstance();
       std::shared_ptr<umpire::op::MemoryOperation> op;
+      
       if (alloc_record->strategy->getPlatform() == Platform::host &&
           getAllocator("HOST").getId() != alloc_record->strategy->getId()) {
         op = op_registry.find("REALLOCATE", std::make_pair(Platform::undefined, Platform::undefined));
@@ -713,6 +715,16 @@ void* ResourceManager::reallocate_impl(void* current_ptr, std::size_t new_size, 
       }
 
       op->transform(current_ptr, &new_ptr, alloc_record, alloc_record, new_size);
+      
+      // In the future, when the template implementation is ready:
+      // auto platform = alloc_record->strategy->getPlatform();
+      // if (platform == Platform::host) {
+      //   new_ptr = umpire::reallocate<resource::host_platform>(current_ptr, new_size);
+      // } else if (platform == Platform::cuda) {
+      //   new_ptr = umpire::reallocate<resource::cuda_platform>(current_ptr, new_size);
+      // } else if (platform == Platform::hip) {
+      //   new_ptr = umpire::reallocate<resource::hip_platform>(current_ptr, new_size);
+      // }
     }
   }
 
@@ -748,22 +760,50 @@ void* ResourceManager::reallocate_impl(void* current_ptr, std::size_t new_size, 
       alloc.deallocate(current_ptr);
       new_ptr = alloc.allocate(new_size);
     } else {
-      auto& op_registry = op::MemoryOperationRegistry::getInstance();
-
+      // Check for offset pointer
       if (current_ptr != alloc_record->ptr) {
         UMPIRE_ERROR(runtime_error,
                      fmt::format("Cannot reallocate an offset ptr (ptr={}, base={})", current_ptr, alloc_record->ptr));
       }
-
+      
+      // During transition we need to use the MemoryOperationRegistry for the actual reallocation
+      // since our template-based implementation doesn't have access to the allocation records
+      auto& op_registry = op::MemoryOperationRegistry::getInstance();
       std::shared_ptr<umpire::op::MemoryOperation> op;
+      
       if (alloc_record->strategy->getPlatform() == Platform::host &&
           getAllocator("HOST").getId() != alloc_record->strategy->getId()) {
         op = op_registry.find("REALLOCATE", std::make_pair(Platform::undefined, Platform::undefined));
         op->transform(current_ptr, &new_ptr, alloc_record, alloc_record, new_size);
       } else {
         op = op_registry.find("REALLOCATE", alloc_record->strategy, alloc_record->strategy);
-        op->transform_async(current_ptr, &new_ptr, alloc_record, alloc_record, new_size, ctx);
+        // Use async transform for async reallocate
+        auto event = op->transform_async(current_ptr, &new_ptr, alloc_record, alloc_record, new_size, ctx);
+        // We might need to wait for the event to complete here since reallocate
+        // needs to return a pointer that is immediately usable
+        event.wait();
       }
+      
+      // When the template implementation is ready, uncomment this code:
+      // auto platform = alloc_record->strategy->getPlatform();
+      // if (platform == Platform::host) {
+      //   // For async host reallocate we still need to handle allocation records properly
+      //   auto proxy = umpire::reallocate(static_cast<void*>(current_ptr), new_size, ctx);
+      //   // Wait for the operation to complete since we need the pointer right away
+      //   proxy.wait();
+      //   // Get the result pointer from somewhere...
+      //   // new_ptr = ...
+      // } else if (platform == Platform::cuda) {
+      //   // Similar pattern for CUDA
+      //   auto proxy = umpire::reallocate(static_cast<void*>(current_ptr), new_size, ctx);
+      //   proxy.wait();
+      //   // new_ptr = ...
+      // } else if (platform == Platform::hip) {
+      //   // Similar pattern for HIP
+      //   auto proxy = umpire::reallocate(static_cast<void*>(current_ptr), new_size, ctx);
+      //   proxy.wait();
+      //   // new_ptr = ...
+      // }
     }
   }
 
@@ -851,7 +891,6 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::prefetch
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ", device=" << device << ")");
 
-  auto& op_registry = op::MemoryOperationRegistry::getInstance();
   auto alloc_record = m_allocations.find(ptr);
 
   if (alloc_record->strategy->getTraits().resource != umpire::MemoryResourceTraits::resource_type::um) {
@@ -861,8 +900,28 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::prefetch
   std::ptrdiff_t offset = static_cast<char*>(ptr) - static_cast<char*>(alloc_record->ptr);
   std::size_t size = alloc_record->size - offset;
 
+  auto platform = alloc_record->strategy->getPlatform();
+  
+  // We need to add a template-based prefetch operation in include/umpire/op/dispatch.hpp
+  // For now, we'll continue to use the class-based implementation
+  auto& op_registry = op::MemoryOperationRegistry::getInstance();
   auto op = op_registry.find("PREFETCH", alloc_record->strategy, alloc_record->strategy);
   return op->apply_async(ptr, alloc_record, device, size, ctx);
+  
+  // In the future, we would have something like:
+  /*
+  if (platform == Platform::cuda) {
+    return umpire::prefetch<resource::cuda_platform>(static_cast<void*>(ptr), device, ctx, size);
+  } else if (platform == Platform::hip) {
+    return umpire::prefetch<resource::hip_platform>(static_cast<void*>(ptr), device, ctx, size);
+  } else {
+    UMPIRE_ERROR(runtime_error, 
+                 fmt::format("Prefetch not supported for platform: {}", 
+                             static_cast<int>(platform)));
+    // Unreachable, but needed to satisfy compiler
+    return camp::resources::EventProxy<camp::resources::Resource>{ctx};
+  }
+  */
 }
 
 void ResourceManager::deallocate(void* ptr)

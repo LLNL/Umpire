@@ -89,7 +89,7 @@ namespace {
 
   // Async version of copy for use with HIP streams
   template<typename T>
-  inline camp::resources::Event copy_async_impl(T* src, T* dst, std::size_t len, camp::resources::Resource& r, hipMemcpyKind kind) {
+  inline camp::resources::EventProxy<camp::resources::Resource> copy_async_impl(T* src, T* dst, std::size_t len, camp::resources::Resource& r, hipMemcpyKind kind) {
     auto device = r.try_get<camp::resources::Hip>();
     if (!device) {
       UMPIRE_ERROR(resource_error, umpire::fmt::format("Expected resources::Hip, got resources::{}",
