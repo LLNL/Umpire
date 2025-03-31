@@ -26,7 +26,7 @@ namespace umpire {
 namespace op {
 class MemoryOperation;
 
-template<int args, template<typename... T> class Op> struct op_caller;
+template<template<typename... T> class Op> struct op_caller;
 
 }
 
@@ -42,6 +42,9 @@ class AllocateNull;
  * \brief
  */
 class ResourceManager {
+  // Friend declarations for template operations
+  template<template<typename... T> class Op> 
+  friend struct op::op_caller;
  public:
   /*!
    * \brief
@@ -339,7 +342,10 @@ class ResourceManager {
 
   void* reallocate_impl(void* current_ptr, std::size_t new_size, Allocator allocator, camp::resources::Resource& ctx);
 
+ public:
   util::AllocationMap m_allocations;
+  
+ private:
 
   std::list<std::unique_ptr<strategy::AllocationStrategy>> m_allocators;
   std::vector<std::string> m_shared_allocator_names;
@@ -363,7 +369,7 @@ class ResourceManager {
   friend strategy::ZeroByteHandler;
   friend strategy::mixins::AllocateNull;
 
-  template<int args, template<typename... T> class Op>
+  template<template<typename... T> class Op>
   friend struct umpire::op::op_caller;
 };
 
