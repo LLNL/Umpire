@@ -25,6 +25,9 @@ namespace umpire {
 
 namespace op {
 class MemoryOperation;
+
+template<int args, template<typename... T> class Op> struct op_caller;
+
 }
 
 namespace strategy {
@@ -359,6 +362,9 @@ class ResourceManager {
   friend std::vector<util::AllocationRecord> get_allocator_records(Allocator);
   friend strategy::ZeroByteHandler;
   friend strategy::mixins::AllocateNull;
+
+  template<int args, template<typename... T> class Op>
+  friend struct umpire::op::op_caller;
 };
 
 } // end namespace umpire
