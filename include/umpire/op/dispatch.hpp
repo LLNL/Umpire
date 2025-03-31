@@ -92,22 +92,121 @@ void copy(T* src, T* dst, std::size_t len) {
     op::op_caller<2, op::copy>::exec(src, dst, len);
 }
 
-//template <typename T>
-//void copy(T* src, T* dst, std::size_t len, ) {
-//    op::op_caller<2, op::copy>::exec(src, dst, len);
-//}
+template <typename T>
+camp::resources::EventProxy<camp::resources::Resource> copy(T* src, T* dst, camp::resources::Resource& ctx, std::size_t len) {
+    auto& allocation_map = ResourceManager::getInstance().m_allocations;
+    auto src_record = allocation_map.find(src);
+    auto dst_record = allocation_map.find(dst);
 
+    auto p1 = src_record->strategy->getPlatform();
+    auto p2 = dst_record->strategy->getPlatform();
+    
+    // get src and dest platform
+    if ((p1 == p2) && (p1 == camp::resources::Platform::host)) {
+      return op::copy<resource::host_platform, resource::host_platform>::exec(src, dst, len, ctx);
+    } 
+#if defined(UMPIRE_ENABLE_CUDA)
+    if (p1 == p2 && (p1 == camp::resources::Platform::cuda)) {
+      return op::copy<resource::cuda_platform, resource::cuda_platform>::exec(src, dst, len, ctx);
+    } else if (p1 == camp::resources::Platform::host && p2 == camp::resources::Platform::cuda) {
+      return op::copy<resource::host_platform, resource::cuda_platform>::exec(src, dst, len, ctx);
+    } else if (p1 == camp::resources::Platform::cuda && p2 == camp::resources::Platform::host) {
+      return op::copy<resource::cuda_platform, resource::host_platform>::exec(src, dst, len, ctx);
+    }
+#endif
+#if defined(UMPIRE_ENABLE_HIP)
+    if (p1 == p2 && (p1 == camp::resources::Platform::hip)) {
+      return op::copy<resource::hip_platform, resource::hip_platform>::exec(src, dst, len, ctx);
+    } else if (p1 == camp::resources::Platform::host && p2 == camp::resources::Platform::hip) {
+      return op::copy<resource::host_platform, resource::hip_platform>::exec(src, dst, len, ctx);
+    } else if (p1 == camp::resources::Platform::hip && p2 == camp::resources::Platform::host) {
+      return op::copy<resource::hip_platform, resource::host_platform>::exec(src, dst, len, ctx);
+    }
+#endif
+    
+    UMPIRE_ERROR(runtime_error, 
+                 fmt::format("Unknown platforms for copy: src={}, dst={}", 
+                            static_cast<int>(p1), static_cast<int>(p2)));
+    
+    // Unreachable, but needed to satisfy compiler
+    return camp::resources::EventProxy<camp::resources::Resource>{ctx};
+}
 
-
-// template<typename Src, typename T>
-// void memset(T* a, T v, std::size_t len) {
-//   op::memset<typename Src::platform>::exec(a, v, len);
-// }
-// 
 template <typename T, typename V>
 void memset(T* src, V v, std::size_t len) {
-
     op::op_caller<1, op::memset>::exec(src, v, len);
+}
+
+template <typename T>
+camp::resources::EventProxy<camp::resources::Resource> memset(T* src, int v, camp::resources::Resource& ctx, std::size_t len) {
+    auto& allocation_map = ResourceManager::getInstance().m_allocations;
+    auto src_record = allocation_map.find(src);
+    auto p = src_record->strategy->getPlatform();
+    
+    if (p == camp::resources::Platform::host) {
+      return op::memset<resource::host_platform>::exec(src, v, len, ctx);
+    } 
+#if defined(UMPIRE_ENABLE_CUDA)
+    else if (p == camp::resources::Platform::cuda) {
+      return op::memset<resource::cuda_platform>::exec(src, v, len, ctx);
+    }
+#endif
+#if defined(UMPIRE_ENABLE_HIP)
+    else if (p == camp::resources::Platform::hip) {
+      return op::memset<resource::hip_platform>::exec(src, v, len, ctx);
+    }
+#endif
+    
+    UMPIRE_ERROR(runtime_error, 
+                 fmt::format("Unknown platform for memset: platform={}", 
+                            static_cast<int>(p)));
+    
+    // Unreachable, but needed to satisfy compiler
+    return camp::resources::EventProxy<camp::resources::Resource>{ctx};
+}
+
+template <typename T>
+T* reallocate(T* src, std::size_t size) {
+    // Template-based reallocate is a placeholder for now
+    // Need the ResourceManager to handle allocations/deallocations
+    // and allocation record tracking
+    return nullptr;
+}
+
+template <typename T>
+camp::resources::EventProxy<camp::resources::Resource> reallocate(T* src, std::size_t size, camp::resources::Resource& ctx) {
+    // Template-based reallocate is a placeholder for now
+    // Need the ResourceManager to handle allocations/deallocations
+    // and allocation record tracking with async support
+    
+    // Placeholder return to satisfy compiler
+    return camp::resources::EventProxy<camp::resources::Resource>{ctx};
+}
+
+template <typename T>
+camp::resources::EventProxy<camp::resources::Resource> prefetch(T* ptr, int device, camp::resources::Resource& ctx, std::size_t size) {
+    auto& allocation_map = ResourceManager::getInstance().m_allocations;
+    auto ptr_record = allocation_map.find(ptr);
+    auto p = ptr_record->strategy->getPlatform();
+    
+    // Currently only CUDA and HIP platforms support prefetch
+#if defined(UMPIRE_ENABLE_CUDA)
+    if (p == camp::resources::Platform::cuda) {
+      return op::prefetch<resource::cuda_platform>::exec(ptr, device, size, ctx);
+    }
+#endif
+#if defined(UMPIRE_ENABLE_HIP)
+    if (p == camp::resources::Platform::hip) {
+      return op::prefetch<resource::hip_platform>::exec(ptr, device, size, ctx);
+    }
+#endif
+    
+    UMPIRE_ERROR(runtime_error, 
+                 fmt::format("Prefetch not supported for platform: {}", 
+                            static_cast<int>(p)));
+    
+    // Unreachable, but needed to satisfy compiler
+    return camp::resources::EventProxy<camp::resources::Resource>{ctx};
 }
 
 }

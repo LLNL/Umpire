@@ -89,7 +89,7 @@ namespace {
 
   // Async version of copy for use with CUDA streams
   template<typename T>
-  inline camp::resources::Event copy_async_impl(T* src, T* dst, std::size_t len, camp::resources::Resource& r, cudaMemcpyKind kind) {
+  inline camp::resources::EventProxy<camp::resources::Resource> copy_async_impl(T* src, T* dst, std::size_t len, camp::resources::Resource& r, cudaMemcpyKind kind) {
     auto device = r.try_get<camp::resources::Cuda>();
     if (!device) {
       UMPIRE_ERROR(resource_error, umpire::fmt::format("Expected resources::Cuda, got resources::{}",
@@ -133,7 +133,7 @@ namespace {
   
   // Async version of memset
   template<typename T>
-  inline camp::resources::Event memset_async_impl(T* ptr, int value, std::size_t len, camp::resources::Resource& r) {
+  inline camp::resources::EventProxy<camp::resources::Resource> memset_async_impl(T* ptr, int value, std::size_t len, camp::resources::Resource& r) {
     auto device = r.try_get<camp::resources::Cuda>();
     if (!device) {
       UMPIRE_ERROR(resource_error, umpire::fmt::format("Expected resources::Cuda, got resources::{}",
@@ -169,7 +169,7 @@ struct copy<resource::cuda_platform, resource::cuda_platform>
   }
 
   template<typename T>
-  static camp::resources::Event exec(T* src, T* dst, std::size_t len, camp::resources::Resource& r) {
+  static camp::resources::EventProxy<camp::resources::Resource> exec(T* src, T* dst, std::size_t len, camp::resources::Resource& r) {
     return copy_async_impl(src, dst, len, r, cudaMemcpyDeviceToDevice);
   }
 };
@@ -183,7 +183,7 @@ struct copy<resource::cuda_platform, resource::host_platform>
   }
 
   template<typename T>
-  static camp::resources::Event exec(T* src, T* dst, std::size_t len, camp::resources::Resource& r) {
+  static camp::resources::EventProxy<camp::resources::Resource> exec(T* src, T* dst, std::size_t len, camp::resources::Resource& r) {
     return copy_async_impl(src, dst, len, r, cudaMemcpyDeviceToHost);
   }
 };
@@ -197,7 +197,7 @@ struct copy<resource::host_platform, resource::cuda_platform>
   }
 
   template<typename T>
-  static camp::resources::Event exec(T* src, T* dst, std::size_t len, camp::resources::Resource& r) {
+  static camp::resources::EventProxy<camp::resources::Resource> exec(T* src, T* dst, std::size_t len, camp::resources::Resource& r) {
     return copy_async_impl(src, dst, len, r, cudaMemcpyHostToDevice);
   }
 };
@@ -231,7 +231,7 @@ struct memset<resource::cuda_platform>
   }
 
   template<typename T>
-  static camp::resources::Event exec(T* src, int val, std::size_t len, camp::resources::Resource& r) {
+  static camp::resources::EventProxy<camp::resources::Resource> exec(T* src, int val, std::size_t len, camp::resources::Resource& r) {
     return memset_async_impl(src, val, len, r);
   }
   
@@ -242,7 +242,7 @@ struct memset<resource::cuda_platform>
   }
   
   template<>
-  static camp::resources::Event exec<void>(void* src, int val, std::size_t len, camp::resources::Resource& r) {
+  static camp::resources::EventProxy<camp::resources::Resource> exec<void>(void* src, int val, std::size_t len, camp::resources::Resource& r) {
     return memset_async_impl<void>(src, val, len, r);
   }
 };
@@ -387,7 +387,7 @@ struct prefetch<resource::cuda_platform>
   }
 
   template<typename T>
-  static camp::resources::Event exec(T* src, int device, std::size_t len, camp::resources::Resource& r) {
+  static camp::resources::EventProxy<camp::resources::Resource> exec(T* src, int device, std::size_t len, camp::resources::Resource& r) {
     auto cuda_device = r.try_get<camp::resources::Cuda>();
     if (!cuda_device) {
       UMPIRE_ERROR(resource_error, umpire::fmt::format("Expected resources::Cuda, got resources::{}",
@@ -438,7 +438,7 @@ struct prefetch<resource::cuda_platform>
   }
   
   template<>
-  static camp::resources::Event exec<void>(void* src, int device, std::size_t len, camp::resources::Resource& r) {
+  static camp::resources::EventProxy<camp::resources::Resource> exec<void>(void* src, int device, std::size_t len, camp::resources::Resource& r) {
     auto cuda_device = r.try_get<camp::resources::Cuda>();
     if (!cuda_device) {
       UMPIRE_ERROR(resource_error, umpire::fmt::format("Expected resources::Cuda, got resources::{}",

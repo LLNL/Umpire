@@ -45,7 +45,7 @@ struct copy<resource::host_platform, resource::host_platform>
   
   // Async version returns a dummy event
   template<typename T>
-  static camp::resources::Event exec(T* src, T* dst, std::size_t len, camp::resources::Resource& r) {
+  static camp::resources::EventProxy<camp::resources::Resource> exec(T* src, T* dst, std::size_t len, camp::resources::Resource& r) {
     copy_impl(src, dst, len);
     return camp::resources::EventProxy<camp::resources::Resource>{r};
   }
@@ -57,7 +57,7 @@ struct copy<resource::host_platform, resource::host_platform>
   }
   
   template<>
-  static camp::resources::Event exec<void>(void* src, void* dst, std::size_t len, camp::resources::Resource& r) {
+  static camp::resources::EventProxy<camp::resources::Resource> exec<void>(void* src, void* dst, std::size_t len, camp::resources::Resource& r) {
     copy_impl<void>(src, dst, len);
     return camp::resources::EventProxy<camp::resources::Resource>{r};
   }
@@ -74,7 +74,7 @@ struct memset<resource::host_platform>
   
   // Async version returns a dummy event
   template<typename T>
-  static camp::resources::Event exec(T* src, int val, std::size_t len, camp::resources::Resource& r) {
+  static camp::resources::EventProxy<camp::resources::Resource> exec(T* src, int val, std::size_t len, camp::resources::Resource& r) {
     memset_impl(src, val, len);
     return camp::resources::EventProxy<camp::resources::Resource>{r};
   }
@@ -86,7 +86,7 @@ struct memset<resource::host_platform>
   }
   
   template<>
-  static camp::resources::Event exec<void>(void* src, int val, std::size_t len, camp::resources::Resource& r) {
+  static camp::resources::EventProxy<camp::resources::Resource> exec<void>(void* src, int val, std::size_t len, camp::resources::Resource& r) {
     memset_impl<void>(src, val, len);
     return camp::resources::EventProxy<camp::resources::Resource>{r};
   }
