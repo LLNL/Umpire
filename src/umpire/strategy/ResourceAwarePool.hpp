@@ -186,7 +186,7 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
 
   using PointerMap = std::unordered_map<void*, Chunk*>;
   //using PendingMap = std::unordered_map<Resource, std::vector<Chunk*>>;
-  using PendingMap = std::map<std::optional<Resource>, std::vector<Chunk*>>;
+  using PendingMap = std::unordered_map<Resource*, std::vector<Chunk*>>;
   using SizeMap =
       std::multimap<std::size_t, Chunk*, std::less<std::size_t>, pool_allocator<std::pair<const std::size_t, Chunk*>>>;
 
@@ -217,6 +217,7 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
     Chunk* prev{nullptr};
     Chunk* next{nullptr};
     SizeMap::iterator size_map_it;
+    PendingMap::iterator pending_map_it;
     Resource resource;
     Event event;
   };
