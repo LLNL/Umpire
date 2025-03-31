@@ -223,20 +223,89 @@ camp::resources::EventProxy<camp::resources::Resource> memset(T* src, int v, cam
 
 template <typename T>
 T* reallocate(T* src, std::size_t size) {
-    // Template-based reallocate is a placeholder for now
-    // Need the ResourceManager to handle allocations/deallocations
-    // and allocation record tracking
-    return nullptr;
+    if (src == nullptr) {
+        // If src is nullptr, just allocate memory from the default allocator
+        auto& rm = ResourceManager::getInstance();
+        Allocator allocator = rm.getDefaultAllocator();
+        return static_cast<T*>(allocator.allocate(size * sizeof(T)));
+    }
+    
+    // Otherwise, use the platform-specific implementation if available,
+    // falling back to the generic implementation
+    auto& allocation_map = ResourceManager::getInstance().m_allocations;
+    auto src_record = allocation_map.find(src);
+    auto p = src_record->strategy->getPlatform();
+    
+    if (p == camp::resources::Platform::host) {
+      return op::generic_reallocate<resource::host_platform>::exec(src, size);
+    } 
+#if defined(UMPIRE_ENABLE_CUDA)
+    else if (p == camp::resources::Platform::cuda) {
+      return op::generic_reallocate<resource::cuda_platform>::exec(src, size);
+    }
+#endif
+#if defined(UMPIRE_ENABLE_HIP)
+    else if (p == camp::resources::Platform::hip) {
+      return op::generic_reallocate<resource::hip_platform>::exec(src, size);
+    }
+#endif
+#if defined(UMPIRE_ENABLE_SYCL)
+    else if (p == camp::resources::Platform::sycl) {
+      return op::generic_reallocate<op::sycl_platform>::exec(src, size);
+    }
+#endif
+#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
+    else if (p == camp::resources::Platform::omp_target) {
+      return op::generic_reallocate<op::openmp_target_platform>::exec(src, size);
+    }
+#endif
+    
+    // Fallback to generic implementation
+    return op::generic_reallocate<resource::undefined_platform>::exec(src, size);
 }
 
 template <typename T>
 camp::resources::EventProxy<camp::resources::Resource> reallocate(T* src, std::size_t size, camp::resources::Resource& ctx) {
-    // Template-based reallocate is a placeholder for now
-    // Need the ResourceManager to handle allocations/deallocations
-    // and allocation record tracking with async support
+    if (src == nullptr) {
+        // If src is nullptr, just allocate memory from the default allocator
+        auto& rm = ResourceManager::getInstance();
+        Allocator allocator = rm.getDefaultAllocator();
+        allocator.allocate(size * sizeof(T));
+        return camp::resources::EventProxy<camp::resources::Resource>{ctx};
+    }
     
-    // Placeholder return to satisfy compiler
-    return camp::resources::EventProxy<camp::resources::Resource>{ctx};
+    // Otherwise, use the platform-specific implementation if available,
+    // falling back to the generic implementation
+    auto& allocation_map = ResourceManager::getInstance().m_allocations;
+    auto src_record = allocation_map.find(src);
+    auto p = src_record->strategy->getPlatform();
+    
+    if (p == camp::resources::Platform::host) {
+      return op::generic_reallocate<resource::host_platform>::exec(src, size, ctx);
+    } 
+#if defined(UMPIRE_ENABLE_CUDA)
+    else if (p == camp::resources::Platform::cuda) {
+      return op::generic_reallocate<resource::cuda_platform>::exec(src, size, ctx);
+    }
+#endif
+#if defined(UMPIRE_ENABLE_HIP)
+    else if (p == camp::resources::Platform::hip) {
+      return op::generic_reallocate<resource::hip_platform>::exec(src, size, ctx);
+    }
+#endif
+#if defined(UMPIRE_ENABLE_SYCL)
+    else if (p == camp::resources::Platform::sycl) {
+      return op::generic_reallocate<op::sycl_platform>::exec(src, size, ctx);
+    }
+#endif
+#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
+    else if (p == camp::resources::Platform::omp_target) {
+      return op::generic_reallocate<op::openmp_target_platform>::exec(src, size, ctx);
+    }
+#endif
+    
+    // Fallback to generic implementation
+    return op::generic_reallocate<resource::undefined_platform>::exec(src, size, ctx);
 }
 
 template <typename T>
