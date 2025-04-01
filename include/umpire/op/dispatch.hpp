@@ -6,6 +6,7 @@
 
 namespace umpire {
 namespace op {
+namespace detail {
 
 /**
  * @brief Dispatch an operation to the appropriate platform implementation
@@ -122,6 +123,7 @@ inline auto dispatch(camp::resources::Platform src_platform, camp::resources::Pl
 
   UMPIRE_ERROR(runtime_error, "Unsupported platform combination");
 }
+} // namespace detail
 
 // Base template for op_caller with helper functions for argument handling
 template <template <typename...> class Op>
@@ -259,7 +261,7 @@ struct op_caller {
     }
 
     // Dispatch based on platform
-    return dispatch<Op>(p, src, args...);
+    return detail::dispatch<Op>(p, src, args...);
   }
 
   // Single-pointer operations (asynchronous)
@@ -287,7 +289,7 @@ struct op_caller {
                    "size", size);
     }
 
-    return dispatch<Op>(p, src, args...);
+    return detail::dispatch<Op>(p, src, args...);
   }
 
   // Dual-pointer operations (synchronous)
@@ -319,7 +321,7 @@ struct op_caller {
     }
 
     // Dispatch based on source and destination platforms
-    return dispatch<Op>(p1, p2, src, dst, args...);
+    return detail::dispatch<Op>(p1, p2, src, dst, args...);
   }
 
   // Dual-pointer operations (asynchronous)
@@ -350,7 +352,7 @@ struct op_caller {
                    dst_record->strategy->getName());
     }
 
-    return dispatch<Op>(p1, p2, src, dst, args...);
+    return detail::dispatch<Op>(p1, p2, src, dst, args...);
   }
 };
 
@@ -361,8 +363,6 @@ struct op_caller {
 template <typename T>
 auto copy(T* src, T* dst, std::size_t len)
 {
-  std::cout << "copying " << len << " elements from " << static_cast<void*>(src) << " to " << static_cast<void*>(dst)
-            << std::endl;
   op::op_caller<op::copy>::exec(src, dst, len);
 }
 

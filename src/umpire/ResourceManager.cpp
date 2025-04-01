@@ -571,6 +571,12 @@ const util::AllocationRecord* ResourceManager::findAllocationRecord(void* ptr) c
 
 void ResourceManager::copy(void* dst_ptr, void* src_ptr, std::size_t size)
 {
+  if (size == 0) {
+    auto record = findAllocationRecord(src_ptr);
+    std::ptrdiff_t src_offset = reinterpret_cast<char*>(src_ptr) - reinterpret_cast<char*>(record->ptr);
+    size = record->size - src_offset;
+  }
+
   UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", dst_ptr=" << dst_ptr << ", size=" << size << ")");
 
   umpire::copy(static_cast<void*>(src_ptr), static_cast<void*>(dst_ptr), size);
@@ -580,6 +586,12 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::copy(voi
                                                                              camp::resources::Resource& ctx,
                                                                              std::size_t size)
 {
+  if (size == 0) {
+    auto record = findAllocationRecord(src_ptr);
+    std::ptrdiff_t src_offset = reinterpret_cast<char*>(src_ptr) - reinterpret_cast<char*>(record->ptr);
+    size = record->size - src_offset;
+  }
+
   UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", dst_ptr=" << dst_ptr << ", size=" << size << ")");
 
   return umpire::copy(static_cast<void*>(src_ptr), static_cast<void*>(dst_ptr), size, ctx);
@@ -587,6 +599,11 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::copy(voi
 
 void ResourceManager::memset(void* ptr, int value, std::size_t length)
 {
+  if (length == 0) {
+    auto record = findAllocationRecord(ptr);
+    std::ptrdiff_t src_offset = reinterpret_cast<char*>(ptr) - reinterpret_cast<char*>(record->ptr);
+    length = record->size - src_offset;
+  }
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ", value=" << value << ", length=" << length << ")");
 
   umpire::memset(static_cast<void*>(ptr), value, length);
@@ -596,6 +613,12 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::memset(v
                                                                                camp::resources::Resource& ctx,
                                                                                std::size_t length)
 {
+  if (length == 0) {
+    auto record = findAllocationRecord(ptr);
+    std::ptrdiff_t src_offset = reinterpret_cast<char*>(ptr) - reinterpret_cast<char*>(record->ptr);
+    length = record->size - src_offset;
+  }
+
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ", value=" << value << ", length=" << length << ")");
 
   return umpire::memset(static_cast<void*>(ptr), value, length, ctx);
