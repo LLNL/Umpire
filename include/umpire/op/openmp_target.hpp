@@ -18,62 +18,104 @@
 
 #include "umpire/util/Platform.hpp"
 #include "umpire/util/error.hpp"
-
 #include "umpire/resource/platform.hpp"
-
 #include "camp/resource.hpp"
 #include "camp/resource/event.hpp"
 
 namespace umpire {
 namespace op {
 
+// Platform-specific type 
 struct openmp_target_platform {};
 
-// Helper function for copy operations
+// OpenMP Target implementation helpers
+namespace {
+// Size-aware calculation with type awareness
+template<typename T>
+inline std::size_t calculate_size(T* ptr, std::size_t count) {
+  return std::is_same<T, void>::value ? count : count * sizeof(T);
+}
+
+// Helper function for device-to-device copy operations
 template <typename T>
-inline void copy_impl(T* src_ptr, T* dst_ptr, std::size_t len) {
+inline void copy_impl(T* src_ptr, T* dst_ptr, std::size_t count) {
+  std::size_t size = calculate_size(src_ptr, count);
+  
   #pragma omp target data use_device_ptr(src_ptr, dst_ptr)
   {
-    std::memcpy(dst_ptr, src_ptr, len * sizeof(T));
+    std::memcpy(dst_ptr, src_ptr, size);
+  }
+}
+
+// Helper function for host-to-device copy operations
+template <typename T>
+inline void host_to_device_copy_impl(T* src_ptr, T* dst_ptr, std::size_t count) {
+  std::size_t size = calculate_size(src_ptr, count);
+  
+  #pragma omp target data use_device_ptr(dst_ptr)
+  {
+    std::memcpy(dst_ptr, src_ptr, size);
+  }
+}
+
+// Helper function for device-to-host copy operations
+template <typename T>
+inline void device_to_host_copy_impl(T* src_ptr, T* dst_ptr, std::size_t count) {
+  std::size_t size = calculate_size(src_ptr, count);
+  
+  #pragma omp target data use_device_ptr(src_ptr)
+  {
+    std::memcpy(dst_ptr, src_ptr, size);
   }
 }
 
 // Helper function for copy operations that returns an Event
 template <typename T>
 inline camp::resources::EventProxy<camp::resources::Resource> copy_async_impl(
-    T* src_ptr, T* dst_ptr, std::size_t len, camp::resources::Resource& res) {
-    
-  #pragma omp target data use_device_ptr(src_ptr, dst_ptr)
-  {
-    std::memcpy(dst_ptr, src_ptr, len * sizeof(T));
-  }
-  
-  // OpenMP Target doesn't have async operations, so we just return a completed event
+    T* src_ptr, T* dst_ptr, std::size_t count, camp::resources::Resource& res) {
+  // Just call synchronous version and return a completed event
+  copy_impl(src_ptr, dst_ptr, count);
+  return camp::resources::EventProxy<camp::resources::Resource>{res};
+}
+
+// Helper function for host_to_device async copy
+template <typename T>
+inline camp::resources::EventProxy<camp::resources::Resource> host_to_device_async_impl(
+    T* src_ptr, T* dst_ptr, std::size_t count, camp::resources::Resource& res) {
+  // Just call synchronous version and return a completed event
+  host_to_device_copy_impl(src_ptr, dst_ptr, count);
+  return camp::resources::EventProxy<camp::resources::Resource>{res};
+}
+
+// Helper function for device_to_host async copy
+template <typename T>
+inline camp::resources::EventProxy<camp::resources::Resource> device_to_host_async_impl(
+    T* src_ptr, T* dst_ptr, std::size_t count, camp::resources::Resource& res) {
+  // Just call synchronous version and return a completed event
+  device_to_host_copy_impl(src_ptr, dst_ptr, count);
   return camp::resources::EventProxy<camp::resources::Resource>{res};
 }
 
 // Helper function for memset operations
 template <typename T>
-inline void memset_impl(T* ptr, int val, std::size_t len) {
+inline void memset_impl(T* ptr, int val, std::size_t count) {
+  std::size_t size = calculate_size(ptr, count);
+  
   #pragma omp target data use_device_ptr(ptr)
   {
-    std::memset(ptr, val, len * sizeof(T));
+    std::memset(ptr, val, size);
   }
 }
 
 // Helper function for memset operations that returns an Event
 template <typename T>
 inline camp::resources::EventProxy<camp::resources::Resource> memset_async_impl(
-    T* ptr, int val, std::size_t len, camp::resources::Resource& res) {
-    
-  #pragma omp target data use_device_ptr(ptr)
-  {
-    std::memset(ptr, val, len * sizeof(T));
-  }
-  
-  // OpenMP Target doesn't have async operations, so we just return a completed event
+    T* ptr, int val, std::size_t count, camp::resources::Resource& res) {
+  // Just call synchronous version and return a completed event
+  memset_impl(ptr, val, count);
   return camp::resources::EventProxy<camp::resources::Resource>{res};
 }
+} // namespace
 
 // Device-to-device copy specialization
 template<>
@@ -83,21 +125,10 @@ struct copy<openmp_target_platform, openmp_target_platform> {
     copy_impl(src_ptr, dst_ptr, len);
   }
   
-  // void pointer specialization
-  static void exec(void* src_ptr, void* dst_ptr, std::size_t len) {
-    copy_impl(static_cast<char*>(src_ptr), static_cast<char*>(dst_ptr), len);
-  }
-  
   template <typename T>
   static camp::resources::EventProxy<camp::resources::Resource> exec(
       T* src_ptr, T* dst_ptr, std::size_t len, camp::resources::Resource& res) {
     return copy_async_impl(src_ptr, dst_ptr, len, res);
-  }
-  
-  // void pointer specialization
-  static camp::resources::EventProxy<camp::resources::Resource> exec(
-      void* src_ptr, void* dst_ptr, std::size_t len, camp::resources::Resource& res) {
-    return copy_async_impl(static_cast<char*>(src_ptr), static_cast<char*>(dst_ptr), len, res);
   }
 };
 
@@ -106,40 +137,13 @@ template<>
 struct copy<resource::host_platform, openmp_target_platform> {
   template <typename T>
   static void exec(T* src_ptr, T* dst_ptr, std::size_t len) {
-    #pragma omp target data use_device_ptr(dst_ptr)
-    {
-      std::memcpy(dst_ptr, src_ptr, len * sizeof(T));
-    }
-  }
-  
-  // void pointer specialization
-  static void exec(void* src_ptr, void* dst_ptr, std::size_t len) {
-    #pragma omp target data use_device_ptr(dst_ptr)
-    {
-      std::memcpy(dst_ptr, src_ptr, len * sizeof(T));
-    }
+    host_to_device_copy_impl(src_ptr, dst_ptr, len);
   }
   
   template <typename T>
   static camp::resources::EventProxy<camp::resources::Resource> exec(
       T* src_ptr, T* dst_ptr, std::size_t len, camp::resources::Resource& res) {
-    #pragma omp target data use_device_ptr(dst_ptr)
-    {
-      std::memcpy(dst_ptr, src_ptr, len * sizeof(T));
-    }
-    
-    return camp::resources::EventProxy<camp::resources::Resource>{res};
-  }
-  
-  // void pointer specialization
-  static camp::resources::EventProxy<camp::resources::Resource> exec(
-      void* src_ptr, void* dst_ptr, std::size_t len, camp::resources::Resource& res) {
-    #pragma omp target data use_device_ptr(dst_ptr)
-    {
-      std::memcpy(dst_ptr, src_ptr, len * sizeof(char) * len);
-    }
-    
-    return camp::resources::EventProxy<camp::resources::Resource>{res};
+    return host_to_device_async_impl(src_ptr, dst_ptr, len, res);
   }
 };
 
@@ -148,40 +152,13 @@ template<>
 struct copy<openmp_target_platform, resource::host_platform> {
   template <typename T>
   static void exec(T* src_ptr, T* dst_ptr, std::size_t len) {
-    #pragma omp target data use_device_ptr(src_ptr)
-    {
-      std::memcpy(dst_ptr, src_ptr, len * sizeof(T));
-    }
-  }
-  
-  // void pointer specialization
-  static void exec(void* src_ptr, void* dst_ptr, std::size_t len) {
-    #pragma omp target data use_device_ptr(src_ptr)
-    {
-      std::memcpy(dst_ptr, src_ptr, len * sizeof(char));
-    }
+    device_to_host_copy_impl(src_ptr, dst_ptr, len);
   }
   
   template <typename T>
   static camp::resources::EventProxy<camp::resources::Resource> exec(
       T* src_ptr, T* dst_ptr, std::size_t len, camp::resources::Resource& res) {
-    #pragma omp target data use_device_ptr(src_ptr)
-    {
-      std::memcpy(dst_ptr, src_ptr, len * sizeof(T));
-    }
-    
-    return camp::resources::EventProxy<camp::resources::Resource>{res};
-  }
-  
-  // void pointer specialization
-  static camp::resources::EventProxy<camp::resources::Resource> exec(
-      void* src_ptr, void* dst_ptr, std::size_t len, camp::resources::Resource& res) {
-    #pragma omp target data use_device_ptr(src_ptr)
-    {
-      std::memcpy(dst_ptr, src_ptr, len * sizeof(char));
-    }
-    
-    return camp::resources::EventProxy<camp::resources::Resource>{res};
+    return device_to_host_async_impl(src_ptr, dst_ptr, len, res);
   }
 };
 
@@ -193,36 +170,19 @@ struct memset<openmp_target_platform> {
     memset_impl(ptr, val, len);
   }
   
-  // void pointer specialization
-  static void exec(void* ptr, int val, std::size_t len) {
-    memset_impl(static_cast<char*>(ptr), val, len);
-  }
-  
   template <typename T>
   static camp::resources::EventProxy<camp::resources::Resource> exec(
       T* ptr, int val, std::size_t len, camp::resources::Resource& res) {
     return memset_async_impl(ptr, val, len, res);
   }
-  
-  // void pointer specialization
-  static camp::resources::EventProxy<camp::resources::Resource> exec(
-      void* ptr, int val, std::size_t len, camp::resources::Resource& res) {
-    return memset_async_impl(static_cast<char*>(ptr), val, len, res);
-  }
 };
 
-// Reallocate operations - basic implementation
+// Reallocate operations - stub implementation
 template<>
 struct reallocate<openmp_target_platform> {
   template <typename T>
   static T* exec(T* src_ptr, std::size_t size) {
-    // For OpenMP Target, we need a strategy that involves:
-    // 1. Allocate new memory
-    // 2. Copy data if src_ptr is not null
-    // 3. Free old memory if src_ptr is not null
-    // 
-    // This requires allocation information which is not available
-    // in this layer, so it's implemented in ResourceManager
+    // OpenMP Target needs ResourceManager for allocation information
     UMPIRE_ERROR(runtime_error, "Direct OpenMP Target reallocate not implemented");
     return nullptr;
   }
