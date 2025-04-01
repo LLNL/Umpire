@@ -50,7 +50,7 @@ void* ResourceAwarePool::allocate(std::size_t bytes)
 
   return allocate_resource(bytes, camp::resources::Host().get_default());
 }
-
+   
 void* ResourceAwarePool::allocate_resource(std::size_t bytes, camp::resources::Resource r)
 {
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ")");
@@ -59,19 +59,13 @@ void* ResourceAwarePool::allocate_resource(std::size_t bytes, camp::resources::R
 
   // First, try to reuse a pending chunk
   if (!m_pending_map.empty()) {
-    auto pair = m_pending_map.find(&r);
-    if (pair != m_pending_map.end()) { // If chunks with the same resource were found...
-      auto& chunk_vec = pair->second;
-      for (auto it = chunk_vec.begin(); it != chunk_vec.end(); ) { 
-        auto pending_chunk = (*it);
-        if (pending_chunk->size >= rounded_bytes) {
-          chunk = pending_chunk;
-          chunk->free = false;
-          chunk_vec.erase(it);
-          break; // Found a chunk to reuse, can proceed
-        } else {
-          it++;
-        }
+    for (auto it = m_pending_map.begin(); it != m_pending_map.end(); it++) {
+      auto pending_chunk = it->second;
+      if (pending_chunk->size >= rounded_bytes && pending_chunk->resource == r) { // reusing chunk with same resource
+        chunk = pending_chunk;
+        chunk->free = false;
+        m_pending_map.erase(it);
+        break;
       }
     }
   } 
@@ -182,28 +176,12 @@ void ResourceAwarePool::deallocate(void* ptr, std::size_t size)
 void ResourceAwarePool::do_deallocate(Chunk* chunk, void* ptr) noexcept
 {
   UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, chunk->size);
-  UMPIRE_USE_VAR(ptr);
   chunk->free = true;
 
   // Removing chunk from pending
-  for (auto it = m_pending_map.begin(); it != m_pending_map.end();) {
-    auto& chunk_vec = it->second;
-    
-    // Search the chunk vector, looking for the chunk to remove
-    for (auto vec_it = chunk_vec.begin(); vec_it != chunk_vec.end();) {
-      if (*vec_it == chunk) {
-        vec_it = chunk_vec.erase(vec_it);
-      } else {
-        vec_it++;
-      }
-    }
-
-    // Remove the chunk vector entirely if it becomes empty
-    if (chunk_vec.empty()) {
-      it = m_pending_map.erase(it);
-    } else {
-      it++;
-    }
+  auto it = m_pending_map.find(ptr);
+  if (it != m_pending_map.end()) {
+    m_pending_map.erase(it);
   }
 
   UMPIRE_LOG(Debug, "In the do_deallocate function. Deallocating data held by " << chunk);
@@ -293,14 +271,7 @@ void ResourceAwarePool::deallocate_resource(void* ptr, camp::resources::Resource
     do_deallocate(chunk, ptr);
   } else {
     // Chunk is now pending, add to map
-    auto pair = m_pending_map.find(&r);
-    if (pair != m_pending_map.end()) { // If r already exists in map
-      pair->second.push_back(chunk);
-    } else {
-      std::vector<Chunk*> chunk_vec = {chunk}; // Otherwise create new entry
-      m_pending_map.insert(std::make_pair(&r, chunk_vec));
-    }
-    // Should I use m_pending_map[r]->push_back(chunk); instead?
+    m_pending_map.insert(std::make_pair(ptr, chunk));
   }
 
   std::size_t suggested_size{m_should_coalesce(*this)};
@@ -319,19 +290,17 @@ void ResourceAwarePool::release()
 #endif
 
   for (auto it = m_pending_map.begin(); it != m_pending_map.end();) {
-    auto& chunk_vec = (*it).second;
-    for (auto chunk : chunk_vec) {
-      if (m_is_destructing) { // If we are destructing, wait for all deallocations to occur
-        chunk->event.wait();
-      }
-      if (chunk != nullptr && chunk->free == false &&
-        chunk->event.check()) { // Otherwise, move all finished pending chunks to free map to be released
-        m_free_map.insert(std::make_pair(chunk->size, chunk));
-        chunk->free = true;
-        it = m_pending_map.erase(it);
-      } else {
-        it++;
-      }
+    auto chunk = (*it).second;
+    if (m_is_destructing) { // If we are destructing, wait for all deallocations to occur
+      chunk->event.wait();
+    }
+    if (chunk != nullptr && chunk->free == false &&
+      chunk->event.check()) { // Otherwise, move all finished pending chunks to free map to be released
+      m_free_map.insert(std::make_pair(chunk->size, chunk));
+      chunk->free = true;
+      it = m_pending_map.erase(it);
+    } else {
+      it++;
     }
   }
 
@@ -429,12 +398,10 @@ camp::resources::Resource ResourceAwarePool::getResource(void* ptr) const
     auto chunk = it->second;
     return chunk->resource;
   }
-  for (auto pair : m_pending_map) { // check pending chunks
-    for (Chunk* chunk : pair.second) {
-      if (chunk->data == ptr) { 
-        return chunk->resource;
-      }
-    }
+  it = m_pending_map.find(ptr); // check pending chunks
+  if (it != m_pending_map.end()) {
+    auto chunk = it->second;
+    return chunk->resource;
   }
   for (auto pair = m_free_map.begin(); pair != m_free_map.end(); pair++) { 
     // ptr shouldn't be found in the free map typically
@@ -489,12 +456,9 @@ void ResourceAwarePool::coalesce() noexcept
 
   if (!m_pending_map.empty()) {
     for (auto it = m_pending_map.begin(); it != m_pending_map.end(); it++) {
-      auto& chunk_vec = it->second;
-      for (auto pending_chunk : chunk_vec) {
-        if (pending_chunk->free == false && pending_chunk->event.check()) { // a pending chunk is finished...
-          do_deallocate(pending_chunk, pending_chunk->data);
-          //break; Would removing the chunk from the vector invalidate the iterator?
-        }
+      auto pending_chunk = it->second;
+      if (pending_chunk->free == false && pending_chunk->event.check()) { // a pending chunk is finished...
+        do_deallocate(pending_chunk, pending_chunk->data);
       }
     }
   }
