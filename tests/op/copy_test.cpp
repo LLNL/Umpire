@@ -38,7 +38,7 @@ TEST(Copy, HostToHost)
   std::memset(dest_ptr, 0, size);
 
   // Copy data using umpire::copy
-  umpire::copy(source_ptr, dest_ptr, size);
+  umpire::copy(source_ptr, dest_ptr, num_elements);
 
   // Verify the copy was successful
   for (int i = 0; i < num_elements; ++i) {
@@ -103,7 +103,7 @@ TEST(Copy, PartialCopy)
   }
 
   // Copy partial data using umpire::copy
-  umpire::copy(source_ptr, dest_ptr, partial_size);
+  umpire::copy(source_ptr, dest_ptr, partial_elements);
 
   // Verify partial copy was successful
   for (int i = 0; i < partial_elements; ++i) {

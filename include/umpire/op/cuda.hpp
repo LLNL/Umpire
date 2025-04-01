@@ -17,7 +17,7 @@ namespace umpire {
 namespace op {
 
 // CUDA implementation helpers
-namespace {
+namespace detail {
 
 /**
  * @brief Get the CUDA memory copy direction kind
@@ -276,7 +276,7 @@ prefetch_async(T* ptr, int device, std::size_t count, camp::resources::Resource&
   return camp::resources::EventProxy<camp::resources::Resource>{resource};
 }
 
-} // unnamed namespace
+} // namespace detail
 
 //------------------------------------------------------------------------------
 // CUDA Operation Template Specializations
@@ -296,7 +296,7 @@ struct copy<resource::cuda_platform, resource::cuda_platform> {
   template <typename T>
   static void exec(T* src, T* dst, std::size_t len) noexcept
   {
-    copy(src, dst, len, copy_kind<resource::cuda_platform, resource::cuda_platform>::value);
+    detail::copy(src, dst, len, detail::copy_kind<resource::cuda_platform, resource::cuda_platform>::value);
   }
 
   /**
@@ -313,8 +313,8 @@ struct copy<resource::cuda_platform, resource::cuda_platform> {
   static camp::resources::EventProxy<camp::resources::Resource> exec(
       T* src, T* dst, std::size_t len, camp::resources::Resource& resource)
   {
-    return copy_async(src, dst, len, resource, 
-                     copy_kind<resource::cuda_platform, resource::cuda_platform>::value);
+    return detail::copy_async(src, dst, len, resource, 
+                     detail::copy_kind<resource::cuda_platform, resource::cuda_platform>::value);
   }
 };
 
@@ -332,7 +332,7 @@ struct copy<resource::cuda_platform, resource::host_platform> {
   template <typename T>
   static void exec(T* src, T* dst, std::size_t len) noexcept
   {
-    copy(src, dst, len, copy_kind<resource::cuda_platform, resource::host_platform>::value);
+    detail::copy(src, dst, len, detail::copy_kind<resource::cuda_platform, resource::host_platform>::value);
   }
 
   /**
@@ -349,8 +349,8 @@ struct copy<resource::cuda_platform, resource::host_platform> {
   static camp::resources::EventProxy<camp::resources::Resource> exec(
       T* src, T* dst, std::size_t len, camp::resources::Resource& resource)
   {
-    return copy_async(src, dst, len, resource, 
-                     copy_kind<resource::cuda_platform, resource::host_platform>::value);
+    return detail::copy_async(src, dst, len, resource, 
+                     detail::copy_kind<resource::cuda_platform, resource::host_platform>::value);
   }
 };
 
@@ -368,7 +368,7 @@ struct copy<resource::host_platform, resource::cuda_platform> {
   template <typename T>
   static void exec(T* src, T* dst, std::size_t len) noexcept
   {
-    copy(src, dst, len, copy_kind<resource::host_platform, resource::cuda_platform>::value);
+    detail::copy(src, dst, len, detail::copy_kind<resource::host_platform, resource::cuda_platform>::value);
   }
 
   /**
@@ -385,8 +385,8 @@ struct copy<resource::host_platform, resource::cuda_platform> {
   static camp::resources::EventProxy<camp::resources::Resource> exec(
       T* src, T* dst, std::size_t len, camp::resources::Resource& resource)
   {
-    return copy_async(src, dst, len, resource, 
-                     copy_kind<resource::host_platform, resource::cuda_platform>::value);
+    return detail::copy_async(src, dst, len, resource, 
+                     detail::copy_kind<resource::host_platform, resource::cuda_platform>::value);
   }
 };
 
@@ -404,7 +404,7 @@ struct memset<resource::cuda_platform> {
   template <typename T>
   static void exec(T* ptr, int val, std::size_t len) noexcept
   {
-    memset(ptr, val, len);
+    detail::memset(ptr, val, len);
   }
 
   /**
@@ -421,7 +421,7 @@ struct memset<resource::cuda_platform> {
   static camp::resources::EventProxy<camp::resources::Resource> exec(
       T* ptr, int val, std::size_t len, camp::resources::Resource& resource)
   {
-    return memset_async(ptr, val, len, resource);
+    return detail::memset_async(ptr, val, len, resource);
   }
 };
 
@@ -439,7 +439,7 @@ struct prefetch<resource::cuda_platform> {
   template <typename T>
   static void exec(T* ptr, int device, std::size_t len) noexcept
   {
-    prefetch(ptr, device, len);
+    detail::prefetch(ptr, device, len);
   }
 
   /**
@@ -456,7 +456,7 @@ struct prefetch<resource::cuda_platform> {
   static camp::resources::EventProxy<camp::resources::Resource> exec(
       T* ptr, int device, std::size_t len, camp::resources::Resource& resource)
   {
-    return prefetch_async(ptr, device, len, resource);
+    return detail::prefetch_async(ptr, device, len, resource);
   }
 };
 
@@ -474,7 +474,7 @@ struct op_name<resource::cuda_platform> { \
    */ \
   template <typename T> \
   static inline void exec(T* ptr, int device, std::size_t len) noexcept { \
-    advise(ptr, len, device, advice_flag); \
+    detail::advise(ptr, len, device, advice_flag); \
   } \
 };
 
@@ -489,201 +489,4 @@ DEFINE_CUDA_ADVICE_OP(unset_coarse_grain, cudaMemAdviseUnsetCoarseGrain)
 
 #undef DEFINE_CUDA_ADVICE_OP
 
-// CUDA-to-CUDA copy operation
-template <>
-struct copy<resource::cuda_platform, resource::cuda_platform> {
-  /**
-   * @brief CUDA to CUDA synchronous copy
-   * 
-   * @tparam T Type of data being copied
-   * @param src Source pointer
-   * @param dst Destination pointer
-   * @param len Number of elements to copy
-   */
-  template <typename T>
-  static void exec(T* src, T* dst, std::size_t len) noexcept
-  {
-    cuda::copy(src, dst, len, cuda::copy_kind<resource::cuda_platform, resource::cuda_platform>::value);
-  }
-
-  /**
-   * @brief CUDA to CUDA asynchronous copy
-   * 
-   * @tparam T Type of data being copied
-   * @param src Source pointer
-   * @param dst Destination pointer
-   * @param len Number of elements to copy
-   * @param resource Resource for asynchronous operation
-   * @return Event representing the asynchronous operation
-   */
-  template <typename T>
-  static camp::resources::EventProxy<camp::resources::Resource> exec(
-      T* src, T* dst, std::size_t len, camp::resources::Resource& resource)
-  {
-    return cuda::copy_async(src, dst, len, resource, 
-                           cuda::copy_kind<resource::cuda_platform, resource::cuda_platform>::value);
-  }
-};
-
-// CUDA-to-Host copy operation
-template <>
-struct copy<resource::cuda_platform, resource::host_platform> {
-  /**
-   * @brief CUDA to Host synchronous copy
-   * 
-   * @tparam T Type of data being copied
-   * @param src Source pointer
-   * @param dst Destination pointer
-   * @param len Number of elements to copy
-   */
-  template <typename T>
-  static void exec(T* src, T* dst, std::size_t len) noexcept
-  {
-    cuda::copy(src, dst, len, cuda::copy_kind<resource::cuda_platform, resource::host_platform>::value);
-  }
-
-  /**
-   * @brief CUDA to Host asynchronous copy
-   * 
-   * @tparam T Type of data being copied
-   * @param src Source pointer
-   * @param dst Destination pointer
-   * @param len Number of elements to copy
-   * @param resource Resource for asynchronous operation
-   * @return Event representing the asynchronous operation
-   */
-  template <typename T>
-  static camp::resources::EventProxy<camp::resources::Resource> exec(
-      T* src, T* dst, std::size_t len, camp::resources::Resource& resource)
-  {
-    return cuda::copy_async(src, dst, len, resource, 
-                           cuda::copy_kind<resource::cuda_platform, resource::host_platform>::value);
-  }
-};
-
-// Host-to-CUDA copy operation
-template <>
-struct copy<resource::host_platform, resource::cuda_platform> {
-  /**
-   * @brief Host to CUDA synchronous copy
-   * 
-   * @tparam T Type of data being copied
-   * @param src Source pointer
-   * @param dst Destination pointer
-   * @param len Number of elements to copy
-   */
-  template <typename T>
-  static void exec(T* src, T* dst, std::size_t len) noexcept
-  {
-    cuda::copy(src, dst, len, cuda::copy_kind<resource::host_platform, resource::cuda_platform>::value);
-  }
-
-  /**
-   * @brief Host to CUDA asynchronous copy
-   * 
-   * @tparam T Type of data being copied
-   * @param src Source pointer
-   * @param dst Destination pointer
-   * @param len Number of elements to copy
-   * @param resource Resource for asynchronous operation
-   * @return Event representing the asynchronous operation
-   */
-  template <typename T>
-  static camp::resources::EventProxy<camp::resources::Resource> exec(
-      T* src, T* dst, std::size_t len, camp::resources::Resource& resource)
-  {
-    return cuda::copy_async(src, dst, len, resource, 
-                           cuda::copy_kind<resource::host_platform, resource::cuda_platform>::value);
-  }
-};
-
-// CUDA memset operation
-template <>
-struct memset<resource::cuda_platform> {
-  /**
-   * @brief CUDA synchronous memset
-   * 
-   * @tparam T Type of memory being set
-   * @param ptr Pointer to memory
-   * @param val Value to set
-   * @param len Number of elements to set
-   */
-  template <typename T>
-  static void exec(T* ptr, int val, std::size_t len) noexcept
-  {
-    cuda::memset(ptr, val, len);
-  }
-
-  /**
-   * @brief CUDA asynchronous memset
-   * 
-   * @tparam T Type of memory being set
-   * @param ptr Pointer to memory
-   * @param val Value to set
-   * @param len Number of elements to set
-   * @param resource Resource for asynchronous operation
-   * @return Event representing the asynchronous operation
-   */
-  template <typename T>
-  static camp::resources::EventProxy<camp::resources::Resource> exec(
-      T* ptr, int val, std::size_t len, camp::resources::Resource& resource)
-  {
-    return cuda::memset_async(ptr, val, len, resource);
-  }
-};
-
-// CUDA prefetch operation
-template <>
-struct prefetch<resource::cuda_platform> {
-  /**
-   * @brief CUDA synchronous prefetch
-   * 
-   * @tparam T Type of memory being prefetched
-   * @param ptr Pointer to memory
-   * @param device Device to prefetch to
-   * @param len Number of elements to prefetch
-   */
-  template <typename T>
-  static void exec(T* ptr, int device, std::size_t len) noexcept
-  {
-    cuda::prefetch(ptr, device, len);
-  }
-
-  /**
-   * @brief CUDA asynchronous prefetch
-   * 
-   * @tparam T Type of memory being prefetched
-   * @param ptr Pointer to memory
-   * @param device Device to prefetch to
-   * @param len Number of elements to prefetch
-   * @param resource Resource for asynchronous operation
-   * @return Event representing the asynchronous operation
-   */
-  template <typename T>
-  static camp::resources::EventProxy<camp::resources::Resource> exec(
-      T* ptr, int device, std::size_t len, camp::resources::Resource& resource)
-  {
-    return cuda::prefetch_async(ptr, device, len, resource);
-  }
-};
-
-// Memory advice operations define macro to reduce duplication
-#define DEFINE_CUDA_ADVICE_OP(op_name, advice_flag) \
-template <> \
-struct op_name<resource::cuda_platform> { \
-  template <typename T> \
-  static inline void exec(T* ptr, int device, std::size_t len) noexcept { \
-    cuda::advise(ptr, len, device, advice_flag); \
-  } \
-};
-
-DEFINE_CUDA_ADVICE_OP(accessed_by, cudaMemAdviseSetAccessedBy)
-DEFINE_CUDA_ADVICE_OP(preferred_location, cudaMemAdviseSetPreferredLocation)
-DEFINE_CUDA_ADVICE_OP(read_mostly, cudaMemAdviseSetReadMostly)
-DEFINE_CUDA_ADVICE_OP(unset_accessed_by, cudaMemAdviseUnsetAccessedBy)
-DEFINE_CUDA_ADVICE_OP(unset_preferred_location, cudaMemAdviseUnsetPreferredLocation)
-DEFINE_CUDA_ADVICE_OP(unset_read_mostly, cudaMemAdviseUnsetReadMostly)
-DEFINE_CUDA_ADVICE_OP(coarse_grain, cudaMemAdviseSetCoarseGrain)
-DEFINE_CUDA_ADVICE_OP(unset_coarse_grain, cudaMemAdviseUnsetCoarseGrain)
-
-#undef DEFINE_CUDA_ADVICE_OP
+// Deleted duplicate specializations
