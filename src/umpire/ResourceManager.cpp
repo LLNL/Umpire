@@ -391,7 +391,6 @@ void ResourceManager::copy(void* dst_ptr, void* src_ptr, std::size_t size)
 {
   UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", dst_ptr=" << dst_ptr << ", size=" << size << ")");
 
-  // Use the template-based copy operation which will perform the checks and logging internally
   umpire::copy(static_cast<void*>(src_ptr), static_cast<void*>(dst_ptr), size);
 }
 
@@ -401,15 +400,13 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::copy(voi
 {
   UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", dst_ptr=" << dst_ptr << ", size=" << size << ")");
 
-  // Use the template-based async copy operation which will perform the checks and logging internally
-  return umpire::copy(static_cast<void*>(src_ptr), static_cast<void*>(dst_ptr), ctx, size);
+  return umpire::copy(static_cast<void*>(src_ptr), static_cast<void*>(dst_ptr), size, ctx);
 }
 
 void ResourceManager::memset(void* ptr, int value, std::size_t length)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ", value=" << value << ", length=" << length << ")");
 
-  // Use the template-based memset operation which will perform the checks and logging internally
   umpire::memset(static_cast<void*>(ptr), value, length);
 }
 
@@ -419,8 +416,7 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::memset(v
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ", value=" << value << ", length=" << length << ")");
 
-  // Use the template-based async memset operation which will perform the checks and logging internally
-  return umpire::memset(static_cast<void*>(ptr), value, ctx, length);
+  return umpire::memset(static_cast<void*>(ptr), value, length, ctx);
 }
 
 void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size)
@@ -577,9 +573,9 @@ void* ResourceManager::reallocate_impl(void* current_ptr, std::size_t new_size, 
         UMPIRE_ERROR(runtime_error,
                      fmt::format("Cannot reallocate an offset ptr (ptr={}, base={})", current_ptr, alloc_record->ptr));
       }
-      
+
       // Use the template-based reallocate operation directly
-      // This will find the allocator for current_ptr, allocate new memory, 
+      // This will find the allocator for current_ptr, allocate new memory,
       // copy the data, and deallocate the old memory
       new_ptr = umpire::reallocate(static_cast<void*>(current_ptr), new_size);
     }
@@ -622,19 +618,19 @@ void* ResourceManager::reallocate_impl(void* current_ptr, std::size_t new_size, 
         UMPIRE_ERROR(runtime_error,
                      fmt::format("Cannot reallocate an offset ptr (ptr={}, base={})", current_ptr, alloc_record->ptr));
       }
-      
+
       // Use the template-based reallocate operation with async support
       // Even though we're using the async version, the implementation actually
       // does the allocation and deallocation right away - it's just the copy that's async
       new_ptr = allocator.allocate(new_size);
-      
+
       // Calculate copy size (minimum of old and new size)
       std::size_t old_size = getSize(current_ptr);
       std::size_t copy_size = (old_size > new_size) ? new_size : old_size;
-      
+
       // Copy data asynchronously - we already have the new pointer
       auto event = copy(new_ptr, current_ptr, ctx, copy_size);
-      
+
       // Deallocate the old pointer
       allocator.deallocate(current_ptr);
     }
@@ -734,7 +730,7 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::prefetch
   std::size_t size = alloc_record->size - offset;
 
   // Use the template-based prefetch operation which will perform the checks and logging internally
-  return umpire::prefetch(static_cast<void*>(ptr), device, ctx, size);
+  return umpire::prefetch(static_cast<void*>(ptr), device, size, ctx);
 }
 
 void ResourceManager::deallocate(void* ptr)
