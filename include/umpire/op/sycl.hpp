@@ -13,9 +13,7 @@
 #include "umpire/util/Platform.hpp"
 #include "umpire/util/error.hpp"
 #include "umpire/util/sycl_compat.hpp"
-
 #include "umpire/resource/platform.hpp"
-
 #include "camp/resource.hpp"
 #include "camp/resource/event.hpp"
 
@@ -26,7 +24,16 @@
 namespace umpire {
 namespace op {
 
+// Platform-specific type
 struct sycl_platform {};
+
+// SYCL implementation helpers
+namespace {
+// Size-aware calculation with type awareness
+template<typename T>
+inline std::size_t calculate_size(T* ptr, std::size_t count) {
+  return std::is_same<T, void>::value ? count : count * sizeof(T);
+}
 
 // Error handling for SYCL operations
 inline void sycl_error_check(sycl::event event, const char* message) {
@@ -37,69 +44,82 @@ inline void sycl_error_check(sycl::event event, const char* message) {
   }
 }
 
-// Helper function for copy operations that returns an Event
+// Synchronous copy implementation
 template <typename T>
-inline camp::resources::EventProxy<camp::resources::Resource> copy_async_impl(
-    T* src_ptr, T* dst_ptr, std::size_t len, camp::resources::Resource& res,
-    sycl::usm::alloc alloc_type) {
+inline void copy_impl(T* src_ptr, T* dst_ptr, std::size_t count, sycl::usm::alloc alloc_type) {
+  std::size_t size = calculate_size(src_ptr, count);
   
-  auto& sycl_res = dynamic_cast<camp::resources::Sycl&>(res);
-  sycl::queue& queue = sycl_res.get_queue();
-  
-  auto event = queue.memcpy(dst_ptr, src_ptr, len * sizeof(T));
-  
-  return camp::resources::EventProxy<camp::resources::Resource>{res, event};
-}
-
-// Helper function for copy operations
-template <typename T>
-inline void copy_impl(T* src_ptr, T* dst_ptr, std::size_t len, sycl::usm::alloc alloc_type) {
   sycl::queue queue;
-  auto event = queue.memcpy(dst_ptr, src_ptr, len * sizeof(T));
+  auto event = queue.memcpy(dst_ptr, src_ptr, size);
   sycl_error_check(event, "SYCL memcpy failed");
 }
 
-// Helper function for memset operations that returns an Event
+// Asynchronous copy implementation
 template <typename T>
-inline camp::resources::EventProxy<camp::resources::Resource> memset_async_impl(
-    T* ptr, int val, std::size_t len, camp::resources::Resource& res) {
+inline camp::resources::EventProxy<camp::resources::Resource> copy_async_impl(
+    T* src_ptr, T* dst_ptr, std::size_t count, camp::resources::Resource& res,
+    sycl::usm::alloc alloc_type) {
+  
+  std::size_t size = calculate_size(src_ptr, count);
   
   auto& sycl_res = dynamic_cast<camp::resources::Sycl&>(res);
   sycl::queue& queue = sycl_res.get_queue();
   
-  auto event = queue.memset(ptr, val, len * sizeof(T));
+  auto event = queue.memcpy(dst_ptr, src_ptr, size);
   
   return camp::resources::EventProxy<camp::resources::Resource>{res, event};
 }
 
-// Helper function for memset operations
+// Synchronous memset implementation
 template <typename T>
-inline void memset_impl(T* ptr, int val, std::size_t len) {
+inline void memset_impl(T* ptr, int val, std::size_t count) {
+  std::size_t size = calculate_size(ptr, count);
+  
   sycl::queue queue;
-  auto event = queue.memset(ptr, val, len * sizeof(T));
+  auto event = queue.memset(ptr, val, size);
   sycl_error_check(event, "SYCL memset failed");
 }
 
-// Helper function for prefetch operations that returns an Event
+// Asynchronous memset implementation
 template <typename T>
-inline camp::resources::EventProxy<camp::resources::Resource> prefetch_async_impl(
-    T* ptr, int device, std::size_t len, camp::resources::Resource& res) {
+inline camp::resources::EventProxy<camp::resources::Resource> memset_async_impl(
+    T* ptr, int val, std::size_t count, camp::resources::Resource& res) {
+  
+  std::size_t size = calculate_size(ptr, count);
   
   auto& sycl_res = dynamic_cast<camp::resources::Sycl&>(res);
   sycl::queue& queue = sycl_res.get_queue();
   
-  auto event = queue.prefetch(ptr, len * sizeof(T));
+  auto event = queue.memset(ptr, val, size);
   
   return camp::resources::EventProxy<camp::resources::Resource>{res, event};
 }
 
-// Helper function for prefetch operations
+// Synchronous prefetch implementation
 template <typename T>
-inline void prefetch_impl(T* ptr, int device, std::size_t len) {
+inline void prefetch_impl(T* ptr, int device, std::size_t count) {
+  std::size_t size = calculate_size(ptr, count);
+  
   sycl::queue queue;
-  auto event = queue.prefetch(ptr, len * sizeof(T));
+  auto event = queue.prefetch(ptr, size);
   sycl_error_check(event, "SYCL prefetch failed");
 }
+
+// Asynchronous prefetch implementation
+template <typename T>
+inline camp::resources::EventProxy<camp::resources::Resource> prefetch_async_impl(
+    T* ptr, int device, std::size_t count, camp::resources::Resource& res) {
+  
+  std::size_t size = calculate_size(ptr, count);
+  
+  auto& sycl_res = dynamic_cast<camp::resources::Sycl&>(res);
+  sycl::queue& queue = sycl_res.get_queue();
+  
+  auto event = queue.prefetch(ptr, size);
+  
+  return camp::resources::EventProxy<camp::resources::Resource>{res, event};
+}
+} // namespace
 
 // Device-to-device copy specialization
 template<>
@@ -109,21 +129,10 @@ struct copy<sycl_platform, sycl_platform> {
     copy_impl(src_ptr, dst_ptr, len, sycl::usm::alloc::device);
   }
   
-  // void pointer specialization
-  static void exec(void* src_ptr, void* dst_ptr, std::size_t len) {
-    copy_impl(static_cast<char*>(src_ptr), static_cast<char*>(dst_ptr), len, sycl::usm::alloc::device);
-  }
-  
   template <typename T>
   static camp::resources::EventProxy<camp::resources::Resource> exec(
       T* src_ptr, T* dst_ptr, std::size_t len, camp::resources::Resource& res) {
     return copy_async_impl(src_ptr, dst_ptr, len, res, sycl::usm::alloc::device);
-  }
-  
-  // void pointer specialization
-  static camp::resources::EventProxy<camp::resources::Resource> exec(
-      void* src_ptr, void* dst_ptr, std::size_t len, camp::resources::Resource& res) {
-    return copy_async_impl(static_cast<char*>(src_ptr), static_cast<char*>(dst_ptr), len, res, sycl::usm::alloc::device);
   }
 };
 
@@ -135,21 +144,10 @@ struct copy<resource::host_platform, sycl_platform> {
     copy_impl(src_ptr, dst_ptr, len, sycl::usm::alloc::host);
   }
   
-  // void pointer specialization
-  static void exec(void* src_ptr, void* dst_ptr, std::size_t len) {
-    copy_impl(static_cast<char*>(src_ptr), static_cast<char*>(dst_ptr), len, sycl::usm::alloc::host);
-  }
-  
   template <typename T>
   static camp::resources::EventProxy<camp::resources::Resource> exec(
       T* src_ptr, T* dst_ptr, std::size_t len, camp::resources::Resource& res) {
     return copy_async_impl(src_ptr, dst_ptr, len, res, sycl::usm::alloc::host);
-  }
-  
-  // void pointer specialization
-  static camp::resources::EventProxy<camp::resources::Resource> exec(
-      void* src_ptr, void* dst_ptr, std::size_t len, camp::resources::Resource& res) {
-    return copy_async_impl(static_cast<char*>(src_ptr), static_cast<char*>(dst_ptr), len, res, sycl::usm::alloc::host);
   }
 };
 
@@ -161,21 +159,10 @@ struct copy<sycl_platform, resource::host_platform> {
     copy_impl(src_ptr, dst_ptr, len, sycl::usm::alloc::host);
   }
   
-  // void pointer specialization
-  static void exec(void* src_ptr, void* dst_ptr, std::size_t len) {
-    copy_impl(static_cast<char*>(src_ptr), static_cast<char*>(dst_ptr), len, sycl::usm::alloc::host);
-  }
-  
   template <typename T>
   static camp::resources::EventProxy<camp::resources::Resource> exec(
       T* src_ptr, T* dst_ptr, std::size_t len, camp::resources::Resource& res) {
     return copy_async_impl(src_ptr, dst_ptr, len, res, sycl::usm::alloc::host);
-  }
-  
-  // void pointer specialization
-  static camp::resources::EventProxy<camp::resources::Resource> exec(
-      void* src_ptr, void* dst_ptr, std::size_t len, camp::resources::Resource& res) {
-    return copy_async_impl(static_cast<char*>(src_ptr), static_cast<char*>(dst_ptr), len, res, sycl::usm::alloc::host);
   }
 };
 
@@ -187,21 +174,10 @@ struct memset<sycl_platform> {
     memset_impl(ptr, val, len);
   }
   
-  // void pointer specialization
-  static void exec(void* ptr, int val, std::size_t len) {
-    memset_impl(static_cast<char*>(ptr), val, len);
-  }
-  
   template <typename T>
   static camp::resources::EventProxy<camp::resources::Resource> exec(
       T* ptr, int val, std::size_t len, camp::resources::Resource& res) {
     return memset_async_impl(ptr, val, len, res);
-  }
-  
-  // void pointer specialization
-  static camp::resources::EventProxy<camp::resources::Resource> exec(
-      void* ptr, int val, std::size_t len, camp::resources::Resource& res) {
-    return memset_async_impl(static_cast<char*>(ptr), val, len, res);
   }
 };
 
@@ -213,36 +189,19 @@ struct prefetch<sycl_platform> {
     prefetch_impl(ptr, device, len);
   }
   
-  // void pointer specialization
-  static void exec(void* ptr, int device, std::size_t len) {
-    prefetch_impl(static_cast<char*>(ptr), device, len);
-  }
-  
   template <typename T>
   static camp::resources::EventProxy<camp::resources::Resource> exec(
       T* ptr, int device, std::size_t len, camp::resources::Resource& res) {
     return prefetch_async_impl(ptr, device, len, res);
   }
-  
-  // void pointer specialization
-  static camp::resources::EventProxy<camp::resources::Resource> exec(
-      void* ptr, int device, std::size_t len, camp::resources::Resource& res) {
-    return prefetch_async_impl(static_cast<char*>(ptr), device, len, res);
-  }
 };
 
-// Reallocate operations - basic implementation
+// Reallocate operations - stub implementation
 template<>
 struct reallocate<sycl_platform> {
   template <typename T>
   static T* exec(T* src_ptr, std::size_t size) {
-    // For SYCL, we need a strategy that involves:
-    // 1. Allocate new memory
-    // 2. Copy data if src_ptr is not null
-    // 3. Free old memory if src_ptr is not null
-    // 
-    // This requires allocation information which is not available
-    // in this layer, so it's implemented in ResourceManager
+    // SYCL needs ResourceManager for allocation information
     UMPIRE_ERROR(runtime_error, "Direct SYCL reallocate not implemented");
     return nullptr;
   }
