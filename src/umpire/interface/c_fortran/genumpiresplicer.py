@@ -13,7 +13,7 @@ types = (
     ( 'double', 'real(C_DOUBLE)' )
 )
 
-maxdims = 3
+maxdims = 4
 
 def gen_bounds():
     print('')
