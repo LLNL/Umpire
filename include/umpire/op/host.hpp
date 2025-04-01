@@ -3,83 +3,107 @@
 #include <cstring>
 
 #include "umpire/op/detail/utils.hpp"
+#include "umpire/op/operations.hpp"
 #include "umpire/resource/platform.hpp"
 #include "umpire/util/error.hpp"
 
 namespace umpire {
 namespace op {
 
-namespace {
-
-template <typename T>
-inline void copy_impl(T* src, T* dst, std::size_t len)
-{
-  std::memcpy(dst, src, detail::get_size<T>(len));
-}
-
-template <typename T>
-inline void memset_impl(T* src, int val, std::size_t len)
-{
-  std::memset(src, val, detail::get_size<T>(len));
-}
-
-} // namespace
-
 // Host-to-host copy operation
 template <>
 struct copy<resource::host_platform, resource::host_platform> {
+  /**
+   * @brief Host-to-host memory copy implementation
+   * 
+   * @tparam T Type of data being copied
+   * @param src Source pointer
+   * @param dst Destination pointer
+   * @param len Number of elements to copy
+   */
   template <typename T>
-  static void exec(T* src, T* dst, std::size_t len)
+  static void exec(T* src, T* dst, std::size_t len) noexcept
   {
-    copy_impl(src, dst, len);
+    std::memcpy(dst, src, detail::get_size<T>(len));
   }
 
-  // Async version returns a dummy event
+  /**
+   * @brief Asynchronous host-to-host memory copy implementation
+   * 
+   * Since host operations are synchronous, this simply performs a sync copy
+   * and returns a completed event.
+   */
   template <typename T>
-  static camp::resources::EventProxy<camp::resources::Resource> exec(T* src, T* dst, std::size_t len,
-                                                                     camp::resources::Resource& r)
+  static camp::resources::EventProxy<camp::resources::Resource> exec(
+      T* src, T* dst, std::size_t len, camp::resources::Resource& resource) noexcept
   {
-    copy_impl(src, dst, len);
-    return camp::resources::EventProxy<camp::resources::Resource>{r};
+    exec(src, dst, len);
+    return detail::make_completed_event(resource);
   }
 };
 
 // Host memset operation
 template <>
 struct memset<resource::host_platform> {
+  /**
+   * @brief Fill host memory with a value
+   * 
+   * @tparam T Type of data being set
+   * @param ptr Pointer to memory
+   * @param val Value to set (treated as byte)
+   * @param len Number of elements to set
+   */
   template <typename T>
-  static void exec(T* src, int val, std::size_t len)
+  static void exec(T* ptr, int val, std::size_t len) noexcept
   {
-    memset_impl(src, val, len);
+    std::memset(ptr, val, detail::get_size<T>(len));
   }
 
-  // Async version returns a dummy event
+  /**
+   * @brief Asynchronous memset implementation for host memory
+   * 
+   * Since host operations are synchronous, this simply performs a sync memset
+   * and returns a completed event.
+   */
   template <typename T>
-  static camp::resources::EventProxy<camp::resources::Resource> exec(T* src, int val, std::size_t len,
-                                                                     camp::resources::Resource& r)
+  static camp::resources::EventProxy<camp::resources::Resource> exec(
+      T* ptr, int val, std::size_t len, camp::resources::Resource& resource) noexcept
   {
-    memset_impl(src, val, len);
-    return camp::resources::EventProxy<camp::resources::Resource>{r};
+    exec(ptr, val, len);
+    return detail::make_completed_event(resource);
   }
 };
 
 // Host reallocate operation - uses system realloc
 template <>
 struct reallocate<resource::host_platform> {
+  /**
+   * @brief Reallocate host memory
+   * 
+   * @tparam T Type of data being reallocated
+   * @param src Pointer to current allocation (may be null)
+   * @param size New size in elements (or bytes for void*)
+   * @return T* Pointer to new allocation or null on failure
+   */
   template <typename T>
   static T* exec(T* src, std::size_t size)
   {
+    // Special cases for null pointer or zero size
     if (!src)
       return nullptr;
+    
     if (size == 0) {
       std::free(src);
       return nullptr;
     }
 
-    // Calculate appropriate size
-    const std::size_t bytes = std::is_same<T, void>::value ? size : size * sizeof(T);
+    // Calculate size in bytes based on type
+    const std::size_t bytes = detail::get_size<T>(size);
+    
+    // Perform the reallocation
     T* ret = static_cast<T*>(std::realloc(src, bytes));
 
+    // Error handling
     if (!ret && size > 0) {
       UMPIRE_ERROR(runtime_error, fmt::format("Host realloc failed for pointer={}, size={}", src, bytes));
     }
@@ -91,19 +115,30 @@ struct reallocate<resource::host_platform> {
 // Host prefetch operation - no-op for host memory
 template <>
 struct prefetch<resource::host_platform> {
+  /**
+   * @brief Prefetch host memory (no-op)
+   * 
+   * This is a no-op for host memory as prefetching isn't applicable.
+   */
   template <typename T>
-  static void exec(T* src, int device, std::size_t len)
+  static void exec(T* UMPIRE_UNUSED_ARG(ptr), int UMPIRE_UNUSED_ARG(device), 
+                   std::size_t UMPIRE_UNUSED_ARG(len)) noexcept
   {
     // No-op for host memory
   }
 
-  // Async version returns a dummy event
+  /**
+   * @brief Asynchronous prefetch for host memory (no-op)
+   * 
+   * This is a no-op that returns a completed event.
+   */
   template <typename T>
-  static camp::resources::EventProxy<camp::resources::Resource> exec(T* src, int device, std::size_t len,
-                                                                     camp::resources::Resource& r)
+  static camp::resources::EventProxy<camp::resources::Resource> exec(
+      T* UMPIRE_UNUSED_ARG(ptr), int UMPIRE_UNUSED_ARG(device), 
+      std::size_t UMPIRE_UNUSED_ARG(len), camp::resources::Resource& resource) noexcept
   {
     // No-op for host memory
-    return camp::resources::EventProxy<camp::resources::Resource>{r};
+    return detail::make_completed_event(resource);
   }
 };
 

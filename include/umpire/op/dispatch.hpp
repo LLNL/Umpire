@@ -165,7 +165,7 @@ struct op_caller {
   template <typename T, typename... Args>
   static void check_memset_bounds(T* src, const util::AllocationRecord* record, std::size_t length)
   {
-    std::ptrdiff_t offset = static_cast<char*>(src) - static_cast<char*>(record->ptr);
+    std::ptrdiff_t offset = reinterpret_cast<const char*>(src) - reinterpret_cast<const char*>(record->ptr);
     std::size_t size = record->size - offset;
 
     if (length > 0 && length > size) {
@@ -179,10 +179,10 @@ struct op_caller {
                                 const util::AllocationRecord* dst_record, std::size_t size)
   {
     // Calculate source and destination details
-    std::ptrdiff_t src_offset = static_cast<char*>(src) - static_cast<char*>(src_record->ptr);
+    std::ptrdiff_t src_offset = reinterpret_cast<const char*>(src) - reinterpret_cast<const char*>(src_record->ptr);
     std::size_t src_size = src_record->size - src_offset;
 
-    std::ptrdiff_t dst_offset = static_cast<char*>(dst) - static_cast<char*>(dst_record->ptr);
+    std::ptrdiff_t dst_offset = reinterpret_cast<const char*>(dst) - reinterpret_cast<const char*>(dst_record->ptr);
     std::size_t dst_size = dst_record->size - dst_offset;
 
     // If size is 0, use the source size
@@ -273,8 +273,8 @@ struct op_caller {
       std::size_t size = get_arg<0>(args...);
       check_copy_bounds(src, dst, src_record, dst_record, size);
 
-      std::ptrdiff_t src_offset = static_cast<char*>(src) - static_cast<char*>(src_record->ptr);
-      std::ptrdiff_t dst_offset = static_cast<char*>(dst) - static_cast<char*>(dst_record->ptr);
+      std::ptrdiff_t src_offset = reinterpret_cast<const char*>(src) - reinterpret_cast<const char*>(src_record->ptr);
+      std::ptrdiff_t dst_offset = reinterpret_cast<const char*>(dst) - reinterpret_cast<const char*>(dst_record->ptr);
 
       record_event("copy", src, src_record->strategy, src_record->strategy->getName(), false, "dst", dst, "src_offset",
                    src_offset, "dst_offset", dst_offset, "size", size, "dst_allocator_ref", (void*)dst_record->strategy,
@@ -305,8 +305,8 @@ struct op_caller {
       std::size_t size = get_arg<0>(args...);
       check_copy_bounds(src, dst, src_record, dst_record, size);
 
-      std::ptrdiff_t src_offset = static_cast<char*>(src) - static_cast<char*>(src_record->ptr);
-      std::ptrdiff_t dst_offset = static_cast<char*>(dst) - static_cast<char*>(dst_record->ptr);
+      std::ptrdiff_t src_offset = reinterpret_cast<const char*>(src) - reinterpret_cast<const char*>(src_record->ptr);
+      std::ptrdiff_t dst_offset = reinterpret_cast<const char*>(dst) - reinterpret_cast<const char*>(dst_record->ptr);
 
       record_event("copy", src, src_record->strategy, src_record->strategy->getName(), true, "dst", dst, "src_offset",
                    src_offset, "dst_offset", dst_offset, "size", size, "dst_allocator_ref", (void*)dst_record->strategy,
@@ -325,6 +325,8 @@ struct op_caller {
 template <typename T>
 auto copy(T* src, T* dst, std::size_t len)
 {
+  std::cout << "copying " << len << " elements from " << static_cast<void*>(src) << " to " << static_cast<void*>(dst)
+            << std::endl;
   op::op_caller<op::copy>::exec(src, dst, len);
 }
 

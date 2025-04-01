@@ -1,16 +1,53 @@
 #pragma once
 
+#include <cstddef>
+#include <type_traits>
+#include "camp/resource.hpp"
+
 namespace umpire {
 namespace op {
 namespace detail {
 
+/**
+ * @brief Calculate size in bytes based on element count and type
+ * 
+ * @tparam T The pointer type (void* or typed pointer)
+ * @param count Number of elements or bytes (if T is void)
+ * @return std::size_t Size in bytes
+ */
 template <typename T>
-inline std::size_t get_size(std::size_t bytes)
+inline std::size_t get_size(std::size_t count) noexcept
 {
   if constexpr (std::is_same_v<T, void>)
-    return bytes;
+    return count;
   else
-    return bytes * sizeof(T);
+    return count * sizeof(T);
+}
+
+/**
+ * @brief Create a default event for platforms without native async support
+ * 
+ * @param resource The resource to create the event for
+ * @return camp::resources::EventProxy<camp::resources::Resource> A completed event
+ */
+inline camp::resources::EventProxy<camp::resources::Resource> 
+make_completed_event(camp::resources::Resource& resource) noexcept
+{
+  return camp::resources::EventProxy<camp::resources::Resource>{resource};
+}
+
+/**
+ * @brief Get minimum of two values (used for copy size calculations)
+ * 
+ * @tparam T The type of values being compared
+ * @param a First value
+ * @param b Second value
+ * @return constexpr T The smaller of the two values
+ */
+template <typename T>
+constexpr T min(const T& a, const T& b) noexcept
+{
+  return (a < b) ? a : b;
 }
 
 } // namespace detail
