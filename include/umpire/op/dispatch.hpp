@@ -7,9 +7,17 @@
 namespace umpire {
 namespace op {
 
-// Platform dispatch for single-platform operations
+/**
+ * @brief Dispatch an operation to the appropriate platform implementation
+ *
+ * @tparam Op The operation template to dispatch
+ * @tparam Args Argument types for the operation
+ * @param platform The platform to dispatch to
+ * @param args Arguments for the operation
+ * @return Result of the operation
+ */
 template <template <typename...> class Op, typename... Args>
-inline auto dispatch_by_platform(camp::resources::Platform platform, Args&&... args)
+inline auto dispatch(camp::resources::Platform platform, Args&&... args)
 {
   switch (platform) {
     case camp::resources::Platform::host:
@@ -35,10 +43,18 @@ inline auto dispatch_by_platform(camp::resources::Platform platform, Args&&... a
   }
 }
 
-// Platform dispatch for dual-platform operations
+/**
+ * @brief Dispatch an operation between two platforms (same or different)
+ *
+ * @tparam Op The operation template to dispatch
+ * @tparam Args Argument types for the operation
+ * @param src_platform The source platform
+ * @param dst_platform The destination platform
+ * @param args Arguments for the operation
+ * @return Result of the operation
+ */
 template <template <typename...> class Op, typename... Args>
-inline auto dispatch_dual_platforms(camp::resources::Platform src_platform, camp::resources::Platform dst_platform,
-                                    Args&&... args)
+inline auto dispatch(camp::resources::Platform src_platform, camp::resources::Platform dst_platform, Args&&... args)
 {
   // Same-platform operations
   if (src_platform == dst_platform) {
@@ -153,11 +169,31 @@ struct op_caller {
     // No more arguments to process
   }
 
-  // Process key-value pairs
+  // Process key-value pairs with explicit overload for std::string keys
+  template <typename Event, typename Value, typename... Rest>
+  static void add_args(Event& event, const std::string& key, Value&& value, Rest&&... rest)
+  {
+    // Explicitly call the correct arg overload
+    event.arg(key, std::forward<Value>(value));
+    add_args(event, std::forward<Rest>(rest)...);
+  }
+
+  // Process key-value pairs with explicit overload for const char* keys
+  template <typename Event, typename Value, typename... Rest>
+  static void add_args(Event& event, const char* key, Value&& value, Rest&&... rest)
+  {
+    // Explicitly call the correct arg overload
+    event.arg(key, std::forward<Value>(value));
+    add_args(event, std::forward<Rest>(rest)...);
+  }
+
+  // Keep the generic version with perfect forwarding (lowest priority due to template specialization rules)
   template <typename Event, typename Key, typename Value, typename... Rest>
   static void add_args(Event& event, Key&& key, Value&& value, Rest&&... rest)
   {
-    event.arg(std::forward<Key>(key), std::forward<Value>(value));
+    // Cast to solve ambiguity
+    const std::string key_str(std::forward<Key>(key));
+    event.arg(key_str, std::forward<Value>(value));
     add_args(event, std::forward<Rest>(rest)...);
   }
 
@@ -223,7 +259,7 @@ struct op_caller {
     }
 
     // Dispatch based on platform
-    return dispatch_by_platform<Op>(p, src, args...);
+    return dispatch<Op>(p, src, args...);
   }
 
   // Single-pointer operations (asynchronous)
@@ -251,7 +287,7 @@ struct op_caller {
                    "size", size);
     }
 
-    return dispatch_by_platform<Op>(p, src, args...);
+    return dispatch<Op>(p, src, args...);
   }
 
   // Dual-pointer operations (synchronous)
@@ -276,14 +312,14 @@ struct op_caller {
       std::ptrdiff_t src_offset = reinterpret_cast<const char*>(src) - reinterpret_cast<const char*>(src_record->ptr);
       std::ptrdiff_t dst_offset = reinterpret_cast<const char*>(dst) - reinterpret_cast<const char*>(dst_record->ptr);
 
-      record_event("copy", src, src_record->strategy, src_record->strategy->getName(), false, "dst", dst, "src_offset",
-                   src_offset, "dst_offset", dst_offset, "size", size, "dst_allocator_ref", (void*)dst_record->strategy,
-                   "src_allocator_name", src_record->strategy->getName(), "dst_allocator_name",
-                   dst_record->strategy->getName());
+      record_event("copy", (void*)src, src_record->strategy, src_record->strategy->getName(), false, "dst", (void*)dst,
+                   "src_offset", src_offset, "dst_offset", dst_offset, "size", size, "dst_allocator_ref",
+                   (void*)dst_record->strategy, "src_allocator_name", src_record->strategy->getName(),
+                   "dst_allocator_name", dst_record->strategy->getName());
     }
 
     // Dispatch based on source and destination platforms
-    return dispatch_dual_platforms<Op>(p1, p2, src, dst, args...);
+    return dispatch<Op>(p1, p2, src, dst, args...);
   }
 
   // Dual-pointer operations (asynchronous)
@@ -314,7 +350,7 @@ struct op_caller {
                    dst_record->strategy->getName());
     }
 
-    return dispatch_dual_platforms<Op>(p1, p2, src, dst, args...);
+    return dispatch<Op>(p1, p2, src, dst, args...);
   }
 };
 
@@ -351,7 +387,7 @@ camp::resources::EventProxy<camp::resources::Resource> memset(T* src, int v, std
 
 // Non-void pointer reallocate
 template <typename T, typename std::enable_if<!std::is_void<T>::value, int>::type = 0>
-T* reallocate(T* src, std::size_t size)
+inline T* reallocate(T* src, std::size_t size)
 {
   // Handle null pointer case
   if (src == nullptr) {
@@ -391,7 +427,7 @@ T* reallocate(T* src, std::size_t size)
 
 // Void pointer reallocate
 template <typename T, typename std::enable_if<std::is_void<T>::value, int>::type = 0>
-void* reallocate(T* src, std::size_t size)
+inline void* reallocate(T* src, std::size_t size)
 {
   // Handle null pointer case
   if (src == nullptr) {
@@ -430,9 +466,9 @@ void* reallocate(T* src, std::size_t size)
 }
 
 // Async reallocate implementation
-template <typename T>
-camp::resources::EventProxy<camp::resources::Resource> reallocate(T* src, std::size_t size,
-                                                                  camp::resources::Resource& ctx)
+template <typename T, typename std::enable_if<!std::is_void<T>::value, int>::type = 0>
+inline camp::resources::EventProxy<camp::resources::Resource> reallocate(T* src, std::size_t size,
+                                                                         camp::resources::Resource& ctx)
 {
   // Handle null pointer case
   if (src == nullptr) {
@@ -473,8 +509,8 @@ camp::resources::EventProxy<camp::resources::Resource> reallocate(T* src, std::s
 }
 
 // Explicit specialization for void* async reallocate
-template <>
-camp::resources::EventProxy<camp::resources::Resource> reallocate(void* src, std::size_t size,
+template <typename T, typename std::enable_if<std::is_void<T>::value, int>::type = 0>
+camp::resources::EventProxy<camp::resources::Resource> reallocate(T* src, std::size_t size,
                                                                   camp::resources::Resource& ctx)
 {
   // Handle null pointer case
