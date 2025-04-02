@@ -173,7 +173,7 @@ module umpire_mod
         procedure :: make_allocator_advisor => resourcemanager_make_allocator_advisor
         procedure :: make_allocator_named => resourcemanager_make_allocator_named
         procedure :: make_allocator_thread_safe => resourcemanager_make_allocator_thread_safe
-        procedure :: make_allocator_fixed_pool => resourcemanager_make_allocator_fixed_pool
+        procedure :: make_allocator_aligned_allocator => resourcemanager_make_allocator_aligned_allocator
         procedure :: make_allocator_prefetcher => resourcemanager_make_allocator_prefetcher
         procedure :: add_alias => resourcemanager_add_alias
         procedure :: remove_alias => resourcemanager_remove_alias
@@ -543,10 +543,10 @@ module umpire_mod
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_bufferify_thread_safe
 
-        function c_resourcemanager_make_allocator_fixed_pool(self, name, &
-                allocator, object_size, SHT_crv) &
+        function c_resourcemanager_make_allocator_aligned_allocator( &
+                self, name, allocator, object_size, SHT_crv) &
                 result(SHT_rv) &
-                bind(C, name="umpire_resourcemanager_make_allocator_fixed_pool")
+                bind(C, name="umpire_resourcemanager_make_allocator_aligned_allocator")
             use iso_c_binding, only : C_CHAR, C_PTR, C_SIZE_T
             import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
             implicit none
@@ -556,12 +556,12 @@ module umpire_mod
             integer(C_SIZE_T), value, intent(IN) :: object_size
             type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
-        end function c_resourcemanager_make_allocator_fixed_pool
+        end function c_resourcemanager_make_allocator_aligned_allocator
 
-        function c_resourcemanager_make_allocator_bufferify_fixed_pool( &
+        function c_resourcemanager_make_allocator_bufferify_aligned_allocator( &
                 self, name, Lname, allocator, object_size, SHT_crv) &
                 result(SHT_rv) &
-                bind(C, name="umpire_resourcemanager_make_allocator_bufferify_fixed_pool")
+                bind(C, name="umpire_resourcemanager_make_allocator_bufferify_aligned_allocator")
             use iso_c_binding, only : C_CHAR, C_INT, C_PTR, C_SIZE_T
             import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
             implicit none
@@ -572,7 +572,7 @@ module umpire_mod
             integer(C_SIZE_T), value, intent(IN) :: object_size
             type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
-        end function c_resourcemanager_make_allocator_bufferify_fixed_pool
+        end function c_resourcemanager_make_allocator_bufferify_aligned_allocator
 
         function c_resourcemanager_make_allocator_prefetcher(self, name, &
                 allocator, device_id, SHT_crv) &
@@ -2008,7 +2008,7 @@ contains
         ! splicer end class.ResourceManager.method.make_allocator_thread_safe
     end function resourcemanager_make_allocator_thread_safe
 
-    function resourcemanager_make_allocator_fixed_pool(obj, name, &
+    function resourcemanager_make_allocator_aligned_allocator(obj, name, &
             allocator, object_size) &
             result(SHT_rv)
         use iso_c_binding, only : C_INT, C_PTR, C_SIZE_T
@@ -2017,13 +2017,13 @@ contains
         type(UmpireAllocator), value, intent(IN) :: allocator
         integer(C_SIZE_T), value, intent(IN) :: object_size
         type(UmpireAllocator) :: SHT_rv
-        ! splicer begin class.ResourceManager.method.make_allocator_fixed_pool
+        ! splicer begin class.ResourceManager.method.make_allocator_aligned_allocator
         type(C_PTR) :: SHT_prv
-        SHT_prv = c_resourcemanager_make_allocator_bufferify_fixed_pool(obj%cxxmem, &
+        SHT_prv = c_resourcemanager_make_allocator_bufferify_aligned_allocator(obj%cxxmem, &
             name, len_trim(name, kind=C_INT), allocator%cxxmem, &
             object_size, SHT_rv%cxxmem)
-        ! splicer end class.ResourceManager.method.make_allocator_fixed_pool
-    end function resourcemanager_make_allocator_fixed_pool
+        ! splicer end class.ResourceManager.method.make_allocator_aligned_allocator
+    end function resourcemanager_make_allocator_aligned_allocator
 
     function resourcemanager_make_allocator_prefetcher(obj, name, &
             allocator, device_id) &

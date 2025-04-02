@@ -93,6 +93,13 @@ struct s_umpire_resourcemanager {
 };
 typedef struct s_umpire_resourcemanager umpire_resourcemanager;
 
+// helper capsule_umpire_strategy_alignedallocator
+struct s_umpire_strategy_alignedallocator {
+    void *addr;     /* address of C++ memory */
+    int idtor;      /* index of destructor */
+};
+typedef struct s_umpire_strategy_alignedallocator umpire_strategy_alignedallocator;
+
 // helper capsule_umpire_strategy_allocationadvisor
 struct s_umpire_strategy_allocationadvisor {
     void *addr;     /* address of C++ memory */

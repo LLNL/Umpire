@@ -9,10 +9,10 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 
+#include "umpire/strategy/AlignedAllocator.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
 #include "umpire/strategy/AllocationPrefetcher.hpp"
 #include "umpire/strategy/DynamicPoolList.hpp"
-#include "umpire/strategy/FixedPool.hpp"
 #include "umpire/strategy/NamedAllocationStrategy.hpp"
 #include "umpire/strategy/QuickPool.hpp"
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
@@ -290,44 +290,46 @@ umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_thread_safe(
     // splicer end class.ResourceManager.method.make_allocator_bufferify_thread_safe
 }
 
-umpire_allocator * umpire_resourcemanager_make_allocator_fixed_pool(
+umpire_allocator * umpire_resourcemanager_make_allocator_aligned_allocator(
     umpire_resourcemanager * self, const char * name,
     umpire_allocator allocator, size_t object_size,
     umpire_allocator * SHC_rv)
 {
     umpire::ResourceManager *SH_this =
         static_cast<umpire::ResourceManager *>(self->addr);
-    // splicer begin class.ResourceManager.method.make_allocator_fixed_pool
+    // splicer begin class.ResourceManager.method.make_allocator_aligned_allocator
     const std::string SHCXX_name(name);
     umpire::Allocator * SHCXX_allocator =
         static_cast<umpire::Allocator *>(allocator.addr);
     umpire::Allocator * SHCXX_rv = new umpire::Allocator;
-    *SHCXX_rv = SH_this->makeAllocator<umpire::strategy::FixedPool>(
+    *SHCXX_rv =
+        SH_this->makeAllocator<umpire::strategy::AlignedAllocator>(
         SHCXX_name, *SHCXX_allocator, object_size);
     SHC_rv->addr = SHCXX_rv;
     SHC_rv->idtor = 1;
     return SHC_rv;
-    // splicer end class.ResourceManager.method.make_allocator_fixed_pool
+    // splicer end class.ResourceManager.method.make_allocator_aligned_allocator
 }
 
-umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_fixed_pool(
+umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_aligned_allocator(
     umpire_resourcemanager * self, const char * name, int Lname,
     umpire_allocator allocator, size_t object_size,
     umpire_allocator * SHC_rv)
 {
     umpire::ResourceManager *SH_this =
         static_cast<umpire::ResourceManager *>(self->addr);
-    // splicer begin class.ResourceManager.method.make_allocator_bufferify_fixed_pool
+    // splicer begin class.ResourceManager.method.make_allocator_bufferify_aligned_allocator
     const std::string SHCXX_name(name, Lname);
     umpire::Allocator * SHCXX_allocator =
         static_cast<umpire::Allocator *>(allocator.addr);
     umpire::Allocator * SHCXX_rv = new umpire::Allocator;
-    *SHCXX_rv = SH_this->makeAllocator<umpire::strategy::FixedPool>(
+    *SHCXX_rv =
+        SH_this->makeAllocator<umpire::strategy::AlignedAllocator>(
         SHCXX_name, *SHCXX_allocator, object_size);
     SHC_rv->addr = SHCXX_rv;
     SHC_rv->idtor = 1;
     return SHC_rv;
-    // splicer end class.ResourceManager.method.make_allocator_bufferify_fixed_pool
+    // splicer end class.ResourceManager.method.make_allocator_bufferify_aligned_allocator
 }
 
 umpire_allocator * umpire_resourcemanager_make_allocator_prefetcher(
