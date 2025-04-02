@@ -88,6 +88,12 @@ declarations:
           wrap_c: false
           wrap_fortran: false
 
+      - decl: class AlignedAllocator
+        cxx_header: umpire/strategy/AlignedAllocator.hpp
+        options:
+          wrap_c: false
+          wrap_fortran: false
+
   - decl: class Allocator
     cxx_header: umpire/Allocator.hpp
     format:
@@ -170,6 +176,11 @@ declarations:
           - instantiation: <umpire::strategy::FixedPool>
             format:
               template_suffix: _fixed_pool
+              function_suffix: ""
+        cxx_template:
+          - instantiation: <umpire::strategy::AlignedAllocator>
+            format:
+              template_suffix: _aligned_allocator
               function_suffix: ""
 
       - decl: template <typename T> Allocator makeAllocator(const std::string& name, Allocator allocator, int device_id);
