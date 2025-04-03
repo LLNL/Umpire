@@ -128,7 +128,7 @@ module umpire_mod
             allocate_double_array_2d, &
             allocate_double_array_3d, &
             allocate_double_array_4d, &
-            allocate_double_array_5d, &
+            allocate_double_array_5d
 
         generic, public :: deallocate => &
             deallocate_int_array_1d, &
@@ -150,7 +150,7 @@ module umpire_mod
             deallocate_double_array_2d, &
             deallocate_double_array_3d, &
             deallocate_double_array_4d, &
-            deallocate_double_array_5d, &
+            deallocate_double_array_5d
 
         ! splicer end class.Allocator.type_bound_procedure_part
     end type UmpireAllocator
