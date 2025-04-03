@@ -92,6 +92,16 @@ umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_thread_safe(
     umpire_resourcemanager * self, const char * name, int Lname,
     umpire_allocator allocator, umpire_allocator * SHC_rv);
 
+umpire_allocator * umpire_resourcemanager_make_allocator_fixed_pool(
+    umpire_resourcemanager * self, const char * name,
+    umpire_allocator allocator, size_t object_size,
+    umpire_allocator * SHC_rv);
+
+umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_fixed_pool(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    umpire_allocator allocator, size_t object_size,
+    umpire_allocator * SHC_rv);
+
 umpire_allocator * umpire_resourcemanager_make_allocator_aligned_allocator(
     umpire_resourcemanager * self, const char * name,
     umpire_allocator allocator, size_t object_size,

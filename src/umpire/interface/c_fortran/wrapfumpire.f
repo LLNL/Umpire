@@ -173,6 +173,7 @@ module umpire_mod
         procedure :: make_allocator_advisor => resourcemanager_make_allocator_advisor
         procedure :: make_allocator_named => resourcemanager_make_allocator_named
         procedure :: make_allocator_thread_safe => resourcemanager_make_allocator_thread_safe
+        procedure :: make_allocator_fixed_pool => resourcemanager_make_allocator_fixed_pool
         procedure :: make_allocator_aligned_allocator => resourcemanager_make_allocator_aligned_allocator
         procedure :: make_allocator_prefetcher => resourcemanager_make_allocator_prefetcher
         procedure :: add_alias => resourcemanager_add_alias
@@ -542,6 +543,37 @@ module umpire_mod
             type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_bufferify_thread_safe
+
+        function c_resourcemanager_make_allocator_fixed_pool(self, name, &
+                allocator, object_size, SHT_crv) &
+                result(SHT_rv) &
+                bind(C, name="umpire_resourcemanager_make_allocator_fixed_pool")
+            use iso_c_binding, only : C_CHAR, C_PTR, C_SIZE_T
+            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            implicit none
+            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            character(kind=C_CHAR), intent(IN) :: name(*)
+            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+            integer(C_SIZE_T), value, intent(IN) :: object_size
+            type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
+            type(C_PTR) SHT_rv
+        end function c_resourcemanager_make_allocator_fixed_pool
+
+        function c_resourcemanager_make_allocator_bufferify_fixed_pool( &
+                self, name, Lname, allocator, object_size, SHT_crv) &
+                result(SHT_rv) &
+                bind(C, name="umpire_resourcemanager_make_allocator_bufferify_fixed_pool")
+            use iso_c_binding, only : C_CHAR, C_INT, C_PTR, C_SIZE_T
+            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            implicit none
+            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            character(kind=C_CHAR), intent(IN) :: name(*)
+            integer(C_INT), value, intent(IN) :: Lname
+            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+            integer(C_SIZE_T), value, intent(IN) :: object_size
+            type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
+            type(C_PTR) SHT_rv
+        end function c_resourcemanager_make_allocator_bufferify_fixed_pool
 
         function c_resourcemanager_make_allocator_aligned_allocator( &
                 self, name, allocator, object_size, SHT_crv) &
@@ -2007,6 +2039,23 @@ contains
             SHT_rv%cxxmem)
         ! splicer end class.ResourceManager.method.make_allocator_thread_safe
     end function resourcemanager_make_allocator_thread_safe
+
+    function resourcemanager_make_allocator_fixed_pool(obj, name, &
+            allocator, object_size) &
+            result(SHT_rv)
+        use iso_c_binding, only : C_INT, C_PTR, C_SIZE_T
+        class(UmpireResourceManager) :: obj
+        character(len=*), intent(IN) :: name
+        type(UmpireAllocator), value, intent(IN) :: allocator
+        integer(C_SIZE_T), value, intent(IN) :: object_size
+        type(UmpireAllocator) :: SHT_rv
+        ! splicer begin class.ResourceManager.method.make_allocator_fixed_pool
+        type(C_PTR) :: SHT_prv
+        SHT_prv = c_resourcemanager_make_allocator_bufferify_fixed_pool(obj%cxxmem, &
+            name, len_trim(name, kind=C_INT), allocator%cxxmem, &
+            object_size, SHT_rv%cxxmem)
+        ! splicer end class.ResourceManager.method.make_allocator_fixed_pool
+    end function resourcemanager_make_allocator_fixed_pool
 
     function resourcemanager_make_allocator_aligned_allocator(obj, name, &
             allocator, object_size) &
