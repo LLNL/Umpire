@@ -177,7 +177,6 @@ declarations:
             format:
               template_suffix: _fixed_pool
               function_suffix: ""
-        cxx_template:
           - instantiation: <umpire::strategy::AlignedAllocator>
             format:
               template_suffix: _aligned_allocator
