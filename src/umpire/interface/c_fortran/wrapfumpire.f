@@ -78,6 +78,10 @@ module umpire_mod
         procedure :: deallocate_int_array_4d => allocator_deallocate_int_array_4d
         procedure :: allocate_int_array_5d => allocator_allocate_int_array_5d
         procedure :: deallocate_int_array_5d => allocator_deallocate_int_array_5d
+        procedure :: allocate_int_array_6d => allocator_allocate_int_array_6d
+        procedure :: deallocate_int_array_6d => allocator_deallocate_int_array_6d
+        procedure :: allocate_int_array_7d => allocator_allocate_int_array_7d
+        procedure :: deallocate_int_array_7d => allocator_deallocate_int_array_7d
         procedure :: allocate_long_array_1d => allocator_allocate_long_array_1d
         procedure :: deallocate_long_array_1d => allocator_deallocate_long_array_1d
         procedure :: allocate_long_array_2d => allocator_allocate_long_array_2d
@@ -88,6 +92,10 @@ module umpire_mod
         procedure :: deallocate_long_array_4d => allocator_deallocate_long_array_4d
         procedure :: allocate_long_array_5d => allocator_allocate_long_array_5d
         procedure :: deallocate_long_array_5d => allocator_deallocate_long_array_5d
+        procedure :: allocate_long_array_6d => allocator_allocate_long_array_6d
+        procedure :: deallocate_long_array_6d => allocator_deallocate_long_array_6d
+        procedure :: allocate_long_array_7d => allocator_allocate_long_array_7d
+        procedure :: deallocate_long_array_7d => allocator_deallocate_long_array_7d
         procedure :: allocate_float_array_1d => allocator_allocate_float_array_1d
         procedure :: deallocate_float_array_1d => allocator_deallocate_float_array_1d
         procedure :: allocate_float_array_2d => allocator_allocate_float_array_2d
@@ -98,6 +106,10 @@ module umpire_mod
         procedure :: deallocate_float_array_4d => allocator_deallocate_float_array_4d
         procedure :: allocate_float_array_5d => allocator_allocate_float_array_5d
         procedure :: deallocate_float_array_5d => allocator_deallocate_float_array_5d
+        procedure :: allocate_float_array_6d => allocator_allocate_float_array_6d
+        procedure :: deallocate_float_array_6d => allocator_deallocate_float_array_6d
+        procedure :: allocate_float_array_7d => allocator_allocate_float_array_7d
+        procedure :: deallocate_float_array_7d => allocator_deallocate_float_array_7d
         procedure :: allocate_double_array_1d => allocator_allocate_double_array_1d
         procedure :: deallocate_double_array_1d => allocator_deallocate_double_array_1d
         procedure :: allocate_double_array_2d => allocator_allocate_double_array_2d
@@ -108,27 +120,39 @@ module umpire_mod
         procedure :: deallocate_double_array_4d => allocator_deallocate_double_array_4d
         procedure :: allocate_double_array_5d => allocator_allocate_double_array_5d
         procedure :: deallocate_double_array_5d => allocator_deallocate_double_array_5d
+        procedure :: allocate_double_array_6d => allocator_allocate_double_array_6d
+        procedure :: deallocate_double_array_6d => allocator_deallocate_double_array_6d
+        procedure :: allocate_double_array_7d => allocator_allocate_double_array_7d
+        procedure :: deallocate_double_array_7d => allocator_deallocate_double_array_7d
         generic, public :: allocate => &
             allocate_int_array_1d, &
             allocate_int_array_2d, &
             allocate_int_array_3d, &
             allocate_int_array_4d, &
             allocate_int_array_5d, &
+            allocate_int_array_6d, &
+            allocate_int_array_7d, &
             allocate_long_array_1d, &
             allocate_long_array_2d, &
             allocate_long_array_3d, &
             allocate_long_array_4d, &
             allocate_long_array_5d, &
+            allocate_long_array_6d, &
+            allocate_long_array_7d, &
             allocate_float_array_1d, &
             allocate_float_array_2d, &
             allocate_float_array_3d, &
             allocate_float_array_4d, &
             allocate_float_array_5d, &
+            allocate_float_array_6d, &
+            allocate_float_array_7d, &
             allocate_double_array_1d, &
             allocate_double_array_2d, &
             allocate_double_array_3d, &
             allocate_double_array_4d, &
-            allocate_double_array_5d
+            allocate_double_array_5d, &
+            allocate_double_array_6d, &
+            allocate_double_array_7d
 
         generic, public :: deallocate => &
             deallocate_int_array_1d, &
@@ -136,21 +160,29 @@ module umpire_mod
             deallocate_int_array_3d, &
             deallocate_int_array_4d, &
             deallocate_int_array_5d, &
+            deallocate_int_array_6d, &
+            deallocate_int_array_7d, &
             deallocate_long_array_1d, &
             deallocate_long_array_2d, &
             deallocate_long_array_3d, &
             deallocate_long_array_4d, &
             deallocate_long_array_5d, &
+            deallocate_long_array_6d, &
+            deallocate_long_array_7d, &
             deallocate_float_array_1d, &
             deallocate_float_array_2d, &
             deallocate_float_array_3d, &
             deallocate_float_array_4d, &
             deallocate_float_array_5d, &
+            deallocate_float_array_6d, &
+            deallocate_float_array_7d, &
             deallocate_double_array_1d, &
             deallocate_double_array_2d, &
             deallocate_double_array_3d, &
             deallocate_double_array_4d, &
-            deallocate_double_array_5d
+            deallocate_double_array_5d, &
+            deallocate_double_array_6d, &
+            deallocate_double_array_7d
 
         ! splicer end class.Allocator.type_bound_procedure_part
     end type UmpireAllocator
@@ -1302,6 +1334,88 @@ contains
 
 
 
+    subroutine allocator_allocate_int_array_6d(this, array, dims)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          integer(C_INT), intent(inout), pointer, dimension(:, :, :, :, :, :) :: array
+
+          integer, dimension(:) :: dims
+
+          type(C_PTR) :: data_ptr
+
+          integer(C_INT) :: size_type
+          integer(C_SIZE_T) :: num_bytes, p, i
+
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
+
+          call c_f_pointer(data_ptr, array, dims)
+    end subroutine allocator_allocate_int_array_6d
+
+
+
+    subroutine allocator_deallocate_int_array_6d(this, array)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          integer(C_INT), intent(inout), pointer, dimension(:, :, :, :, :, :) :: array
+
+          type(C_PTR) :: data_ptr
+
+          data_ptr = c_loc(array)
+
+          call this%deallocate_pointer(data_ptr)
+          nullify(array)
+    end subroutine allocator_deallocate_int_array_6d
+
+
+
+    subroutine allocator_allocate_int_array_7d(this, array, dims)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          integer(C_INT), intent(inout), pointer, dimension(:, :, :, :, :, :, :) :: array
+
+          integer, dimension(:) :: dims
+
+          type(C_PTR) :: data_ptr
+
+          integer(C_INT) :: size_type
+          integer(C_SIZE_T) :: num_bytes, p, i
+
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
+
+          call c_f_pointer(data_ptr, array, dims)
+    end subroutine allocator_allocate_int_array_7d
+
+
+
+    subroutine allocator_deallocate_int_array_7d(this, array)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          integer(C_INT), intent(inout), pointer, dimension(:, :, :, :, :, :, :) :: array
+
+          type(C_PTR) :: data_ptr
+
+          data_ptr = c_loc(array)
+
+          call this%deallocate_pointer(data_ptr)
+          nullify(array)
+    end subroutine allocator_deallocate_int_array_7d
+
+
+
     subroutine allocator_allocate_long_array_1d(this, array, dims)
           use iso_c_binding
 
@@ -1504,6 +1618,88 @@ contains
           call this%deallocate_pointer(data_ptr)
           nullify(array)
     end subroutine allocator_deallocate_long_array_5d
+
+
+
+    subroutine allocator_allocate_long_array_6d(this, array, dims)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          integer(C_LONG), intent(inout), pointer, dimension(:, :, :, :, :, :) :: array
+
+          integer, dimension(:) :: dims
+
+          type(C_PTR) :: data_ptr
+
+          integer(C_LONG) :: size_type
+          integer(C_SIZE_T) :: num_bytes, p, i
+
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
+
+          call c_f_pointer(data_ptr, array, dims)
+    end subroutine allocator_allocate_long_array_6d
+
+
+
+    subroutine allocator_deallocate_long_array_6d(this, array)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          integer(C_LONG), intent(inout), pointer, dimension(:, :, :, :, :, :) :: array
+
+          type(C_PTR) :: data_ptr
+
+          data_ptr = c_loc(array)
+
+          call this%deallocate_pointer(data_ptr)
+          nullify(array)
+    end subroutine allocator_deallocate_long_array_6d
+
+
+
+    subroutine allocator_allocate_long_array_7d(this, array, dims)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          integer(C_LONG), intent(inout), pointer, dimension(:, :, :, :, :, :, :) :: array
+
+          integer, dimension(:) :: dims
+
+          type(C_PTR) :: data_ptr
+
+          integer(C_LONG) :: size_type
+          integer(C_SIZE_T) :: num_bytes, p, i
+
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
+
+          call c_f_pointer(data_ptr, array, dims)
+    end subroutine allocator_allocate_long_array_7d
+
+
+
+    subroutine allocator_deallocate_long_array_7d(this, array)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          integer(C_LONG), intent(inout), pointer, dimension(:, :, :, :, :, :, :) :: array
+
+          type(C_PTR) :: data_ptr
+
+          data_ptr = c_loc(array)
+
+          call this%deallocate_pointer(data_ptr)
+          nullify(array)
+    end subroutine allocator_deallocate_long_array_7d
 
 
 
@@ -1712,6 +1908,88 @@ contains
 
 
 
+    subroutine allocator_allocate_float_array_6d(this, array, dims)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          real(C_FLOAT), intent(inout), pointer, dimension(:, :, :, :, :, :) :: array
+
+          integer, dimension(:) :: dims
+
+          type(C_PTR) :: data_ptr
+
+          real(C_FLOAT) :: size_type
+          integer(C_SIZE_T) :: num_bytes, p, i
+
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
+
+          call c_f_pointer(data_ptr, array, dims)
+    end subroutine allocator_allocate_float_array_6d
+
+
+
+    subroutine allocator_deallocate_float_array_6d(this, array)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          real(C_FLOAT), intent(inout), pointer, dimension(:, :, :, :, :, :) :: array
+
+          type(C_PTR) :: data_ptr
+
+          data_ptr = c_loc(array)
+
+          call this%deallocate_pointer(data_ptr)
+          nullify(array)
+    end subroutine allocator_deallocate_float_array_6d
+
+
+
+    subroutine allocator_allocate_float_array_7d(this, array, dims)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          real(C_FLOAT), intent(inout), pointer, dimension(:, :, :, :, :, :, :) :: array
+
+          integer, dimension(:) :: dims
+
+          type(C_PTR) :: data_ptr
+
+          real(C_FLOAT) :: size_type
+          integer(C_SIZE_T) :: num_bytes, p, i
+
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
+
+          call c_f_pointer(data_ptr, array, dims)
+    end subroutine allocator_allocate_float_array_7d
+
+
+
+    subroutine allocator_deallocate_float_array_7d(this, array)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          real(C_FLOAT), intent(inout), pointer, dimension(:, :, :, :, :, :, :) :: array
+
+          type(C_PTR) :: data_ptr
+
+          data_ptr = c_loc(array)
+
+          call this%deallocate_pointer(data_ptr)
+          nullify(array)
+    end subroutine allocator_deallocate_float_array_7d
+
+
+
     subroutine allocator_allocate_double_array_1d(this, array, dims)
           use iso_c_binding
 
@@ -1914,6 +2192,88 @@ contains
           call this%deallocate_pointer(data_ptr)
           nullify(array)
     end subroutine allocator_deallocate_double_array_5d
+
+
+
+    subroutine allocator_allocate_double_array_6d(this, array, dims)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          real(C_DOUBLE), intent(inout), pointer, dimension(:, :, :, :, :, :) :: array
+
+          integer, dimension(:) :: dims
+
+          type(C_PTR) :: data_ptr
+
+          real(C_DOUBLE) :: size_type
+          integer(C_SIZE_T) :: num_bytes, p, i
+
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
+
+          call c_f_pointer(data_ptr, array, dims)
+    end subroutine allocator_allocate_double_array_6d
+
+
+
+    subroutine allocator_deallocate_double_array_6d(this, array)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          real(C_DOUBLE), intent(inout), pointer, dimension(:, :, :, :, :, :) :: array
+
+          type(C_PTR) :: data_ptr
+
+          data_ptr = c_loc(array)
+
+          call this%deallocate_pointer(data_ptr)
+          nullify(array)
+    end subroutine allocator_deallocate_double_array_6d
+
+
+
+    subroutine allocator_allocate_double_array_7d(this, array, dims)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          real(C_DOUBLE), intent(inout), pointer, dimension(:, :, :, :, :, :, :) :: array
+
+          integer, dimension(:) :: dims
+
+          type(C_PTR) :: data_ptr
+
+          real(C_DOUBLE) :: size_type
+          integer(C_SIZE_T) :: num_bytes, p, i
+
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
+
+          call c_f_pointer(data_ptr, array, dims)
+    end subroutine allocator_allocate_double_array_7d
+
+
+
+    subroutine allocator_deallocate_double_array_7d(this, array)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          real(C_DOUBLE), intent(inout), pointer, dimension(:, :, :, :, :, :, :) :: array
+
+          type(C_PTR) :: data_ptr
+
+          data_ptr = c_loc(array)
+
+          call this%deallocate_pointer(data_ptr)
+          nullify(array)
+    end subroutine allocator_deallocate_double_array_7d
 
 
     ! splicer end class.Allocator.additional_functions
