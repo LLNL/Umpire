@@ -33,9 +33,9 @@ push_to_registry=${PUSH_TO_REGISTRY:-true}
 # REGISTRY_TOKEN allows you to provide your own personal access token to the CI
 # registry. Be sure to set the token with at least read access to the registry.
 registry_token=${REGISTRY_TOKEN:-""}
-ci_registry_user=${CI_REGISTRY_USER:-"${USER}"}
 ci_registry_image=${CI_REGISTRY_IMAGE:-"czregistry.llnl.gov:5050/radiuss/umpire"}
-ci_registry_token=${CI_JOB_TOKEN:-"${registry_token}"}
+export ci_registry_user=${CI_REGISTRY_USER:-"${USER}"}
+export ci_registry_token=${CI_JOB_TOKEN:-"${registry_token}"}
 
 timed_message ()
 {
@@ -124,7 +124,7 @@ then
     if [[ -n ${ci_registry_token} ]]
     then
         timed_message "GitLab registry as Spack Buildcache"
-        ${spack_cmd} -D ${spack_env_path} mirror add --unsigned --oci-username ${ci_registry_user} --oci-password ${ci_registry_token} gitlab_ci oci://${ci_registry_image}
+        ${spack_cmd} -D ${spack_env_path} mirror add --unsigned --oci-username-variable ci_registry_user --oci-password-variable ci_registry_token gitlab_ci oci://${ci_registry_image}
     fi
 
     timed_message "Spack build of dependencies"
@@ -189,7 +189,13 @@ then
     echo ""
     timed_message "Cleaning working directory"
 
+    # Map CPU core allocations
+    declare -A core_counts=(["lassen"]=40 ["ruby"]=28 ["poodle"]=28 ["corona"]=32 ["rzansel"]=48 ["tioga"]=32)
+
     # If building, then delete everything first
+    # NOTE: 'cmake --build . -j core_counts' attempts to reduce individual build resources.
+    #       If core_counts does not contain hostname, then will default to '-j ', which should
+    #       use max cores.
     rm -rf ${build_dir} 2>/dev/null
     mkdir -p ${build_dir} && cd ${build_dir}
 
@@ -208,7 +214,7 @@ then
       ${cmake_options} \
       -DCMAKE_INSTALL_PREFIX=${install_dir} \
       ${project_dir}
-    if ! $cmake_exe --build . -j
+    if ! $cmake_exe --build . -j ${core_counts[$truehostname]}
     then
         echo "[Error]: Compilation failed, building with verbose output..."
         timed_message "Re-building with --verbose"
@@ -249,9 +255,9 @@ then
         echo "[Error]: No tests were found" && exit 1
     fi
 
-    timed_message "Preparing testing xml reports for export"
+    timed_message "Preparing tests xml reports for export"
     tree Testing
-    xsltproc -o junit.xml ${project_dir}/blt/tests/ctest-to-junit.xsl Testing/*/Test.xml
+    xsltproc -o junit.xml ${project_dir}/scripts/radiuss-spack-configs/utilities/ctest-to-junit.xsl Testing/*/Test.xml
     mv junit.xml ${project_dir}/junit.xml
 
     if grep -q "Errors while running CTest" ./tests_output.txt
@@ -288,10 +294,3 @@ fi
 cd ${project_dir}
 
 timed_message "Build and test completed"
-echo "~~~~~ To reproduce this build on ${truehostname}:"
-echo ""
-echo " git checkout `git rev-parse HEAD` && git submodule update --init --recursive"
-echo ""
-echo "SPACK_DISABLE_LOCAL_CONFIG=\"\" SPACK_USER_CACHE_PATH=\"ci_spack_cache\" python3 scripts/uberenv/uberenv.py --prefix=/tmp/\$(whoami)/uberenv --spec=\"${spec}\""
-echo ""
-echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
