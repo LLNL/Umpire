@@ -359,7 +359,6 @@ struct op_caller {
 } // namespace op
 
 // Global operation implementations that use the op_caller
-
 template <typename T>
 auto copy(T* src, T* dst, std::size_t len)
 {

@@ -7,6 +7,8 @@
 #ifndef UMPIRE_ResourceManager_HPP
 #define UMPIRE_ResourceManager_HPP
 
+#include "umpire/config.hpp"
+
 #include <list>
 #include <memory>
 #include <mutex>
@@ -218,9 +220,13 @@ class ResourceManager {
    * \param dst_ptr Destination pointer.
    * \param src_ptr Source pointer.
    * \param size Size in bytes.
+   * 
+   * \deprecated Use the global umpire::copy function instead.
    */
+  [[deprecated("Use the global umpire::copy function instead")]]
   void copy(void* dst_ptr, void* src_ptr, std::size_t size = 0);
 
+  [[deprecated("Use the global umpire::copy function with Resource instead")]]
   camp::resources::EventProxy<camp::resources::Resource> copy(void* dst_ptr, void* src_ptr,
                                                               camp::resources::Resource& ctx, std::size_t size = 0);
 
@@ -230,9 +236,13 @@ class ResourceManager {
    * \param ptr Pointer to data.
    * \param val Value to set.
    * \param length Number of bytes to set to val.
+   * 
+   * \deprecated Use the global umpire::memset function instead.
    */
+  [[deprecated("Use the global umpire::memset function instead")]]
   void memset(void* ptr, int val, std::size_t length = 0);
 
+  [[deprecated("Use the global umpire::memset function with Resource instead")]]
   camp::resources::EventProxy<camp::resources::Resource> memset(void* ptr, int val, camp::resources::Resource& ctx,
                                                                 std::size_t length = 0);
 
@@ -256,10 +266,13 @@ class ResourceManager {
    * a nullptr, and a zero-byte allocation will be returned.
    *
    * \return Reallocated pointer.
-   *
+   * 
+   * \deprecated Use the global umpire::reallocate function instead.
    */
+  [[deprecated("Use the global umpire::reallocate function instead")]]
   void* reallocate(void* current_ptr, std::size_t new_size);
 
+  [[deprecated("Use the global umpire::reallocate function with Resource instead")]]
   void* reallocate(void* current_ptr, std::size_t new_size, camp::resources::Resource& ctx);
 
   /*!
@@ -276,10 +289,13 @@ class ResourceManager {
    * a nullptr, and a zero-byte allocation will be returned.
    *
    * \return Reallocated pointer.
-   *
+   * 
+   * \deprecated Use the global umpire::reallocate function instead.
    */
+  [[deprecated("Use the global umpire::reallocate function instead")]]
   void* reallocate(void* current_ptr, std::size_t new_size, Allocator allocator);
 
+  [[deprecated("Use the global umpire::reallocate function with Resource instead")]]
   void* reallocate(void* current_ptr, std::size_t new_size, Allocator allocator, camp::resources::Resource& ctx);
 
   /*!
@@ -289,7 +305,10 @@ class ResourceManager {
    * \param allocator Allocator to use to allocate new memory for moved data.
    *
    * \return Pointer to new location of data.
+   * 
+   * \deprecated Use the global umpire::move function instead.
    */
+  [[deprecated("Use the global umpire::move function instead")]]
   void* move(void* src_ptr, Allocator allocator);
 
   /*!
@@ -305,7 +324,10 @@ class ResourceManager {
    * \param ptr Pointer to prefech
    * \param device Device to prefetch data to
    * \param ctx Resource to use for asynchronous operation
+   * 
+   * \deprecated Use the global umpire::prefetch function instead.
    */
+  [[deprecated("Use the global umpire::prefetch function instead")]]
   camp::resources::EventProxy<camp::resources::Resource> prefetch(void* ptr, int device,
                                                                   camp::resources::Resource& ctx);
 
