@@ -142,63 +142,6 @@ struct op_caller {
     return std::get<N>(std::forward_as_tuple(args...));
   }
 
-  // Record operation event with common fields
-  template <typename... Args>
-  static void record_event(const char* name, void* ptr, void* strategy, const std::string& strategy_name,
-                           bool async = false, Args&&... args)
-  {
-    umpire::event::record([&](auto& event) {
-      event.name(name)
-          .category(event::category::operation)
-          .arg("ptr", ptr)
-          .arg("allocator_ref", strategy)
-          .tag("allocator_name", strategy_name)
-          .tag("replay", "true");
-
-      if (async) {
-        event.tag("async", "true");
-      }
-
-      // Add any additional arguments
-      add_args(event, std::forward<Args>(args)...);
-    });
-  }
-
-  // Base case for argument processing
-  template <typename Event>
-  static void add_args(Event&)
-  {
-    // No more arguments to process
-  }
-
-  // Process key-value pairs with explicit overload for std::string keys
-  template <typename Event, typename Value, typename... Rest>
-  static void add_args(Event& event, const std::string& key, Value&& value, Rest&&... rest)
-  {
-    // Explicitly call the correct arg overload
-    event.arg(key, std::forward<Value>(value));
-    add_args(event, std::forward<Rest>(rest)...);
-  }
-
-  // Process key-value pairs with explicit overload for const char* keys
-  template <typename Event, typename Value, typename... Rest>
-  static void add_args(Event& event, const char* key, Value&& value, Rest&&... rest)
-  {
-    // Explicitly call the correct arg overload
-    event.arg(key, std::forward<Value>(value));
-    add_args(event, std::forward<Rest>(rest)...);
-  }
-
-  // Keep the generic version with perfect forwarding (lowest priority due to template specialization rules)
-  template <typename Event, typename Key, typename Value, typename... Rest>
-  static void add_args(Event& event, Key&& key, Value&& value, Rest&&... rest)
-  {
-    // Cast to solve ambiguity
-    const std::string key_str(std::forward<Key>(key));
-    event.arg(key_str, std::forward<Value>(value));
-    add_args(event, std::forward<Rest>(rest)...);
-  }
-
   // Boundary check for memset operations
   template <typename T, typename... Args>
   static void check_memset_bounds(T* src, const util::AllocationRecord* record, std::size_t length)
@@ -250,14 +193,6 @@ struct op_caller {
       int value = get_arg<0>(args...);
       std::size_t length = get_arg<1>(args...);
       check_memset_bounds(src, src_record, length);
-      record_event("memset", src, src_record->strategy, src_record->strategy->getName(), false, "value", value, "size",
-                   length);
-    } else if constexpr (std::is_same_v<Op<resource::host_platform>, prefetch<resource::host_platform>>) {
-      // For prefetch, we expect args to be {device, size}
-      int device = get_arg<0>(args...);
-      std::size_t size = get_arg<1>(args...);
-      record_event("prefetch", src, src_record->strategy, src_record->strategy->getName(), false, "device", device,
-                   "size", size);
     }
 
     // Dispatch based on platform
@@ -279,14 +214,6 @@ struct op_caller {
       int value = get_arg<0>(args...);
       std::size_t length = get_arg<1>(args...);
       check_memset_bounds(src, src_record, length);
-      record_event("memset", src, src_record->strategy, src_record->strategy->getName(), true, "value", value, "size",
-                   length);
-    } else if constexpr (std::is_same_v<Op<resource::host_platform>, prefetch<resource::host_platform>>) {
-      // For prefetch, we expect args to be {device, size}
-      int device = get_arg<0>(args...);
-      std::size_t size = get_arg<1>(args...);
-      record_event("prefetch", src, src_record->strategy, src_record->strategy->getName(), true, "device", device,
-                   "size", size);
     }
 
     return detail::dispatch<Op>(p, src, args...);
@@ -310,14 +237,6 @@ struct op_caller {
       // For copy, we expect args to be {size}
       std::size_t size = get_arg<0>(args...);
       check_copy_bounds(src, dst, src_record, dst_record, size);
-
-      std::ptrdiff_t src_offset = reinterpret_cast<const char*>(src) - reinterpret_cast<const char*>(src_record->ptr);
-      std::ptrdiff_t dst_offset = reinterpret_cast<const char*>(dst) - reinterpret_cast<const char*>(dst_record->ptr);
-
-      record_event("copy", (void*)src, src_record->strategy, src_record->strategy->getName(), false, "dst", (void*)dst,
-                   "src_offset", src_offset, "dst_offset", dst_offset, "size", size, "dst_allocator_ref",
-                   (void*)dst_record->strategy, "src_allocator_name", src_record->strategy->getName(),
-                   "dst_allocator_name", dst_record->strategy->getName());
     }
 
     // Dispatch based on source and destination platforms
@@ -342,14 +261,6 @@ struct op_caller {
       // For copy, we expect args to be {size}
       std::size_t size = get_arg<0>(args...);
       check_copy_bounds(src, dst, src_record, dst_record, size);
-
-      std::ptrdiff_t src_offset = reinterpret_cast<const char*>(src) - reinterpret_cast<const char*>(src_record->ptr);
-      std::ptrdiff_t dst_offset = reinterpret_cast<const char*>(dst) - reinterpret_cast<const char*>(dst_record->ptr);
-
-      record_event("copy", src, src_record->strategy, src_record->strategy->getName(), true, "dst", dst, "src_offset",
-                   src_offset, "dst_offset", dst_offset, "size", size, "dst_allocator_ref", (void*)dst_record->strategy,
-                   "src_allocator_name", src_record->strategy->getName(), "dst_allocator_name",
-                   dst_record->strategy->getName());
     }
 
     return detail::dispatch<Op>(p1, p2, src, dst, args...);
@@ -394,34 +305,8 @@ inline T* reallocate(T* src, std::size_t size)
     Allocator allocator = rm.getDefaultAllocator();
     return static_cast<T*>(allocator.allocate(size * sizeof(T)));
   }
-
-  auto& allocation_map = ResourceManager::getInstance().m_allocations;
-  auto src_record = allocation_map.find(src);
-  auto p = src_record->strategy->getPlatform();
-
-  // Platform-specific dispatch based on the pointer's platform
-  switch (p) {
-    case camp::resources::Platform::host:
-      return op::generic_reallocate<resource::host_platform>::exec(src, size);
-#if defined(UMPIRE_ENABLE_CUDA)
-    case camp::resources::Platform::cuda:
-      return op::generic_reallocate<resource::cuda_platform>::exec(src, size);
-#endif
-#if defined(UMPIRE_ENABLE_HIP)
-    case camp::resources::Platform::hip:
-      return op::generic_reallocate<resource::hip_platform>::exec(src, size);
-#endif
-#if defined(UMPIRE_ENABLE_SYCL)
-    case camp::resources::Platform::sycl:
-      return op::generic_reallocate<resource::sycl_platform>::exec(src, size);
-#endif
-#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
-    case camp::resources::Platform::omp_target:
-      return op::generic_reallocate<resource::openmp_target_platform>::exec(src, size);
-#endif
-    default:
-      UMPIRE_ERROR(runtime_error, "Unknown platform for reallocate operation");
-  }
+  
+  return op::op_caller<op::reallocate>::exec(src, size);
 }
 
 // Void pointer reallocate
@@ -434,34 +319,8 @@ inline void* reallocate(T* src, std::size_t size)
     Allocator allocator = rm.getDefaultAllocator();
     return allocator.allocate(size);
   }
-
-  auto& allocation_map = ResourceManager::getInstance().m_allocations;
-  auto src_record = allocation_map.find(src);
-  auto p = src_record->strategy->getPlatform();
-
-  // Platform-specific dispatch based on the pointer's platform
-  switch (p) {
-    case camp::resources::Platform::host:
-      return op::generic_reallocate<resource::host_platform>::exec(src, size);
-#if defined(UMPIRE_ENABLE_CUDA)
-    case camp::resources::Platform::cuda:
-      return op::generic_reallocate<resource::cuda_platform>::exec(src, size);
-#endif
-#if defined(UMPIRE_ENABLE_HIP)
-    case camp::resources::Platform::hip:
-      return op::generic_reallocate<resource::hip_platform>::exec(src, size);
-#endif
-#if defined(UMPIRE_ENABLE_SYCL)
-    case camp::resources::Platform::sycl:
-      return op::generic_reallocate<resource::sycl_platform>::exec(src, size);
-#endif
-#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
-    case camp::resources::Platform::omp_target:
-      return op::generic_reallocate<resource::openmp_target_platform>::exec(src, size);
-#endif
-    default:
-      UMPIRE_ERROR(runtime_error, "Unknown platform for reallocate operation");
-  }
+  
+  return op::op_caller<op::reallocate>::exec(src, size);
 }
 
 // Async reallocate implementation
@@ -476,35 +335,8 @@ inline camp::resources::EventProxy<camp::resources::Resource> reallocate(T* src,
     allocator.allocate(size * sizeof(T));
     return camp::resources::EventProxy<camp::resources::Resource>{ctx};
   }
-
-  // Get platform and dispatch to appropriate implementation
-  auto& allocation_map = ResourceManager::getInstance().m_allocations;
-  auto src_record = allocation_map.find(src);
-  auto p = src_record->strategy->getPlatform();
-
-  // Use platform-specific dispatch with generic fallback
-  switch (p) {
-    case camp::resources::Platform::host:
-      return op::generic_reallocate<resource::host_platform>::exec(src, size, ctx);
-#if defined(UMPIRE_ENABLE_CUDA)
-    case camp::resources::Platform::cuda:
-      return op::generic_reallocate<resource::cuda_platform>::exec(src, size, ctx);
-#endif
-#if defined(UMPIRE_ENABLE_HIP)
-    case camp::resources::Platform::hip:
-      return op::generic_reallocate<resource::hip_platform>::exec(src, size, ctx);
-#endif
-#if defined(UMPIRE_ENABLE_SYCL)
-    case camp::resources::Platform::sycl:
-      return op::generic_reallocate<resource::sycl_platform>::exec(src, size, ctx);
-#endif
-#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
-    case camp::resources::Platform::omp_target:
-      return op::generic_reallocate<resource::openmp_target_platform>::exec(src, size, ctx);
-#endif
-    default:
-      return op::generic_reallocate<resource::undefined_platform>::exec(src, size, ctx);
-  }
+  
+  return op::op_caller<op::reallocate>::exec(src, size, ctx);
 }
 
 // Explicit specialization for void* async reallocate
@@ -519,69 +351,23 @@ camp::resources::EventProxy<camp::resources::Resource> reallocate(T* src, std::s
     allocator.allocate(size);
     return camp::resources::EventProxy<camp::resources::Resource>{ctx};
   }
-
-  // Get platform and dispatch to appropriate implementation
-  auto& allocation_map = ResourceManager::getInstance().m_allocations;
-  auto src_record = allocation_map.find(src);
-  auto p = src_record->strategy->getPlatform();
-
-  // Use platform-specific dispatch with generic fallback
-  switch (p) {
-    case camp::resources::Platform::host:
-      return op::generic_reallocate<resource::host_platform>::exec(src, size, ctx);
-#if defined(UMPIRE_ENABLE_CUDA)
-    case camp::resources::Platform::cuda:
-      return op::generic_reallocate<resource::cuda_platform>::exec(src, size, ctx);
-#endif
-#if defined(UMPIRE_ENABLE_HIP)
-    case camp::resources::Platform::hip:
-      return op::generic_reallocate<resource::hip_platform>::exec(src, size, ctx);
-#endif
-#if defined(UMPIRE_ENABLE_SYCL)
-    case camp::resources::Platform::sycl:
-      return op::generic_reallocate<resource::sycl_platform>::exec(src, size, ctx);
-#endif
-#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
-    case camp::resources::Platform::omp_target:
-      return op::generic_reallocate<resource::openmp_target_platform>::exec(src, size, ctx);
-#endif
-    default:
-      return op::generic_reallocate<resource::undefined_platform>::exec(src, size, ctx);
-  }
+  
+  return op::op_caller<op::reallocate>::exec(src, size, ctx);
 }
 
+// Synchronous prefetch implementation
+template <typename T>
+void prefetch(T* ptr, int device, std::size_t size)
+{
+  op::op_caller<op::prefetch>::exec(ptr, device, size);
+}
+
+// Asynchronous prefetch implementation
 template <typename T>
 camp::resources::EventProxy<camp::resources::Resource> prefetch(T* ptr, int device, std::size_t size,
                                                                 camp::resources::Resource& ctx)
 {
-  auto& rm = ResourceManager::getInstance();
-  auto& allocation_map = rm.m_allocations;
-  auto src_record = allocation_map.find(ptr);
-  auto p = src_record->strategy->getPlatform();
-
-  // Dispatch based on platform
-  switch (p) {
-    case camp::resources::Platform::host:
-      return op::prefetch<resource::host_platform>::exec(ptr, device, size, ctx);
-#if defined(UMPIRE_ENABLE_CUDA)
-    case camp::resources::Platform::cuda:
-      return op::prefetch<resource::cuda_platform>::exec(ptr, device, size, ctx);
-#endif
-#if defined(UMPIRE_ENABLE_HIP)
-    case camp::resources::Platform::hip:
-      return op::prefetch<resource::hip_platform>::exec(ptr, device, size, ctx);
-#endif
-#if defined(UMPIRE_ENABLE_SYCL)
-    case camp::resources::Platform::sycl:
-      return op::prefetch<resource::sycl_platform>::exec(ptr, device, size, ctx);
-#endif
-#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
-    case camp::resources::Platform::omp_target:
-      return op::prefetch<resource::openmp_target_platform>::exec(ptr, device, size, ctx);
-#endif
-    default:
-      UMPIRE_ERROR(runtime_error, "Unknown platform for operation");
-  }
+  return op::op_caller<op::prefetch>::exec(ptr, device, size, ctx);
 }
 
 } // namespace umpire
