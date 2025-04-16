@@ -85,7 +85,8 @@ struct allocate_and_use<cuda_platform> {
     cudaError_t e = cudaDeviceSynchronize();
     if (e != cudaSuccess) {
       cudaError_t lastError = cudaGetLastError();
-      UMPIRE_ERROR(umpire::runtime_error, fmt::format("Error when trying to sync device: {}", cudaGetErrorString(lastError)));
+      UMPIRE_ERROR(umpire::runtime_error,
+                   fmt::format("Error when trying to sync device: {}", cudaGetErrorString(lastError)));
     }
     alloc->deallocate(data);
   }
@@ -105,7 +106,8 @@ struct allocate_and_use<hip_platform> {
     hipError_t e = hipDeviceSynchronize();
     if (e != hipSuccess) {
       hipError_t lastError = hipGetLastError();
-      UMPIRE_ERROR(umpire::runtime_error, fmt::format("Error when trying to sync device: {}", hipGetErrorString(lastError)));
+      UMPIRE_ERROR(umpire::runtime_error,
+                   fmt::format("Error when trying to sync device: {}", hipGetErrorString(lastError)));
     }
     alloc->deallocate(data);
   }

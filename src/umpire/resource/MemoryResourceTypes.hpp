@@ -128,7 +128,8 @@ inline int resource_to_device_id(const std::string& resource)
     cudaError_t e = cudaGetDevice(&device_id);
     if (e != cudaSuccess) {
       cudaError_t lastError = cudaGetLastError();
-      UMPIRE_ERROR(runtime_error, fmt::format("Error when trying to get CUDA Device: {}", cudaGetErrorString(lastError)));
+      UMPIRE_ERROR(runtime_error,
+                   fmt::format("Error when trying to get CUDA Device: {}", cudaGetErrorString(lastError)));
     }
 #endif /* UMPIRE_ENABLE_CUDA */
 
