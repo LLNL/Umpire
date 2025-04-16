@@ -125,18 +125,16 @@ inline int resource_to_device_id(const std::string& resource)
     // get the device bound to the current process
 
 #if defined(UMPIRE_ENABLE_CUDA)
-    cudaError_t e = cudaGetDevice(&device_id);
-    if (e != cudaSuccess) {
-      cudaError_t lastError = cudaGetLastError();
-      UMPIRE_ERROR(runtime_error, fmt::format("Error when trying to get CUDA Device: {}", cudaGetErrorString(lastError)));
+    cudaError_t err = cudaGetDevice(&device_id);
+    if (err != cudaSuccess) {
+      UMPIRE_ERROR(runtime_error, fmt::format("Error when trying to get CUDA Device: {}", cudaGetErrorString(err)));
     }
 #endif /* UMPIRE_ENABLE_CUDA */
 
 #if defined(UMPIRE_ENABLE_HIP)
-    hipError_t e = hipGetDevice(&device_id);
-    if (e != hipSuccess) {
-      hipError_t lastError = hipGetLastError();
-      UMPIRE_ERROR(runtime_error, fmt::format("Error when trying to get HIP Device: {}", hipGetErrorString(lastError)));
+    hipError_t err = hipGetDevice(&device_id);
+    if (err != hipSuccess) {
+      UMPIRE_ERROR(runtime_error, fmt::format("Error when trying to get HIP Device: {}", hipGetErrorString(err)));
     }
 #endif /* UMPIRE_ENABLE_HIP */
   }

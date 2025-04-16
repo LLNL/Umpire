@@ -82,10 +82,9 @@ struct allocate_and_use<cuda_platform> {
   {
     size_t* data{do_allocate(alloc, size * sizeof(size_t))};
     tester<<<1, 16>>>(data, size);
-    cudaError_t e = cudaDeviceSynchronize();
-    if (e != cudaSuccess) {
-      cudaError_t lastError = cudaGetLastError();
-      UMPIRE_ERROR(umpire::runtime_error, fmt::format("Error when trying to sync device: {}", cudaGetErrorString(lastError)));
+    cudaError_t err = cudaDeviceSynchronize();
+    if (err != cudaSuccess) {
+      UMPIRE_ERROR(umpire::runtime_error, fmt::format("Error when trying to sync device: {}", cudaGetErrorString(err)));
     }
     alloc->deallocate(data);
   }
@@ -102,10 +101,9 @@ struct allocate_and_use<hip_platform> {
   {
     size_t* data{do_allocate(alloc, size * sizeof(size_t))};
     hipLaunchKernelGGL(tester, dim3(1), dim3(16), 0, 0, data, size);
-    hipError_t e = hipDeviceSynchronize();
-    if (e != hipSuccess) {
-      hipError_t lastError = hipGetLastError();
-      UMPIRE_ERROR(umpire::runtime_error, fmt::format("Error when trying to sync device: {}", hipGetErrorString(lastError)));
+    hipError_t err = hipDeviceSynchronize();
+    if (err != hipSuccess) {
+      UMPIRE_ERROR(umpire::runtime_error, fmt::format("Error when trying to sync device: {}", hipGetErrorString(err)));
     }
     alloc->deallocate(data);
   }
