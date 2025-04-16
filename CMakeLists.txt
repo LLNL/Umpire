@@ -23,18 +23,17 @@ set(UMPIRE_VERSION_RC "")
 
 include(cmake/SetupUmpireOptions.cmake)
 
+set(BLT_CXX_STD "c++17" CACHE STRING "Version of C++ standard")
+set(CMAKE_CUDA_STANDARD 17)
+
 if (UMPIRE_ENABLE_SYCL)
-  set(BLT_CXX_STD "c++17" CACHE STRING "Version of C++ standard")
    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsycl")
    endif()
-else()
-  set(BLT_CXX_STD "c++14" CACHE STRING "Version of C++ standard")
-  set(CMAKE_CUDA_STANDARD 14)
 endif()
 
-if("${BLT_CXX_STD}" STREQUAL "c++98" OR "${BLT_CXX_STD}" STREQUAL "c++11" )
-    message(FATAL_ERROR "Umpire requires minimum C++ standard of c++14. Please set BLT_CXX_STD appropriately.")
+if("${BLT_CXX_STD}" STREQUAL "c++98" OR "${BLT_CXX_STD}" STREQUAL "c++11" OR "${BLT_CXX_STD}" STREQUAL "c++14")
+    message(FATAL_ERROR "Umpire requires minimum C++ standard of c++17. Please set BLT_CXX_STD appropriately.")
 endif()
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "PGI")
