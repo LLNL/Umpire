@@ -58,17 +58,16 @@ void* ResourceAwarePool::allocate_resource(std::size_t bytes, camp::resources::R
   Chunk* chunk{nullptr};
 
   // First, try to reuse a pending chunk
-  if (!m_pending_map.empty()) {
-    for (auto it = m_pending_map.begin(); it != m_pending_map.end(); it++) {
-      auto pending_chunk = it->second;
-      if (pending_chunk->size >= rounded_bytes && pending_chunk->resource == r) { // reusing chunk with same resource
-        chunk = pending_chunk;
-        chunk->free = false;
-        m_pending_map.erase(it);
-        break;
-      }
+  auto range = m_pending_map.equal_range(&r);
+  for (auto it = range.first; it != range.second; it++) {
+    auto pending_chunk = it->second;
+    if (pending_chunk->size >= rounded_bytes) {
+      chunk = pending_chunk;
+      chunk->free = false;
+      m_pending_map.erase(it);
+      break;
     }
-  } 
+  }
 
   const auto& best = m_free_map.lower_bound(rounded_bytes);
 
@@ -176,12 +175,15 @@ void ResourceAwarePool::deallocate(void* ptr, std::size_t size)
 void ResourceAwarePool::do_deallocate(Chunk* chunk, void* ptr) noexcept
 {
   UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, chunk->size);
+  UMPIRE_USE_VAR(ptr);
   chunk->free = true;
 
   // Removing chunk from pending
-  auto it = m_pending_map.find(ptr);
-  if (it != m_pending_map.end()) {
-    m_pending_map.erase(it);
+  for (auto pair = m_pending_map.begin(); pair != m_pending_map.end(); pair++) {
+    auto pending_chunk = (*pair).second;
+    if (pending_chunk == chunk) {
+      m_pending_map.erase(pair);
+    }
   }
 
   UMPIRE_LOG(Debug, "In the do_deallocate function. Deallocating data held by " << chunk);
@@ -271,7 +273,7 @@ void ResourceAwarePool::deallocate_resource(void* ptr, camp::resources::Resource
     do_deallocate(chunk, ptr);
   } else {
     // Chunk is now pending, add to map
-    m_pending_map.insert(std::make_pair(ptr, chunk));
+    m_pending_map.insert({&r, chunk});
   }
 
   std::size_t suggested_size{m_should_coalesce(*this)};
@@ -289,8 +291,8 @@ void ResourceAwarePool::release()
   std::size_t prev_size{m_actual_bytes};
 #endif
 
-  for (auto it = m_pending_map.begin(); it != m_pending_map.end();) {
-    auto chunk = (*it).second;
+  for (auto pair = m_pending_map.begin(); pair != m_pending_map.end();) {
+    auto chunk = (*pair).second;
     if (m_is_destructing) { // If we are destructing, wait for all deallocations to occur
       chunk->event.wait();
     }
@@ -298,9 +300,9 @@ void ResourceAwarePool::release()
       chunk->event.check()) { // Otherwise, move all finished pending chunks to free map to be released
       m_free_map.insert(std::make_pair(chunk->size, chunk));
       chunk->free = true;
-      it = m_pending_map.erase(it);
+      pair = m_pending_map.erase(pair);
     } else {
-      it++;
+      pair++;
     }
   }
 
@@ -398,10 +400,12 @@ camp::resources::Resource ResourceAwarePool::getResource(void* ptr) const
     auto chunk = it->second;
     return chunk->resource;
   }
-  it = m_pending_map.find(ptr); // check pending chunks
-  if (it != m_pending_map.end()) {
-    auto chunk = it->second;
-    return chunk->resource;
+  for (auto pair = m_pending_map.begin(); pair != m_pending_map.end(); pair++) {
+    //check pending chunks
+    auto chunk = (*pair).second;
+    if (chunk->data == ptr) {
+      return chunk->resource;
+    }
   }
   for (auto pair = m_free_map.begin(); pair != m_free_map.end(); pair++) { 
     // ptr shouldn't be found in the free map typically
@@ -454,12 +458,10 @@ void ResourceAwarePool::coalesce() noexcept
     event.name("coalesce").category(event::category::operation).tag("allocator_name", getName()).tag("replay", "true");
   });
 
-  if (!m_pending_map.empty()) {
-    for (auto it = m_pending_map.begin(); it != m_pending_map.end(); it++) {
-      auto pending_chunk = it->second;
-      if (pending_chunk->free == false && pending_chunk->event.check()) { // a pending chunk is finished...
-        do_deallocate(pending_chunk, pending_chunk->data);
-      }
+  for (auto pair = m_pending_map.begin(); pair != m_pending_map.end();) {
+    auto pending_chunk = (*pair).second;
+    if (pending_chunk->free == false && pending_chunk->event.check()) { // a pending chunk is finished...
+      do_deallocate(pending_chunk, pending_chunk->data);
     }
   }
 
