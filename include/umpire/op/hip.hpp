@@ -426,24 +426,8 @@ struct memset<resource::hip_platform> {
   }
 };
 
-// HIP reallocate operation - stub implementation
-template <>
-struct reallocate<resource::hip_platform> {
-  /**
-   * @brief HIP reallocate stub implementation
-   * 
-   * @tparam T Type of memory being reallocated
-   * @param src Pointer to current allocation
-   * @param size New size in elements
-   * @return T* nullptr (not directly implemented for HIP)
-   */
-  template <typename T>
-  static T* exec(T* src, std::size_t size)
-  {
-    // HIP doesn't have direct realloc, this needs to be handled at ResourceManager level
-    return nullptr;
-  }
-};
+// Note: HIP platform uses the generic reallocate implementation from operations.hpp
+// since direct HIP reallocation isn't supported and memory pools require a safe allocate-copy-free pattern
 
 // HIP prefetch operation
 template <>

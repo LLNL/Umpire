@@ -27,28 +27,24 @@ struct memset : public operation {
   static constexpr const char* name = "MEMSET";
 };
 
+// Platform-independent reallocate implementation that works for all allocator types
+// This implements the allocate-copy-free pattern which is safe for all memory pools
 template <typename Src>
 struct reallocate : public operation {
   static constexpr int arity = 1;
   static constexpr const char* name = "REALLOCATE";
-};
-
-// Generic reallocate implementation that works for any platform
-// This is the template-based version of GenericReallocateOperation
-template <typename Src>
-struct generic_reallocate : public operation {
-  static constexpr int arity = 1;
-  static constexpr const char* name = "REALLOCATE";
 
   template <typename T>
-  static void exec(T** ptr, std::size_t new_size)
+  static T* exec(T** ptr, std::size_t new_size)
   {
     auto current_ptr = *ptr;
     if (!current_ptr) {
       // If current pointer is null, just allocate
       auto& rm = ResourceManager::getInstance();
       Allocator allocator = rm.getDefaultAllocator();
-      return static_cast<T*>(allocator.allocate(new_size * sizeof(T)));
+      T* new_ptr = static_cast<T*>(allocator.allocate(new_size * sizeof(T)));
+      *ptr = new_ptr;
+      return new_ptr;
     }
 
     auto& rm = ResourceManager::getInstance();
@@ -74,7 +70,9 @@ struct generic_reallocate : public operation {
     // Special case for 0-byte size
     if (new_bytes == 0) {
       allocator.deallocate(current_ptr);
-      return static_cast<T*>(allocator.allocate(0));
+      T* new_ptr = static_cast<T*>(allocator.allocate(0));
+      *ptr = new_ptr;
+      return new_ptr;
     }
 
     // Allocate new memory
@@ -88,21 +86,27 @@ struct generic_reallocate : public operation {
 
     // Deallocate old memory
     allocator.deallocate(current_ptr);
-
+    
+    // Update the pointer
+    *ptr = new_ptr;
+    
     return new_ptr;
   }
 
   // Async version
   template <typename T>
-  static camp::resources::EventProxy<camp::resources::Resource> exec(T* current_ptr, std::size_t new_size,
+  static camp::resources::EventProxy<camp::resources::Resource> exec(T** ptr_ptr, std::size_t new_size,
                                                                      camp::resources::Resource& ctx)
   {
+    T* current_ptr = *ptr_ptr;
+    
     if (!current_ptr) {
       // If current pointer is null, just allocate
       auto& rm = ResourceManager::getInstance();
       Allocator allocator = rm.getDefaultAllocator();
       // Since there's no data to copy, we can just return a completed event
-      allocator.allocate(new_size * sizeof(T));
+      T* new_ptr = static_cast<T*>(allocator.allocate(new_size * sizeof(T)));
+      *ptr_ptr = new_ptr;
       return camp::resources::EventProxy<camp::resources::Resource>{ctx};
     }
 
@@ -130,6 +134,7 @@ struct generic_reallocate : public operation {
     if (new_bytes == 0) {
       allocator.deallocate(current_ptr);
       T* new_ptr = static_cast<T*>(allocator.allocate(0));
+      *ptr_ptr = new_ptr;
       return camp::resources::EventProxy<camp::resources::Resource>{ctx};
     }
 
@@ -152,18 +157,25 @@ struct generic_reallocate : public operation {
     // A better solution would be to have the ResourceManager wait on the event before returning
     // or implement a chained operation system.
     allocator.deallocate(current_ptr);
+    
+    // Update the pointer
+    *ptr_ptr = new_ptr;
 
     return event;
   }
 
   // void* specialization for sync version
-  static void* exec(void* current_ptr, std::size_t new_size)
+  static void* exec(void** ptr_ptr, std::size_t new_size)
   {
+    void* current_ptr = *ptr_ptr;
+    
     if (!current_ptr) {
       // If current pointer is null, just allocate
       auto& rm = ResourceManager::getInstance();
       Allocator allocator = rm.getDefaultAllocator();
-      return allocator.allocate(new_size); // No sizeof multiplication for void*
+      void* new_ptr = allocator.allocate(new_size); // No sizeof multiplication for void*
+      *ptr_ptr = new_ptr;
+      return new_ptr;
     }
 
     auto& rm = ResourceManager::getInstance();
@@ -185,7 +197,9 @@ struct generic_reallocate : public operation {
     // Special case for 0-byte size
     if (new_size == 0) {
       allocator.deallocate(current_ptr);
-      return allocator.allocate(0);
+      void* new_ptr = allocator.allocate(0);
+      *ptr_ptr = new_ptr;
+      return new_ptr;
     }
 
     // Allocate new memory
@@ -199,20 +213,26 @@ struct generic_reallocate : public operation {
 
     // Deallocate old memory
     allocator.deallocate(current_ptr);
+    
+    // Update the pointer
+    *ptr_ptr = new_ptr;
 
     return new_ptr;
   }
 
   // void* specialization for async version
-  static camp::resources::EventProxy<camp::resources::Resource> exec(void* current_ptr, std::size_t new_size,
+  static camp::resources::EventProxy<camp::resources::Resource> exec(void** ptr_ptr, std::size_t new_size,
                                                                      camp::resources::Resource& ctx)
   {
+    void* current_ptr = *ptr_ptr;
+    
     if (!current_ptr) {
       // If current pointer is null, just allocate
       auto& rm = ResourceManager::getInstance();
       Allocator allocator = rm.getDefaultAllocator();
       // Since there's no data to copy, we can just return a completed event
-      allocator.allocate(new_size); // No sizeof multiplication for void*
+      void* new_ptr = allocator.allocate(new_size); // No sizeof multiplication for void*
+      *ptr_ptr = new_ptr;
       return camp::resources::EventProxy<camp::resources::Resource>{ctx};
     }
 
@@ -235,7 +255,8 @@ struct generic_reallocate : public operation {
     // Special case for 0-byte size
     if (new_size == 0) {
       allocator.deallocate(current_ptr);
-      allocator.allocate(0); // Just allocate, don't need to store the pointer
+      void* new_ptr = allocator.allocate(0);
+      *ptr_ptr = new_ptr;
       return camp::resources::EventProxy<camp::resources::Resource>{ctx};
     }
 
@@ -250,6 +271,9 @@ struct generic_reallocate : public operation {
 
     // Deallocate old memory
     allocator.deallocate(current_ptr);
+    
+    // Update the pointer
+    *ptr_ptr = new_ptr;
 
     return event;
   }

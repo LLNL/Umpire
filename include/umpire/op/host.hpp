@@ -75,53 +75,8 @@ struct memset<resource::host_platform> {
   }
 };
 
-// Host reallocate operation - uses system realloc
-template <>
-struct reallocate<resource::host_platform> {
-  /**
-   * @brief Reallocate host memory
-   *
-   * @tparam T Type of data being reallocated
-   * @param src Pointer to current allocation (may be null)
-   * @param size New size in elements (or bytes for void*)
-   * @return T* Pointer to new allocation or null on failure
-   */
-  template <typename T>
-  static T* exec(T** src, std::size_t size)
-  {
-    // Calculate size in bytes based on type
-    const std::size_t bytes = detail::get_size<T>(size);
-
-    // Perform the reallocation
-    T* ret = static_cast<T*>(std::realloc(*src, bytes));
-
-    // Error handling
-    if (!ret && size > 0) {
-      UMPIRE_ERROR(runtime_error, fmt::format("Host realloc failed for pointer={}, size={}", *src, bytes));
-    }
-
-    *src = ret;
-    return ret;
-  }
-
-  template <typename T>
-  static auto exec(T** src, std::size_t size, camp::resources::Resource& ctx)
-  {
-    // Calculate size in bytes based on type
-    const std::size_t bytes = detail::get_size<T>(size);
-
-    // Perform the reallocation
-    T* ret = static_cast<T*>(std::realloc(*src, bytes));
-
-    // Error handling
-    if (!ret && size > 0) {
-      UMPIRE_ERROR(runtime_error, fmt::format("Host realloc failed for pointer={}, size={}", *src, bytes));
-    }
-
-    *src = ret;
-    return detail::make_completed_event(ctx);
-  }
-};
+// Note: Host platform uses the generic reallocate implementation from operations.hpp
+// since std::realloc is unsafe for memory pools and other allocator strategies
 
 // Host prefetch operation - no-op for host memory
 template <>
