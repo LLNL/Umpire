@@ -389,7 +389,7 @@ const util::AllocationRecord* ResourceManager::findAllocationRecord(void* ptr) c
 
 void ResourceManager::copy(void* dst_ptr, void* src_ptr, std::size_t size)
 {
-#if defined(UMPIRE_ENABLE_NEW_OPS)
+#if defined(UMPIRE_RM_USE_NEW_OPS)
   if (size == 0) {
     auto record = findAllocationRecord(src_ptr);
     std::ptrdiff_t src_offset = reinterpret_cast<char*>(src_ptr) - reinterpret_cast<char*>(record->ptr);
@@ -400,25 +400,45 @@ void ResourceManager::copy(void* dst_ptr, void* src_ptr, std::size_t size)
 
   umpire::copy(static_cast<void*>(src_ptr), static_cast<void*>(dst_ptr), size);
 #else
-  if (size == 0) {
-    auto record = findAllocationRecord(src_ptr);
-    std::ptrdiff_t src_offset = reinterpret_cast<char*>(src_ptr) - reinterpret_cast<char*>(record->ptr);
-    size = record->size - src_offset;
-  }
-
   UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", dst_ptr=" << dst_ptr << ", size=" << size << ")");
 
   auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
   auto src_alloc_record = m_allocations.find(src_ptr);
+  std::ptrdiff_t src_offset = static_cast<char*>(src_ptr) - static_cast<char*>(src_alloc_record->ptr);
+  std::size_t src_size = src_alloc_record->size - src_offset;
+
   auto dst_alloc_record = m_allocations.find(dst_ptr);
+  std::ptrdiff_t dst_offset = static_cast<char*>(dst_ptr) - static_cast<char*>(dst_alloc_record->ptr);
+  std::size_t dst_size = dst_alloc_record->size - dst_offset;
 
-  std::ptrdiff_t src_offset = reinterpret_cast<char*>(src_ptr) - reinterpret_cast<char*>(src_alloc_record->ptr);
-  std::ptrdiff_t dst_offset = reinterpret_cast<char*>(dst_ptr) - reinterpret_cast<char*>(dst_alloc_record->ptr);
+  if (size == 0) {
+    size = src_size;
+  }
 
-  auto operation = op_registry.find("COPY", src_alloc_record->strategy, dst_alloc_record->strategy);
+  umpire::event::record([&](auto& event) {
+    event.name("copy")
+        .category(event::category::operation)
+        .arg("src", src_ptr)
+        .arg("dst", dst_ptr)
+        .arg("src_offset", src_offset)
+        .arg("dst_offset", dst_offset)
+        .arg("size", size)
+        .arg("src_allocator_ref", (void*)src_alloc_record->strategy)
+        .arg("dst_allocator_ref", (void*)dst_alloc_record->strategy)
+        .tag("src_allocator_name", src_alloc_record->strategy->getName())
+        .tag("dst_allocator_name", dst_alloc_record->strategy->getName())
+        .tag("replay", "true");
+  });
 
-  operation->transform(src_ptr, dst_ptr, src_alloc_record, dst_alloc_record, size);
+  if (size > dst_size) {
+    UMPIRE_ERROR(runtime_error,
+                 fmt::format("Not enough space in destination to copy {} bytes into {} bytes", size, dst_size));
+  }
+
+  auto op = op_registry.find("COPY", src_alloc_record->strategy, dst_alloc_record->strategy);
+
+  op->transform(src_ptr, &dst_ptr, src_alloc_record, dst_alloc_record, size);
 #endif
 }
 
@@ -426,7 +446,7 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::copy(voi
                                                                              camp::resources::Resource& ctx,
                                                                              std::size_t size)
 {
-#if defined(UMPIRE_ENABLE_NEW_OPS)
+#if defined(UMPIRE_RM_USE_NEW_OPS)
   if (size == 0) {
     auto record = findAllocationRecord(src_ptr);
     std::ptrdiff_t src_offset = reinterpret_cast<char*>(src_ptr) - reinterpret_cast<char*>(record->ptr);
@@ -437,34 +457,51 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::copy(voi
 
   return umpire::copy(static_cast<void*>(src_ptr), static_cast<void*>(dst_ptr), size, ctx);
 #else
-  if (size == 0) {
-    auto record = findAllocationRecord(src_ptr);
-    std::ptrdiff_t src_offset = reinterpret_cast<char*>(src_ptr) - reinterpret_cast<char*>(record->ptr);
-    size = record->size - src_offset;
-  }
-
   UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", dst_ptr=" << dst_ptr << ", size=" << size << ")");
 
   auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
   auto src_alloc_record = m_allocations.find(src_ptr);
+  std::ptrdiff_t src_offset = static_cast<char*>(src_ptr) - static_cast<char*>(src_alloc_record->ptr);
+  std::size_t src_size = src_alloc_record->size - src_offset;
+
   auto dst_alloc_record = m_allocations.find(dst_ptr);
+  std::ptrdiff_t dst_offset = static_cast<char*>(dst_ptr) - static_cast<char*>(dst_alloc_record->ptr);
+  std::size_t dst_size = dst_alloc_record->size - dst_offset;
 
-  std::ptrdiff_t src_offset = reinterpret_cast<char*>(src_ptr) - reinterpret_cast<char*>(src_alloc_record->ptr);
-  std::ptrdiff_t dst_offset = reinterpret_cast<char*>(dst_ptr) - reinterpret_cast<char*>(dst_alloc_record->ptr);
+  if (size == 0) {
+    size = src_size;
+  }
 
-  auto operation = op_registry.find("COPY", src_alloc_record->strategy, dst_alloc_record->strategy);
+  umpire::event::record([&](auto& event) {
+    event.name("copy")
+        .category(event::category::operation)
+        .arg("src", src_ptr)
+        .arg("dst", dst_ptr)
+        .arg("src_offset", src_offset)
+        .arg("dst_offset", dst_offset)
+        .arg("size", size)
+        .arg("src_allocator_ref", (void*)src_alloc_record->strategy)
+        .arg("dst_allocator_ref", (void*)dst_alloc_record->strategy)
+        .tag("src_allocator_name", src_alloc_record->strategy->getName())
+        .tag("dst_allocator_name", dst_alloc_record->strategy->getName())
+        .tag("replay", "true")
+        .tag("async", "true");
+  });
 
-  operation->transform(src_ptr, dst_ptr, src_alloc_record, dst_alloc_record, size);
-  
-  // Return a completed event since the old implementation is synchronous
-  return camp::resources::EventProxy<camp::resources::Resource>{ctx};
+  if (size > dst_size) {
+    UMPIRE_ERROR(runtime_error, fmt::format("Not enough resource in destination for copy: {} -> {}", size, dst_size));
+  }
+
+  auto op = op_registry.find("COPY", src_alloc_record->strategy, dst_alloc_record->strategy);
+
+  return op->transform_async(src_ptr, &dst_ptr, src_alloc_record, dst_alloc_record, size, ctx);
 #endif
 }
 
 void ResourceManager::memset(void* ptr, int value, std::size_t length)
 {
-#if defined(UMPIRE_ENABLE_NEW_OPS)
+#if defined(UMPIRE_RM_USE_NEW_OPS)
   if (length == 0) {
     auto record = findAllocationRecord(ptr);
     std::ptrdiff_t src_offset = reinterpret_cast<char*>(ptr) - reinterpret_cast<char*>(record->ptr);
@@ -474,19 +511,37 @@ void ResourceManager::memset(void* ptr, int value, std::size_t length)
 
   umpire::memset(static_cast<void*>(ptr), value, length);
 #else
-  if (length == 0) {
-    auto record = findAllocationRecord(ptr);
-    std::ptrdiff_t src_offset = reinterpret_cast<char*>(ptr) - reinterpret_cast<char*>(record->ptr);
-    length = record->size - src_offset;
-  }
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ", value=" << value << ", length=" << length << ")");
+
+  auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
   auto alloc_record = m_allocations.find(ptr);
 
-  auto& op_registry = op::MemoryOperationRegistry::getInstance();
-  auto operation = op_registry.find("MEMSET", alloc_record->strategy, alloc_record->strategy);
+  std::ptrdiff_t offset = static_cast<char*>(ptr) - static_cast<char*>(alloc_record->ptr);
+  std::size_t size = alloc_record->size - offset;
 
-  operation->apply(ptr, alloc_record, value, length);
+  if (length == 0) {
+    length = size;
+  }
+
+  umpire::event::record([&](auto& event) {
+    event.name("memset")
+        .category(event::category::operation)
+        .arg("ptr", ptr)
+        .arg("value", value)
+        .arg("size", size)
+        .arg("allocator_ref", (void*)alloc_record->strategy)
+        .tag("allocator_name", alloc_record->strategy->getName())
+        .tag("replay", "true");
+  });
+
+  if (length > size) {
+    UMPIRE_ERROR(runtime_error, fmt::format("Cannot memset over the end of allocation: {} -> {}", length, size));
+  }
+
+  auto op = op_registry.find("MEMSET", alloc_record->strategy, alloc_record->strategy);
+
+  op->apply(ptr, alloc_record, value, length);
 #endif
 }
 
@@ -494,7 +549,7 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::memset(v
                                                                                camp::resources::Resource& ctx,
                                                                                std::size_t length)
 {
-#if defined(UMPIRE_ENABLE_NEW_OPS)
+#if defined(UMPIRE_RM_USE_NEW_OPS)
   if (length == 0) {
     auto record = findAllocationRecord(ptr);
     std::ptrdiff_t src_offset = reinterpret_cast<char*>(ptr) - reinterpret_cast<char*>(record->ptr);
@@ -505,36 +560,58 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::memset(v
 
   return umpire::memset(static_cast<void*>(ptr), value, length, ctx);
 #else
-  if (length == 0) {
-    auto record = findAllocationRecord(ptr);
-    std::ptrdiff_t src_offset = reinterpret_cast<char*>(ptr) - reinterpret_cast<char*>(record->ptr);
-    length = record->size - src_offset;
-  }
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ", value=" << value << ", length=" << length << ")");
+
+  auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
   auto alloc_record = m_allocations.find(ptr);
 
-  auto& op_registry = op::MemoryOperationRegistry::getInstance();
-  auto operation = op_registry.find("MEMSET", alloc_record->strategy, alloc_record->strategy);
+  std::ptrdiff_t offset = static_cast<char*>(ptr) - static_cast<char*>(alloc_record->ptr);
+  std::size_t size = alloc_record->size - offset;
 
-  operation->apply(ptr, alloc_record, value, length);
+  if (length == 0) {
+    length = size;
+  }
 
-  // Return a completed event since the old implementation is synchronous
-  return camp::resources::EventProxy<camp::resources::Resource>{ctx};
+  umpire::event::record([&](auto& event) {
+    event.name("memset")
+        .category(event::category::operation)
+        .arg("ptr", ptr)
+        .arg("value", value)
+        .arg("size", size)
+        .arg("allocator_ref", (void*)alloc_record->strategy)
+        .tag("allocator_name", alloc_record->strategy->getName())
+        .tag("replay", "true")
+        .tag("async", "true");
+  });
+
+  if (length > size) {
+    UMPIRE_ERROR(runtime_error, fmt::format("Cannot memset over the end of allocation: {} -> {}", length, size));
+  }
+
+  auto op = op_registry.find("MEMSET", alloc_record->strategy, alloc_record->strategy);
+
+  return op->apply_async(ptr, alloc_record, value, length, ctx);
 #endif
 }
 
 void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size)
 {
-#if defined(UMPIRE_ENABLE_NEW_OPS)
+#if defined(UMPIRE_RM_USE_NEW_OPS)
   if (!current_ptr) {
-    auto& alloc = getDefaultAllocator();
+    auto alloc = getDefaultAllocator();
     return alloc.allocate(new_size);
   }
-  
+
+  if (new_size == 0) {
+    auto alloc = getDefaultAllocator();
+    alloc.deallocate(current_ptr);
+    return alloc.allocate(new_size);
+  }
+
   UMPIRE_LOG(Debug, "(current_ptr=" << current_ptr << ", new_size=" << new_size << ")");
-  
-  return umpire::reallocate(current_ptr, new_size);
+
+  return umpire::reallocate(&current_ptr, new_size);
 #else
   strategy::AllocationStrategy* strategy;
 
@@ -571,16 +648,22 @@ void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size)
 
 void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size, camp::resources::Resource& ctx)
 {
-#if defined(UMPIRE_ENABLE_NEW_OPS)
+#if defined(UMPIRE_RM_USE_NEW_OPS)
   if (!current_ptr) {
-    auto& alloc = getDefaultAllocator();
+    auto alloc = getDefaultAllocator();
     return alloc.allocate(new_size);
   }
-  
+
+  if (new_size == 0) {
+    auto alloc = getDefaultAllocator();
+    alloc.deallocate(current_ptr);
+    return alloc.allocate(new_size);
+  }
+
   UMPIRE_LOG(Debug, "(current_ptr=" << current_ptr << ", new_size=" << new_size << ")");
-  
-  auto event = umpire::reallocate(current_ptr, new_size, ctx);
-  return current_ptr; // This isn't quite right, but we can't get the new pointer easily
+
+  auto event = umpire::reallocate(&current_ptr, new_size, ctx);
+  return current_ptr;
 #else
   strategy::AllocationStrategy* strategy;
 
@@ -618,8 +701,13 @@ void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size, camp:
 
 void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size, Allocator alloc)
 {
-#if defined(UMPIRE_ENABLE_NEW_OPS)
+#if defined(UMPIRE_RM_USE_NEW_OPS)
   if (!current_ptr) {
+    return alloc.allocate(new_size);
+  }
+
+  if (new_size == 0) {
+    alloc.deallocate(current_ptr);
     return alloc.allocate(new_size);
   }
 
@@ -627,13 +715,13 @@ void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size, Alloc
   auto src_allocator = getAllocator(current_ptr);
   if (src_allocator.getId() != alloc.getId()) {
     UMPIRE_ERROR(runtime_error, fmt::format("Cannot reallocate {} from allocator \"{}\" with allocator \"{}\"",
-                                           current_ptr, src_allocator.getName(), alloc.getName()));
+                                            current_ptr, src_allocator.getName(), alloc.getName()));
   }
-  
-  UMPIRE_LOG(Debug, "(current_ptr=" << current_ptr << ", new_size=" << new_size 
-                    << ", with Allocator " << alloc.getName() << ")");
-  
-  return umpire::reallocate(current_ptr, new_size);
+
+  UMPIRE_LOG(Debug, "(current_ptr=" << current_ptr << ", new_size=" << new_size << ", with Allocator "
+                                    << alloc.getName() << ")");
+
+  return umpire::reallocate(&current_ptr, new_size);
 #else
   umpire::event::record([&](auto& event) {
     event.name("reallocate")
@@ -662,8 +750,13 @@ void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size, Alloc
 void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size, Allocator alloc,
                                   camp::resources::Resource& ctx)
 {
-#if defined(UMPIRE_ENABLE_NEW_OPS)
+#if defined(UMPIRE_RM_USE_NEW_OPS)
   if (!current_ptr) {
+    return alloc.allocate(new_size);
+  }
+
+  if (new_size == 0) {
+    alloc.deallocate(current_ptr);
     return alloc.allocate(new_size);
   }
 
@@ -671,14 +764,14 @@ void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size, Alloc
   auto src_allocator = getAllocator(current_ptr);
   if (src_allocator.getId() != alloc.getId()) {
     UMPIRE_ERROR(runtime_error, fmt::format("Cannot reallocate {} from allocator \"{}\" with allocator \"{}\"",
-                                           current_ptr, src_allocator.getName(), alloc.getName()));
+                                            current_ptr, src_allocator.getName(), alloc.getName()));
   }
-  
-  UMPIRE_LOG(Debug, "(current_ptr=" << current_ptr << ", new_size=" << new_size 
-                    << ", with Allocator " << alloc.getName() << ")");
-  
-  auto event = umpire::reallocate(current_ptr, new_size, ctx);
-  return current_ptr; // This isn't quite right, but we can't get the new pointer easily
+
+  UMPIRE_LOG(Debug, "(current_ptr=" << current_ptr << ", new_size=" << new_size << ", with Allocator "
+                                    << alloc.getName() << ")");
+
+  auto event = umpire::reallocate(&current_ptr, new_size, ctx);
+  return current_ptr;
 #else
   umpire::event::record([&](auto& event) {
     event.name("reallocate")
@@ -733,16 +826,22 @@ void* ResourceManager::reallocate_impl(void* current_ptr, std::size_t new_size, 
       alloc.deallocate(current_ptr);
       new_ptr = alloc.allocate(new_size);
     } else {
-      // Check for offset pointer
+      auto& op_registry = op::MemoryOperationRegistry::getInstance();
+
       if (current_ptr != alloc_record->ptr) {
         UMPIRE_ERROR(runtime_error,
                      fmt::format("Cannot reallocate an offset ptr (ptr={}, base={})", current_ptr, alloc_record->ptr));
       }
 
-      // Use the template-based reallocate operation directly
-      // This will find the allocator for current_ptr, allocate new memory,
-      // copy the data, and deallocate the old memory
-      new_ptr = umpire::reallocate(static_cast<void*>(current_ptr), new_size);
+      std::shared_ptr<umpire::op::MemoryOperation> op;
+      if (alloc_record->strategy->getPlatform() == Platform::host &&
+          getAllocator("HOST").getId() != alloc_record->strategy->getId()) {
+        op = op_registry.find("REALLOCATE", std::make_pair(Platform::undefined, Platform::undefined));
+      } else {
+        op = op_registry.find("REALLOCATE", alloc_record->strategy, alloc_record->strategy);
+      }
+
+      op->transform(current_ptr, &new_ptr, alloc_record, alloc_record, new_size);
     }
   }
 
@@ -778,26 +877,22 @@ void* ResourceManager::reallocate_impl(void* current_ptr, std::size_t new_size, 
       alloc.deallocate(current_ptr);
       new_ptr = alloc.allocate(new_size);
     } else {
-      // Check for offset pointer
+      auto& op_registry = op::MemoryOperationRegistry::getInstance();
+
       if (current_ptr != alloc_record->ptr) {
         UMPIRE_ERROR(runtime_error,
                      fmt::format("Cannot reallocate an offset ptr (ptr={}, base={})", current_ptr, alloc_record->ptr));
       }
 
-      // Use the template-based reallocate operation with async support
-      // Even though we're using the async version, the implementation actually
-      // does the allocation and deallocation right away - it's just the copy that's async
-      new_ptr = allocator.allocate(new_size);
-
-      // Calculate copy size (minimum of old and new size)
-      std::size_t old_size = getSize(current_ptr);
-      std::size_t copy_size = (old_size > new_size) ? new_size : old_size;
-
-      // Copy data asynchronously - we already have the new pointer
-      auto event = copy(new_ptr, current_ptr, ctx, copy_size);
-
-      // Deallocate the old pointer
-      allocator.deallocate(current_ptr);
+      std::shared_ptr<umpire::op::MemoryOperation> op;
+      if (alloc_record->strategy->getPlatform() == Platform::host &&
+          getAllocator("HOST").getId() != alloc_record->strategy->getId()) {
+        op = op_registry.find("REALLOCATE", std::make_pair(Platform::undefined, Platform::undefined));
+        op->transform(current_ptr, &new_ptr, alloc_record, alloc_record, new_size);
+      } else {
+        op = op_registry.find("REALLOCATE", alloc_record->strategy, alloc_record->strategy);
+        op->transform_async(current_ptr, &new_ptr, alloc_record, alloc_record, new_size, ctx);
+      }
     }
   }
 
@@ -806,11 +901,11 @@ void* ResourceManager::reallocate_impl(void* current_ptr, std::size_t new_size, 
 
 void* ResourceManager::move(void* src_ptr, Allocator allocator)
 {
-#if defined(UMPIRE_ENABLE_NEW_OPS)
+#if defined(UMPIRE_RM_USE_NEW_OPS)
   UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", allocator=" << allocator.getName() << ")");
 
   auto src_allocator = getAllocator(src_ptr);
-  
+
   // short-circuit if ptr was allocated by 'allocator'
   if (src_allocator.getId() == allocator.getId()) {
     return src_ptr;
@@ -825,13 +920,13 @@ void* ResourceManager::move(void* src_ptr, Allocator allocator)
   // Allocate new memory in destination
   std::size_t size = getSize(src_ptr);
   void* dst_ptr = allocator.allocate(size);
-  
+
   // Copy data
   umpire::copy(src_ptr, dst_ptr, size);
-  
+
   // Deallocate original
   deallocate(src_ptr);
-  
+
   return dst_ptr;
 #else
   UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", allocator=" << allocator.getName() << ")");
@@ -912,9 +1007,9 @@ void* ResourceManager::move(void* src_ptr, Allocator allocator)
 camp::resources::EventProxy<camp::resources::Resource> ResourceManager::prefetch(void* ptr, int device,
                                                                                  camp::resources::Resource& ctx)
 {
-#if defined(UMPIRE_ENABLE_NEW_OPS)
+#if defined(UMPIRE_RM_USE_NEW_OPS)
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ", device=" << device << ")");
-  
+
   auto alloc_record = m_allocations.find(ptr);
 
   // Get size from offset to end of allocation
@@ -934,8 +1029,9 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::prefetch
   std::ptrdiff_t offset = static_cast<char*>(ptr) - static_cast<char*>(alloc_record->ptr);
   std::size_t size = alloc_record->size - offset;
 
-  // Use the template-based prefetch operation which will perform the checks and logging internally
-  return umpire::prefetch(static_cast<void*>(ptr), device, size, ctx);
+  auto& op_registry = op::MemoryOperationRegistry::getInstance();
+  auto op = op_registry.find("PREFETCH", alloc_record->strategy, alloc_record->strategy);
+  return op->apply_async(ptr, alloc_record, device, size, ctx);
 #endif
 }
 

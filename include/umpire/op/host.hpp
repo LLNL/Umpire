@@ -2,6 +2,7 @@
 
 #include <cstring>
 
+#include "camp/resource.hpp"
 #include "umpire/op/detail/utils.hpp"
 #include "umpire/op/operations.hpp"
 #include "umpire/resource/platform.hpp"
@@ -86,29 +87,39 @@ struct reallocate<resource::host_platform> {
    * @return T* Pointer to new allocation or null on failure
    */
   template <typename T>
-  static T* exec(T* src, std::size_t size)
+  static T* exec(T** src, std::size_t size)
   {
-    // Special cases for null pointer or zero size
-    if (!src)
-      return nullptr;
-
-    if (size == 0) {
-      std::free(src);
-      return nullptr;
-    }
-
     // Calculate size in bytes based on type
     const std::size_t bytes = detail::get_size<T>(size);
 
     // Perform the reallocation
-    T* ret = static_cast<T*>(std::realloc(src, bytes));
+    T* ret = static_cast<T*>(std::realloc(*src, bytes));
 
     // Error handling
     if (!ret && size > 0) {
-      UMPIRE_ERROR(runtime_error, fmt::format("Host realloc failed for pointer={}, size={}", src, bytes));
+      UMPIRE_ERROR(runtime_error, fmt::format("Host realloc failed for pointer={}, size={}", *src, bytes));
     }
 
+    *src = ret;
     return ret;
+  }
+
+  template <typename T>
+  static auto exec(T** src, std::size_t size, camp::resources::Resource& ctx)
+  {
+    // Calculate size in bytes based on type
+    const std::size_t bytes = detail::get_size<T>(size);
+
+    // Perform the reallocation
+    T* ret = static_cast<T*>(std::realloc(*src, bytes));
+
+    // Error handling
+    if (!ret && size > 0) {
+      UMPIRE_ERROR(runtime_error, fmt::format("Host realloc failed for pointer={}, size={}", *src, bytes));
+    }
+
+    *src = ret;
+    return detail::make_completed_event(ctx);
   }
 };
 

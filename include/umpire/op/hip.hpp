@@ -18,7 +18,7 @@ namespace umpire {
 namespace op {
 
 // HIP implementation helpers
-namespace {
+namespace detail {
 
 /**
  * @brief Get the HIP memory copy direction kind
@@ -277,7 +277,7 @@ prefetch_async(T* ptr, int device, std::size_t count, camp::resources::Resource&
   return camp::resources::EventProxy<camp::resources::Resource>{resource};
 }
 
-} // unnamed namespace
+} // namespace detail
 
 //------------------------------------------------------------------------------
 // HIP Operation Template Specializations
@@ -297,7 +297,7 @@ struct copy<resource::hip_platform, resource::hip_platform> {
   template <typename T>
   static void exec(T* src, T* dst, std::size_t len) noexcept
   {
-    copy(src, dst, len, copy_kind<resource::hip_platform, resource::hip_platform>::value);
+    detail::copy(src, dst, len, detail::copy_kind<resource::hip_platform, resource::hip_platform>::value);
   }
 
   /**
@@ -314,8 +314,8 @@ struct copy<resource::hip_platform, resource::hip_platform> {
   static camp::resources::EventProxy<camp::resources::Resource> exec(
       T* src, T* dst, std::size_t len, camp::resources::Resource& resource)
   {
-    return copy_async(src, dst, len, resource, 
-                      copy_kind<resource::hip_platform, resource::hip_platform>::value);
+    return detail::copy_async(src, dst, len, resource, 
+                      detail::copy_kind<resource::hip_platform, resource::hip_platform>::value);
   }
 };
 
@@ -333,7 +333,7 @@ struct copy<resource::hip_platform, resource::host_platform> {
   template <typename T>
   static void exec(T* src, T* dst, std::size_t len) noexcept
   {
-    copy(src, dst, len, copy_kind<resource::hip_platform, resource::host_platform>::value);
+    detail::copy(src, dst, len, detail::copy_kind<resource::hip_platform, resource::host_platform>::value);
   }
 
   /**
@@ -350,8 +350,8 @@ struct copy<resource::hip_platform, resource::host_platform> {
   static camp::resources::EventProxy<camp::resources::Resource> exec(
       T* src, T* dst, std::size_t len, camp::resources::Resource& resource)
   {
-    return copy_async(src, dst, len, resource, 
-                      copy_kind<resource::hip_platform, resource::host_platform>::value);
+    return detail::copy_async(src, dst, len, resource, 
+                      detail::copy_kind<resource::hip_platform, resource::host_platform>::value);
   }
 };
 
@@ -369,7 +369,7 @@ struct copy<resource::host_platform, resource::hip_platform> {
   template <typename T>
   static void exec(T* src, T* dst, std::size_t len) noexcept
   {
-    copy(src, dst, len, copy_kind<resource::host_platform, resource::hip_platform>::value);
+    detail::copy(src, dst, len, detail::copy_kind<resource::host_platform, resource::hip_platform>::value);
   }
 
   /**
@@ -386,8 +386,8 @@ struct copy<resource::host_platform, resource::hip_platform> {
   static camp::resources::EventProxy<camp::resources::Resource> exec(
       T* src, T* dst, std::size_t len, camp::resources::Resource& resource)
   {
-    return copy_async(src, dst, len, resource, 
-                      copy_kind<resource::host_platform, resource::hip_platform>::value);
+    return detail::copy_async(src, dst, len, resource, 
+                      detail::copy_kind<resource::host_platform, resource::hip_platform>::value);
   }
 };
 
@@ -405,7 +405,7 @@ struct memset<resource::hip_platform> {
   template <typename T>
   static void exec(T* ptr, int val, std::size_t len) noexcept
   {
-    memset(ptr, val, len);
+    detail::memset(ptr, val, len);
   }
 
   /**
@@ -422,7 +422,7 @@ struct memset<resource::hip_platform> {
   static camp::resources::EventProxy<camp::resources::Resource> exec(
       T* ptr, int val, std::size_t len, camp::resources::Resource& resource)
   {
-    return memset_async(ptr, val, len, resource);
+    return detail::memset_async(ptr, val, len, resource);
   }
 };
 
@@ -459,7 +459,7 @@ struct prefetch<resource::hip_platform> {
   template <typename T>
   static void exec(T* ptr, int device, std::size_t len) noexcept
   {
-    prefetch(ptr, device, len);
+    detail::prefetch(ptr, device, len);
   }
 
   /**
@@ -476,7 +476,7 @@ struct prefetch<resource::hip_platform> {
   static camp::resources::EventProxy<camp::resources::Resource> exec(
       T* ptr, int device, std::size_t len, camp::resources::Resource& resource)
   {
-    return prefetch_async(ptr, device, len, resource);
+    return detail::prefetch_async(ptr, device, len, resource);
   }
 };
 
@@ -494,7 +494,7 @@ struct op_name<resource::hip_platform> { \
    */ \
   template <typename T> \
   static inline void exec(T* ptr, int device, std::size_t len) noexcept { \
-    advise(ptr, len, device, advice_flag); \
+    detail::advise(ptr, len, device, advice_flag); \
   } \
 };
 
