@@ -177,23 +177,8 @@ struct memset<openmp_target_platform> {
   }
 };
 
-// Reallocate operations - stub implementation
-template<>
-struct reallocate<openmp_target_platform> {
-  template <typename T>
-  static T* exec(T* src_ptr, std::size_t size) {
-    // OpenMP Target needs ResourceManager for allocation information
-    UMPIRE_ERROR(runtime_error, "Direct OpenMP Target reallocate not implemented");
-    return nullptr;
-  }
-  
-  template <typename T>
-  static camp::resources::EventProxy<camp::resources::Resource> exec(
-      T* src_ptr, std::size_t size, camp::resources::Resource& res) {
-    UMPIRE_ERROR(runtime_error, "Direct OpenMP Target async reallocate not implemented");
-    return camp::resources::EventProxy<camp::resources::Resource>{res};
-  }
-};
+// Note: OpenMP Target platform uses the generic reallocate implementation from operations.hpp
+// since direct OpenMP Target reallocation isn't supported and memory pools require a safe allocate-copy-free pattern
 
 } // end of namespace op
 } // end of namespace umpire
