@@ -125,7 +125,7 @@ inline auto dispatch(camp::resources::Platform src_platform, camp::resources::Pl
 }
 
 template <typename T>
-auto decay_ptr(T* ptr)
+constexpr auto decay_ptr(T* ptr)
 {
   if constexpr (std::is_pointer_v<T>) {
     return *ptr;

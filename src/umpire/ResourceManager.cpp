@@ -598,13 +598,15 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::memset(v
 void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size)
 {
 #if defined(UMPIRE_RM_USE_NEW_OPS)
+
   if (!current_ptr) {
     auto alloc = getDefaultAllocator();
     return alloc.allocate(new_size);
   }
 
   if (new_size == 0) {
-    auto alloc = getDefaultAllocator();
+    auto alloc_record = m_allocations.find(current_ptr);
+    auto alloc = Allocator(alloc_record->strategy);
     alloc.deallocate(current_ptr);
     return alloc.allocate(new_size);
   }
@@ -655,7 +657,8 @@ void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size, camp:
   }
 
   if (new_size == 0) {
-    auto alloc = getDefaultAllocator();
+    auto alloc_record = m_allocations.find(current_ptr);
+    auto alloc = Allocator(alloc_record->strategy);
     alloc.deallocate(current_ptr);
     return alloc.allocate(new_size);
   }
@@ -707,7 +710,9 @@ void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size, Alloc
   }
 
   if (new_size == 0) {
-    alloc.deallocate(current_ptr);
+    auto alloc_record = m_allocations.find(current_ptr);
+    auto a = Allocator(alloc_record->strategy);
+    a.deallocate(current_ptr);
     return alloc.allocate(new_size);
   }
 
@@ -756,7 +761,9 @@ void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size, Alloc
   }
 
   if (new_size == 0) {
-    alloc.deallocate(current_ptr);
+    auto alloc_record = m_allocations.find(current_ptr);
+    auto a = Allocator(alloc_record->strategy);
+    a.deallocate(current_ptr);
     return alloc.allocate(new_size);
   }
 
