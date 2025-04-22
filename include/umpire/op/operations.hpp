@@ -41,8 +41,9 @@ struct generic_reallocate : public operation {
   static constexpr const char* name = "REALLOCATE";
 
   template <typename T>
-  static T* exec(T* current_ptr, std::size_t new_size)
+  static void exec(T** ptr, std::size_t new_size)
   {
+    auto current_ptr = *ptr;
     if (!current_ptr) {
       // If current pointer is null, just allocate
       auto& rm = ResourceManager::getInstance();

@@ -123,6 +123,16 @@ inline auto dispatch(camp::resources::Platform src_platform, camp::resources::Pl
 
   UMPIRE_ERROR(runtime_error, "Unsupported platform combination");
 }
+
+template <typename T>
+auto decay_ptr(T* ptr)
+{
+  if constexpr (std::is_pointer_v<T>) {
+    return *ptr;
+  } else {
+    return ptr;
+  }
+}
 } // namespace detail
 
 // Base template for op_caller with helper functions for argument handling
@@ -184,7 +194,7 @@ struct op_caller {
   {
     auto& rm = ResourceManager::getInstance();
     auto& allocation_map = rm.m_allocations;
-    auto src_record = allocation_map.find(src);
+    auto src_record = allocation_map.find(detail::decay_ptr(src));
     auto p = src_record->strategy->getPlatform();
 
     // Operation-specific handling
@@ -205,7 +215,7 @@ struct op_caller {
   {
     auto& rm = ResourceManager::getInstance();
     auto& allocation_map = rm.m_allocations;
-    auto src_record = allocation_map.find(src);
+    auto src_record = allocation_map.find(detail::decay_ptr(src));
     auto p = src_record->strategy->getPlatform();
 
     // Operation-specific handling
@@ -225,7 +235,7 @@ struct op_caller {
   {
     auto& rm = ResourceManager::getInstance();
     auto& allocation_map = rm.m_allocations;
-    auto src_record = allocation_map.find(src);
+    auto src_record = allocation_map.find(detail::decay_ptr(src));
     auto dst_record = allocation_map.find(dst);
 
     auto p1 = src_record->strategy->getPlatform();
@@ -249,7 +259,7 @@ struct op_caller {
   {
     auto& rm = ResourceManager::getInstance();
     auto& allocation_map = rm.m_allocations;
-    auto src_record = allocation_map.find(src);
+    auto src_record = allocation_map.find(detail::decay_ptr(src));
     auto dst_record = allocation_map.find(dst);
 
     auto p1 = src_record->strategy->getPlatform();
@@ -295,63 +305,17 @@ camp::resources::EventProxy<camp::resources::Resource> memset(T* src, int v, std
   return op::op_caller<op::memset>::exec(src, v, len, ctx);
 }
 
-// Non-void pointer reallocate
-template <typename T, typename std::enable_if<!std::is_void<T>::value, int>::type = 0>
-inline T* reallocate(T* src, std::size_t size)
+template <typename T>
+inline T* reallocate(T** src, std::size_t size)
 {
-  // Handle null pointer case
-  if (src == nullptr) {
-    auto& rm = ResourceManager::getInstance();
-    Allocator allocator = rm.getDefaultAllocator();
-    return static_cast<T*>(allocator.allocate(size * sizeof(T)));
-  }
-  
-  return op::op_caller<op::reallocate>::exec(src, size);
-}
-
-// Void pointer reallocate
-template <typename T, typename std::enable_if<std::is_void<T>::value, int>::type = 0>
-inline void* reallocate(T* src, std::size_t size)
-{
-  // Handle null pointer case
-  if (src == nullptr) {
-    auto& rm = ResourceManager::getInstance();
-    Allocator allocator = rm.getDefaultAllocator();
-    return allocator.allocate(size);
-  }
-  
   return op::op_caller<op::reallocate>::exec(src, size);
 }
 
 // Async reallocate implementation
-template <typename T, typename std::enable_if<!std::is_void<T>::value, int>::type = 0>
-inline camp::resources::EventProxy<camp::resources::Resource> reallocate(T* src, std::size_t size,
+template <typename T>
+inline camp::resources::EventProxy<camp::resources::Resource> reallocate(T** src, std::size_t size,
                                                                          camp::resources::Resource& ctx)
 {
-  // Handle null pointer case
-  if (src == nullptr) {
-    auto& rm = ResourceManager::getInstance();
-    Allocator allocator = rm.getDefaultAllocator();
-    allocator.allocate(size * sizeof(T));
-    return camp::resources::EventProxy<camp::resources::Resource>{ctx};
-  }
-  
-  return op::op_caller<op::reallocate>::exec(src, size, ctx);
-}
-
-// Explicit specialization for void* async reallocate
-template <typename T, typename std::enable_if<std::is_void<T>::value, int>::type = 0>
-camp::resources::EventProxy<camp::resources::Resource> reallocate(T* src, std::size_t size,
-                                                                  camp::resources::Resource& ctx)
-{
-  // Handle null pointer case
-  if (src == nullptr) {
-    auto& rm = ResourceManager::getInstance();
-    Allocator allocator = rm.getDefaultAllocator();
-    allocator.allocate(size);
-    return camp::resources::EventProxy<camp::resources::Resource>{ctx};
-  }
-  
   return op::op_caller<op::reallocate>::exec(src, size, ctx);
 }
 
