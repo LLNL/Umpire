@@ -73,18 +73,6 @@ void HipConstantMemoryResource::deallocate(void* ptr, std::size_t size)
   }
 }
 
-std::size_t HipConstantMemoryResource::getCurrentSize() const noexcept
-{
-  UMPIRE_LOG(Debug, "() returning " << m_current_size);
-  return m_current_size;
-}
-
-std::size_t HipConstantMemoryResource::getHighWatermark() const noexcept
-{
-  UMPIRE_LOG(Debug, "() returning " << m_highwatermark);
-  return m_highwatermark;
-}
-
 bool HipConstantMemoryResource::isAccessibleFrom(Platform p) noexcept
 {
   if (p == Platform::hip)
