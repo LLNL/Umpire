@@ -472,7 +472,7 @@ module umpire_fortran_generated_tests
       end subroutine test_allocate_bool_host_array_4d
 
     
-#ifdef UMPIRE_ENABLE_CUDA
+#ifdef UMPIRE_ENABLE_DEVICE
 
       subroutine test_allocate_int_device_array_1d
         use iso_c_binding
@@ -1427,7 +1427,7 @@ program fortran_test
   call test_allocate_bool_host_array_2d
   call test_allocate_bool_host_array_3d
   call test_allocate_bool_host_array_4d
-#ifdef UMPIRE_ENABLE_CUDA
+#ifdef UMPIRE_ENABLE_DEVICE
   call test_allocate_int_device_array_1d
   call test_allocate_int_device_array_2d
   call test_allocate_int_device_array_3d
