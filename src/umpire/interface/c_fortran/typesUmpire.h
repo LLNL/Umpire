@@ -142,6 +142,13 @@ struct s_umpire_strategy_quickpool {
 };
 typedef struct s_umpire_strategy_quickpool umpire_strategy_quickpool;
 
+// helper capsule_umpire_strategy_sizelimiter
+struct s_umpire_strategy_sizelimiter {
+    void *addr;     /* address of C++ memory */
+    int idtor;      /* index of destructor */
+};
+typedef struct s_umpire_strategy_sizelimiter umpire_strategy_sizelimiter;
+
 // helper capsule_umpire_strategy_threadsafeallocator
 struct s_umpire_strategy_threadsafeallocator {
     void *addr;     /* address of C++ memory */
