@@ -207,6 +207,7 @@ module umpire_mod
         procedure :: make_allocator_thread_safe => resourcemanager_make_allocator_thread_safe
         procedure :: make_allocator_fixed_pool => resourcemanager_make_allocator_fixed_pool
         procedure :: make_allocator_aligned_allocator => resourcemanager_make_allocator_aligned_allocator
+        procedure :: make_allocator_size_limiter => resourcemanager_make_allocator_size_limiter
         procedure :: make_allocator_prefetcher => resourcemanager_make_allocator_prefetcher
         procedure :: add_alias => resourcemanager_add_alias
         procedure :: remove_alias => resourcemanager_remove_alias
@@ -637,6 +638,37 @@ module umpire_mod
             type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_bufferify_aligned_allocator
+
+        function c_resourcemanager_make_allocator_size_limiter(self, &
+                name, allocator, object_size, SHT_crv) &
+                result(SHT_rv) &
+                bind(C, name="umpire_resourcemanager_make_allocator_size_limiter")
+            use iso_c_binding, only : C_CHAR, C_PTR, C_SIZE_T
+            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            implicit none
+            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            character(kind=C_CHAR), intent(IN) :: name(*)
+            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+            integer(C_SIZE_T), value, intent(IN) :: object_size
+            type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
+            type(C_PTR) SHT_rv
+        end function c_resourcemanager_make_allocator_size_limiter
+
+        function c_resourcemanager_make_allocator_bufferify_size_limiter( &
+                self, name, Lname, allocator, object_size, SHT_crv) &
+                result(SHT_rv) &
+                bind(C, name="umpire_resourcemanager_make_allocator_bufferify_size_limiter")
+            use iso_c_binding, only : C_CHAR, C_INT, C_PTR, C_SIZE_T
+            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            implicit none
+            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            character(kind=C_CHAR), intent(IN) :: name(*)
+            integer(C_INT), value, intent(IN) :: Lname
+            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+            integer(C_SIZE_T), value, intent(IN) :: object_size
+            type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
+            type(C_PTR) SHT_rv
+        end function c_resourcemanager_make_allocator_bufferify_size_limiter
 
         function c_resourcemanager_make_allocator_prefetcher(self, name, &
                 allocator, device_id, SHT_crv) &
@@ -2433,6 +2465,23 @@ contains
             object_size, SHT_rv%cxxmem)
         ! splicer end class.ResourceManager.method.make_allocator_aligned_allocator
     end function resourcemanager_make_allocator_aligned_allocator
+
+    function resourcemanager_make_allocator_size_limiter(obj, name, &
+            allocator, object_size) &
+            result(SHT_rv)
+        use iso_c_binding, only : C_INT, C_PTR, C_SIZE_T
+        class(UmpireResourceManager) :: obj
+        character(len=*), intent(IN) :: name
+        type(UmpireAllocator), value, intent(IN) :: allocator
+        integer(C_SIZE_T), value, intent(IN) :: object_size
+        type(UmpireAllocator) :: SHT_rv
+        ! splicer begin class.ResourceManager.method.make_allocator_size_limiter
+        type(C_PTR) :: SHT_prv
+        SHT_prv = c_resourcemanager_make_allocator_bufferify_size_limiter(obj%cxxmem, &
+            name, len_trim(name, kind=C_INT), allocator%cxxmem, &
+            object_size, SHT_rv%cxxmem)
+        ! splicer end class.ResourceManager.method.make_allocator_size_limiter
+    end function resourcemanager_make_allocator_size_limiter
 
     function resourcemanager_make_allocator_prefetcher(obj, name, &
             allocator, device_id) &

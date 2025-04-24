@@ -112,6 +112,16 @@ umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_aligned_alloc
     umpire_allocator allocator, size_t object_size,
     umpire_allocator * SHC_rv);
 
+umpire_allocator * umpire_resourcemanager_make_allocator_size_limiter(
+    umpire_resourcemanager * self, const char * name,
+    umpire_allocator allocator, size_t object_size,
+    umpire_allocator * SHC_rv);
+
+umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_size_limiter(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    umpire_allocator allocator, size_t object_size,
+    umpire_allocator * SHC_rv);
+
 umpire_allocator * umpire_resourcemanager_make_allocator_prefetcher(
     umpire_resourcemanager * self, const char * name,
     umpire_allocator allocator, int device_id,
