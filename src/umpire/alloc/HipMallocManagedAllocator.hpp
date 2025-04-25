@@ -56,8 +56,7 @@ struct HipMallocManagedAllocator : HipAllocator {
       hipError_t error = ::hipGetDevice(&device);
       if (error != hipSuccess) {
         UMPIRE_ERROR(runtime_error,
-                     fmt::format("hipGetDevice( device = {}) failed with error: {}", device,
-                                 hipGetErrorString(error)));
+                     fmt::format("hipGetDevice( device = {}) failed with error: {}", device, hipGetErrorString(error)));
       }
 
       UMPIRE_LOG(Debug, "::hipMemAdvise(hipMemAdviseSetCoarseGrain)");
