@@ -53,10 +53,15 @@ struct HipMallocManagedAllocator : HipAllocator {
     if (m_granularity == MemoryResourceTraits::granularity_type::coarse_grained) {
       int device;
 
-      ::hipGetDevice(&device);
+      hipError_t error = ::hipGetDevice(&device);
+      if (error != hipSuccess) {
+        UMPIRE_ERROR(runtime_error,
+                     fmt::format("hipGetDevice( device = {}) failed with error: {}", device,
+                                 hipGetErrorString(error)));
+      }
 
       UMPIRE_LOG(Debug, "::hipMemAdvise(hipMemAdviseSetCoarseGrain)");
-      auto error = ::hipMemAdvise(ptr, bytes, hipMemAdviseSetCoarseGrain, device);
+      error = ::hipMemAdvise(ptr, bytes, hipMemAdviseSetCoarseGrain, device);
 
       if (error != hipSuccess) {
         UMPIRE_ERROR(runtime_error,
