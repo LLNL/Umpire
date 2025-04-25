@@ -23,16 +23,10 @@ class HipConstantMemoryResource : public MemoryResource {
   void* allocate(std::size_t bytes);
   void deallocate(void* ptr, std::size_t size);
 
-  std::size_t getCurrentSize() const noexcept;
-  std::size_t getHighWatermark() const noexcept;
-
   bool isAccessibleFrom(Platform p) noexcept;
   Platform getPlatform() noexcept;
 
  private:
-  std::size_t m_current_size;
-  std::size_t m_highwatermark;
-
   Platform m_platform;
 
   std::size_t m_offset;

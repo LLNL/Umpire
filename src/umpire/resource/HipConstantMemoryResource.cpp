@@ -21,13 +21,7 @@ namespace umpire {
 namespace resource {
 
 HipConstantMemoryResource::HipConstantMemoryResource(const std::string& name, int id, MemoryResourceTraits traits)
-    : MemoryResource{name, id, traits},
-      m_current_size{0},
-      m_highwatermark{0},
-      m_platform{Platform::hip},
-      m_offset{0},
-      m_ptr{nullptr},
-      m_initialized{false}
+    : MemoryResource{name, id, traits}, m_platform{Platform::hip}, m_offset{0}, m_ptr{nullptr}, m_initialized{false}
 {
 }
 

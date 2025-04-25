@@ -152,8 +152,6 @@ if (UMPIRE_ENABLE_HIP)
       HipConstantMemoryResource.cpp)
 
     set_source_files_properties(HipConstantMemoryResource.cpp PROPERTIES LANGUAGE HIP)
-    target_compile_options(umpire_resource PUBLIC -fgpu-rdc)
-    target_link_options(umpire_resource PUBLIC -fgpu-rdc)
   endif ()
 
   set(umpire_resource_depends ${umpire_resource_depends} blt::hip_runtime)
