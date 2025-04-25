@@ -44,23 +44,26 @@ int main(int, char**)
 #if defined(UMPIRE_ENABLE_CUDA)
   cudaError_t err = cudaSetDevice(0);
   if (err != cudaSuccess) {
-    UMPIRE_ERROR(umpire::runtime_error, fmt::format("Error when trying to set CUDA Device: {}", cudaGetErrorString(err)));
+    UMPIRE_ERROR(umpire::runtime_error,
+                 fmt::format("Error when trying to set CUDA Device: {}", cudaGetErrorString(err)));
   }
   touch_data<<<NUM_BLOCKS, BLOCK_SIZE>>>(a, NUM_THREADS);
   err = cudaDeviceSynchronize();
   if (err != cudaSuccess) {
-    UMPIRE_ERROR(umpire::runtime_error, fmt::format("Error when trying to sync CUDA Device: {}", cudaGetErrorString(err)));
+    UMPIRE_ERROR(umpire::runtime_error,
+                 fmt::format("Error when trying to sync CUDA Device: {}", cudaGetErrorString(err)));
   }
 #endif
 #if defined(UMPIRE_ENABLE_HIP)
   hipError_t err = hipSetDevice(0);
   if (err != hipSuccess) {
-      UMPIRE_ERROR(umpire::runtime_error, fmt::format("Error when trying to set HIP Device: {}", hipGetErrorString(err)));
+    UMPIRE_ERROR(umpire::runtime_error, fmt::format("Error when trying to set HIP Device: {}", hipGetErrorString(err)));
   }
   hipLaunchKernelGGL(touch_data, dim3(NUM_BLOCKS), dim3(BLOCK_SIZE), 0, 0, a, NUM_THREADS);
   err = hipDeviceSynchronize();
   if (err != hipSuccess) {
-      UMPIRE_ERROR(umpire::runtime_error, fmt::format("Error when trying to sync HIP Device: {}", hipGetErrorString(err)));
+    UMPIRE_ERROR(umpire::runtime_error,
+                 fmt::format("Error when trying to sync HIP Device: {}", hipGetErrorString(err)));
   }
 #endif
 
