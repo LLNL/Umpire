@@ -68,6 +68,26 @@ typemap:
         f_derived_type: fixedpool
         f_capsule_data_type: umpire_SHROUD_strategy_fixedpool_capsule
         f_to_c: "{f_var}%cxxmem"
+    - type: MixedPool
+      fields:
+        base: shadow
+        wrap_header:
+        - typesUmpire.h
+        c_type: umpire_strategy_mixedpool
+        f_module_name: umpire_strategy_mod
+        f_derived_type: mixedpool
+        f_capsule_data_type: umpire_SHROUD_strategy_mixedpool_capsule
+        f_to_c: "{f_var}%cxxmem"
+    - type: MonotonicAllocationStrategy
+      fields:
+        base: shadow
+        wrap_header:
+        - typesUmpire.h
+        c_type: umpire_strategy_monotonicallocationstrategy
+        f_module_name: umpire_strategy_mod
+        f_derived_type: monotonicallocationstrategy
+        f_capsule_data_type: umpire_SHROUD_strategy_monotonicallocationstrategy_capsule
+        f_to_c: "{f_var}%cxxmem"
     - type: NamedAllocationStrategy
       fields:
         base: shadow
@@ -78,6 +98,16 @@ typemap:
         f_derived_type: namedallocationstrategy
         f_capsule_data_type: umpire_SHROUD_strategy_namedallocationstrategy_capsule
         f_to_c: "{f_var}%cxxmem"
+    - type: NamingShim
+      fields:
+        base: shadow
+        wrap_header:
+        - typesUmpire.h
+        c_type: umpire_strategy_namingshim
+        f_module_name: umpire_strategy_mod
+        f_derived_type: namingshim
+        f_capsule_data_type: umpire_SHROUD_strategy_namingshim_capsule
+        f_to_c: "{f_var}%cxxmem"
     - type: QuickPool
       fields:
         base: shadow
@@ -87,6 +117,16 @@ typemap:
         f_module_name: umpire_strategy_mod
         f_derived_type: quickpool
         f_capsule_data_type: umpire_SHROUD_strategy_quickpool_capsule
+        f_to_c: "{f_var}%cxxmem"
+    - type: ResourceAwarePool
+      fields:
+        base: shadow
+        wrap_header:
+        - typesUmpire.h
+        c_type: umpire_strategy_resourceawarepool
+        f_module_name: umpire_strategy_mod
+        f_derived_type: resourceawarepool
+        f_capsule_data_type: umpire_SHROUD_strategy_resourceawarepool_capsule
         f_to_c: "{f_var}%cxxmem"
     - type: ResourceManager
       fields:
@@ -107,6 +147,16 @@ typemap:
         f_module_name: umpire_strategy_mod
         f_derived_type: sizelimiter
         f_capsule_data_type: umpire_SHROUD_strategy_sizelimiter_capsule
+        f_to_c: "{f_var}%cxxmem"
+    - type: SlotPool
+      fields:
+        base: shadow
+        wrap_header:
+        - typesUmpire.h
+        c_type: umpire_strategy_slotpool
+        f_module_name: umpire_strategy_mod
+        f_derived_type: slotpool
+        f_capsule_data_type: umpire_SHROUD_strategy_slotpool_capsule
         f_to_c: "{f_var}%cxxmem"
     - type: ThreadSafeAllocator
       fields:
