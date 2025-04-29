@@ -25,6 +25,7 @@ fi
 
 set -o errexit
 set -o nounset
+set -o pipefail
 
 option=${1:-""}
 hostname="$(hostname)"
@@ -127,25 +128,25 @@ then
     spack_user_cache="${prefix}/spack-user-cache"
     export SPACK_DISABLE_LOCAL_CONFIG=""
     export SPACK_USER_CACHE_PATH="${spack_user_cache}"
-    mkdir -p ${spack_user_cache}
+    mkdir -p "${spack_user_cache}"
 
     # generate cmake cache file with uberenv and radiuss spack package
     timed_message "Spack setup and environment"
-    ${uberenv_cmd} --setup-and-env-only --spec="${spec}" ${prefix_opt}
+    "${uberenv_cmd}" --setup-and-env-only --spec="${spec}" ${prefix_opt}
 
     if [[ -n ${ci_registry_token} ]]
     then
         timed_message "GitLab registry as Spack Buildcache"
-        ${spack_cmd} -D ${spack_env_path} mirror add --unsigned --oci-username-variable ci_registry_user --oci-password-variable ci_registry_token gitlab_ci oci://${ci_registry_image}
+        "${spack_cmd}" -D "${spack_env_path}" mirror add --unsigned --oci-username-variable ci_registry_user --oci-password-variable ci_registry_token gitlab_ci oci://${ci_registry_image}
     fi
 
     timed_message "Spack build of dependencies"
-    ${uberenv_cmd} --skip-setup-and-env --spec="${spec}" ${prefix_opt}
+    "${uberenv_cmd}" --skip-setup-and-env --spec="${spec}" ${prefix_opt}
 
     if [[ -n ${ci_registry_token} && ${push_to_registry} == true ]]
     then
         timed_message "Push dependencies to buildcache"
-        ${spack_cmd} -D ${spack_env_path} buildcache push --only dependencies gitlab_ci
+        "${spack_cmd}" -D "${spack_env_path}" buildcache push --only dependencies gitlab_ci
     fi
 
     timed_message "Dependencies built"
@@ -186,7 +187,7 @@ build_root=${BUILD_ROOT:-"${prefix}"}
 build_dir="${build_root}/build_${hostconfig//.cmake/}"
 install_dir="${build_root}/install_${hostconfig//.cmake/}"
 
-cmake_exe=`grep 'CMake executable' "${hostconfig_path}" | cut -d ':' -f 2 | xargs`
+cmake_exe="$(grep 'CMake executable' "${hostconfig_path}" | cut -d ':' -f 2 | xargs)"
 
 # Build
 if [[ "${option}" != "--deps-only" && "${option}" != "--test-only" ]]
@@ -291,10 +292,17 @@ then
             echo "[Error]: Install directory not found : ${install_dir}" && exit 1
         fi
 
-        cd "${install_dir}/examples/umpire/using-with-cmake"
-        mkdir build && cd build
-        if ! $cmake_exe -C ../host-config.cmake ..; then
-            echo "[Error]: Running $cmake_exe for using-with-cmake test" && exit 1
+        cmake_use_dir="${install_dir}/examples/umpire/using-with-cmake"
+        if [[ ! -d ${cmake_use_dir} ]]
+        then
+            echo "[Error]: CMake test directory not found : ${cmake_test_dir}" && exit 1
+        fi
+
+        mkdir "${cmake_use_dir}/build"
+        cd "${cmake_use_dir}/build"
+
+        if ! "${cmake_exe}" -C ../host-config.cmake ..; then
+            echo "[Error]: Running ${cmake_exe} for using-with-cmake test" && exit 1
         fi
 
         if ! make; then
