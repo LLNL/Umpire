@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 
+if ((BASH_VERSINFO[0] < 4)); then
+    echo "[Error]: Bash version 4 or higher is required." >&2
+    exit 1
+fi
+
+if [[ ! -e /usr/share/lmod/lmod/init/bash ]]; then
+    echo "[Error]: Module initialization script not found." >&2
+    exit 1
+fi
+
 # Initialize modules for users not using bash as a default shell
 if test -e /usr/share/lmod/lmod/init/bash
 then
@@ -40,7 +50,7 @@ export ci_registry_token=${CI_JOB_TOKEN:-"${registry_token}"}
 timed_message ()
 {
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    echo "~ $(date --rfc-3339=seconds) ~ ${1}"
+    echo "~ $(date "+%Y-%m-%d %H:%M:%S") ~ ${1}"
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 }
 
@@ -60,7 +70,9 @@ fi
 if [[ -n ${module_list} ]]
 then
     timed_message "Modules to load: ${module_list}"
-    module load ${module_list}
+    for module in ${module_list}; do
+        module load "${module}"
+    done
 fi
 
 prefix=""
@@ -85,7 +97,7 @@ fi
 echo "Creating directory ${prefix}"
 echo "project_dir: ${project_dir}"
 
-mkdir -p ${prefix}
+mkdir -p "${prefix}"
 
 spack_cmd="${prefix}/spack/bin/spack"
 spack_env_path="${prefix}/spack_env"
@@ -144,7 +156,7 @@ if [[ -z ${hostconfig} ]]
 then
     # If no host config file was provided, we assume it was generated.
     # This means we are looking of a unique one in project dir.
-    hostconfigs=( $( ls "${project_dir}/"*.cmake ) )
+    hostconfigs=( "${project_dir}"/*.cmake )
     if [[ ${#hostconfigs[@]} == 1 ]]
     then
         hostconfig_path=${hostconfigs[0]}
@@ -164,7 +176,7 @@ else
     hostconfig_path="${project_dir}/${hostconfig}"
 fi
 
-hostconfig=$(basename ${hostconfig_path})
+hostconfig=$(basename "${hostconfig_path}")
 echo "[Information]: Found hostconfig ${hostconfig_path}"
 
 # Build Directory
@@ -174,7 +186,7 @@ build_root=${BUILD_ROOT:-"${prefix}"}
 build_dir="${build_root}/build_${hostconfig//.cmake/}"
 install_dir="${build_root}/install_${hostconfig//.cmake/}"
 
-cmake_exe=`grep 'CMake executable' ${hostconfig_path} | cut -d ':' -f 2 | xargs`
+cmake_exe=`grep 'CMake executable' "${hostconfig_path}" | cut -d ':' -f 2 | xargs`
 
 # Build
 if [[ "${option}" != "--deps-only" && "${option}" != "--test-only" ]]
@@ -192,12 +204,17 @@ then
     # Map CPU core allocations
     declare -A core_counts=(["lassen"]=40 ["ruby"]=28 ["poodle"]=28 ["corona"]=32 ["rzansel"]=48 ["tioga"]=32)
 
+    cores=${core_counts[$truehostname]:-$(nproc)}
+
     # If building, then delete everything first
-    # NOTE: 'cmake --build . -j core_counts' attempts to reduce individual build resources.
-    #       If core_counts does not contain hostname, then will default to '-j ', which should
-    #       use max cores.
-    rm -rf ${build_dir} 2>/dev/null
-    mkdir -p ${build_dir} && cd ${build_dir}
+    if [[ -n "${build_dir}" ]]; then
+        rm -rf "${build_dir}" 2>/dev/null
+    else
+        echo "[Error]: Build directory is not set." >&2
+        exit 1
+    fi
+    mkdir -p "${build_dir}" || { echo "[Error]: Failed to create build directory: ${build_dir}" >&2; exit 1; }
+    cd "${build_dir}" || { echo "[Error]: Failed to change directory to: ${build_dir}" >&2; exit 1; }
 
     timed_message "Building Umpire"
     # We set the MPI tests command to allow overlapping.
@@ -210,11 +227,11 @@ then
     fi
 
     $cmake_exe \
-      -C ${hostconfig_path} \
+      -C "${hostconfig_path}" \
       ${cmake_options} \
       -DCMAKE_INSTALL_PREFIX=${install_dir} \
-      ${project_dir}
-    if ! $cmake_exe --build . -j ${core_counts[$truehostname]}
+      "${project_dir}"
+    if ! $cmake_exe --build . -j ${cores}
     then
         echo "[Error]: Compilation failed, building with verbose output..."
         timed_message "Re-building with --verbose"
@@ -228,7 +245,7 @@ then
 fi
 
 # Test
-if [[ "${option}" != "--build-only" ]] && grep -q -i "ENABLE_TESTS.*ON" ${hostconfig_path}
+if [[ "${option}" != "--build-only" ]] && grep -q -i "ENABLE_TESTS.*ON" "${hostconfig_path}"
 then
 
     if [[ ! -d ${build_dir} ]]
@@ -236,13 +253,13 @@ then
         echo "[Error]: Build directory not found : ${build_dir}" && exit 1
     fi
 
-    cd ${build_dir}
+    cd "${build_dir}"
 
     timed_message "Testing Umpire"
     ctest --output-on-failure --no-compress-output -T test -VV 2>&1 | tee tests_output.txt
 
     # If Developer benchmarks enabled, run the no-op benchmark and show output
-    if [[ "${option}" != "--build-only" ]] && grep -q -i "UMPIRE_ENABLE_DEVELOPER_BENCHMARKS.*ON" ${hostconfig_path}
+    if [[ "${option}" != "--build-only" ]] && grep -q -i "UMPIRE_ENABLE_DEVELOPER_BENCHMARKS.*ON" "${hostconfig_path}"
     then
         date
         ctest --verbose -C Benchmark -R no-op_stress_test
@@ -257,15 +274,15 @@ then
 
     timed_message "Preparing tests xml reports for export"
     tree Testing
-    xsltproc -o junit.xml ${project_dir}/scripts/radiuss-spack-configs/utilities/ctest-to-junit.xsl Testing/*/Test.xml
-    mv junit.xml ${project_dir}/junit.xml
+    xsltproc -o junit.xml "${project_dir}/scripts/radiuss-spack-configs/utilities/ctest-to-junit.xsl" Testing/*/Test.xml
+    mv junit.xml "${project_dir}/junit.xml"
 
     if grep -q "Errors while running CTest" ./tests_output.txt
     then
         echo "[Error]: Failure(s) while running CTest" && exit 1
     fi
 
-    if grep -q -i "ENABLE_HIP.*ON" ${hostconfig_path}
+    if grep -q -i "ENABLE_HIP.*ON" "${hostconfig_path}"
     then
         echo "[Warning]: Not testing install with HIP"
     else
@@ -274,7 +291,7 @@ then
             echo "[Error]: Install directory not found : ${install_dir}" && exit 1
         fi
 
-        cd ${install_dir}/examples/umpire/using-with-cmake
+        cd "${install_dir}/examples/umpire/using-with-cmake"
         mkdir build && cd build
         if ! $cmake_exe -C ../host-config.cmake ..; then
             echo "[Error]: Running $cmake_exe for using-with-cmake test" && exit 1
@@ -291,6 +308,8 @@ fi
 #timed_message "Cleaning up"
 #make clean
 
-cd ${project_dir}
+cd "${project_dir}"
 
 timed_message "Build and test completed"
+
+date "+%Y-%m-%d %H:%M:%S"
