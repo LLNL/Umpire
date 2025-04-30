@@ -1,3 +1,10 @@
+##############################################################################
+# Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
+# project contributors. See the COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: (MIT)
+##############################################################################
+
 ignore:
   - "src/umpire/tpl/conduit"
   - "src/umpire/tpl/cxxopts"

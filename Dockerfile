@@ -1,3 +1,10 @@
+##############################################################################
+# Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
+# project contributors. See the COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: (MIT)
+##############################################################################
+
 FROM ghcr.io/llnl/radiuss:ubuntu-22.04-gcc-13 AS gcc
 ENV GTEST_COLOR=1
 COPY . /home/umpire/workspace
