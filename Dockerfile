@@ -1,8 +1,8 @@
-##############################################################################
-# Copyright (c) Umpire Project Developers. See the COPYRIGHT file for details.
+#############################################################################################
+# Copyright (c) Lawrence Livermore National Security LLC. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
-##############################################################################
+#############################################################################################
 
 FROM ghcr.io/llnl/radiuss:ubuntu-22.04-gcc-13 AS gcc
 ENV GTEST_COLOR=1
