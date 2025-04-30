@@ -128,6 +128,20 @@ struct s_umpire_strategy_fixedpool {
 };
 typedef struct s_umpire_strategy_fixedpool umpire_strategy_fixedpool;
 
+// helper capsule_umpire_strategy_mixedpool
+struct s_umpire_strategy_mixedpool {
+    void *addr;     /* address of C++ memory */
+    int idtor;      /* index of destructor */
+};
+typedef struct s_umpire_strategy_mixedpool umpire_strategy_mixedpool;
+
+// helper capsule_umpire_strategy_monotonicallocationstrategy
+struct s_umpire_strategy_monotonicallocationstrategy {
+    void *addr;     /* address of C++ memory */
+    int idtor;      /* index of destructor */
+};
+typedef struct s_umpire_strategy_monotonicallocationstrategy umpire_strategy_monotonicallocationstrategy;
+
 // helper capsule_umpire_strategy_namedallocationstrategy
 struct s_umpire_strategy_namedallocationstrategy {
     void *addr;     /* address of C++ memory */
@@ -135,12 +149,40 @@ struct s_umpire_strategy_namedallocationstrategy {
 };
 typedef struct s_umpire_strategy_namedallocationstrategy umpire_strategy_namedallocationstrategy;
 
+// helper capsule_umpire_strategy_namingshim
+struct s_umpire_strategy_namingshim {
+    void *addr;     /* address of C++ memory */
+    int idtor;      /* index of destructor */
+};
+typedef struct s_umpire_strategy_namingshim umpire_strategy_namingshim;
+
 // helper capsule_umpire_strategy_quickpool
 struct s_umpire_strategy_quickpool {
     void *addr;     /* address of C++ memory */
     int idtor;      /* index of destructor */
 };
 typedef struct s_umpire_strategy_quickpool umpire_strategy_quickpool;
+
+// helper capsule_umpire_strategy_resourceawarepool
+struct s_umpire_strategy_resourceawarepool {
+    void *addr;     /* address of C++ memory */
+    int idtor;      /* index of destructor */
+};
+typedef struct s_umpire_strategy_resourceawarepool umpire_strategy_resourceawarepool;
+
+// helper capsule_umpire_strategy_sizelimiter
+struct s_umpire_strategy_sizelimiter {
+    void *addr;     /* address of C++ memory */
+    int idtor;      /* index of destructor */
+};
+typedef struct s_umpire_strategy_sizelimiter umpire_strategy_sizelimiter;
+
+// helper capsule_umpire_strategy_slotpool
+struct s_umpire_strategy_slotpool {
+    void *addr;     /* address of C++ memory */
+    int idtor;      /* index of destructor */
+};
+typedef struct s_umpire_strategy_slotpool umpire_strategy_slotpool;
 
 // helper capsule_umpire_strategy_threadsafeallocator
 struct s_umpire_strategy_threadsafeallocator {
