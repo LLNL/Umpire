@@ -34,7 +34,7 @@ Contributors
 ~~~~~~~~~~~~
 
 - **Definition**: Individuals who contribute to the project, including code, documentation, and other assets.
-- **Members**: See the list of contributors for Umpire `here<https://github.com/LLNL/Umpire/graphs/contributors>`_.
+- **Members**: See the list of contributors for Umpire `here <https://github.com/LLNL/Umpire/graphs/contributors>`_.
 - **Responsibilities**:
 
   - Following the contribution guidelines.
