@@ -24,10 +24,10 @@ Project Maintainers
 
 - **Definition**: A group of trusted contributors responsible for the overall direction and health of the project and who may be members of the Technical Steering Committee (see below).
 - **Responsibilities**:
-  -Reviewing and merging pull requests.
-  -Ensuring the project adheres to its code of conduct.
-  -Managing releases and ensuring high-quality standards.
-  -Facilitating discussions and resolving project issues.
+  - Reviewing and merging pull requests.
+  - Ensuring the project adheres to its code of conduct.
+  - Managing releases and ensuring high-quality standards.
+  - Facilitating discussions and resolving project issues.
 
 Contributors
 ~~~~~~~~~~~~
@@ -35,9 +35,9 @@ Contributors
 - **Definition**: Individuals who contribute to the project, including code, documentation, and other assets.
 - **Members**: See the list of contributors for Umpire `here<https://github.com/LLNL/Umpire/graphs/contributors>`_.
 - **Responsibilities**:
-  -Following the contribution guidelines.
-  -Participating in discussions and code reviews.
-  -Reporting issues and suggesting improvements.
+  - Following the contribution guidelines.
+  - Participating in discussions and code reviews.
+  - Reporting issues and suggesting improvements.
 
 Technical Steering Committee
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -45,9 +45,9 @@ Technical Steering Committee
 - **Definition**: A subset of maintainers responsible for making high-level decisions.
 - **Members**: David Beckingsale and Kristi Belcher
 - **Responsibilities**:
-  -Setting the long-term technical and community goals of the project.
-  -Deciding on major feature inclusions and deprecations.
-  -Resolving escalated bug fix or feature request disputes.
+  - Setting the long-term technical and community goals of the project.
+  - Deciding on major feature inclusions and deprecations.
+  - Resolving escalated bug fix or feature request disputes.
 
 Decision-Making Process
 =======================
