@@ -5,7 +5,7 @@
 .. # SPDX-License-Identifier: (MIT)
 .. ##############################################################################
 
-.. _tutorial:
+.. _governance-policy:
 
 =================
 Governance Policy
@@ -72,7 +72,7 @@ Pull Requests
 
 - Contributions are made via pull requests (PRs).
 - PRs must be reviewed by at least one maintainer before merging.
-- See the Contribution guide `here<https://github.com/LLNL/Umpire/blob/develop/CONTRIBUTING.md>`_.
+- See the Contribution guide `here <https://github.com/LLNL/Umpire/blob/develop/CONTRIBUTING.md>`_.
 
 Issues
 ~~~~~~
@@ -83,7 +83,7 @@ Issues
 Code of Conduct
 ~~~~~~~~~~~~~~~
 
-- All contributors must adhere to the project's `Code of Conduct<https://github.com/LLNL/Umpire/blob/develop/CODE_OF_CONDUCT.md>`_.
+- All contributors must adhere to the project's `Code of Conduct <https://github.com/LLNL/Umpire/blob/develop/CODE_OF_CONDUCT.md>`_.
 
 Release Management
 ==================
@@ -95,13 +95,13 @@ Regular Releases
 - Each release includes a summary of changes, new features, and bug fixes.
 - Umpire maintainers will coordinate project releases according to the release schedule. 
 - Releases are coordinated with the RAJA and Camp teams as part of timely RAJA Portability Suite releases. 
-- The release names will correspond to the release names of RAJA and Camp as part of this process. Once the release has been merged, it will be published in the `Releases<https://github.com/LLNL/Umpire/releases>`_ section of the repo. 
+- The release names will correspond to the release names of RAJA and Camp as part of this process. Once the release has been merged, it will be published in the `Releases <https://github.com/LLNL/Umpire/releases>`_ section of the repo. 
 
 Communication Channels
 ======================
 
 - The primary communication channel is the GitHub repository (issues, PR comments).
-- Other channels may include mailing lists and Slack (See the `README<https://github.com/LLNL/Umpire/blob/develop/README.md>`_ for details).
+- Other channels may include mailing lists and Slack (See the `README <https://github.com/LLNL/Umpire/blob/develop/README.md>`_ for details).
 
 Amendments
 ==========
