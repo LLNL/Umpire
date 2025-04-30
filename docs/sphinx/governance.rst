@@ -14,7 +14,7 @@ Governance Policy
 Introduction
 ============
 
-Umpire is an application-focused API for memory management on NUMA & GPU architectures. This governance policy outlines the rules and processes that guide the development, contributions, and decision-making of the Umpire project.
+Umpire is an application-focused API for memory management on NUMA & GPU architectures. This governance policy outlines the rules and processes that guide the development, contributions, and decision making of the Umpire project.
 
 Roles and Responsibilities
 ==========================
@@ -52,7 +52,7 @@ Technical Steering Committee
   - Deciding on major feature inclusions and deprecations.
   - Resolving escalated bug fix or feature request disputes.
 
-Decision-Making Process
+Decision Making Process
 =======================
 
 Consensus-Based Decision Making
