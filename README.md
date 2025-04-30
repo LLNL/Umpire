@@ -71,9 +71,7 @@ If you are referencing Umpire in a publication, please use the following citatio
 # Release
 
 Umpire is released under an MIT license. For more details, please see the
-[LICENSE](./LICENSE) and [RELEASE](./RELEASE) files.
-
-See the [COPYRIGHT](./COPYRIGHT) file for details.
+[LICENSE](./LICENSE), [RELEASE](./RELEASE), and [COPYRIGHT](./COPYRIGHT) files.
 
 `LLNL-CODE-747640`
 `OCEC-18-031`
