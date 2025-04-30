@@ -73,7 +73,7 @@ If you are referencing Umpire in a publication, please use the following citatio
 Umpire is released under an MIT license. For more details, please see the
 [LICENSE](./LICENSE) and [RELEASE](./RELEASE) files.
 
-Copyright (c) 2016-25, Lawrence Livermore National Security LLC
+Copyright (c) Umpire Project Developers. See the COPYRIGHT file for details.
 
 `LLNL-CODE-747640`
 `OCEC-18-031`

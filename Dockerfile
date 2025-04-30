@@ -1,6 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
-# project contributors. See the COPYRIGHT file for details.
+# Copyright (c) Umpire Project Developers. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
