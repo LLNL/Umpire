@@ -33,3 +33,4 @@ that have introspection disabled for improved performance, and applying CUDA
    cookbook/shared_memory_allocators.rst
    cookbook/naming_shim.rst
    cookbook/strategy_name.rst
+   cookbook/device_ipc.rst
