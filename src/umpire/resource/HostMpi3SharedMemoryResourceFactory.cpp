@@ -16,7 +16,8 @@ namespace resource {
 
 bool HostMpi3SharedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name) noexcept
 {
-  if (name == "SHARED" || name == "SHARED_MPI3") {
+  if (name == "SHARED_MPI3" || 
+      (name == "SHARED" && std::string(UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE) == "MPI3")) {
     return true;
   } else {
     return false;
