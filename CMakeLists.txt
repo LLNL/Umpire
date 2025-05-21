@@ -95,10 +95,8 @@ cmake_dependent_option( UMPIRE_ENABLE_IPC_SHARED_MEMORY "Enable Host Shared Memo
 
 cmake_dependent_option( UMPIRE_ENABLE_MPI3_SHARED_MEMORY "Enable MPI3 Shared Memory Resource" Off "${ENABLE_MPI}" Off)
 
-if (UMPIRE_ENABLE_IPC_SHARED_MEMORY AND UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
-  message(FATAL_ERROR "Please select one shared memory option"
-        "(UMPIRE_ENABLE_IPC_SHARED_MEMORY OR UMPIRE_ENABLE_MPI3_SHARED_MEMORY)")
-endif ()
+# Both shared memory options can now be enabled simultaneously
+# When both are enabled, MPI3 will be the default "SHARED" implementation
 
 cmake_dependent_option( UMPIRE_ENABLE_TESTS "Build Umpire tests" On
                        "ENABLE_TESTS" Off )

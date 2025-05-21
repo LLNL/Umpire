@@ -51,12 +51,12 @@ class SharedMemoryTest : public ::testing::Test {
 
     if (shmem_resource == nullptr) {
       auto& rm = umpire::ResourceManager::getInstance();
-      auto traits{umpire::get_default_resource_traits("SHARED")};
+      auto traits{umpire::get_default_resource_traits("SHARED_POSIX")};
       ASSERT_EQ(traits.scope, umpire::MemoryResourceTraits::shared_scope::node);
       ASSERT_EQ(traits.resource, umpire::MemoryResourceTraits::resource_type::shared);
 
       traits.size = m_segment_size;
-      ASSERT_NO_THROW(allocator = rm.makeResource("SHARED::node_allocator", traits););
+      ASSERT_NO_THROW(allocator = rm.makeResource("SHARED_POSIX::node_allocator", traits););
       auto base_strategy = allocator.getAllocationStrategy();
       shmem_resource = dynamic_cast<umpire::resource::HostSharedMemoryResource*>(base_strategy);
       MPI_Barrier(MPI_COMM_WORLD);
