@@ -16,7 +16,7 @@ namespace resource {
 
 bool HostSharedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name) noexcept
 {
-  if (name.find("SHARED_POSIX") != std::string::npos ||
+  if (name == "SHARED::POSIX" ||
       (name.find("SHARED::") != std::string::npos && std::string(UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE) == "POSIX")) {
     return true;
   } else {

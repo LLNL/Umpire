@@ -98,7 +98,7 @@ MemoryResourceRegistry::MemoryResourceRegistry() : m_allocator_factories()
 
 #if defined(UMPIRE_ENABLE_IPC_SHARED_MEMORY)
   registerMemoryResource(util::make_unique<resource::HostSharedMemoryResourceFactory>());
-  m_resource_names.push_back("SHARED_POSIX");
+  m_resource_names.push_back("SHARED::POSIX");
   if (std::string(UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE) == "POSIX") {
     m_resource_names.push_back("SHARED");
   }
@@ -106,7 +106,7 @@ MemoryResourceRegistry::MemoryResourceRegistry() : m_allocator_factories()
 
 #if defined(UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
   registerMemoryResource(util::make_unique<resource::HostMpi3SharedMemoryResourceFactory>());
-  m_resource_names.push_back("SHARED_MPI3");
+  m_resource_names.push_back("SHARED::MPI3");
   if (std::string(UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE) == "MPI3") {
     m_resource_names.push_back("SHARED");
   }
