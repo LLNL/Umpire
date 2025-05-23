@@ -63,6 +63,7 @@ UMPIRE_EXPORT extern int    UMPIRE_VERSION_SYM;
 
 namespace umpire {
 constexpr int invalid_allocator_id = 0xDEADBEE;
+constexpr const char* default_shared_memory_resource = UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE;
 }
 
 #endif

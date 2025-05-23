@@ -10,18 +10,14 @@
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/error.hpp"
 #include "umpire/util/make_unique.hpp"
+#include "umpire/util/shared_memory_helper.hpp"
 
 namespace umpire {
 namespace resource {
 
 bool HostSharedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name) noexcept
 {
-  if (name == "SHARED::POSIX" ||
-      (name.find("SHARED::") != std::string::npos && std::string(UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE) == "POSIX")) {
-    return true;
-  } else {
-    return false;
-  }
+  return umpire::util::matchesSharedMemoryResource(name, "POSIX");
 }
 
 std::unique_ptr<resource::MemoryResource> HostSharedMemoryResourceFactory::create(const std::string& name, int id)
