@@ -1,3 +1,9 @@
+#############################################################################################
+# Copyright (c) Lawrence Livermore National Security LLC. See the COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: (MIT)
+#############################################################################################
+
 ifeq ($(DEBUG),1)
 	DebugArgs=--progress plain
 else
