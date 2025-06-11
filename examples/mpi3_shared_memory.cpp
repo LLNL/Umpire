@@ -1,8 +1,10 @@
-#include <iostream>
 #include <mpi.h>
+
+#include <iostream>
+
 #include "umpire/Allocator.hpp"
-#include "umpire/Umpire.hpp"
 #include "umpire/ResourceManager.hpp"
+#include "umpire/Umpire.hpp"
 #include "umpire/config.hpp"
 #include "umpire/resource/HostMpi3SharedMemoryResource.hpp"
 #include "umpire/strategy/NamedAllocationStrategy.hpp"
