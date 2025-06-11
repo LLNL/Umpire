@@ -200,22 +200,26 @@ std::size_t get_device_memory_usage(int device_id)
   int current_device;
   cudaError_t err = cudaGetDevice(&current_device);
   if (err != cudaSuccess) {
-     UMPIRE_ERROR(umpire::runtime_error, fmt::format("Error when trying to get CUDA Device: {}", cudaGetErrorString(err)));
+    UMPIRE_ERROR(umpire::runtime_error,
+                 fmt::format("Error when trying to get CUDA Device: {}", cudaGetErrorString(err)));
   }
 
   err = cudaSetDevice(device_id);
   if (err != cudaSuccess) {
-     UMPIRE_ERROR(umpire::runtime_error, fmt::format("Error when trying to set CUDA Device: {}", cudaGetErrorString(err)));
+    UMPIRE_ERROR(umpire::runtime_error,
+                 fmt::format("Error when trying to set CUDA Device: {}", cudaGetErrorString(err)));
   }
 
   err = cudaMemGetInfo(&mem_free, &mem_tot);
   if (err != cudaSuccess) {
-     UMPIRE_ERROR(umpire::runtime_error, fmt::format("Error when trying to get CUDA Device Info: {}", cudaGetErrorString(err)));
+    UMPIRE_ERROR(umpire::runtime_error,
+                 fmt::format("Error when trying to get CUDA Device Info: {}", cudaGetErrorString(err)));
   }
 
   err = cudaSetDevice(current_device);
   if (err != cudaSuccess) {
-     UMPIRE_ERROR(umpire::runtime_error, fmt::format("Error when trying to set CUDA Device: {}", cudaGetErrorString(err)));
+    UMPIRE_ERROR(umpire::runtime_error,
+                 fmt::format("Error when trying to set CUDA Device: {}", cudaGetErrorString(err)));
   }
 
   return std::size_t{mem_tot - mem_free};
@@ -226,22 +230,23 @@ std::size_t get_device_memory_usage(int device_id)
   int current_device;
   hipError_t err = hipGetDevice(&current_device);
   if (err != hipSuccess) {
-     UMPIRE_ERROR(umpire::runtime_error, fmt::format("Error when trying to get HIP Device: {}", hipGetErrorString(err)));
+    UMPIRE_ERROR(umpire::runtime_error, fmt::format("Error when trying to get HIP Device: {}", hipGetErrorString(err)));
   }
 
   err = hipSetDevice(device_id);
   if (err != hipSuccess) {
-     UMPIRE_ERROR(umpire::runtime_error, fmt::format("Error when trying to set HIP Device: {}", hipGetErrorString(err)));
+    UMPIRE_ERROR(umpire::runtime_error, fmt::format("Error when trying to set HIP Device: {}", hipGetErrorString(err)));
   }
 
   err = hipMemGetInfo(&mem_free, &mem_tot);
   if (err != hipSuccess) {
-     UMPIRE_ERROR(umpire::runtime_error, fmt::format("Error when trying to get HIP Device info: {}", hipGetErrorString(err)));
+    UMPIRE_ERROR(umpire::runtime_error,
+                 fmt::format("Error when trying to get HIP Device info: {}", hipGetErrorString(err)));
   }
 
   err = hipSetDevice(current_device);
   if (err != hipSuccess) {
-     UMPIRE_ERROR(umpire::runtime_error, fmt::format("Error when trying to set HIP Device: {}", hipGetErrorString(err)));
+    UMPIRE_ERROR(umpire::runtime_error, fmt::format("Error when trying to set HIP Device: {}", hipGetErrorString(err)));
   }
 
   return std::size_t{mem_tot - mem_free};
