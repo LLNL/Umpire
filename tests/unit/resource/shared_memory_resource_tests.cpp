@@ -192,7 +192,7 @@ TEST_F(SharedMemoryTest, UnitTests)
 
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     for (std::size_t i{0}; i < allocs.size(); i++) {
-      if (i % size != m_rank)
+      if (int(i % size) != m_rank)
         continue;
 
       ArrayElement* buffer{allocs[i]};

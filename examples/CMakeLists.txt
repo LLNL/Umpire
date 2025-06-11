@@ -12,6 +12,17 @@ if (UMPIRE_ENABLE_OPENMP_TARGET)
       openmp)
 endif()
 
+if (UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
+  if (UMPIRE_ENABLE_MPI)
+    blt_add_executable(
+      NAME mpi3_shared_memory
+      SOURCES mpi3_shared_memory.cpp
+      DEPENDS_ON ${example_depends})
+    list(APPEND umpire_examples mpi3_shared_memory)
+  endif()
+endif()
+
+
 blt_add_executable(
   NAME aligned_allocator
   SOURCES aligned_allocator.cpp
