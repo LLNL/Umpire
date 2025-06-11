@@ -21,8 +21,8 @@ inline bool matchesSharedMemoryResource(const std::string& name, const std::stri
     return true;
   }
 
-  // Check if name starts with "SHARED::" and this resource_type is the default
-  if (name.find("SHARED::") == 0) {
+  // Check if name starts with "SHARED::" or "SHARED" AND that this resource_type is the default
+  if ((name.find("SHARED::") == 0) || (name == "SHARED")) {
 #ifdef UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE
     return std::string(UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE) == resource_type;
 #else
