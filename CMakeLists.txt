@@ -92,11 +92,11 @@ cmake_dependent_option( UMPIRE_ENABLE_IPC_SHARED_MEMORY "Enable Host Shared Memo
                        "NOT WIN32;NOT APPLE" Off )
 
 # NOTE: MPI3 Shared Memory will be turned on if mpi is enabled AND IPC shared memory is disabled
-cmake_dependent_option( UMPIRE_ENABLE_MPI3_SHARED_MEMORY "Enable MPI3 Shared Memory Resource" Off "ENABLE_MPI;NOT UMPIRE_ENABLE_IPC_SHARED_MEMORY" Off)
+cmake_dependent_option( UMPIRE_ENABLE_MPI3_SHARED_MEMORY "Enable MPI3 Shared Memory Resource" Off "${ENABLE_MPI};NOT ${UMPIRE_ENABLE_IPC_SHARED_MEMORY}" Off)
 
 # Both shared memory options can now be enabled simultaneously
 # User can select which implementation responds to "SHARED"
-set(UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE "MPI3" CACHE STRING "Default implementation for SHARED memory resource (POSIX or MPI3)")
+set(UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE "POSIX" CACHE STRING "Default implementation for SHARED memory resource (POSIX or MPI3)")
 set_property(CACHE UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE PROPERTY STRINGS "POSIX" "MPI3")
 
 if (UMPIRE_ENABLE_IPC_SHARED_MEMORY OR UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
