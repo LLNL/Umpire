@@ -22,7 +22,6 @@ if (UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
   endif()
 endif()
 
-
 blt_add_executable(
   NAME aligned_allocator
   SOURCES aligned_allocator.cpp
