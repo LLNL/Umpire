@@ -116,7 +116,7 @@ if (NOT TARGET camp)
     set_target_properties(camp PROPERTIES IMPORTED_GLOBAL TRUE)
   else ()
     # In this case, camp will be installed inside of Umpire install prefix
-    set(camp_DIR ${CMAKE_INSTALL_PREFIX} CACHE PATH "")
+    set(UMPIRE_INTERNAL_camp_DIR ${CMAKE_INSTALL_PREFIX} CACHE PATH "")
     add_subdirectory(umpire/camp)
   endif()
 
@@ -150,7 +150,7 @@ if (NOT TARGET ${UMPIRE_FMT_TARGET})
       message(FATAL_ERROR "fmt submodule not initialized. Run 'git submodule update --init --recursive' in the git repository or set fmt_DIR to use an external build of fmt.")
     else ()
       # In this case, fmt will be installed inside of Umpire install prefix
-      set(fmt_DIR ${CMAKE_INSTALL_PREFIX} CACHE PATH "")
+      set(UMPIRE_INTERNAL_fmt_DIR ${CMAKE_INSTALL_PREFIX} CACHE PATH "")
       set(FMT_INSTALL ON)
       set(FMT_SYSTEM_HEADERS ON)
       add_subdirectory(umpire/fmt)
