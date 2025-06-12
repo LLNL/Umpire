@@ -150,7 +150,6 @@ if (NOT TARGET ${UMPIRE_FMT_TARGET})
       message(FATAL_ERROR "fmt submodule not initialized. Run 'git submodule update --init --recursive' in the git repository or set fmt_DIR to use an external build of fmt.")
     else ()
       # In this case, fmt will be installed inside of Umpire install prefix
-      set(fmt_DIR ${CMAKE_INSTALL_PREFIX} CACHE PATH "")
       set(FMT_INSTALL ON)
       set(FMT_SYSTEM_HEADERS ON)
       add_subdirectory(umpire/fmt)
