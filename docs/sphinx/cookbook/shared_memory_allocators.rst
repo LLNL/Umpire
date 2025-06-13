@@ -90,6 +90,6 @@ example could be easily adapted to the MPI3 Shared Memory type if needed.
 The following example shows how to create, use, and verify the MPI3 Shared Memory Allocator. Note that although the Shared Memory
 allocator has a name in this example, it does not need one for MPI3 Shared Memory to work.
 
-.. literalinclude:: ../.././examples/mpi3_shared_memory.cpp
+.. literalinclude:: ../../../examples/mpi3_shared_memory.cpp
    :language: cpp
 
