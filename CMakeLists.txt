@@ -115,7 +115,7 @@ if(NOT DEFINED UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE)
     set(UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE "MPI3" CACHE STRING "Default implementation for SHARED memory resource (MPI3)")
   else()
     # Either both or neither enabled - default to POSIX
-    set(UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE "POSIX" CACHE STRING "Default implementation for SHARED memory resource (POSIX)")
+    set(UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE "MPI3" CACHE STRING "Default implementation for SHARED memory resource (MPI3)")
   endif()
 endif()
 
