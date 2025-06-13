@@ -744,17 +744,16 @@ TEST(AlignedAllocator, BadAlignment)
       },
       umpire::runtime_error);
 }
-
 #if defined(UMPIRE_ENABLE_IPC_SHARED_MEMORY)
 TEST(NamingShimTests, TestAllocateDeallocate)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  auto traits{umpire::get_default_resource_traits("SHARED")};
+  auto traits{umpire::get_default_resource_traits("SHARED::POSIX")};
   traits.size = 1 * 1024 * 1024;
   traits.scope = umpire::MemoryResourceTraits::shared_scope::node;
 
-  auto node_allocator{rm.makeResource("SHARED::shim_allocator", traits)};
+  auto node_allocator{rm.makeResource("SHARED::POSIX::shim_allocator", traits)};
 
   auto shim{rm.makeAllocator<umpire::strategy::NamingShim>("shim", node_allocator)};
   {
@@ -768,11 +767,11 @@ TEST(NamedAllocatorTest, ForwardName)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  auto traits{umpire::get_default_resource_traits("SHARED")};
+  auto traits{umpire::get_default_resource_traits("SHARED::POSIX")};
   traits.size = 1 * 1024 * 1024;
   traits.scope = umpire::MemoryResourceTraits::shared_scope::node;
 
-  auto node_allocator{rm.makeResource("SHARED::allocator_for_named_test", traits)};
+  auto node_allocator{rm.makeResource("SHARED::POSIX::allocator_for_named_test", traits)};
 
   auto allocator{rm.makeAllocator<umpire::strategy::NamedAllocationStrategy>("shared named alloc", node_allocator)};
   {
