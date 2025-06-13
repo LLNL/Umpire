@@ -63,7 +63,7 @@ Now you can allocate and deallocate shared memory with:
    can instead use the :class:`umpire::strategy::NamingShim` strategy. This allows you to call allocate with only 1 argument
    for the size in bytes. Check out the :doc:`cookbook recipe <../cookbook/naming_shim>` to learn more.
 
-See the bottom of this page for a full example of how to use Shared Memory Allocators with Umpire.
+See the bottom of this page for a full example of how to use IPC Shared Memory Allocators with Umpire.
 
 MPI3 Shared Memory
 ------------------
@@ -74,14 +74,22 @@ uses the MPI3 API for its Shared Memory mechanisms that allow processes to commu
 To use Umpire's MPI3 Shared Memory allocators, the ``UMPIRE_ENABLE_MPI3_SHARED_MEMORY`` flag 
 should be set to ``On``. Note that if you are using MPI3 Shared Memory, then MPI must be enabled.
 
-See the bottom of this page for a full example of how to use Shared Memory Allocators with Umpire.
+See the bottom of this page for a full example of how to use MPI3 Shared Memory Allocators with Umpire.
 
-Full IPC Shared Memory Recipe
------------------------------
+Ful Shared Memory Examples
+--------------------------
 
-The following example shows how to create, use, and destruct the IPC Shared Memory Allocator whether using MPI or not. For an example of using
-MPI3 Shared Memory Allocators, users could simply update the included header file. No other code changes are necessary assuming the input
-parameter specifies MPI for the following example code.
+This section shows two full code examples, one for IPC Shared Memory and one for MPI3.
+
+The following example shows how to create, use, and destruct the IPC Shared Memory Allocator whether using MPI or not. Note that this
+example could be easily adapted to the MPI3 Shared Memory type if needed.
 
 .. literalinclude:: ../../../examples/cookbook/recipe_shared_memory.cpp
    :language: cpp
+
+The following example shows how to create, use, and verify the MPI3 Shared Memory Allocator. Note that although the Shared Memory
+allocator has a name in this example, it does not need one for MPI3 Shared Memory to work.
+
+.. literalinclude:: ../.././examples/mpi3_shared_memory.cpp
+   :language: cpp
+
