@@ -72,22 +72,26 @@ __host__ void destroy_device_allocator();
  * synced up and pointing to each other.
  */
 #if defined(UMPIRE_ENABLE_CUDA)
-#define UMPIRE_SET_UP_DEVICE_ALLOCATORS()                                                                            \
-  {                                                                                                                  \
-    if (umpire::macro_tracking == 0) {                                                                               \
-      UMPIRE_LOG(Debug, "Calling cudaMemcpyToSymbol DeviceAllocator macro.");                                        \
-      cudaMemcpyToSymbol(umpire::UMPIRE_DEV_ALLOCS, &umpire::UMPIRE_DEV_ALLOCS_h, sizeof(umpire::DeviceAllocator*)); \
-    }                                                                                                                \
-    umpire::macro_tracking = 1;                                                                                      \
+#define UMPIRE_SET_UP_DEVICE_ALLOCATORS()                                                                              \
+  {                                                                                                                    \
+    if (umpire::macro_tracking == 0) {                                                                                 \
+      UMPIRE_LOG(Debug, "Calling cudaMemcpyToSymbol DeviceAllocator macro.");                                          \
+      cudaError_t err =                                                                                                \
+        cudaMemcpyToSymbol(umpire::UMPIRE_DEV_ALLOCS, &umpire::UMPIRE_DEV_ALLOCS_h, sizeof(umpire::DeviceAllocator*)); \
+      UMPIRE_USE_VAR(err);                                                                                             \
+    }                                                                                                                  \
+    umpire::macro_tracking = 1;                                                                                        \
   }
 #elif defined(UMPIRE_ENABLE_HIP)
-#define UMPIRE_SET_UP_DEVICE_ALLOCATORS()                                                                           \
-  {                                                                                                                 \
-    if (umpire::macro_tracking == 0) {                                                                              \
-      UMPIRE_LOG(Debug, "Calling hipMemcpyToSymbol DeviceAllocator macro.");                                        \
-      hipMemcpyToSymbol(umpire::UMPIRE_DEV_ALLOCS, &umpire::UMPIRE_DEV_ALLOCS_h, sizeof(umpire::DeviceAllocator*)); \
-    }                                                                                                               \
-    umpire::macro_tracking = 1;                                                                                     \
+#define UMPIRE_SET_UP_DEVICE_ALLOCATORS()                                                                             \
+  {                                                                                                                   \
+    if (umpire::macro_tracking == 0) {                                                                                \
+      UMPIRE_LOG(Debug, "Calling hipMemcpyToSymbol DeviceAllocator macro.");                                          \
+      hipError_t err =                                                                                                \
+        hipMemcpyToSymbol(umpire::UMPIRE_DEV_ALLOCS, &umpire::UMPIRE_DEV_ALLOCS_h, sizeof(umpire::DeviceAllocator*)); \
+      UMPIRE_USE_VAR(err);                                                                                            \
+    }                                                                                                                 \
+    umpire::macro_tracking = 1;                                                                                       \
   }
 #else
 #define UMPIRE_SET_UP_DEVICE_ALLOCATORS()                                              \

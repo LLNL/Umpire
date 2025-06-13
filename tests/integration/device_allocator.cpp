@@ -81,10 +81,18 @@ TEST_P(DeviceAllocator, LaunchKernelTest)
 
 #if defined(UMPIRE_ENABLE_CUDA)
   tester_by_name<<<1, 16>>>(data_ptr, str_index);
-  cudaDeviceSynchronize();
+  cudaError_t err = cudaDeviceSynchronize();
+  if (err != cudaSuccess) {
+    UMPIRE_ERROR(umpire::runtime_error,
+                 fmt::format("Error when trying to sync CUDA Device: {}", cudaGetErrorString(err)));
+  }
 #elif defined(UMPIRE_ENABLE_HIP)
   hipLaunchKernelGGL(tester_by_name, dim3(1), dim3(16), 0, 0, data_ptr, str_index);
-  hipDeviceSynchronize();
+  hipError_t err = hipDeviceSynchronize();
+  if (err != hipSuccess) {
+    UMPIRE_ERROR(umpire::runtime_error,
+                 fmt::format("Error when trying to sync HIP Device: {}", hipGetErrorString(err)));
+  }
 #endif
 
   ASSERT_EQ(*data_ptr[0], NUM);
@@ -96,10 +104,18 @@ TEST_P(DeviceAllocator, LaunchKernelTest)
 
 #if defined(UMPIRE_ENABLE_CUDA)
   tester_by_ID<<<1, 16>>>(data_ptr, str_index);
-  cudaDeviceSynchronize();
+  err = cudaDeviceSynchronize();
+  if (err != cudaSuccess) {
+    UMPIRE_ERROR(umpire::runtime_error,
+                 fmt::format("Error when trying to sync CUDA Device: {}", cudaGetErrorString(err)));
+  }
 #elif defined(UMPIRE_ENABLE_HIP)
   hipLaunchKernelGGL(tester_by_ID, dim3(1), dim3(16), 0, 0, data_ptr, my_da.getID());
-  hipDeviceSynchronize();
+  err = hipDeviceSynchronize();
+  if (err != hipSuccess) {
+    UMPIRE_ERROR(umpire::runtime_error,
+                 fmt::format("Error when trying to sync HIP Device: {}", hipGetErrorString(err)));
+  }
 #endif
 
   ASSERT_EQ(my_da.getCurrentSize(), sizeof(double));
