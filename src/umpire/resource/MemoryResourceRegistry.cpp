@@ -148,7 +148,7 @@ MemoryResourceRegistry::MemoryResourceRegistry() : m_allocator_factories()
     int device_count{0};
     error = ::hipGetDeviceCount(&device_count);
     if (error != hipSuccess) {
-      UMPIRE_ERROR(umpire::runtime_error, fmt::format("Error when trying to get HIP device count: {}", hipGetErrorString(error)));
+      UMPIRE_ERROR(umpire::runtime_error, fmt::format("Error!Can't get HIP device count: {}", hipGetErrorString(error)));
     } else {
       registerMemoryResource(util::make_unique<resource::HipDeviceResourceFactory>());
       m_resource_names.push_back("DEVICE");
