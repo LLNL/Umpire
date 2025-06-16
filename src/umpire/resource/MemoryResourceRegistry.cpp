@@ -148,7 +148,7 @@ MemoryResourceRegistry::MemoryResourceRegistry() : m_allocator_factories()
     int device_count{0};
     error = ::hipGetDeviceCount(&device_count);
     if (error != hipSuccess) {
-      UMPIRE_LOG(Warning, "Umpire compiled with HIP support but no GPUs detected!");
+      UMPIRE_ERROR(umpire::runtime_error, fmt::format("Error when trying to get HIP device count: {}", hipGetErrorString(error)));
     } else {
       registerMemoryResource(util::make_unique<resource::HipDeviceResourceFactory>());
       m_resource_names.push_back("DEVICE");
@@ -193,6 +193,7 @@ MemoryResourceRegistry::MemoryResourceRegistry() : m_allocator_factories()
       m_resource_names.push_back("DEVICE_CONST");
 #endif
     }
+  UMPIRE_USE_VAR(coherence_enabled);
   }
 #endif
 
