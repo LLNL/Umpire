@@ -24,7 +24,7 @@ if (@UMPIRE_ENABLE_CUDA@ OR @UMPIRE_ENABLE_MPI@ OR @UMPIRE_ENABLE_IPC_SHARED_MEM
 endif ()
 
 if (NOT TARGET camp)
-  set(UMPIRE_CAMP_DIR "@UMPIRE_INTERNAL_camp_DIR@")
+  set(UMPIRE_CAMP_DIR "@UMPIRE_CONFIG_camp_DIR@")
   if(NOT camp_DIR) 
     set(camp_DIR ${UMPIRE_CAMP_DIR}) 
   endif()
@@ -41,7 +41,7 @@ if (@UMPIRE_ENABLE_IPC_SHARED_MEMORY@)
 endif ()
 
 if (NOT TARGET @UMPIRE_FMT_TARGET@)
-  set(UMPIRE_FMT_DIR "@UMPIRE_INTERNAL_fmt_DIR@")
+  set(UMPIRE_FMT_DIR "@UMPIRE_CONFIG_fmt_DIR@")
   if(NOT fmt_DIR)
     set(fmt_DIR ${UMPIRE_FMT_DIR})
   endif()
