@@ -114,7 +114,7 @@ if(NOT DEFINED UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE)
   elseif(UMPIRE_ENABLE_MPI3_SHARED_MEMORY AND NOT UMPIRE_ENABLE_IPC_SHARED_MEMORY)
     set(UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE "MPI3" CACHE STRING "Default implementation for SHARED memory resource (MPI3)")
   else()
-    # Either both or neither enabled - default to POSIX
+    # Either both or neither enabled. NOTE: MUST default to MPI3, otherwise there is confusion on which "allocate" func to call 
     set(UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE "MPI3" CACHE STRING "Default implementation for SHARED memory resource (MPI3)")
   endif()
 endif()

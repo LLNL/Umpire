@@ -56,6 +56,7 @@ class SharedMemoryTest : public ::testing::Test {
       ASSERT_EQ(traits.resource, umpire::MemoryResourceTraits::resource_type::shared);
 
       traits.size = m_segment_size;
+      // NOTE: The name of the allocator MUST have "SHARED::POSIX:: prefix when both IPC and MPI3 enabled.
       ASSERT_NO_THROW(allocator = rm.makeResource("SHARED::POSIX::node_allocator", traits););
       auto base_strategy = allocator.getAllocationStrategy();
       shmem_resource = dynamic_cast<umpire::resource::HostSharedMemoryResource*>(base_strategy);

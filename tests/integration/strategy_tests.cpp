@@ -753,6 +753,7 @@ TEST(NamingShimTests, TestAllocateDeallocate)
   traits.size = 1 * 1024 * 1024;
   traits.scope = umpire::MemoryResourceTraits::shared_scope::node;
 
+  // NOTE: The name of the allocator MUST have "SHARED::POSIX:: prefix when both IPC and MPI3 enabled.
   auto node_allocator{rm.makeResource("SHARED::POSIX::shim_allocator", traits)};
 
   auto shim{rm.makeAllocator<umpire::strategy::NamingShim>("shim", node_allocator)};
@@ -771,6 +772,7 @@ TEST(NamedAllocatorTest, ForwardName)
   traits.size = 1 * 1024 * 1024;
   traits.scope = umpire::MemoryResourceTraits::shared_scope::node;
 
+  // NOTE: The name of the allocator MUST have "SHARED::POSIX:: prefix when both IPC and MPI3 enabled.
   auto node_allocator{rm.makeResource("SHARED::POSIX::allocator_for_named_test", traits)};
 
   auto allocator{rm.makeAllocator<umpire::strategy::NamedAllocationStrategy>("shared named alloc", node_allocator)};
