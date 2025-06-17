@@ -17,6 +17,7 @@ int main(int argc, char** argv)
   auto& rm = umpire::ResourceManager::getInstance();
 
   // Use MPI3 shared memory resource
+  // Note: Could also use "SHARED"
   auto traits = umpire::get_default_resource_traits("SHARED::MPI3");
   traits.size = 1 * 1024 * 1024; // 1 MB
 
