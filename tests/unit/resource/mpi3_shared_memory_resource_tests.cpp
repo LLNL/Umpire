@@ -21,7 +21,7 @@ class MPISharedMemoryTest : public ::testing::Test {
   static void SetUpTestSuite()
   {
     auto& rm = umpire::ResourceManager::getInstance();
-    auto node_allocator = rm.makeResource("SHARED");
+    auto node_allocator = rm.makeResource("SHARED"); // Defaults to MPI3 Shared Memory
 
     shared_allocator_comm = umpire::get_communicator_for_allocator(node_allocator, MPI_COMM_WORLD);
     MPI_Comm_size(shared_allocator_comm, &num_ranks);
