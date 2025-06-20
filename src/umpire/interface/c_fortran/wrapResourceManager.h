@@ -66,6 +66,16 @@ umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_quick_pool(
     umpire_allocator allocator, size_t initial_size, size_t block,
     umpire_allocator * SHC_rv);
 
+umpire_allocator * umpire_resourcemanager_make_allocator_resource_aware_pool(
+    umpire_resourcemanager * self, const char * name,
+    umpire_allocator allocator, size_t initial_size, size_t block,
+    umpire_allocator * SHC_rv);
+
+umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_resource_aware_pool(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    umpire_allocator allocator, size_t initial_size, size_t block,
+    umpire_allocator * SHC_rv);
+
 umpire_allocator * umpire_resourcemanager_make_allocator_advisor(
     umpire_resourcemanager * self, const char * name,
     umpire_allocator allocator, const char * advice_op, int device_id,
@@ -100,6 +110,70 @@ umpire_allocator * umpire_resourcemanager_make_allocator_fixed_pool(
 umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_fixed_pool(
     umpire_resourcemanager * self, const char * name, int Lname,
     umpire_allocator allocator, size_t object_size,
+    umpire_allocator * SHC_rv);
+
+umpire_allocator * umpire_resourcemanager_make_allocator_aligned_allocator(
+    umpire_resourcemanager * self, const char * name,
+    umpire_allocator allocator, size_t object_size,
+    umpire_allocator * SHC_rv);
+
+umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_aligned_allocator(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    umpire_allocator allocator, size_t object_size,
+    umpire_allocator * SHC_rv);
+
+umpire_allocator * umpire_resourcemanager_make_allocator_size_limiter(
+    umpire_resourcemanager * self, const char * name,
+    umpire_allocator allocator, size_t object_size,
+    umpire_allocator * SHC_rv);
+
+umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_size_limiter(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    umpire_allocator allocator, size_t object_size,
+    umpire_allocator * SHC_rv);
+
+umpire_allocator * umpire_resourcemanager_make_allocator_monotonic(
+    umpire_resourcemanager * self, const char * name,
+    umpire_allocator allocator, size_t object_size,
+    umpire_allocator * SHC_rv);
+
+umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_monotonic(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    umpire_allocator allocator, size_t object_size,
+    umpire_allocator * SHC_rv);
+
+umpire_allocator * umpire_resourcemanager_make_allocator_slot_pool(
+    umpire_resourcemanager * self, const char * name,
+    umpire_allocator allocator, size_t object_size,
+    umpire_allocator * SHC_rv);
+
+umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_slot_pool(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    umpire_allocator allocator, size_t object_size,
+    umpire_allocator * SHC_rv);
+
+umpire_allocator * umpire_resourcemanager_make_allocator_naming_shim(
+    umpire_resourcemanager * self, const char * name,
+    umpire_allocator allocator, umpire_allocator * SHC_rv);
+
+umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_naming_shim(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    umpire_allocator allocator, umpire_allocator * SHC_rv);
+
+umpire_allocator * umpire_resourcemanager_make_allocator_mixed_pool(
+    umpire_resourcemanager * self, const char * name,
+    umpire_allocator allocator, size_t smallest_fixed_obj_size,
+    size_t largest_fixed_obj_size, size_t max_initial_fixed_pool_size,
+    size_t fixed_size_multiplier, size_t quick_pool_initial_alloc_size,
+    size_t quick_pool_min_alloc_size, size_t quick_pool_align_bytes,
+    umpire_allocator * SHC_rv);
+
+umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_mixed_pool(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    umpire_allocator allocator, size_t smallest_fixed_obj_size,
+    size_t largest_fixed_obj_size, size_t max_initial_fixed_pool_size,
+    size_t fixed_size_multiplier, size_t quick_pool_initial_alloc_size,
+    size_t quick_pool_min_alloc_size, size_t quick_pool_align_bytes,
     umpire_allocator * SHC_rv);
 
 umpire_allocator * umpire_resourcemanager_make_allocator_prefetcher(

@@ -207,10 +207,23 @@ std::size_t get_device_memory_usage(int device_id)
   cudaSetDevice(current_device);
 
   return std::size_t{mem_tot - mem_free};
-#else
+#elif defined(UMPIRE_ENABLE_HIP)
+  std::size_t mem_free{0};
+  std::size_t mem_tot{0};
+
+  int current_device;
+  hipGetDevice(&current_device);
+
+  hipSetDevice(device_id);
+
+  hipMemGetInfo(&mem_free, &mem_tot);
+
+  hipSetDevice(current_device);
+
+  return std::size_t{mem_tot - mem_free};
+#endif
   UMPIRE_USE_VAR(device_id);
   return 0;
-#endif
 }
 
 std::vector<util::AllocationRecord> get_leaked_allocations(Allocator allocator)
