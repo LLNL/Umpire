@@ -38,13 +38,13 @@ rocmcc_6_3_1_hip_openmp_device_alloc:
     SPEC: "~shared +fortran +openmp +rocm +device_alloc tests=basic amdgpu_target=gfx90a %rocmcc@=6.3.1 ^hip@6.3.1"
   extends: .job_on_tioga
 
-rocmcc_6_3_0_hip_deviceconst:
+rocmcc_6_3_1_hip_deviceconst:
   variables:
     SPEC: "~shared +fortran +deviceconst +rocm tests=basic amdgpu_target=gfx90a %rocmcc@=6.3.1 ^hip@6.3.1"
   extends: .job_on_tioga
 
-rocmcc_6_1_1_hip_memleak:
+rocmcc_6_4_1_hip_memleak:
   variables:
-    SPEC: "~shared +asan +sanitizer_tests +tools +rocm tests=basic amdgpu_target=gfx90a:xnack+ cxxflags==\"-fsanitize=address\" %rocmcc@6.1.1 ^hip@6.1.1"
+    SPEC: "~shared +asan +sanitizer_tests +tools +rocm tests=basic amdgpu_target=gfx90a:xnack+ cxxflags==\"-fsanitize=address\" %rocmcc@6.4.1 ^hip@6.4.1"
     ASAN_OPTIONS: "detect_leaks=1"
   extends: .job_on_tioga
