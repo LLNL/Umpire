@@ -1,3 +1,9 @@
+# v2025.03.1
+
+## New Features
+
+- Added DeviceIpcAllocator strategy to allow interprocess device shared memory. 
+
 # v2025.03.0
 
 ## New Features
