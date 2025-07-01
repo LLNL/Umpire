@@ -19,6 +19,11 @@
 #include "umpire/config.hpp"
 #include "umpire/resource/HostSharedMemoryResource.hpp"
 #include "umpire/resource/MemoryResource.hpp"
+#if defined(UMPIRE_ENABLE_MPI) && defined(UMPIRE_ENABLE_IPC_SHARED_MEMORY)
+#if defined(UMPIRE_ENABLE_DEVICE)
+#include "umpire/strategy/DeviceIpcAllocator.hpp"
+#endif
+#endif
 #include "umpire/strategy/DynamicPoolList.hpp"
 #include "umpire/strategy/QuickPool.hpp"
 #include "umpire/strategy/ResourceAwarePool.hpp"
@@ -307,6 +312,11 @@ std::map<int, MPI_Comm>& get_cached_communicators()
 
 MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm)
 {
+#if defined(UMPIRE_ENABLE_IPC_SHARED_MEMORY) && defined(UMPIRE_ENABLE_DEVICE)
+  if (auto alloc = dynamic_cast<strategy::DeviceIpcAllocator*>(a.getAllocationStrategy()))
+    return alloc->get_scope_communicator();
+#endif
+
   std::map<int, MPI_Comm>& cached_communicators = get_cached_communicators();
 
   MPI_Comm c;
