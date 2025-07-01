@@ -9,6 +9,8 @@
 
 #include <string>
 
+#include "umpire/config.hpp"
+
 namespace umpire {
 namespace util {
 
@@ -23,11 +25,7 @@ inline bool matchesSharedMemoryResource(const std::string& name, const std::stri
 
   // Check if name starts with "SHARED::" or "SHARED" AND that this resource_type is the default
   if ((name.find("SHARED::") == 0) || (name == "SHARED")) {
-#ifdef UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE
-    return std::string(UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE) == resource_type;
-#else
-    return false;
-#endif
+    return std::string(umpire::default_shared_memory_resource) == resource_type;
   }
 
   return false;

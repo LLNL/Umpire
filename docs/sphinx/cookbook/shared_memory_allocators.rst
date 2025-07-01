@@ -74,7 +74,7 @@ uses the MPI3 API for its Shared Memory mechanisms that allow processes to commu
 To use Umpire's MPI3 Shared Memory allocators, the ``UMPIRE_ENABLE_MPI3_SHARED_MEMORY`` flag 
 should be set to ``On``. Note that if you are using MPI3 Shared Memory, then MPI must be enabled.
 
-To create an allocator with the MPI3 Shared Memeory resource, you can do the following:
+To create an allocator with the MPI3 Shared Memory resource, you can do the following:
 
 .. code-block:: cpp
 
@@ -88,7 +88,7 @@ Using Both IPC and MPI3 Shared Memory Allocators
 
 It is possible to enable both IPC and MPI3 Shared Memory Allocators at the same time.
 
-To create these Shared Memeory allocators, you can do the following:
+To create these Shared Memory allocators, you can do the following:
 
 .. code-block:: cpp
 
