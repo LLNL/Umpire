@@ -27,7 +27,7 @@ void* HipDeviceMemoryResource::allocate(std::size_t bytes)
   hipError_t err = hipGetDevice(&old_device);
   if (err != hipSuccess) {
     UMPIRE_ERROR(runtime_error,
-                 fmt::format("hipGetDevice( device = {} ) failed with error: {}", old_device, hipGetErrorString(err)));
+                 fmt::format("Error when trying to get HIP Device: {}", hipGetErrorString(err)));
   }
   if (old_device != m_traits.id) {
     err = hipSetDevice(m_traits.id);
@@ -57,7 +57,7 @@ void HipDeviceMemoryResource::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_AR
   hipError_t err = hipGetDevice(&old_device);
   if (err != hipSuccess) {
     UMPIRE_ERROR(runtime_error,
-                 fmt::format("hipGetDevice( device = {} ) failed with error: {}", old_device, hipGetErrorString(err)));
+                 fmt::format("Error when trying to get HIP Device: {}", hipGetErrorString(err)));
   }
   if (old_device != m_traits.id) {
     err = hipSetDevice(m_traits.id);

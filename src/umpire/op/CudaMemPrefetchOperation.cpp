@@ -23,12 +23,15 @@ void CudaMemPrefetchOperation::apply(void* src_ptr, util::AllocationRecord* UMPI
 
   // Use current device for properties if device is CPU
   int current_device;
-  cudaGetDevice(&current_device);
+  error = cudaGetDevice(&current_device);
+  if (error != cudaSuccess) {
+    UMPIRE_ERROR(runtime_error, 
+                   fmt::format("Error when trying to get CUDA Device: {}", cudaGetErrorString(err)));
+  }
   int gpu = (device != cudaCpuDeviceId) ? device : current_device;
 
   cudaDeviceProp properties;
   error = ::cudaGetDeviceProperties(&properties, gpu);
-
   if (error != cudaSuccess) {
     UMPIRE_ERROR(runtime_error, fmt::format("cudaGetDeviceProperties( device = {} ) failed with error: {}", device,
                                             cudaGetErrorString(error)));
@@ -54,11 +57,19 @@ camp::resources::EventProxy<camp::resources::Resource> CudaMemPrefetchOperation:
 
   // Use current device for properties if device is CPU
   int current_device;
-  cudaGetDevice(&current_device);
+  error = cudaGetDevice(&current_device);
+  if (error != cudaSuccess) {
+    UMPIRE_ERROR(runtime_error, 
+                   fmt::format("Error when trying to get CUDA Device: {}", cudaGetErrorString(err)));
+  }
   int gpu = (device != cudaCpuDeviceId) ? device : current_device;
 
   cudaDeviceProp properties;
   error = ::cudaGetDeviceProperties(&properties, gpu);
+  if (error != cudaSuccess) {
+    UMPIRE_ERROR(runtime_error, fmt::format("cudaGetDeviceProperties( device = {} ) failed with error: {}", device,
+                                            cudaGetErrorString(error)));
+  }
 
   auto resource = ctx.try_get<camp::resources::Cuda>();
   if (!resource) {
@@ -66,11 +77,6 @@ camp::resources::EventProxy<camp::resources::Resource> CudaMemPrefetchOperation:
                  fmt::format("Expected resources::Cuda, got resources::{}", platform_to_string(ctx.get_platform())));
   }
   auto stream = resource->get_stream();
-
-  if (error != cudaSuccess) {
-    UMPIRE_ERROR(runtime_error, fmt::format("cudaGetDeviceProperties( device = {} ) failed with error: {}", device,
-                                            cudaGetErrorString(error)));
-  }
 
   if (properties.managedMemory == 1 && properties.concurrentManagedAccess == 1) {
     error = ::cudaMemPrefetchAsync(src_ptr, length, device, stream);
