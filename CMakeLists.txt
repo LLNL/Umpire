@@ -92,29 +92,16 @@ cmake_dependent_option( UMPIRE_ENABLE_MPI "Build Umpire with MPI" On
 # Shared Memory Options
 ########
 
-option( UMPIRE_ENABLE_IPC_SHARED_MEMORY "Enable Host (IPC) Shared Memory Resource" Off) 
-
-if(UMPIRE_ENABLE_IPC_SHARED_MEMORY)
-  if(APPLE OR WIN32)
-    message(FATAL_ERROR "IPC_SHARED_MEMORY cannot be enabled on APPLE or WIN32.")
-  endif()
-endif()
-
-option( UMPIRE_ENABLE_MPI3_SHARED_MEMORY "Enable MPI3 Shared Memory Resource" Off)
-
-if(UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
-  if(NOT ENABLE_MPI)
-    message(FATAL_ERROR "UMPIRE_ENABLE_MPI3_SHARED_MEMORY requires ENABLE_MPI to be ON")
-  endif()
-endif()
+cmake_dependent_option( UMPIRE_ENABLE_IPC_SHARED_MEMORY "Enable Host Shared Memory Resource" ${UMPIRE_ENABLE_MPI}
+                        "NOT WIN32;NOT APPLE" Off )
+cmake_dependent_option( UMPIRE_ENABLE_MPI3_SHARED_MEMORY "Enable MPI3 Shared Memory Resource" Off "${ENABLE_MPI}" Off)
 
 if(UMPIRE_ENABLE_IPC_SHARED_MEMORY AND NOT UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
   set(UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE "POSIX" CACHE STRING "Default implementation for SHARED memory resource (POSIX)")
-elseif(UMPIRE_ENABLE_MPI3_SHARED_MEMORY AND NOT UMPIRE_ENABLE_IPC_SHARED_MEMORY)
+elseif(UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
   set(UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE "MPI3" CACHE STRING "Default implementation for SHARED memory resource (MPI3)")
 else()
-  # Either both or neither enabled. NOTE: MUST default to MPI3, otherwise there is confusion on which "allocate" func to call 
-  set(UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE "MPI3" CACHE STRING "Default implementation for SHARED memory resource (MPI3)" FORCE)
+  set (UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE "" CACHE STRING "")
 endif()
 
 ########
