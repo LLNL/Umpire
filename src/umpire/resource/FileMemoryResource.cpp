@@ -157,7 +157,8 @@ bool FileMemoryResource::isPageable() noexcept
   err = cudaDeviceGetAttribute(&pageableMem, cudaDevAttrPageableMemoryAccess, cdev);
   if (err != cudaSuccess) {
     UMPIRE_ERROR(runtime_error,
-                 fmt::format("cudaDeviceGetAttribute( pageableMem = {}, cudaDevAttrPageableMemoryAccess = {}, cdev = {}) failed with error: {}",
+                 fmt::format("cudaDeviceGetAttribute( pageableMem = {}, cudaDevAttrPageableMemoryAccess = {}, cdev = "
+                             "{}) failed with error: {}",
                              pageableMem, cudaDevAttrPageableMemoryAccess, cdev, cudaGetErrorString(err)));
   }
   if (pageableMem)
