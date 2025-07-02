@@ -965,8 +965,7 @@ int ResourceManager::getNumDevices() const
 #elif defined(UMPIRE_ENABLE_HIP)
   hipError_t err = hipGetDeviceCount(&device_count);
   if (err != hipSuccess) {
-    UMPIRE_ERROR(runtime_error,
-                 fmt::format("Error: hipGetDeviceCount failed with error: {}", hipGetErrorString(err)));
+    UMPIRE_ERROR(runtime_error, fmt::format("Error: hipGetDeviceCount failed with error: {}", hipGetErrorString(err)));
   }
 #elif defined(UMPIRE_ENABLE_SYCL)
   sycl::queue queue{sycl::gpu_selector_v};

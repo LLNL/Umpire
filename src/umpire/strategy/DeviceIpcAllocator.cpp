@@ -100,8 +100,7 @@ void DeviceIpcAllocator::setup_shared_scope(MemoryResourceTraits::shared_scope s
     int device_id;
     gpuError err = gpuGetDevice(&device_id);
     if (err != gpuSuccess) {
-      UMPIRE_ERROR(runtime_error,
-                   fmt::format("Error: gpuGetDevice failed with error: {}", gpuGetErrorString(err)));
+      UMPIRE_ERROR(runtime_error, fmt::format("Error: gpuGetDevice failed with error: {}", gpuGetErrorString(err)));
     }
 
     // Get device properties
@@ -183,8 +182,7 @@ void* DeviceIpcAllocator::create(const std::string& name, std::size_t size_in_by
   handle_info->size = size_in_bytes;
   err = gpuGetDevice(&handle_info->device_id);
   if (err != gpuSuccess) {
-    UMPIRE_ERROR(runtime_error,
-                 fmt::format("Error: gpuGetDevice failed with error: {}", gpuGetErrorString(err)));
+    UMPIRE_ERROR(runtime_error, fmt::format("Error: gpuGetDevice failed with error: {}", gpuGetErrorString(err)));
   }
   handle_info->is_initialized.store(true, std::memory_order_release);
 
@@ -209,15 +207,13 @@ void* DeviceIpcAllocator::import(const std::string& name)
   int current_device, target_device = handle_info->device_id;
   gpuError err = gpuGetDevice(&current_device);
   if (err != gpuSuccess) {
-    UMPIRE_ERROR(runtime_error,
-                 fmt::format("Error: gpuGetDevice failed with error: {}", gpuGetErrorString(err)));
+    UMPIRE_ERROR(runtime_error, fmt::format("Error: gpuGetDevice failed with error: {}", gpuGetErrorString(err)));
   }
   bool device_switched = false;
   if (current_device != target_device) {
     err = gpuSetDevice(target_device);
     if (err != gpuSuccess) {
-      UMPIRE_ERROR(runtime_error,
-                   fmt::format("Error: gpuSetDevice failed with error: {}", gpuGetErrorString(err)));
+      UMPIRE_ERROR(runtime_error, fmt::format("Error: gpuSetDevice failed with error: {}", gpuGetErrorString(err)));
     }
     device_switched = true;
   }
@@ -230,8 +226,7 @@ void* DeviceIpcAllocator::import(const std::string& name)
     if (device_switched) {
       err = gpuSetDevice(current_device);
       if (err != gpuSuccess) {
-        UMPIRE_ERROR(runtime_error,
-                     fmt::format("Error: gpuSetDevice failed with error: {}", gpuGetErrorString(err)));
+        UMPIRE_ERROR(runtime_error, fmt::format("Error: gpuSetDevice failed with error: {}", gpuGetErrorString(err)));
       }
     }
     UMPIRE_ERROR(runtime_error, fmt::format("gpuIpcOpenMemHandle failed: {}", store_error_temp));
@@ -241,8 +236,7 @@ void* DeviceIpcAllocator::import(const std::string& name)
   if (device_switched) {
     err = gpuSetDevice(current_device);
     if (err != gpuSuccess) {
-      UMPIRE_ERROR(runtime_error,
-                   fmt::format("Error: gpuSetDevice failed with error: {}", gpuGetErrorString(err)));
+      UMPIRE_ERROR(runtime_error, fmt::format("Error: gpuSetDevice failed with error: {}", gpuGetErrorString(err)));
     }
   }
 
