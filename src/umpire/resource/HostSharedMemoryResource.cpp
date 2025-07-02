@@ -52,21 +52,22 @@ bool HostSharedMemoryResource::isPageable() noexcept
   int pageableMem = 0;
   int cdev = 0;
   cudaError_t err = cudaGetDevice(&cdev);
-  if (err != cudaSuccess) {
-    UMPIRE_ERROR(umpire::runtime_error,
-                 fmt::format("Error when trying to get CUDA Device: {}", cudaGetErrorString(err)));
+  if (err != cudaSuccess) { // since it is noexcept, can't use UMPIRE_ERROR
+    UMPIRE_LOG(Debug, "Error when trying to get CUDA Device:" << cudaGetErrorString(err));
+    return false;
   }
 
   // Device supports coherently accessing pageable memory
   // without calling cudaHostRegister on it
   err = cudaDeviceGetAttribute(&pageableMem, cudaDevAttrPageableMemoryAccess, cdev);
-  if (err != cudaSuccess) {
-    UMPIRE_ERROR(
-        runtime_error,
-        fmt::format("Error: cudaDeviceGetAttribute( pageableMem = {}, cudaDevAttrPageableMemoryAccess = {}, cdev = "
-                    "{}) failed with error: {}",
-                    pageableMem, static_cast<int>(cudaDevAttrPageableMemoryAccess), cdev, cudaGetErrorString(err)));
+  if (err != cudaSuccess) { // since it is noexcept, can't use UMPIRE_ERROR
+    UMPIRE_LOG(Debug, "Error: cudaDeviceGetAttribute(pageableMem = "
+                          << pageableMem
+                          << "cudaDevAttrPageableMemoryAccess = " << static_cast<int>(cudaDevAttrPageableMemoryAccess)
+                          << "cdev = " << cdev << ", failed with error:" << cudaGetErrorString(err));
+    return false;
   }
+
   if (pageableMem)
     return true;
 #endif

@@ -149,6 +149,7 @@ bool FileMemoryResource::isPageable() noexcept
   cudaError_t err = cudaGetDevice(&cdev);
   if (err != cudaSuccess) { // since it is noexcept, can't use UMPIRE_ERROR
     UMPIRE_LOG(Debug, "Error when trying to get CUDA Device:" << cudaGetErrorString(err));
+    return false;
   }
 
   // Device supports coherently accessing pageable memory
@@ -159,6 +160,7 @@ bool FileMemoryResource::isPageable() noexcept
                           << pageableMem
                           << "cudaDevAttrPageableMemoryAccess = " << static_cast<int>(cudaDevAttrPageableMemoryAccess)
                           << "cdev = " << cdev << ", failed with error:" << cudaGetErrorString(err));
+    return false;
   }
   if (pageableMem)
     return true;
