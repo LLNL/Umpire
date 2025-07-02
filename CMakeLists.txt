@@ -92,7 +92,7 @@ cmake_dependent_option( UMPIRE_ENABLE_MPI "Build Umpire with MPI" On
 # Shared Memory Options
 ########
 
-cmake_dependent_option( UMPIRE_ENABLE_IPC_SHARED_MEMORY "Enable Host Shared Memory Resource" ${UMPIRE_ENABLE_MPI}
+cmake_dependent_option( UMPIRE_ENABLE_IPC_SHARED_MEMORY "Enable Host IPC Shared Memory Resource" ${UMPIRE_ENABLE_MPI}
                         "NOT WIN32;NOT APPLE" Off )
 cmake_dependent_option( UMPIRE_ENABLE_MPI3_SHARED_MEMORY "Enable MPI3 Shared Memory Resource" Off "${ENABLE_MPI}" Off)
 
