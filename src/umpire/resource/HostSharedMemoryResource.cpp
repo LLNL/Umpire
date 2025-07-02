@@ -63,7 +63,7 @@ bool HostSharedMemoryResource::isPageable() noexcept
   if (err != cudaSuccess) {
     UMPIRE_ERROR(
         runtime_error,
-        fmt::format("cudaDeviceGetAttribute( pageableMem = {}, cudaDevAttrPageableMemoryAccess = {}, cdev = "
+        fmt::format("Error: cudaDeviceGetAttribute( pageableMem = {}, cudaDevAttrPageableMemoryAccess = {}, cdev = "
                     "{}) failed with error: {}",
                     pageableMem, static_cast<int>(cudaDevAttrPageableMemoryAccess), cdev, cudaGetErrorString(err)));
   }
