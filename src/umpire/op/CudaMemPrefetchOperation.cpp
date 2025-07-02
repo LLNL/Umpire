@@ -25,7 +25,7 @@ void CudaMemPrefetchOperation::apply(void* src_ptr, util::AllocationRecord* UMPI
   int current_device;
   error = cudaGetDevice(&current_device);
   if (error != cudaSuccess) {
-    UMPIRE_ERROR(runtime_error, fmt::format("Error when trying to get CUDA Device: {}", cudaGetErrorString(err)));
+    UMPIRE_ERROR(runtime_error, fmt::format("Error when trying to get CUDA Device: {}", cudaGetErrorString(error)));
   }
   int gpu = (device != cudaCpuDeviceId) ? device : current_device;
 
