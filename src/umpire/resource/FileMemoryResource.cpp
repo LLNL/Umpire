@@ -155,9 +155,10 @@ bool FileMemoryResource::isPageable() noexcept
   // without calling cudaHostRegister on it
   err = cudaDeviceGetAttribute(&pageableMem, cudaDevAttrPageableMemoryAccess, cdev);
   if (err != cudaSuccess) { // since it is noexcept, can't use UMPIRE_ERROR
-    UMPIRE_LOG(Debug, "cudaDeviceGetAttribute(pageableMem = " << pageableMem << "cudaDevAttrPageableMemoryAccess = " 
-                      << static_cast<int>(cudaDevAttrPageableMemoryAccess) << "cdev = " << cdev
-                      << ", failed with error:" << cudaGetErrorString(err));
+    UMPIRE_LOG(Debug, "cudaDeviceGetAttribute(pageableMem = " << pageableMem << "cudaDevAttrPageableMemoryAccess = "
+                                                              << static_cast<int>(cudaDevAttrPageableMemoryAccess)
+                                                              << "cdev = " << cdev
+                                                              << ", failed with error:" << cudaGetErrorString(err));
   }
   if (pageableMem)
     return true;
