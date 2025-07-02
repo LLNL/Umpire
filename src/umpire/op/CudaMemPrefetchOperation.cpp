@@ -32,7 +32,7 @@ void CudaMemPrefetchOperation::apply(void* src_ptr, util::AllocationRecord* UMPI
   cudaDeviceProp properties;
   error = ::cudaGetDeviceProperties(&properties, gpu);
   if (error != cudaSuccess) {
-    UMPIRE_ERROR(runtime_error, fmt::format("cudaGetDeviceProperties( device = {} ) failed with error: {}", device,
+    UMPIRE_ERROR(runtime_error, fmt::format("cudaGetDeviceProperties( device = {} ) failed with error: {}", gpu,
                                             cudaGetErrorString(error)));
   }
 
@@ -58,14 +58,14 @@ camp::resources::EventProxy<camp::resources::Resource> CudaMemPrefetchOperation:
   int current_device;
   error = cudaGetDevice(&current_device);
   if (error != cudaSuccess) {
-    UMPIRE_ERROR(runtime_error, fmt::format("Error when trying to get CUDA Device: {}", cudaGetErrorString(err)));
+    UMPIRE_ERROR(runtime_error, fmt::format("Error when trying to get CUDA Device: {}", cudaGetErrorString(error)));
   }
   int gpu = (device != cudaCpuDeviceId) ? device : current_device;
 
   cudaDeviceProp properties;
   error = ::cudaGetDeviceProperties(&properties, gpu);
   if (error != cudaSuccess) {
-    UMPIRE_ERROR(runtime_error, fmt::format("cudaGetDeviceProperties( device = {} ) failed with error: {}", device,
+    UMPIRE_ERROR(runtime_error, fmt::format("cudaGetDeviceProperties( device = {} ) failed with error: {}", gpu,
                                             cudaGetErrorString(error)));
   }
 
@@ -84,7 +84,7 @@ camp::resources::EventProxy<camp::resources::Resource> CudaMemPrefetchOperation:
           runtime_error,
           fmt::format(
               "cudaMemPrefetchAsync( src_ptr = {}, length = {}, device = {}, stream = {}) failed with error: {}",
-              src_ptr, length, device, cudaGetErrorString(error), (void*)stream));
+              src_ptr, length, device, (void*)stream, cudaGetErrorString(error)));
     }
   }
 
