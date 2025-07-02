@@ -79,10 +79,11 @@ struct MallocAllocator {
     // without calling cudaHostRegister on it
     err = cudaDeviceGetAttribute(&pageableMem, cudaDevAttrPageableMemoryAccess, cdev);
     if (err != cudaSuccess) {
-      UMPIRE_ERROR(runtime_error,
-                   fmt::format("cudaDeviceGetAttribute(pageableMem = {}, cudaDevAttrPageableMemoryAccess = {}, cdev = "
-                               "{}) failed with error: {}",
-                               pageableMem, static_cast<int>(cudaDevAttrPageableMemoryAccess), cdev, cudaGetErrorString(err)));
+      UMPIRE_ERROR(
+          runtime_error,
+          fmt::format("cudaDeviceGetAttribute(pageableMem = {}, cudaDevAttrPageableMemoryAccess = {}, cdev = "
+                      "{}) failed with error: {}",
+                      pageableMem, static_cast<int>(cudaDevAttrPageableMemoryAccess), cdev, cudaGetErrorString(err)));
     }
     if (pageableMem)
       return true;
