@@ -105,7 +105,7 @@ void DeviceIpcAllocator::setup_shared_scope(MemoryResourceTraits::shared_scope s
 
     // Get device properties
     gpuDeviceProp props;
-    gpuError err = gpuGetDeviceProperties(&props, device_id);
+    err = gpuGetDeviceProperties(&props, device_id);
     if (err != gpuSuccess) {
       UMPIRE_ERROR(runtime_error,
                    fmt::format("Error: gpuGetDeviceProperties failed with error: {}", gpuGetErrorString(err)));
@@ -219,7 +219,7 @@ void* DeviceIpcAllocator::import(const std::string& name)
   }
 
   void* ptr = nullptr;
-  auto err = gpuIpcOpenMemHandle(&ptr, handle_info->handle, gpuIpcMemLazyEnablePeerAccess);
+  err = gpuIpcOpenMemHandle(&ptr, handle_info->handle, gpuIpcMemLazyEnablePeerAccess);
   UMPIRE_LOG(Debug, fmt::format("Follower opened IPC handle to device memory at {}", ptr));
   if (err != gpuSuccess) {
     auto store_error_temp = gpuGetErrorString(err);
