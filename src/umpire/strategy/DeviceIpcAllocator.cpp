@@ -200,7 +200,7 @@ void* DeviceIpcAllocator::import(const std::string& name)
 
   IpcHandleInfo* handle_info = get_handle_info(name);
   if (!handle_info || !handle_info->is_initialized.load(std::memory_order_acquire)) {
-    UMPIRE_ERROR(runtime_error, fmt::format("Failed to get initialized IPC handle"));
+    UMPIRE_ERROR(runtime_error, fmt::format("Error: Failed to get initialized IPC handle"));
     return nullptr;
   }
 
