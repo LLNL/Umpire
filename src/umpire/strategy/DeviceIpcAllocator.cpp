@@ -23,6 +23,7 @@
 #define gpuIpcOpenMemHandle cudaIpcOpenMemHandle
 #define gpuGetDevice cudaGetDevice
 #define gpuSetDevice cudaSetDevice
+#define gpuError cudaError_t
 #define gpuGetDeviceProperties cudaGetDeviceProperties
 #define gpuGetErrorString cudaGetErrorString
 #define gpuSuccess cudaSuccess
@@ -34,6 +35,7 @@
 #define gpuIpcOpenMemHandle hipIpcOpenMemHandle
 #define gpuGetDevice hipGetDevice
 #define gpuSetDevice hipSetDevice
+#define gpuError hipError_t
 #define gpuGetDeviceProperties hipGetDeviceProperties
 #define gpuGetErrorString hipGetErrorString
 #define gpuSuccess hipSuccess
@@ -96,11 +98,18 @@ void DeviceIpcAllocator::setup_shared_scope(MemoryResourceTraits::shared_scope s
   } else if (scope == MemoryResourceTraits::shared_scope::socket) {
     // Get current device
     int device_id;
-    gpuGetDevice(&device_id);
+    gpuError err = gpuGetDevice(&device_id);
+    if (err != gpuSuccess) {
+      UMPIRE_ERROR(runtime_error, fmt::format("Error: gpuGetDevice failed with error: {}", gpuGetErrorString(err)));
+    }
 
     // Get device properties
     gpuDeviceProp props;
-    gpuGetDeviceProperties(&props, device_id);
+    err = gpuGetDeviceProperties(&props, device_id);
+    if (err != gpuSuccess) {
+      UMPIRE_ERROR(runtime_error,
+                   fmt::format("Error: gpuGetDeviceProperties failed with error: {}", gpuGetErrorString(err)));
+    }
 
     // Use PCI domain, bus, and device as color for MPI communicator split
     m_scope_color = props.pciDomainID * 1000000 + props.pciBusID * 1000 + props.pciDeviceID;
@@ -171,7 +180,10 @@ void* DeviceIpcAllocator::create(const std::string& name, std::size_t size_in_by
 
   // Setup handle info fields
   handle_info->size = size_in_bytes;
-  gpuGetDevice(&handle_info->device_id);
+  err = gpuGetDevice(&handle_info->device_id);
+  if (err != gpuSuccess) {
+    UMPIRE_ERROR(runtime_error, fmt::format("Error: gpuGetDevice failed with error: {}", gpuGetErrorString(err)));
+  }
   handle_info->is_initialized.store(true, std::memory_order_release);
 
   // Signal followers that the handle is ready
@@ -188,31 +200,44 @@ void* DeviceIpcAllocator::import(const std::string& name)
 
   IpcHandleInfo* handle_info = get_handle_info(name);
   if (!handle_info || !handle_info->is_initialized.load(std::memory_order_acquire)) {
-    UMPIRE_ERROR(runtime_error, fmt::format("Failed to get initialized IPC handle"));
+    UMPIRE_ERROR(runtime_error, fmt::format("Error: Failed to get initialized IPC handle"));
     return nullptr;
   }
 
   int current_device, target_device = handle_info->device_id;
-  gpuGetDevice(&current_device);
+  gpuError err = gpuGetDevice(&current_device);
+  if (err != gpuSuccess) {
+    UMPIRE_ERROR(runtime_error, fmt::format("Error: gpuGetDevice failed with error: {}", gpuGetErrorString(err)));
+  }
   bool device_switched = false;
   if (current_device != target_device) {
-    gpuSetDevice(target_device);
+    err = gpuSetDevice(target_device);
+    if (err != gpuSuccess) {
+      UMPIRE_ERROR(runtime_error, fmt::format("Error: gpuSetDevice failed with error: {}", gpuGetErrorString(err)));
+    }
     device_switched = true;
   }
 
   void* ptr = nullptr;
-  auto err = gpuIpcOpenMemHandle(&ptr, handle_info->handle, gpuIpcMemLazyEnablePeerAccess);
+  err = gpuIpcOpenMemHandle(&ptr, handle_info->handle, gpuIpcMemLazyEnablePeerAccess);
   UMPIRE_LOG(Debug, fmt::format("Follower opened IPC handle to device memory at {}", ptr));
   if (err != gpuSuccess) {
+    auto store_error_temp = gpuGetErrorString(err);
     if (device_switched) {
-      gpuSetDevice(current_device);
+      err = gpuSetDevice(current_device);
+      if (err != gpuSuccess) {
+        UMPIRE_ERROR(runtime_error, fmt::format("Error: gpuSetDevice failed with error: {}", gpuGetErrorString(err)));
+      }
     }
-    UMPIRE_ERROR(runtime_error, fmt::format("gpuIpcOpenMemHandle failed: {}", gpuGetErrorString(err)));
+    UMPIRE_ERROR(runtime_error, fmt::format("gpuIpcOpenMemHandle failed: {}", store_error_temp));
     return nullptr;
   }
 
   if (device_switched) {
-    gpuSetDevice(current_device);
+    err = gpuSetDevice(current_device);
+    if (err != gpuSuccess) {
+      UMPIRE_ERROR(runtime_error, fmt::format("Error: gpuSetDevice failed with error: {}", gpuGetErrorString(err)));
+    }
   }
 
   UMPIRE_LOG(Debug, fmt::format("Follower successfully imported device memory at {}", ptr));
@@ -242,7 +267,11 @@ void DeviceIpcAllocator::deallocate(void* ptr, std::size_t)
 
     m_allocation_names.erase(it);
   } else {
-    gpuIpcCloseMemHandle(ptr);
+    gpuError err = gpuIpcCloseMemHandle(ptr);
+    if (err != gpuSuccess) {
+      UMPIRE_ERROR(runtime_error,
+                   fmt::format("Error: gpuIpcCloseMemHandle failed with error: {}", gpuGetErrorString(err)));
+    }
   }
 }
 
