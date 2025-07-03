@@ -24,31 +24,57 @@ CudaDeviceMemoryResource::CudaDeviceMemoryResource(Platform platform, const std:
 void* CudaDeviceMemoryResource::allocate(std::size_t bytes)
 {
   int old_device;
-  cudaGetDevice(&old_device);
-  if (old_device != m_traits.id)
-    cudaSetDevice(m_traits.id);
+  cudaError_t err = cudaGetDevice(&old_device);
+  if (err != cudaSuccess) {
+    UMPIRE_ERROR(runtime_error, fmt::format("Error when trying to get CUDA Device: {}", cudaGetErrorString(err)));
+  }
+  if (old_device != m_traits.id) {
+    err = cudaSetDevice(m_traits.id);
+    if (err != cudaSuccess) {
+      UMPIRE_ERROR(runtime_error, fmt::format("cudaSetDevice( device = {} ) failed with error: {}", m_traits.id,
+                                              cudaGetErrorString(err)));
+    }
+  }
 
   void* ptr = m_allocator.allocate(bytes);
 
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
 
-  if (old_device != m_traits.id)
-    cudaSetDevice(old_device);
+  if (old_device != m_traits.id) {
+    err = cudaSetDevice(old_device);
+    if (err != cudaSuccess) {
+      UMPIRE_ERROR(runtime_error, fmt::format("cudaSetDevice( device = {} ) failed with error: {}", old_device,
+                                              cudaGetErrorString(err)));
+    }
+  }
   return ptr;
 }
 
 void CudaDeviceMemoryResource::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
 {
   int old_device;
-  cudaGetDevice(&old_device);
-  if (old_device != m_traits.id)
-    cudaSetDevice(m_traits.id);
+  cudaError_t err = cudaGetDevice(&old_device);
+  if (err != cudaSuccess) {
+    UMPIRE_ERROR(runtime_error, fmt::format("Error when trying to get CUDA Device: {}", cudaGetErrorString(err)));
+  }
+  if (old_device != m_traits.id) {
+    err = cudaSetDevice(m_traits.id);
+    if (err != cudaSuccess) {
+      UMPIRE_ERROR(runtime_error, fmt::format("cudaSetDevice( device = {} ) failed with error: {}", m_traits.id,
+                                              cudaGetErrorString(err)));
+    }
+  }
 
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
 
   m_allocator.deallocate(ptr);
-  if (old_device != m_traits.id)
-    cudaSetDevice(old_device);
+  if (old_device != m_traits.id) {
+    err = cudaSetDevice(old_device);
+    if (err != cudaSuccess) {
+      UMPIRE_ERROR(runtime_error, fmt::format("cudaSetDevice( device = {} ) failed with error: {}", old_device,
+                                              cudaGetErrorString(err)));
+    }
+  }
 }
 
 bool CudaDeviceMemoryResource::isAccessibleFrom(Platform p) noexcept

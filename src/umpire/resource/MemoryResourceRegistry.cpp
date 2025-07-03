@@ -98,12 +98,18 @@ MemoryResourceRegistry::MemoryResourceRegistry() : m_allocator_factories()
 
 #if defined(UMPIRE_ENABLE_IPC_SHARED_MEMORY)
   registerMemoryResource(util::make_unique<resource::HostSharedMemoryResourceFactory>());
-  m_resource_names.push_back("SHARED");
+  m_resource_names.push_back("SHARED::POSIX");
+  if (std::string(UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE) == "POSIX") {
+    m_resource_names.push_back("SHARED");
+  }
 #endif
 
 #if defined(UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
   registerMemoryResource(util::make_unique<resource::HostMpi3SharedMemoryResourceFactory>());
-  m_resource_names.push_back("SHARED");
+  m_resource_names.push_back("SHARED::MPI3");
+  if (std::string(UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE) == "MPI3") {
+    m_resource_names.push_back("SHARED");
+  }
 #endif
 
 #if defined(UMPIRE_ENABLE_FILE_RESOURCE)
@@ -148,7 +154,8 @@ MemoryResourceRegistry::MemoryResourceRegistry() : m_allocator_factories()
     int device_count{0};
     error = ::hipGetDeviceCount(&device_count);
     if (error != hipSuccess) {
-      UMPIRE_LOG(Warning, "Umpire compiled with HIP support but no GPUs detected!");
+      UMPIRE_ERROR(umpire::runtime_error,
+                   fmt::format("Error! Can't get HIP device count: {}", hipGetErrorString(error)));
     } else {
       registerMemoryResource(util::make_unique<resource::HipDeviceResourceFactory>());
       m_resource_names.push_back("DEVICE");
@@ -193,6 +200,7 @@ MemoryResourceRegistry::MemoryResourceRegistry() : m_allocator_factories()
       m_resource_names.push_back("DEVICE_CONST");
 #endif
     }
+    UMPIRE_USE_VAR(coherence_enabled);
   }
 #endif
 
