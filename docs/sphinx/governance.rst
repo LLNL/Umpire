@@ -45,7 +45,7 @@ Technical Steering Committee
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 - **Definition**: A subset of maintainers responsible for making high-level decisions.
-- **Members**: David Beckingsale and Kristi Belcher
+- **Members**: David Beckingsale (Github handle: `davidbeckingsale <https://github.com/davidbeckingsale>`_) and Kristi Belcher (Github handle: `kab163 <https://github.com/kab163>`_)
 - **Responsibilities**:
 
   - Setting the long-term technical and community goals of the project.
