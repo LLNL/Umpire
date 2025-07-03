@@ -7,7 +7,7 @@ Using Shared Memory Allocators
 Umpire provides two different kinds of Shared Memory capabilities.
 First, Umpire provides Inter-Process Communication (IPC) Shared Memory
 which can be used with or without MPI. Secondly, Umpire provides
-MPI3 Shared Memory which requires MPI3. Although both kinds of Shared
+MPI3 Shared Memory which requires MPI. Although both kinds of Shared
 Memory provide a convenient way to share memory across nodes/sockets,
 each type has a few unique characteristics and usage details which
 will be outlined in this section of the documentation.
@@ -26,7 +26,7 @@ First, to get started with the shared memory allocator, set up the traits. For e
 
 .. code-block:: cpp
 
-    auto traits{umpire::get_default_resource_traits("SHARED")};
+    auto traits{umpire::get_default_resource_traits("SHARED::POSIX")};
 
 The ``traits`` above is a struct of different properties for your shared allocator. You can
 set the maximum size of the allocator with ``traits.size`` and set the scope of the allocator.
@@ -63,7 +63,7 @@ Now you can allocate and deallocate shared memory with:
    can instead use the :class:`umpire::strategy::NamingShim` strategy. This allows you to call allocate with only 1 argument
    for the size in bytes. Check out the :doc:`cookbook recipe <../cookbook/naming_shim>` to learn more.
 
-See the bottom of this page for a full example of how to use Shared Memory Allocators with Umpire.
+See the bottom of this page for a full example of how to use IPC Shared Memory Allocators with Umpire.
 
 MPI3 Shared Memory
 ------------------
@@ -74,14 +74,61 @@ uses the MPI3 API for its Shared Memory mechanisms that allow processes to commu
 To use Umpire's MPI3 Shared Memory allocators, the ``UMPIRE_ENABLE_MPI3_SHARED_MEMORY`` flag 
 should be set to ``On``. Note that if you are using MPI3 Shared Memory, then MPI must be enabled.
 
-See the bottom of this page for a full example of how to use Shared Memory Allocators with Umpire.
+To create an allocator with the MPI3 Shared Memory resource, you can do the following:
 
-Full IPC Shared Memory Recipe
------------------------------
+.. code-block:: cpp
 
-The following example shows how to create, use, and destruct the IPC Shared Memory Allocator whether using MPI or not. For an example of using
-MPI3 Shared Memory Allocators, users could simply update the included header file. No other code changes are necessary assuming the input
-parameter specifies MPI for the following example code.
+   auto traits{umpire::get_default_resource_traits("SHARED::MPI3")};
+   auto node_allocator{rm.makeResource("SHARED::mpi3_alloc", traits)};
+
+See the bottom of this page for a full example of how to use MPI3 Shared Memory Allocators with Umpire.
+
+Using Both IPC and MPI3 Shared Memory Allocators
+------------------------------------------------
+
+It is possible to enable both IPC and MPI3 Shared Memory Allocators at the same time.
+
+To create these Shared Memory allocators, you can do the following:
+
+.. code-block:: cpp
+
+   auto mpi3_traits{umpire::get_default_resource_traits("SHARED::MPI3")};
+   // or
+   auto ipc_traits{umpire::get_default_resource_traits("SHARED::POSIX")};
+
+   // then create an allocator:
+   auto mpi3_node_allocator{rm.makeResource("SHARED::mpi3_alloc", traits)};
+   // or
+   auto ipc_node_allocator{rm.makeResource("SHARED::ipc_alloc", traits)};
+
+   // and allocate with
+   mpi3_node_allocator.allocate(1024 * sizeof(double));
+   // or
+   ipc_node_allocator.allocate("my_SHARED_alloc", 1024 * sizeof(double));
+
+.. note::
+   It is best practice to use the full name, "SHARED::MPI3" or "SHARED::POSIX", when
+   setting up the `traits` for a shared memory allocator. However, when both IPC and MPI3
+   resources are enabled, using "SHARED" will default to the MPI3 memory resource. Additionally,
+   the name used with the `makeResource` call could also just be "SHARED", but it must
+   include either the "SHARED" or the "SHARED::" prefix. Finally, while a name is not needed
+   for MPI3 allocate calls, it is required for IPC allocations.
+
+
+Full Shared Memory Examples
+--------------------------
+
+This section shows two full code examples, one for IPC Shared Memory and one for MPI3 Shared Memory.
+
+The following example shows how to create, use, and destruct the IPC Shared Memory Allocator. (Can be used with or without MPI, as shown in the example). 
+Note that this example could be easily adapted to the MPI3 Shared Memory type if needed.
 
 .. literalinclude:: ../../../examples/cookbook/recipe_shared_memory.cpp
    :language: cpp
+
+The following example shows how to create, use, and verify the MPI3 Shared Memory Allocator. Note that although a name is needed when
+when creating the MPI3 Shared Memory allocator, a name is not needed when allocating memory.
+
+.. literalinclude:: ../../../examples/mpi3_shared_memory.cpp
+   :language: cpp
+
