@@ -62,7 +62,7 @@ TEST_P(DeviceAllocator, CreateAndAllocate)
   ASSERT_FALSE(umpire::is_device_allocator("not_da"));
   ASSERT_FALSE(umpire::is_device_allocator(0));
 
-  ASSERT_NO_THROW(UMPIRE_SET_UP_DEVICE_ALLOCATORS());
+  ASSERT_NO_THROW((UMPIRE_SET_UP_DEVICE_ALLOCATORS()));
 }
 
 TEST_P(DeviceAllocator, LaunchKernelTest)
