@@ -13,8 +13,4 @@ if (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP)
   blt_add_test(
     NAME mem_advise_op_tests
     COMMAND mem_advise_op_tests)
-    
-  if (UMPIRE_ENABLE_CUDA)
-    target_link_libraries(mem_advise_op_tests cuda_runtime)
-  endif()
 endif ()
