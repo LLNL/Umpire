@@ -28,6 +28,7 @@ set (umpire_util_headers
   detect_vendor.hpp
   make_unique.hpp
   memory_sanitizers.hpp
+  shared_memory_helper.hpp
   wrap_allocator.hpp)
 
 if (UMPIRE_ENABLE_NUMA)

@@ -23,9 +23,11 @@ TEST(GetCommunicator, SharedAndCached)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  auto traits{umpire::get_default_resource_traits("SHARED")};
+  auto traits{umpire::get_default_resource_traits("SHARED::MPI3")};
   traits.size = 4096;
-  auto allocator = rm.makeResource("SHARED::node_allocator", traits);
+
+  // NOTE: The name of the allocator MUST have "SHARED::MPI3:: prefix when both IPC and MPI3 enabled.
+  auto allocator = rm.makeResource("SHARED::MPI3::node_allocator", traits);
 
   auto comm = umpire::get_communicator_for_allocator(allocator, MPI_COMM_WORLD);
   ASSERT_NE(comm, MPI_COMM_NULL);

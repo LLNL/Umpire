@@ -957,9 +957,15 @@ int ResourceManager::getNumDevices() const
 {
   int device_count{0};
 #if defined(UMPIRE_ENABLE_CUDA)
-  ::cudaGetDeviceCount(&device_count);
+  cudaError_t err = ::cudaGetDeviceCount(&device_count);
+  if (err != cudaSuccess) {
+    UMPIRE_ERROR(runtime_error, fmt::format("cudaGetDeviceCount failed with error: {}", cudaGetErrorString(err)));
+  }
 #elif defined(UMPIRE_ENABLE_HIP)
-  hipGetDeviceCount(&device_count);
+  hipError_t err = hipGetDeviceCount(&device_count);
+  if (err != hipSuccess) {
+    UMPIRE_ERROR(runtime_error, fmt::format("hipGetDeviceCount failed with error: {}", hipGetErrorString(err)));
+  }
 #elif defined(UMPIRE_ENABLE_SYCL)
   sycl::queue queue{sycl::gpu_selector_v};
   sycl::platform platform = queue.get_device().get_platform();
