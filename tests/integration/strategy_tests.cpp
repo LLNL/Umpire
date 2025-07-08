@@ -96,7 +96,7 @@ void StrategyTest<umpire::strategy::FixedPool>::SetUp()
   m_parent_name = "HOST";
 }
 
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
 template <>
 void StrategyTest<umpire::strategy::AllocationAdvisor>::SetUp()
 {
@@ -148,7 +148,7 @@ void StrategyTest<umpire::strategy::MonotonicAllocationStrategy>::SetUp()
 
 using Strategies =
     ::testing::Types<umpire::strategy::AlignedAllocator,
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
                      umpire::strategy::AllocationAdvisor,
 #endif
                      umpire::strategy::DynamicPoolList, umpire::strategy::FixedPool, umpire::strategy::MixedPool,
@@ -400,7 +400,7 @@ TEST(MonotonicStrategy, UM)
 }
 #endif // defined(UMPIRE_ENABLE_UM)
 
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
 TEST(AllocationAdvisor, Create)
 {
   auto& rm = umpire::ResourceManager::getInstance();
@@ -443,7 +443,7 @@ TEST(AllocationAdvisor, Host)
     read_only_alloc.deallocate(data);
   });
 }
-#endif // defined(UMPIRE_ENABLE_CUDA)
+#endif // defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
 
 TEST(FixedPool, Host)
 {
