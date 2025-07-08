@@ -10,10 +10,11 @@ types = (
     ( 'int', 'integer(C_INT)' ),
     ( 'long', 'integer(C_LONG)' ),
     ( 'float', 'real(C_FLOAT)' ),
-    ( 'double', 'real(C_DOUBLE)' )
+    ( 'double', 'real(C_DOUBLE)' ),
+    ( 'bool', 'logical(C_BOOL)')
 )
 
-maxdims = 3
+maxdims = 6
 
 def gen_bounds():
     print('')

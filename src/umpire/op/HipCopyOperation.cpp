@@ -48,7 +48,7 @@ camp::resources::EventProxy<camp::resources::Resource> HipCopyOperation::transfo
   if (error != hipSuccess) {
     UMPIRE_ERROR(runtime_error, fmt::format("hipMemcpyAsync( dest_ptr = {}, src_ptr = {}, length = {}, "
                                             "stream = {}) failed with error: {}",
-                                            *dst_ptr, src_ptr, length, hipGetErrorString(error), (void*)stream));
+                                            *dst_ptr, src_ptr, length, (void*)stream, hipGetErrorString(error)));
   }
 
   return camp::resources::EventProxy<camp::resources::Resource>{ctx};

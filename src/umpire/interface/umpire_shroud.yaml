@@ -88,6 +88,48 @@ declarations:
           wrap_c: false
           wrap_fortran: false
 
+      - decl: class AlignedAllocator
+        cxx_header: umpire/strategy/AlignedAllocator.hpp
+        options:
+          wrap_c: false
+          wrap_fortran: false
+
+      - decl: class SizeLimiter
+        cxx_header: umpire/strategy/SizeLimiter.hpp
+        options:
+          wrap_c: false
+          wrap_fortran: false
+
+      - decl: class MixedPool
+        cxx_header: umpire/strategy/MixedPool.hpp
+        options:
+          wrap_c: false
+          wrap_fortran: false
+
+      - decl: class MonotonicAllocationStrategy
+        cxx_header: umpire/strategy/MonotonicAllocationStrategy.hpp
+        options:
+          wrap_c: false
+          wrap_fortran: false
+
+      - decl: class NamingShim
+        cxx_header: umpire/strategy/NamingShim.hpp
+        options:
+          wrap_c: false
+          wrap_fortran: false
+
+      - decl: class ResourceAwarePool
+        cxx_header: umpire/strategy/ResourceAwarePool.hpp
+        options:
+          wrap_c: false
+          wrap_fortran: false
+
+      - decl: class SlotPool
+        cxx_header: umpire/strategy/SlotPool.hpp
+        options:
+          wrap_c: false
+          wrap_fortran: false
+
   - decl: class Allocator
     cxx_header: umpire/Allocator.hpp
     format:
@@ -140,6 +182,10 @@ declarations:
           format:
             template_suffix: _quick_pool
             function_suffix: ""
+        - instantiation: <umpire::strategy::ResourceAwarePool>
+          format:
+            template_suffix: _resource_aware_pool
+            function_suffix: ""
 
       - decl: template <typename T> Allocator makeAllocator(const std::string& name, Allocator allocator, const std::string& advice_op, int device_id);
         options:
@@ -170,6 +216,40 @@ declarations:
           - instantiation: <umpire::strategy::FixedPool>
             format:
               template_suffix: _fixed_pool
+              function_suffix: ""
+          - instantiation: <umpire::strategy::AlignedAllocator>
+            format:
+              template_suffix: _aligned_allocator
+              function_suffix: ""
+          - instantiation: <umpire::strategy::SizeLimiter>
+            format:
+              template_suffix: _size_limiter
+              function_suffix: ""
+          - instantiation: <umpire::strategy::MonotonicAllocationStrategy>
+            format:
+              template_suffix: _monotonic
+              function_suffix: ""
+          - instantiation: <umpire::strategy::SlotPool>
+            format:
+              template_suffix: _slot_pool
+              function_suffix: ""
+
+      - decl: template <typename T> Allocator makeAllocator(const std::string& name, Allocator allocator);
+        options:
+          F_create_generic: False
+        cxx_template:
+          - instantiation: <umpire::strategy::NamingShim>
+            format:
+              template_suffix: _naming_shim
+              function_suffix: ""
+
+      - decl: template <typename T> Allocator makeAllocator(const std::string& name, Allocator allocator, size_t smallest_fixed_obj_size, size_t largest_fixed_obj_size, size_t max_initial_fixed_pool_size, size_t fixed_size_multiplier, size_t quick_pool_initial_alloc_size, size_t quick_pool_min_alloc_size, size_t quick_pool_align_bytes);
+        options:
+          F_create_generic: False
+        cxx_template:
+          - instantiation: <umpire::strategy::MixedPool>
+            format:
+              template_suffix: _mixed_pool
               function_suffix: ""
 
       - decl: template <typename T> Allocator makeAllocator(const std::string& name, Allocator allocator, int device_id);

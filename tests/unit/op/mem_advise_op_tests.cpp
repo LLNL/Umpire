@@ -10,7 +10,9 @@
 #include "umpire/op/MemoryOperationRegistry.hpp"
 #include "umpire/util/AllocationRecord.hpp"
 
-TEST(CudaAdviseAccessedBy, Find)
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
+
+TEST(MemAdviseAccessedBy, Find)
 {
   auto& rm = umpire::ResourceManager::getInstance();
   auto allocator = rm.getAllocator("UM");
@@ -21,7 +23,7 @@ TEST(CudaAdviseAccessedBy, Find)
   ASSERT_NO_THROW(op_registry.find("SET_ACCESSED_BY", strategy, strategy));
 }
 
-TEST(CudaAdviseAccessedBy, Apply)
+TEST(MemAdviseAccessedBy, Apply)
 {
   auto& rm = umpire::ResourceManager::getInstance();
   auto allocator = rm.getAllocator("UM");
@@ -37,9 +39,11 @@ TEST(CudaAdviseAccessedBy, Apply)
                                           nullptr, // AllocationRecord* is unused
                                           0,       // val is unused
                                           1024 * sizeof(float)));
+
+  allocator.deallocate(data);
 }
 
-TEST(CudaAdvisePreferredLocation, Find)
+TEST(MemAdvisePreferredLocation, Find)
 {
   auto& rm = umpire::ResourceManager::getInstance();
   auto allocator = rm.getAllocator("UM");
@@ -50,7 +54,7 @@ TEST(CudaAdvisePreferredLocation, Find)
   ASSERT_NO_THROW(op_registry.find("SET_PREFERRED_LOCATION", strategy, strategy));
 }
 
-TEST(CudaAdvisePreferredLocation, Apply)
+TEST(MemAdvisePreferredLocation, Apply)
 {
   auto& rm = umpire::ResourceManager::getInstance();
   auto allocator = rm.getAllocator("UM");
@@ -71,7 +75,7 @@ TEST(CudaAdvisePreferredLocation, Apply)
   delete record;
 }
 
-TEST(CudaAdvisePreferredLocation, ApplyHost)
+TEST(MemAdvisePreferredLocation, ApplyHost)
 {
   auto& rm = umpire::ResourceManager::getInstance();
   auto allocator = rm.getAllocator("UM");
@@ -92,7 +96,7 @@ TEST(CudaAdvisePreferredLocation, ApplyHost)
   delete record;
 }
 
-TEST(CudaAdviseReadMostly, Find)
+TEST(MemAdviseReadMostly, Find)
 {
   auto& rm = umpire::ResourceManager::getInstance();
   auto allocator = rm.getAllocator("UM");
@@ -103,7 +107,7 @@ TEST(CudaAdviseReadMostly, Find)
   ASSERT_NO_THROW(op_registry.find("SET_READ_MOSTLY", strategy, strategy));
 }
 
-TEST(CudaAdviseReadMostly, Apply)
+TEST(MemAdviseReadMostly, Apply)
 {
   auto& op_registry = umpire::op::MemoryOperationRegistry::getInstance();
 
@@ -119,4 +123,42 @@ TEST(CudaAdviseReadMostly, Apply)
                                           nullptr, // AllocationRecord* is unused
                                           0,       // val is unused
                                           1024 * sizeof(float)));
+
+  allocator.deallocate(data);
 }
+
+#if defined(UMPIRE_ENABLE_HIP)
+// Test HIP-specific operations that don't exist in CUDA
+TEST(MemAdviseCoarseGrain, Find)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto allocator = rm.getAllocator("UM");
+  auto strategy = allocator.getAllocationStrategy();
+
+  auto& op_registry = umpire::op::MemoryOperationRegistry::getInstance();
+
+  ASSERT_NO_THROW(op_registry.find("SET_COARSE_GRAIN", strategy, strategy));
+}
+
+TEST(MemAdviseCoarseGrain, Apply)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto allocator = rm.getAllocator("UM");
+  auto strategy = allocator.getAllocationStrategy();
+
+  auto& op_registry = umpire::op::MemoryOperationRegistry::getInstance();
+
+  auto advice_operation = op_registry.find("SET_COARSE_GRAIN", strategy, strategy);
+
+  float* data = static_cast<float*>(allocator.allocate(1024 * sizeof(float)));
+
+  ASSERT_NO_THROW(advice_operation->apply(data,
+                                          nullptr, // AllocationRecord* is unused
+                                          0,       // val is unused
+                                          1024 * sizeof(float)));
+
+  allocator.deallocate(data);
+}
+#endif // defined(UMPIRE_ENABLE_HIP)
+
+#endif // defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)

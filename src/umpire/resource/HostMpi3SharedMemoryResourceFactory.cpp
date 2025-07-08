@@ -10,17 +10,14 @@
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/error.hpp"
 #include "umpire/util/make_unique.hpp"
+#include "umpire/util/shared_memory_helper.hpp"
 
 namespace umpire {
 namespace resource {
 
 bool HostMpi3SharedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name) noexcept
 {
-  if (name.find("SHARED") != std::string::npos) {
-    return true;
-  } else {
-    return false;
-  }
+  return umpire::util::matchesSharedMemoryResource(name, "MPI3");
 }
 
 std::unique_ptr<resource::MemoryResource> HostMpi3SharedMemoryResourceFactory::create(const std::string& name, int id)

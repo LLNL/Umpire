@@ -76,6 +76,12 @@ module umpire_mod
         procedure :: deallocate_int_array_3d => allocator_deallocate_int_array_3d
         procedure :: allocate_int_array_4d => allocator_allocate_int_array_4d
         procedure :: deallocate_int_array_4d => allocator_deallocate_int_array_4d
+        procedure :: allocate_int_array_5d => allocator_allocate_int_array_5d
+        procedure :: deallocate_int_array_5d => allocator_deallocate_int_array_5d
+        procedure :: allocate_int_array_6d => allocator_allocate_int_array_6d
+        procedure :: deallocate_int_array_6d => allocator_deallocate_int_array_6d
+        procedure :: allocate_int_array_7d => allocator_allocate_int_array_7d
+        procedure :: deallocate_int_array_7d => allocator_deallocate_int_array_7d
         procedure :: allocate_long_array_1d => allocator_allocate_long_array_1d
         procedure :: deallocate_long_array_1d => allocator_deallocate_long_array_1d
         procedure :: allocate_long_array_2d => allocator_allocate_long_array_2d
@@ -84,6 +90,12 @@ module umpire_mod
         procedure :: deallocate_long_array_3d => allocator_deallocate_long_array_3d
         procedure :: allocate_long_array_4d => allocator_allocate_long_array_4d
         procedure :: deallocate_long_array_4d => allocator_deallocate_long_array_4d
+        procedure :: allocate_long_array_5d => allocator_allocate_long_array_5d
+        procedure :: deallocate_long_array_5d => allocator_deallocate_long_array_5d
+        procedure :: allocate_long_array_6d => allocator_allocate_long_array_6d
+        procedure :: deallocate_long_array_6d => allocator_deallocate_long_array_6d
+        procedure :: allocate_long_array_7d => allocator_allocate_long_array_7d
+        procedure :: deallocate_long_array_7d => allocator_deallocate_long_array_7d
         procedure :: allocate_float_array_1d => allocator_allocate_float_array_1d
         procedure :: deallocate_float_array_1d => allocator_deallocate_float_array_1d
         procedure :: allocate_float_array_2d => allocator_allocate_float_array_2d
@@ -92,6 +104,12 @@ module umpire_mod
         procedure :: deallocate_float_array_3d => allocator_deallocate_float_array_3d
         procedure :: allocate_float_array_4d => allocator_allocate_float_array_4d
         procedure :: deallocate_float_array_4d => allocator_deallocate_float_array_4d
+        procedure :: allocate_float_array_5d => allocator_allocate_float_array_5d
+        procedure :: deallocate_float_array_5d => allocator_deallocate_float_array_5d
+        procedure :: allocate_float_array_6d => allocator_allocate_float_array_6d
+        procedure :: deallocate_float_array_6d => allocator_deallocate_float_array_6d
+        procedure :: allocate_float_array_7d => allocator_allocate_float_array_7d
+        procedure :: deallocate_float_array_7d => allocator_deallocate_float_array_7d
         procedure :: allocate_double_array_1d => allocator_allocate_double_array_1d
         procedure :: deallocate_double_array_1d => allocator_deallocate_double_array_1d
         procedure :: allocate_double_array_2d => allocator_allocate_double_array_2d
@@ -100,41 +118,99 @@ module umpire_mod
         procedure :: deallocate_double_array_3d => allocator_deallocate_double_array_3d
         procedure :: allocate_double_array_4d => allocator_allocate_double_array_4d
         procedure :: deallocate_double_array_4d => allocator_deallocate_double_array_4d
+        procedure :: allocate_double_array_5d => allocator_allocate_double_array_5d
+        procedure :: deallocate_double_array_5d => allocator_deallocate_double_array_5d
+        procedure :: allocate_double_array_6d => allocator_allocate_double_array_6d
+        procedure :: deallocate_double_array_6d => allocator_deallocate_double_array_6d
+        procedure :: allocate_double_array_7d => allocator_allocate_double_array_7d
+        procedure :: deallocate_double_array_7d => allocator_deallocate_double_array_7d
+        procedure :: allocate_bool_array_1d => allocator_allocate_bool_array_1d
+        procedure :: deallocate_bool_array_1d => allocator_deallocate_bool_array_1d
+        procedure :: allocate_bool_array_2d => allocator_allocate_bool_array_2d
+        procedure :: deallocate_bool_array_2d => allocator_deallocate_bool_array_2d
+        procedure :: allocate_bool_array_3d => allocator_allocate_bool_array_3d
+        procedure :: deallocate_bool_array_3d => allocator_deallocate_bool_array_3d
+        procedure :: allocate_bool_array_4d => allocator_allocate_bool_array_4d
+        procedure :: deallocate_bool_array_4d => allocator_deallocate_bool_array_4d
+        procedure :: allocate_bool_array_5d => allocator_allocate_bool_array_5d
+        procedure :: deallocate_bool_array_5d => allocator_deallocate_bool_array_5d
+        procedure :: allocate_bool_array_6d => allocator_allocate_bool_array_6d
+        procedure :: deallocate_bool_array_6d => allocator_deallocate_bool_array_6d
+        procedure :: allocate_bool_array_7d => allocator_allocate_bool_array_7d
+        procedure :: deallocate_bool_array_7d => allocator_deallocate_bool_array_7d
         generic, public :: allocate => &
             allocate_int_array_1d, &
             allocate_int_array_2d, &
             allocate_int_array_3d, &
             allocate_int_array_4d, &
+            allocate_int_array_5d, &
+            allocate_int_array_6d, &
+            allocate_int_array_7d, &
             allocate_long_array_1d, &
             allocate_long_array_2d, &
             allocate_long_array_3d, &
             allocate_long_array_4d, &
+            allocate_long_array_5d, &
+            allocate_long_array_6d, &
+            allocate_long_array_7d, &
             allocate_float_array_1d, &
             allocate_float_array_2d, &
             allocate_float_array_3d, &
             allocate_float_array_4d, &
+            allocate_float_array_5d, &
+            allocate_float_array_6d, &
+            allocate_float_array_7d, &
             allocate_double_array_1d, &
             allocate_double_array_2d, &
             allocate_double_array_3d, &
-            allocate_double_array_4d
+            allocate_double_array_4d, &
+            allocate_double_array_5d, &
+            allocate_double_array_6d, &
+            allocate_double_array_7d, &
+            allocate_bool_array_1d, &
+            allocate_bool_array_2d, &
+            allocate_bool_array_3d, &
+            allocate_bool_array_4d, &
+            allocate_bool_array_5d, &
+            allocate_bool_array_6d, &
+            allocate_bool_array_7d
 
         generic, public :: deallocate => &
             deallocate_int_array_1d, &
             deallocate_int_array_2d, &
             deallocate_int_array_3d, &
             deallocate_int_array_4d, &
+            deallocate_int_array_5d, &
+            deallocate_int_array_6d, &
+            deallocate_int_array_7d, &
             deallocate_long_array_1d, &
             deallocate_long_array_2d, &
             deallocate_long_array_3d, &
             deallocate_long_array_4d, &
+            deallocate_long_array_5d, &
+            deallocate_long_array_6d, &
+            deallocate_long_array_7d, &
             deallocate_float_array_1d, &
             deallocate_float_array_2d, &
             deallocate_float_array_3d, &
             deallocate_float_array_4d, &
+            deallocate_float_array_5d, &
+            deallocate_float_array_6d, &
+            deallocate_float_array_7d, &
             deallocate_double_array_1d, &
             deallocate_double_array_2d, &
             deallocate_double_array_3d, &
-            deallocate_double_array_4d
+            deallocate_double_array_4d, &
+            deallocate_double_array_5d, &
+            deallocate_double_array_6d, &
+            deallocate_double_array_7d, &
+            deallocate_bool_array_1d, &
+            deallocate_bool_array_2d, &
+            deallocate_bool_array_3d, &
+            deallocate_bool_array_4d, &
+            deallocate_bool_array_5d, &
+            deallocate_bool_array_6d, &
+            deallocate_bool_array_7d
 
         ! splicer end class.Allocator.type_bound_procedure_part
     end type UmpireAllocator
@@ -154,10 +230,17 @@ module umpire_mod
         procedure :: get_allocator_by_id => resourcemanager_get_allocator_by_id
         procedure :: make_allocator_list_pool => resourcemanager_make_allocator_list_pool
         procedure :: make_allocator_quick_pool => resourcemanager_make_allocator_quick_pool
+        procedure :: make_allocator_resource_aware_pool => resourcemanager_make_allocator_resource_aware_pool
         procedure :: make_allocator_advisor => resourcemanager_make_allocator_advisor
         procedure :: make_allocator_named => resourcemanager_make_allocator_named
         procedure :: make_allocator_thread_safe => resourcemanager_make_allocator_thread_safe
         procedure :: make_allocator_fixed_pool => resourcemanager_make_allocator_fixed_pool
+        procedure :: make_allocator_aligned_allocator => resourcemanager_make_allocator_aligned_allocator
+        procedure :: make_allocator_size_limiter => resourcemanager_make_allocator_size_limiter
+        procedure :: make_allocator_monotonic => resourcemanager_make_allocator_monotonic
+        procedure :: make_allocator_slot_pool => resourcemanager_make_allocator_slot_pool
+        procedure :: make_allocator_naming_shim => resourcemanager_make_allocator_naming_shim
+        procedure :: make_allocator_mixed_pool => resourcemanager_make_allocator_mixed_pool
         procedure :: make_allocator_prefetcher => resourcemanager_make_allocator_prefetcher
         procedure :: add_alias => resourcemanager_add_alias
         procedure :: remove_alias => resourcemanager_remove_alias
@@ -434,6 +517,40 @@ module umpire_mod
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_bufferify_quick_pool
 
+        function c_resourcemanager_make_allocator_resource_aware_pool( &
+                self, name, allocator, initial_size, block, SHT_crv) &
+                result(SHT_rv) &
+                bind(C, name="umpire_resourcemanager_make_allocator_resource_aware_pool")
+            use iso_c_binding, only : C_CHAR, C_PTR, C_SIZE_T
+            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            implicit none
+            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            character(kind=C_CHAR), intent(IN) :: name(*)
+            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+            integer(C_SIZE_T), value, intent(IN) :: initial_size
+            integer(C_SIZE_T), value, intent(IN) :: block
+            type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
+            type(C_PTR) SHT_rv
+        end function c_resourcemanager_make_allocator_resource_aware_pool
+
+        function c_resourcemanager_make_allocator_bufferify_resource_aware_pool( &
+                self, name, Lname, allocator, initial_size, block, &
+                SHT_crv) &
+                result(SHT_rv) &
+                bind(C, name="umpire_resourcemanager_make_allocator_bufferify_resource_aware_pool")
+            use iso_c_binding, only : C_CHAR, C_INT, C_PTR, C_SIZE_T
+            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            implicit none
+            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            character(kind=C_CHAR), intent(IN) :: name(*)
+            integer(C_INT), value, intent(IN) :: Lname
+            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+            integer(C_SIZE_T), value, intent(IN) :: initial_size
+            integer(C_SIZE_T), value, intent(IN) :: block
+            type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
+            type(C_PTR) SHT_rv
+        end function c_resourcemanager_make_allocator_bufferify_resource_aware_pool
+
         function c_resourcemanager_make_allocator_advisor(self, name, &
                 allocator, advice_op, device_id, SHT_crv) &
                 result(SHT_rv) &
@@ -557,6 +674,210 @@ module umpire_mod
             type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_bufferify_fixed_pool
+
+        function c_resourcemanager_make_allocator_aligned_allocator( &
+                self, name, allocator, object_size, SHT_crv) &
+                result(SHT_rv) &
+                bind(C, name="umpire_resourcemanager_make_allocator_aligned_allocator")
+            use iso_c_binding, only : C_CHAR, C_PTR, C_SIZE_T
+            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            implicit none
+            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            character(kind=C_CHAR), intent(IN) :: name(*)
+            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+            integer(C_SIZE_T), value, intent(IN) :: object_size
+            type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
+            type(C_PTR) SHT_rv
+        end function c_resourcemanager_make_allocator_aligned_allocator
+
+        function c_resourcemanager_make_allocator_bufferify_aligned_allocator( &
+                self, name, Lname, allocator, object_size, SHT_crv) &
+                result(SHT_rv) &
+                bind(C, name="umpire_resourcemanager_make_allocator_bufferify_aligned_allocator")
+            use iso_c_binding, only : C_CHAR, C_INT, C_PTR, C_SIZE_T
+            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            implicit none
+            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            character(kind=C_CHAR), intent(IN) :: name(*)
+            integer(C_INT), value, intent(IN) :: Lname
+            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+            integer(C_SIZE_T), value, intent(IN) :: object_size
+            type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
+            type(C_PTR) SHT_rv
+        end function c_resourcemanager_make_allocator_bufferify_aligned_allocator
+
+        function c_resourcemanager_make_allocator_size_limiter(self, &
+                name, allocator, object_size, SHT_crv) &
+                result(SHT_rv) &
+                bind(C, name="umpire_resourcemanager_make_allocator_size_limiter")
+            use iso_c_binding, only : C_CHAR, C_PTR, C_SIZE_T
+            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            implicit none
+            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            character(kind=C_CHAR), intent(IN) :: name(*)
+            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+            integer(C_SIZE_T), value, intent(IN) :: object_size
+            type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
+            type(C_PTR) SHT_rv
+        end function c_resourcemanager_make_allocator_size_limiter
+
+        function c_resourcemanager_make_allocator_bufferify_size_limiter( &
+                self, name, Lname, allocator, object_size, SHT_crv) &
+                result(SHT_rv) &
+                bind(C, name="umpire_resourcemanager_make_allocator_bufferify_size_limiter")
+            use iso_c_binding, only : C_CHAR, C_INT, C_PTR, C_SIZE_T
+            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            implicit none
+            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            character(kind=C_CHAR), intent(IN) :: name(*)
+            integer(C_INT), value, intent(IN) :: Lname
+            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+            integer(C_SIZE_T), value, intent(IN) :: object_size
+            type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
+            type(C_PTR) SHT_rv
+        end function c_resourcemanager_make_allocator_bufferify_size_limiter
+
+        function c_resourcemanager_make_allocator_monotonic(self, name, &
+                allocator, object_size, SHT_crv) &
+                result(SHT_rv) &
+                bind(C, name="umpire_resourcemanager_make_allocator_monotonic")
+            use iso_c_binding, only : C_CHAR, C_PTR, C_SIZE_T
+            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            implicit none
+            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            character(kind=C_CHAR), intent(IN) :: name(*)
+            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+            integer(C_SIZE_T), value, intent(IN) :: object_size
+            type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
+            type(C_PTR) SHT_rv
+        end function c_resourcemanager_make_allocator_monotonic
+
+        function c_resourcemanager_make_allocator_bufferify_monotonic( &
+                self, name, Lname, allocator, object_size, SHT_crv) &
+                result(SHT_rv) &
+                bind(C, name="umpire_resourcemanager_make_allocator_bufferify_monotonic")
+            use iso_c_binding, only : C_CHAR, C_INT, C_PTR, C_SIZE_T
+            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            implicit none
+            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            character(kind=C_CHAR), intent(IN) :: name(*)
+            integer(C_INT), value, intent(IN) :: Lname
+            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+            integer(C_SIZE_T), value, intent(IN) :: object_size
+            type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
+            type(C_PTR) SHT_rv
+        end function c_resourcemanager_make_allocator_bufferify_monotonic
+
+        function c_resourcemanager_make_allocator_slot_pool(self, name, &
+                allocator, object_size, SHT_crv) &
+                result(SHT_rv) &
+                bind(C, name="umpire_resourcemanager_make_allocator_slot_pool")
+            use iso_c_binding, only : C_CHAR, C_PTR, C_SIZE_T
+            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            implicit none
+            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            character(kind=C_CHAR), intent(IN) :: name(*)
+            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+            integer(C_SIZE_T), value, intent(IN) :: object_size
+            type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
+            type(C_PTR) SHT_rv
+        end function c_resourcemanager_make_allocator_slot_pool
+
+        function c_resourcemanager_make_allocator_bufferify_slot_pool( &
+                self, name, Lname, allocator, object_size, SHT_crv) &
+                result(SHT_rv) &
+                bind(C, name="umpire_resourcemanager_make_allocator_bufferify_slot_pool")
+            use iso_c_binding, only : C_CHAR, C_INT, C_PTR, C_SIZE_T
+            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            implicit none
+            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            character(kind=C_CHAR), intent(IN) :: name(*)
+            integer(C_INT), value, intent(IN) :: Lname
+            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+            integer(C_SIZE_T), value, intent(IN) :: object_size
+            type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
+            type(C_PTR) SHT_rv
+        end function c_resourcemanager_make_allocator_bufferify_slot_pool
+
+        function c_resourcemanager_make_allocator_naming_shim(self, &
+                name, allocator, SHT_crv) &
+                result(SHT_rv) &
+                bind(C, name="umpire_resourcemanager_make_allocator_naming_shim")
+            use iso_c_binding, only : C_CHAR, C_PTR
+            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            implicit none
+            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            character(kind=C_CHAR), intent(IN) :: name(*)
+            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+            type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
+            type(C_PTR) SHT_rv
+        end function c_resourcemanager_make_allocator_naming_shim
+
+        function c_resourcemanager_make_allocator_bufferify_naming_shim( &
+                self, name, Lname, allocator, SHT_crv) &
+                result(SHT_rv) &
+                bind(C, name="umpire_resourcemanager_make_allocator_bufferify_naming_shim")
+            use iso_c_binding, only : C_CHAR, C_INT, C_PTR
+            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            implicit none
+            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            character(kind=C_CHAR), intent(IN) :: name(*)
+            integer(C_INT), value, intent(IN) :: Lname
+            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+            type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
+            type(C_PTR) SHT_rv
+        end function c_resourcemanager_make_allocator_bufferify_naming_shim
+
+        function c_resourcemanager_make_allocator_mixed_pool(self, name, &
+                allocator, smallest_fixed_obj_size, &
+                largest_fixed_obj_size, max_initial_fixed_pool_size, &
+                fixed_size_multiplier, quick_pool_initial_alloc_size, &
+                quick_pool_min_alloc_size, quick_pool_align_bytes, &
+                SHT_crv) &
+                result(SHT_rv) &
+                bind(C, name="umpire_resourcemanager_make_allocator_mixed_pool")
+            use iso_c_binding, only : C_CHAR, C_PTR, C_SIZE_T
+            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            implicit none
+            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            character(kind=C_CHAR), intent(IN) :: name(*)
+            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+            integer(C_SIZE_T), value, intent(IN) :: smallest_fixed_obj_size
+            integer(C_SIZE_T), value, intent(IN) :: largest_fixed_obj_size
+            integer(C_SIZE_T), value, intent(IN) :: max_initial_fixed_pool_size
+            integer(C_SIZE_T), value, intent(IN) :: fixed_size_multiplier
+            integer(C_SIZE_T), value, intent(IN) :: quick_pool_initial_alloc_size
+            integer(C_SIZE_T), value, intent(IN) :: quick_pool_min_alloc_size
+            integer(C_SIZE_T), value, intent(IN) :: quick_pool_align_bytes
+            type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
+            type(C_PTR) SHT_rv
+        end function c_resourcemanager_make_allocator_mixed_pool
+
+        function c_resourcemanager_make_allocator_bufferify_mixed_pool( &
+                self, name, Lname, allocator, smallest_fixed_obj_size, &
+                largest_fixed_obj_size, max_initial_fixed_pool_size, &
+                fixed_size_multiplier, quick_pool_initial_alloc_size, &
+                quick_pool_min_alloc_size, quick_pool_align_bytes, &
+                SHT_crv) &
+                result(SHT_rv) &
+                bind(C, name="umpire_resourcemanager_make_allocator_bufferify_mixed_pool")
+            use iso_c_binding, only : C_CHAR, C_INT, C_PTR, C_SIZE_T
+            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            implicit none
+            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            character(kind=C_CHAR), intent(IN) :: name(*)
+            integer(C_INT), value, intent(IN) :: Lname
+            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+            integer(C_SIZE_T), value, intent(IN) :: smallest_fixed_obj_size
+            integer(C_SIZE_T), value, intent(IN) :: largest_fixed_obj_size
+            integer(C_SIZE_T), value, intent(IN) :: max_initial_fixed_pool_size
+            integer(C_SIZE_T), value, intent(IN) :: fixed_size_multiplier
+            integer(C_SIZE_T), value, intent(IN) :: quick_pool_initial_alloc_size
+            integer(C_SIZE_T), value, intent(IN) :: quick_pool_min_alloc_size
+            integer(C_SIZE_T), value, intent(IN) :: quick_pool_align_bytes
+            type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
+            type(C_PTR) SHT_rv
+        end function c_resourcemanager_make_allocator_bufferify_mixed_pool
 
         function c_resourcemanager_make_allocator_prefetcher(self, name, &
                 allocator, device_id, SHT_crv) &
@@ -1213,6 +1534,129 @@ contains
 
 
 
+    subroutine allocator_allocate_int_array_5d(this, array, dims)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          integer(C_INT), intent(inout), pointer, dimension(:, :, :, :, :) :: array
+
+          integer, dimension(:) :: dims
+
+          type(C_PTR) :: data_ptr
+
+          integer(C_INT) :: size_type
+          integer(C_SIZE_T) :: num_bytes, p, i
+
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
+
+          call c_f_pointer(data_ptr, array, dims)
+    end subroutine allocator_allocate_int_array_5d
+
+
+
+    subroutine allocator_deallocate_int_array_5d(this, array)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          integer(C_INT), intent(inout), pointer, dimension(:, :, :, :, :) :: array
+
+          type(C_PTR) :: data_ptr
+
+          data_ptr = c_loc(array)
+
+          call this%deallocate_pointer(data_ptr)
+          nullify(array)
+    end subroutine allocator_deallocate_int_array_5d
+
+
+
+    subroutine allocator_allocate_int_array_6d(this, array, dims)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          integer(C_INT), intent(inout), pointer, dimension(:, :, :, :, :, :) :: array
+
+          integer, dimension(:) :: dims
+
+          type(C_PTR) :: data_ptr
+
+          integer(C_INT) :: size_type
+          integer(C_SIZE_T) :: num_bytes, p, i
+
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
+
+          call c_f_pointer(data_ptr, array, dims)
+    end subroutine allocator_allocate_int_array_6d
+
+
+
+    subroutine allocator_deallocate_int_array_6d(this, array)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          integer(C_INT), intent(inout), pointer, dimension(:, :, :, :, :, :) :: array
+
+          type(C_PTR) :: data_ptr
+
+          data_ptr = c_loc(array)
+
+          call this%deallocate_pointer(data_ptr)
+          nullify(array)
+    end subroutine allocator_deallocate_int_array_6d
+
+
+
+    subroutine allocator_allocate_int_array_7d(this, array, dims)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          integer(C_INT), intent(inout), pointer, dimension(:, :, :, :, :, :, :) :: array
+
+          integer, dimension(:) :: dims
+
+          type(C_PTR) :: data_ptr
+
+          integer(C_INT) :: size_type
+          integer(C_SIZE_T) :: num_bytes, p, i
+
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
+
+          call c_f_pointer(data_ptr, array, dims)
+    end subroutine allocator_allocate_int_array_7d
+
+
+
+    subroutine allocator_deallocate_int_array_7d(this, array)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          integer(C_INT), intent(inout), pointer, dimension(:, :, :, :, :, :, :) :: array
+
+          type(C_PTR) :: data_ptr
+
+          data_ptr = c_loc(array)
+
+          call this%deallocate_pointer(data_ptr)
+          nullify(array)
+    end subroutine allocator_deallocate_int_array_7d
+
+
+
     subroutine allocator_allocate_long_array_1d(this, array, dims)
           use iso_c_binding
 
@@ -1374,6 +1818,129 @@ contains
           call this%deallocate_pointer(data_ptr)
           nullify(array)
     end subroutine allocator_deallocate_long_array_4d
+
+
+
+    subroutine allocator_allocate_long_array_5d(this, array, dims)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          integer(C_LONG), intent(inout), pointer, dimension(:, :, :, :, :) :: array
+
+          integer, dimension(:) :: dims
+
+          type(C_PTR) :: data_ptr
+
+          integer(C_LONG) :: size_type
+          integer(C_SIZE_T) :: num_bytes, p, i
+
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
+
+          call c_f_pointer(data_ptr, array, dims)
+    end subroutine allocator_allocate_long_array_5d
+
+
+
+    subroutine allocator_deallocate_long_array_5d(this, array)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          integer(C_LONG), intent(inout), pointer, dimension(:, :, :, :, :) :: array
+
+          type(C_PTR) :: data_ptr
+
+          data_ptr = c_loc(array)
+
+          call this%deallocate_pointer(data_ptr)
+          nullify(array)
+    end subroutine allocator_deallocate_long_array_5d
+
+
+
+    subroutine allocator_allocate_long_array_6d(this, array, dims)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          integer(C_LONG), intent(inout), pointer, dimension(:, :, :, :, :, :) :: array
+
+          integer, dimension(:) :: dims
+
+          type(C_PTR) :: data_ptr
+
+          integer(C_LONG) :: size_type
+          integer(C_SIZE_T) :: num_bytes, p, i
+
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
+
+          call c_f_pointer(data_ptr, array, dims)
+    end subroutine allocator_allocate_long_array_6d
+
+
+
+    subroutine allocator_deallocate_long_array_6d(this, array)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          integer(C_LONG), intent(inout), pointer, dimension(:, :, :, :, :, :) :: array
+
+          type(C_PTR) :: data_ptr
+
+          data_ptr = c_loc(array)
+
+          call this%deallocate_pointer(data_ptr)
+          nullify(array)
+    end subroutine allocator_deallocate_long_array_6d
+
+
+
+    subroutine allocator_allocate_long_array_7d(this, array, dims)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          integer(C_LONG), intent(inout), pointer, dimension(:, :, :, :, :, :, :) :: array
+
+          integer, dimension(:) :: dims
+
+          type(C_PTR) :: data_ptr
+
+          integer(C_LONG) :: size_type
+          integer(C_SIZE_T) :: num_bytes, p, i
+
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
+
+          call c_f_pointer(data_ptr, array, dims)
+    end subroutine allocator_allocate_long_array_7d
+
+
+
+    subroutine allocator_deallocate_long_array_7d(this, array)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          integer(C_LONG), intent(inout), pointer, dimension(:, :, :, :, :, :, :) :: array
+
+          type(C_PTR) :: data_ptr
+
+          data_ptr = c_loc(array)
+
+          call this%deallocate_pointer(data_ptr)
+          nullify(array)
+    end subroutine allocator_deallocate_long_array_7d
 
 
 
@@ -1541,6 +2108,129 @@ contains
 
 
 
+    subroutine allocator_allocate_float_array_5d(this, array, dims)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          real(C_FLOAT), intent(inout), pointer, dimension(:, :, :, :, :) :: array
+
+          integer, dimension(:) :: dims
+
+          type(C_PTR) :: data_ptr
+
+          real(C_FLOAT) :: size_type
+          integer(C_SIZE_T) :: num_bytes, p, i
+
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
+
+          call c_f_pointer(data_ptr, array, dims)
+    end subroutine allocator_allocate_float_array_5d
+
+
+
+    subroutine allocator_deallocate_float_array_5d(this, array)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          real(C_FLOAT), intent(inout), pointer, dimension(:, :, :, :, :) :: array
+
+          type(C_PTR) :: data_ptr
+
+          data_ptr = c_loc(array)
+
+          call this%deallocate_pointer(data_ptr)
+          nullify(array)
+    end subroutine allocator_deallocate_float_array_5d
+
+
+
+    subroutine allocator_allocate_float_array_6d(this, array, dims)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          real(C_FLOAT), intent(inout), pointer, dimension(:, :, :, :, :, :) :: array
+
+          integer, dimension(:) :: dims
+
+          type(C_PTR) :: data_ptr
+
+          real(C_FLOAT) :: size_type
+          integer(C_SIZE_T) :: num_bytes, p, i
+
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
+
+          call c_f_pointer(data_ptr, array, dims)
+    end subroutine allocator_allocate_float_array_6d
+
+
+
+    subroutine allocator_deallocate_float_array_6d(this, array)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          real(C_FLOAT), intent(inout), pointer, dimension(:, :, :, :, :, :) :: array
+
+          type(C_PTR) :: data_ptr
+
+          data_ptr = c_loc(array)
+
+          call this%deallocate_pointer(data_ptr)
+          nullify(array)
+    end subroutine allocator_deallocate_float_array_6d
+
+
+
+    subroutine allocator_allocate_float_array_7d(this, array, dims)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          real(C_FLOAT), intent(inout), pointer, dimension(:, :, :, :, :, :, :) :: array
+
+          integer, dimension(:) :: dims
+
+          type(C_PTR) :: data_ptr
+
+          real(C_FLOAT) :: size_type
+          integer(C_SIZE_T) :: num_bytes, p, i
+
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
+
+          call c_f_pointer(data_ptr, array, dims)
+    end subroutine allocator_allocate_float_array_7d
+
+
+
+    subroutine allocator_deallocate_float_array_7d(this, array)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          real(C_FLOAT), intent(inout), pointer, dimension(:, :, :, :, :, :, :) :: array
+
+          type(C_PTR) :: data_ptr
+
+          data_ptr = c_loc(array)
+
+          call this%deallocate_pointer(data_ptr)
+          nullify(array)
+    end subroutine allocator_deallocate_float_array_7d
+
+
+
     subroutine allocator_allocate_double_array_1d(this, array, dims)
           use iso_c_binding
 
@@ -1704,6 +2394,416 @@ contains
     end subroutine allocator_deallocate_double_array_4d
 
 
+
+    subroutine allocator_allocate_double_array_5d(this, array, dims)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          real(C_DOUBLE), intent(inout), pointer, dimension(:, :, :, :, :) :: array
+
+          integer, dimension(:) :: dims
+
+          type(C_PTR) :: data_ptr
+
+          real(C_DOUBLE) :: size_type
+          integer(C_SIZE_T) :: num_bytes, p, i
+
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
+
+          call c_f_pointer(data_ptr, array, dims)
+    end subroutine allocator_allocate_double_array_5d
+
+
+
+    subroutine allocator_deallocate_double_array_5d(this, array)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          real(C_DOUBLE), intent(inout), pointer, dimension(:, :, :, :, :) :: array
+
+          type(C_PTR) :: data_ptr
+
+          data_ptr = c_loc(array)
+
+          call this%deallocate_pointer(data_ptr)
+          nullify(array)
+    end subroutine allocator_deallocate_double_array_5d
+
+
+
+    subroutine allocator_allocate_double_array_6d(this, array, dims)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          real(C_DOUBLE), intent(inout), pointer, dimension(:, :, :, :, :, :) :: array
+
+          integer, dimension(:) :: dims
+
+          type(C_PTR) :: data_ptr
+
+          real(C_DOUBLE) :: size_type
+          integer(C_SIZE_T) :: num_bytes, p, i
+
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
+
+          call c_f_pointer(data_ptr, array, dims)
+    end subroutine allocator_allocate_double_array_6d
+
+
+
+    subroutine allocator_deallocate_double_array_6d(this, array)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          real(C_DOUBLE), intent(inout), pointer, dimension(:, :, :, :, :, :) :: array
+
+          type(C_PTR) :: data_ptr
+
+          data_ptr = c_loc(array)
+
+          call this%deallocate_pointer(data_ptr)
+          nullify(array)
+    end subroutine allocator_deallocate_double_array_6d
+
+
+
+    subroutine allocator_allocate_double_array_7d(this, array, dims)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          real(C_DOUBLE), intent(inout), pointer, dimension(:, :, :, :, :, :, :) :: array
+
+          integer, dimension(:) :: dims
+
+          type(C_PTR) :: data_ptr
+
+          real(C_DOUBLE) :: size_type
+          integer(C_SIZE_T) :: num_bytes, p, i
+
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
+
+          call c_f_pointer(data_ptr, array, dims)
+    end subroutine allocator_allocate_double_array_7d
+
+
+
+    subroutine allocator_deallocate_double_array_7d(this, array)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          real(C_DOUBLE), intent(inout), pointer, dimension(:, :, :, :, :, :, :) :: array
+
+          type(C_PTR) :: data_ptr
+
+          data_ptr = c_loc(array)
+
+          call this%deallocate_pointer(data_ptr)
+          nullify(array)
+    end subroutine allocator_deallocate_double_array_7d
+
+
+
+    subroutine allocator_allocate_bool_array_1d(this, array, dims)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          logical(C_BOOL), intent(inout), pointer, dimension(:) :: array
+
+          integer, dimension(:) :: dims
+
+          type(C_PTR) :: data_ptr
+
+          logical(C_BOOL) :: size_type
+          integer(C_SIZE_T) :: num_bytes, p, i
+
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
+
+          call c_f_pointer(data_ptr, array, dims)
+    end subroutine allocator_allocate_bool_array_1d
+
+
+
+    subroutine allocator_deallocate_bool_array_1d(this, array)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          logical(C_BOOL), intent(inout), pointer, dimension(:) :: array
+
+          type(C_PTR) :: data_ptr
+
+          data_ptr = c_loc(array)
+
+          call this%deallocate_pointer(data_ptr)
+          nullify(array)
+    end subroutine allocator_deallocate_bool_array_1d
+
+
+
+    subroutine allocator_allocate_bool_array_2d(this, array, dims)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          logical(C_BOOL), intent(inout), pointer, dimension(:, :) :: array
+
+          integer, dimension(:) :: dims
+
+          type(C_PTR) :: data_ptr
+
+          logical(C_BOOL) :: size_type
+          integer(C_SIZE_T) :: num_bytes, p, i
+
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
+
+          call c_f_pointer(data_ptr, array, dims)
+    end subroutine allocator_allocate_bool_array_2d
+
+
+
+    subroutine allocator_deallocate_bool_array_2d(this, array)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          logical(C_BOOL), intent(inout), pointer, dimension(:, :) :: array
+
+          type(C_PTR) :: data_ptr
+
+          data_ptr = c_loc(array)
+
+          call this%deallocate_pointer(data_ptr)
+          nullify(array)
+    end subroutine allocator_deallocate_bool_array_2d
+
+
+
+    subroutine allocator_allocate_bool_array_3d(this, array, dims)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          logical(C_BOOL), intent(inout), pointer, dimension(:, :, :) :: array
+
+          integer, dimension(:) :: dims
+
+          type(C_PTR) :: data_ptr
+
+          logical(C_BOOL) :: size_type
+          integer(C_SIZE_T) :: num_bytes, p, i
+
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
+
+          call c_f_pointer(data_ptr, array, dims)
+    end subroutine allocator_allocate_bool_array_3d
+
+
+
+    subroutine allocator_deallocate_bool_array_3d(this, array)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          logical(C_BOOL), intent(inout), pointer, dimension(:, :, :) :: array
+
+          type(C_PTR) :: data_ptr
+
+          data_ptr = c_loc(array)
+
+          call this%deallocate_pointer(data_ptr)
+          nullify(array)
+    end subroutine allocator_deallocate_bool_array_3d
+
+
+
+    subroutine allocator_allocate_bool_array_4d(this, array, dims)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          logical(C_BOOL), intent(inout), pointer, dimension(:, :, :, :) :: array
+
+          integer, dimension(:) :: dims
+
+          type(C_PTR) :: data_ptr
+
+          logical(C_BOOL) :: size_type
+          integer(C_SIZE_T) :: num_bytes, p, i
+
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
+
+          call c_f_pointer(data_ptr, array, dims)
+    end subroutine allocator_allocate_bool_array_4d
+
+
+
+    subroutine allocator_deallocate_bool_array_4d(this, array)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          logical(C_BOOL), intent(inout), pointer, dimension(:, :, :, :) :: array
+
+          type(C_PTR) :: data_ptr
+
+          data_ptr = c_loc(array)
+
+          call this%deallocate_pointer(data_ptr)
+          nullify(array)
+    end subroutine allocator_deallocate_bool_array_4d
+
+
+
+    subroutine allocator_allocate_bool_array_5d(this, array, dims)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          logical(C_BOOL), intent(inout), pointer, dimension(:, :, :, :, :) :: array
+
+          integer, dimension(:) :: dims
+
+          type(C_PTR) :: data_ptr
+
+          logical(C_BOOL) :: size_type
+          integer(C_SIZE_T) :: num_bytes, p, i
+
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
+
+          call c_f_pointer(data_ptr, array, dims)
+    end subroutine allocator_allocate_bool_array_5d
+
+
+
+    subroutine allocator_deallocate_bool_array_5d(this, array)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          logical(C_BOOL), intent(inout), pointer, dimension(:, :, :, :, :) :: array
+
+          type(C_PTR) :: data_ptr
+
+          data_ptr = c_loc(array)
+
+          call this%deallocate_pointer(data_ptr)
+          nullify(array)
+    end subroutine allocator_deallocate_bool_array_5d
+
+
+
+    subroutine allocator_allocate_bool_array_6d(this, array, dims)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          logical(C_BOOL), intent(inout), pointer, dimension(:, :, :, :, :, :) :: array
+
+          integer, dimension(:) :: dims
+
+          type(C_PTR) :: data_ptr
+
+          logical(C_BOOL) :: size_type
+          integer(C_SIZE_T) :: num_bytes, p, i
+
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
+
+          call c_f_pointer(data_ptr, array, dims)
+    end subroutine allocator_allocate_bool_array_6d
+
+
+
+    subroutine allocator_deallocate_bool_array_6d(this, array)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          logical(C_BOOL), intent(inout), pointer, dimension(:, :, :, :, :, :) :: array
+
+          type(C_PTR) :: data_ptr
+
+          data_ptr = c_loc(array)
+
+          call this%deallocate_pointer(data_ptr)
+          nullify(array)
+    end subroutine allocator_deallocate_bool_array_6d
+
+
+
+    subroutine allocator_allocate_bool_array_7d(this, array, dims)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          logical(C_BOOL), intent(inout), pointer, dimension(:, :, :, :, :, :, :) :: array
+
+          integer, dimension(:) :: dims
+
+          type(C_PTR) :: data_ptr
+
+          logical(C_BOOL) :: size_type
+          integer(C_SIZE_T) :: num_bytes, p, i
+
+          p = 1
+          do i=1,SIZE(dims)
+             p = p * dims(i)
+          enddo
+          num_bytes = p * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
+
+          call c_f_pointer(data_ptr, array, dims)
+    end subroutine allocator_allocate_bool_array_7d
+
+
+
+    subroutine allocator_deallocate_bool_array_7d(this, array)
+          use iso_c_binding
+
+          class(UmpireAllocator) :: this
+          logical(C_BOOL), intent(inout), pointer, dimension(:, :, :, :, :, :, :) :: array
+
+          type(C_PTR) :: data_ptr
+
+          data_ptr = c_loc(array)
+
+          call this%deallocate_pointer(data_ptr)
+          nullify(array)
+    end subroutine allocator_deallocate_bool_array_7d
+
+
     ! splicer end class.Allocator.additional_functions
 
     function resourcemanager_get_instance() &
@@ -1778,6 +2878,24 @@ contains
         ! splicer end class.ResourceManager.method.make_allocator_quick_pool
     end function resourcemanager_make_allocator_quick_pool
 
+    function resourcemanager_make_allocator_resource_aware_pool(obj, &
+            name, allocator, initial_size, block) &
+            result(SHT_rv)
+        use iso_c_binding, only : C_INT, C_PTR, C_SIZE_T
+        class(UmpireResourceManager) :: obj
+        character(len=*), intent(IN) :: name
+        type(UmpireAllocator), value, intent(IN) :: allocator
+        integer(C_SIZE_T), value, intent(IN) :: initial_size
+        integer(C_SIZE_T), value, intent(IN) :: block
+        type(UmpireAllocator) :: SHT_rv
+        ! splicer begin class.ResourceManager.method.make_allocator_resource_aware_pool
+        type(C_PTR) :: SHT_prv
+        SHT_prv = c_resourcemanager_make_allocator_bufferify_resource_aware_pool(obj%cxxmem, &
+            name, len_trim(name, kind=C_INT), allocator%cxxmem, &
+            initial_size, block, SHT_rv%cxxmem)
+        ! splicer end class.ResourceManager.method.make_allocator_resource_aware_pool
+    end function resourcemanager_make_allocator_resource_aware_pool
+
     function resourcemanager_make_allocator_advisor(obj, name, &
             allocator, advice_op, device_id) &
             result(SHT_rv)
@@ -1844,6 +2962,119 @@ contains
             object_size, SHT_rv%cxxmem)
         ! splicer end class.ResourceManager.method.make_allocator_fixed_pool
     end function resourcemanager_make_allocator_fixed_pool
+
+    function resourcemanager_make_allocator_aligned_allocator(obj, name, &
+            allocator, object_size) &
+            result(SHT_rv)
+        use iso_c_binding, only : C_INT, C_PTR, C_SIZE_T
+        class(UmpireResourceManager) :: obj
+        character(len=*), intent(IN) :: name
+        type(UmpireAllocator), value, intent(IN) :: allocator
+        integer(C_SIZE_T), value, intent(IN) :: object_size
+        type(UmpireAllocator) :: SHT_rv
+        ! splicer begin class.ResourceManager.method.make_allocator_aligned_allocator
+        type(C_PTR) :: SHT_prv
+        SHT_prv = c_resourcemanager_make_allocator_bufferify_aligned_allocator(obj%cxxmem, &
+            name, len_trim(name, kind=C_INT), allocator%cxxmem, &
+            object_size, SHT_rv%cxxmem)
+        ! splicer end class.ResourceManager.method.make_allocator_aligned_allocator
+    end function resourcemanager_make_allocator_aligned_allocator
+
+    function resourcemanager_make_allocator_size_limiter(obj, name, &
+            allocator, object_size) &
+            result(SHT_rv)
+        use iso_c_binding, only : C_INT, C_PTR, C_SIZE_T
+        class(UmpireResourceManager) :: obj
+        character(len=*), intent(IN) :: name
+        type(UmpireAllocator), value, intent(IN) :: allocator
+        integer(C_SIZE_T), value, intent(IN) :: object_size
+        type(UmpireAllocator) :: SHT_rv
+        ! splicer begin class.ResourceManager.method.make_allocator_size_limiter
+        type(C_PTR) :: SHT_prv
+        SHT_prv = c_resourcemanager_make_allocator_bufferify_size_limiter(obj%cxxmem, &
+            name, len_trim(name, kind=C_INT), allocator%cxxmem, &
+            object_size, SHT_rv%cxxmem)
+        ! splicer end class.ResourceManager.method.make_allocator_size_limiter
+    end function resourcemanager_make_allocator_size_limiter
+
+    function resourcemanager_make_allocator_monotonic(obj, name, &
+            allocator, object_size) &
+            result(SHT_rv)
+        use iso_c_binding, only : C_INT, C_PTR, C_SIZE_T
+        class(UmpireResourceManager) :: obj
+        character(len=*), intent(IN) :: name
+        type(UmpireAllocator), value, intent(IN) :: allocator
+        integer(C_SIZE_T), value, intent(IN) :: object_size
+        type(UmpireAllocator) :: SHT_rv
+        ! splicer begin class.ResourceManager.method.make_allocator_monotonic
+        type(C_PTR) :: SHT_prv
+        SHT_prv = c_resourcemanager_make_allocator_bufferify_monotonic(obj%cxxmem, &
+            name, len_trim(name, kind=C_INT), allocator%cxxmem, &
+            object_size, SHT_rv%cxxmem)
+        ! splicer end class.ResourceManager.method.make_allocator_monotonic
+    end function resourcemanager_make_allocator_monotonic
+
+    function resourcemanager_make_allocator_slot_pool(obj, name, &
+            allocator, object_size) &
+            result(SHT_rv)
+        use iso_c_binding, only : C_INT, C_PTR, C_SIZE_T
+        class(UmpireResourceManager) :: obj
+        character(len=*), intent(IN) :: name
+        type(UmpireAllocator), value, intent(IN) :: allocator
+        integer(C_SIZE_T), value, intent(IN) :: object_size
+        type(UmpireAllocator) :: SHT_rv
+        ! splicer begin class.ResourceManager.method.make_allocator_slot_pool
+        type(C_PTR) :: SHT_prv
+        SHT_prv = c_resourcemanager_make_allocator_bufferify_slot_pool(obj%cxxmem, &
+            name, len_trim(name, kind=C_INT), allocator%cxxmem, &
+            object_size, SHT_rv%cxxmem)
+        ! splicer end class.ResourceManager.method.make_allocator_slot_pool
+    end function resourcemanager_make_allocator_slot_pool
+
+    function resourcemanager_make_allocator_naming_shim(obj, name, &
+            allocator) &
+            result(SHT_rv)
+        use iso_c_binding, only : C_INT, C_PTR
+        class(UmpireResourceManager) :: obj
+        character(len=*), intent(IN) :: name
+        type(UmpireAllocator), value, intent(IN) :: allocator
+        type(UmpireAllocator) :: SHT_rv
+        ! splicer begin class.ResourceManager.method.make_allocator_naming_shim
+        type(C_PTR) :: SHT_prv
+        SHT_prv = c_resourcemanager_make_allocator_bufferify_naming_shim(obj%cxxmem, &
+            name, len_trim(name, kind=C_INT), allocator%cxxmem, &
+            SHT_rv%cxxmem)
+        ! splicer end class.ResourceManager.method.make_allocator_naming_shim
+    end function resourcemanager_make_allocator_naming_shim
+
+    function resourcemanager_make_allocator_mixed_pool(obj, name, &
+            allocator, smallest_fixed_obj_size, largest_fixed_obj_size, &
+            max_initial_fixed_pool_size, fixed_size_multiplier, &
+            quick_pool_initial_alloc_size, quick_pool_min_alloc_size, &
+            quick_pool_align_bytes) &
+            result(SHT_rv)
+        use iso_c_binding, only : C_INT, C_PTR, C_SIZE_T
+        class(UmpireResourceManager) :: obj
+        character(len=*), intent(IN) :: name
+        type(UmpireAllocator), value, intent(IN) :: allocator
+        integer(C_SIZE_T), value, intent(IN) :: smallest_fixed_obj_size
+        integer(C_SIZE_T), value, intent(IN) :: largest_fixed_obj_size
+        integer(C_SIZE_T), value, intent(IN) :: max_initial_fixed_pool_size
+        integer(C_SIZE_T), value, intent(IN) :: fixed_size_multiplier
+        integer(C_SIZE_T), value, intent(IN) :: quick_pool_initial_alloc_size
+        integer(C_SIZE_T), value, intent(IN) :: quick_pool_min_alloc_size
+        integer(C_SIZE_T), value, intent(IN) :: quick_pool_align_bytes
+        type(UmpireAllocator) :: SHT_rv
+        ! splicer begin class.ResourceManager.method.make_allocator_mixed_pool
+        type(C_PTR) :: SHT_prv
+        SHT_prv = c_resourcemanager_make_allocator_bufferify_mixed_pool(obj%cxxmem, &
+            name, len_trim(name, kind=C_INT), allocator%cxxmem, &
+            smallest_fixed_obj_size, largest_fixed_obj_size, &
+            max_initial_fixed_pool_size, fixed_size_multiplier, &
+            quick_pool_initial_alloc_size, quick_pool_min_alloc_size, &
+            quick_pool_align_bytes, SHT_rv%cxxmem)
+        ! splicer end class.ResourceManager.method.make_allocator_mixed_pool
+    end function resourcemanager_make_allocator_mixed_pool
 
     function resourcemanager_make_allocator_prefetcher(obj, name, &
             allocator, device_id) &
