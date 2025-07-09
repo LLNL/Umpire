@@ -35,10 +35,10 @@ cce_19_0_0:
 ###
 rocmcc_6_4_1_hip_openmp_device_alloc:
   variables:
-    SPEC: "~shared +fortran +openmp +rocm +device_alloc tests=basic amdgpu_target=gfx90a %rocmcc@=6.4.1 ^hip@6.4.1"
+    SPEC: "~shared +fortran +openmp +rocm +device_alloc tests=basic amdgpu_target=gfx942 %rocmcc@=6.4.1 ^hip@6.4.1"
   extends: .job_on_tuolumne
 
 rocmcc_6_4_1_hip_deviceconst:
   variables:
-    SPEC: "~shared +fortran +deviceconst +rocm tests=basic amdgpu_target=gfx90a %rocmcc@=6.4.1 ^hip@6.4.1"
+    SPEC: "~shared +fortran +deviceconst +rocm tests=basic amdgpu_target=gfx942 %rocmcc@=6.4.1 ^hip@6.4.1"
   extends: .job_on_tuolumne
