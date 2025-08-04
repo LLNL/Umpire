@@ -31,13 +31,13 @@ gcc_10_3_1_numa:
 
 clang_14_0_6_gcc_10_3_1_sqlite_experimental:
   variables:
-    SPEC: "~shared +sqlite_experimental +tools tests=basic %clang@=14.0.6.gcc.10.3.1"
+    SPEC: "~shared +sqlite_experimental +tools tests=basic %clang-14-gcc-10"
   extends: .job_on_ruby
 
 # Develop builds against specific tpl version.
 clang_14_0_6_gcc_10_3_1_tpls:
   variables:
-    SPEC: "~shared +fortran +tools tests=basic %clang@=14.0.6.gcc.10.3.1"
+    SPEC: "~shared +fortran +tools tests=basic %clang-14-gcc-10"
   extends: .job_on_ruby
 
 gcc_10_3_1_tpls:
