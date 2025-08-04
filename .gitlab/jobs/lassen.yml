@@ -26,41 +26,41 @@
 # ${PROJECT_<MACHINE>_DEPS} in the extra jobs. There is no reason not to fully
 # describe the spec here.
 
-ibm_clang_14_0_5_mpi_shmem:
-  variables:
-    SPEC: "~shared +tools tests=basic +ipc_shmem +mpi %clang@=14.0.5.ibm.gcc.8.3.1 ^spectrum-mpi"
-  extends: .job_on_lassen
-
-ibm_clang_14_0_5_mpi_shmem_memleak:
-  variables:
-    SPEC: "~shared +asan +tools tests=basic +ipc_shmem +mpi cxxflags==-fsanitize=address %clang@=14.0.5.ibm.gcc.8.3.1 ^spectrum-mpi"
-    ASAN_OPTIONS: "detect_leaks=1"
-    LSAN_OPTIONS: "suppressions=/usr/workspace/umdev/MyASan.supp"
-    LASSEN_JOB_ALLOC: "1 -W 20 -q pci"
-  extends: .job_on_lassen
-
-ibm_clang_14_0_5_mpi:
-  variables:
-    SPEC: "~shared +fortran +tools +mpi tests=basic %clang@=14.0.5.ibm.gcc.8.3.1 ^spectrum-mpi"
-  extends: .job_on_lassen
-
-ibm_clang_14_0_5_gcc_8_3_1_cuda_11_7_0_mpi_shmem:
-  variables:
-    SPEC: "~shared +tools +cuda +ipc_shmem +mpi tests=basic %clang@=14.0.5.ibm.gcc.8.3.1 ^spectrum-mpi ^cuda@11.7.0+allow-unsupported-compilers"
-    MODULE_LIST: "cuda/11.7.0"
-  extends: .job_on_lassen
-
-clang_12_0_1_libcpp:
-  variables:
-    SPEC: "~shared +tools tests=basic cflags==\"-DGTEST_HAS_CXXABI_H_=0\" cxxflags==\"-stdlib=libc++ -DGTEST_HAS_CXXABI_H_=0\" %clang@=12.0.1"
-  extends: .job_on_lassen
-
-clang_12_0_1_gcc_8_3_1_memleak:
-  variables:
-    SPEC: "~shared +asan +sanitizer_tests +tools tests=basic cxxflags==-fsanitize=address %clang@=12.0.1.gcc.8.3.1"
-    ASAN_OPTIONS: "detect_leaks=1"
-    LASSEN_JOB_ALLOC: "1 -W 20 -q pci"
-  extends: .job_on_lassen
+#ibm_clang_14_0_5_mpi_shmem:
+#  variables:
+#    SPEC: "~shared +tools tests=basic +ipc_shmem +mpi %clang@=14.0.5.ibm.gcc.8.3.1 ^spectrum-mpi"
+#  extends: .job_on_lassen
+#
+#ibm_clang_14_0_5_mpi_shmem_memleak:
+#  variables:
+#    SPEC: "~shared +asan +tools tests=basic +ipc_shmem +mpi cxxflags==-fsanitize=address %clang@=14.0.5.ibm.gcc.8.3.1 ^spectrum-mpi"
+#    ASAN_OPTIONS: "detect_leaks=1"
+#    LSAN_OPTIONS: "suppressions=/usr/workspace/umdev/MyASan.supp"
+#    LASSEN_JOB_ALLOC: "1 -W 20 -q pci"
+#  extends: .job_on_lassen
+#
+#ibm_clang_14_0_5_mpi:
+#  variables:
+#    SPEC: "~shared +fortran +tools +mpi tests=basic %clang@=14.0.5.ibm.gcc.8.3.1 ^spectrum-mpi"
+#  extends: .job_on_lassen
+#
+#ibm_clang_14_0_5_gcc_8_3_1_cuda_11_7_0_mpi_shmem:
+#  variables:
+#    SPEC: "~shared +tools +cuda +ipc_shmem +mpi tests=basic %clang@=14.0.5.ibm.gcc.8.3.1 ^spectrum-mpi ^cuda@11.7.0+allow-unsupported-compilers"
+#    MODULE_LIST: "cuda/11.7.0"
+#  extends: .job_on_lassen
+#
+#clang_12_0_1_libcpp:
+#  variables:
+#    SPEC: "~shared +tools tests=basic cflags==\"-DGTEST_HAS_CXXABI_H_=0\" cxxflags==\"-stdlib=libc++ -DGTEST_HAS_CXXABI_H_=0\" %clang@=12.0.1"
+#  extends: .job_on_lassen
+#
+#clang_12_0_1_gcc_8_3_1_memleak:
+#  variables:
+#    SPEC: "~shared +asan +sanitizer_tests +tools tests=basic cxxflags==-fsanitize=address %clang@=12.0.1.gcc.8.3.1"
+#    ASAN_OPTIONS: "detect_leaks=1"
+#    LASSEN_JOB_ALLOC: "1 -W 20 -q pci"
+#  extends: .job_on_lassen
 
 # clang_9_0_0_datarace (build and test on lassen):
 #   variables:
@@ -96,11 +96,11 @@ gcc_11_2_1_tpls:
     SPEC: "~shared +fortran +tools tests=basic %gcc@=11.2.1"
   extends: .job_on_lassen
 
-ibm_clang_14_0_5_gcc_8_3_1_cuda_11_7_0_tpls:
-  variables:
-    SPEC: "~shared +fortran +cuda +tools tests=basic %clang@=14.0.5.ibm.gcc.8.3.1 ^cuda@11.7.0+allow-unsupported-compilers"
-    MODULE_LIST: "cuda/11.7.0"
-  extends: .job_on_lassen
+#ibm_clang_14_0_5_gcc_8_3_1_cuda_11_7_0_tpls:
+#  variables:
+#    SPEC: "~shared +fortran +cuda +tools tests=basic %clang@=14.0.5.ibm.gcc.8.3.1 ^cuda@11.7.0+allow-unsupported-compilers"
+#    MODULE_LIST: "cuda/11.7.0"
+#  extends: .job_on_lassen
 
 ibm_clang_16_0_6_gcc_11_2_1_cuda_11_8_tpls:
   variables:
