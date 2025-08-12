@@ -11,6 +11,7 @@ variables:
 # in order to save time and resources. This allocation has to be uniquely named
 # so that we are sure to retrieve it and avoid collisions.
   ALLOC_NAME: ${CI_PROJECT_NAME}_ci_${CI_PIPELINE_ID}
+  JACAMAR_SCHEDULER_DEBUG: 1
 
 # Ruby
 # Arguments for top level allocation
