@@ -4,8 +4,8 @@ jobs:
   build_docker:
     strategy:
       matrix:
-        target: [gcc, clang, hip, cuda, sycl, intel]
-    runs-on: ubuntu-latest
+        target: [gcc, clang, hip, sycl, intel]
+    runs-on: radiuss-cpu-runners
     steps:
     - run: |
         sudo rm -rf /usr/share/dotnet
@@ -33,7 +33,7 @@ jobs:
       with:
         submodules: recursive
     - uses: docker/setup-buildx-action@v3
-    - uses: docker/build-push-action@v6
+    - run: docker/build-push-action@v6
       with:
         target: cuda
   build_mac:
