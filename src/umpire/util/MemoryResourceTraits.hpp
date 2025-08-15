@@ -8,6 +8,7 @@
 #define UMPIRE_MemoryResourceTraits_HPP
 
 #include <cstddef>
+#include <string>
 
 #include "umpire/config.hpp"
 
@@ -52,6 +53,19 @@ struct MemoryResourceTraits {
   granularity_type granularity = granularity_type::unknown;
   bool tracking{true};
 };
+
+inline std::string to_string(const MemoryResourceTraits::shared_scope& scope)
+{
+  switch (scope) {
+    case MemoryResourceTraits::shared_scope::unknown:
+      return "unknown";
+    case MemoryResourceTraits::shared_scope::node:
+      return "node";
+    case MemoryResourceTraits::shared_scope::socket:
+      return "socket";
+  }
+  return "unknown";
+}
 
 } // end of namespace umpire
 
