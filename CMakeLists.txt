@@ -23,18 +23,17 @@ set(UMPIRE_VERSION_RC "")
 
 include(cmake/SetupUmpireOptions.cmake)
 
+set(BLT_CXX_STD "c++17" CACHE STRING "Version of C++ standard")
+set(CMAKE_CUDA_STANDARD 17)
+
 if (UMPIRE_ENABLE_SYCL)
-  set(BLT_CXX_STD "c++17" CACHE STRING "Version of C++ standard")
    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsycl")
    endif()
-else()
-  set(BLT_CXX_STD "c++14" CACHE STRING "Version of C++ standard")
-  set(CMAKE_CUDA_STANDARD 14)
 endif()
 
-if("${BLT_CXX_STD}" STREQUAL "c++98" OR "${BLT_CXX_STD}" STREQUAL "c++11" )
-    message(FATAL_ERROR "Umpire requires minimum C++ standard of c++14. Please set BLT_CXX_STD appropriately.")
+if("${BLT_CXX_STD}" STREQUAL "c++98" OR "${BLT_CXX_STD}" STREQUAL "c++11" OR "${BLT_CXX_STD}" STREQUAL "c++14")
+    message(FATAL_ERROR "Umpire requires minimum C++ standard of c++17. Please set BLT_CXX_STD appropriately.")
 endif()
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "PGI")
@@ -88,18 +87,24 @@ cmake_dependent_option( UMPIRE_ENABLE_OPENMP "Build Umpire with OpenMP" On
                        "ENABLE_OPENMP" Off )
 cmake_dependent_option( UMPIRE_ENABLE_MPI "Build Umpire with MPI" On
                        "ENABLE_MPI" Off )
-#
-# NOTE: The following option depends upon UMPIRE_ENABLE_MPI being defined first
-#
-cmake_dependent_option( UMPIRE_ENABLE_IPC_SHARED_MEMORY "Enable Host Shared Memory Resource" ${UMPIRE_ENABLE_MPI}
-                       "NOT WIN32;NOT APPLE" Off )
 
+########
+# Shared Memory Options
+########
+
+cmake_dependent_option( UMPIRE_ENABLE_IPC_SHARED_MEMORY "Enable Host IPC Shared Memory Resource" ${UMPIRE_ENABLE_MPI}
+                        "NOT WIN32;NOT APPLE" Off )
 cmake_dependent_option( UMPIRE_ENABLE_MPI3_SHARED_MEMORY "Enable MPI3 Shared Memory Resource" Off "${ENABLE_MPI}" Off)
 
-if (UMPIRE_ENABLE_IPC_SHARED_MEMORY AND UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
-  message(FATAL_ERROR "Please select one shared memory option"
-        "(UMPIRE_ENABLE_IPC_SHARED_MEMORY OR UMPIRE_ENABLE_MPI3_SHARED_MEMORY)")
-endif ()
+if(UMPIRE_ENABLE_IPC_SHARED_MEMORY AND NOT UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
+  set(UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE "POSIX" CACHE STRING "Default implementation for SHARED memory resource (POSIX)")
+elseif(UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
+  set(UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE "MPI3" CACHE STRING "Default implementation for SHARED memory resource (MPI3)")
+else()
+  set (UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE "" CACHE STRING "")
+endif()
+
+########
 
 cmake_dependent_option( UMPIRE_ENABLE_TESTS "Build Umpire tests" On
                        "ENABLE_TESTS" Off )

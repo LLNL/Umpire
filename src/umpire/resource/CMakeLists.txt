@@ -150,6 +150,8 @@ if (UMPIRE_ENABLE_HIP)
       ${umpire_resource_sources}
       HipConstantMemoryResourceFactory.cpp
       HipConstantMemoryResource.cpp)
+
+    set_source_files_properties(HipConstantMemoryResource.cpp PROPERTIES LANGUAGE HIP)
   endif ()
 
   set(umpire_resource_depends ${umpire_resource_depends} blt::hip_runtime)

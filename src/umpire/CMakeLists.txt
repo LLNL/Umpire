@@ -151,13 +151,19 @@ if (NOT WIN32 AND NOT ${CMAKE_VERSION} VERSION_LESS 3.18)
 endif()
 
 if (UMPIRE_ENABLE_IPC_SHARED_MEMORY)
-  message(STATUS "Host Shared Memory Enabled")
+  message(STATUS "Host (IPC) Shared Memory Enabled")
   find_package(Threads)
   target_link_libraries(
     umpire INTERFACE Threads::Threads -lrt 
   )
 else()
   message(STATUS "IPC Shared Memory Disabled")
+endif()
+
+if (UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
+  message(STATUS "Host (MPI3) Shared Memory Enabled")
+else()
+  message(STATUS "MPI3 Shared Memory Disabled")
 endif()
 
 if (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP)

@@ -47,17 +47,17 @@ To view the CI jobs for diffrent LC machines, follow the steps below:
   $ ls -c1 .gitlab/*jobs.yml
   .gitlab/corona-jobs.yml
   .gitlab/lassen-jobs.yml
-  .gitlab/ruby-jobs.yml
+  .gitlab/dane-jobs.yml
 
-This shows that the CI contains jobs for corona, lassen, and ruby.
+This shows that the CI contains jobs for corona, lassen, and dane.
 
 .. code-block:: bash
 
-  $ git grep -h "SPEC" .gitlab/ruby-jobs.yml | grep "gcc"
+  $ git grep -h "SPEC" .gitlab/dane-jobs.yml | grep "gcc"
       SPEC: "%gcc@4.9.3"
       SPEC: "%gcc@8.1.0"
 
-In the example above, we see a list of the specs vetted on ``ruby``/``toss_3_x86_64_ib``.
+In the example above, we see a list of the specs vetted on ``dane``/``toss_3_x86_64_ib``.
 
 MacOS case
 ^^^^^^^^^^
@@ -68,7 +68,7 @@ In Umpire, the Spack configuration for MacOS contains the default compilers depe
 Using Uberenv to generate the host-config file
 ----------------------------------------------
 
-We have seen that we can safely use `gcc@8.1.0` on ruby. Let us ask for the default configuration first, then produce static libs with OpenMP support and run the benchmarks:
+We have seen that we can safely use `gcc@8.1.0` on dane. Let us ask for the default configuration first, then produce static libs with OpenMP support and run the benchmarks:
 
 .. code-block:: bash
 
@@ -79,7 +79,7 @@ Each will generate a CMake cache file, e.g.:
 
 .. code-block:: bash
 
-  ruby-toss_3_x86_64_ib-gcc@8.1.0-<some_hash>.cmake
+  dane-toss_3_x86_64_ib-gcc@8.1.0-<some_hash>.cmake
 
 Using host-config files to build Umpire
 ---------------------------------------

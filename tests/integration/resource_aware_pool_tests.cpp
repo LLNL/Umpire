@@ -107,9 +107,6 @@ std::vector<std::string> get_allocator_strings()
 #if defined(UMPIRE_ENABLE_UM)
   allocators.push_back("UM");
 #endif
-#if defined(UMPIRE_ENABLE_CONST)
-  allocators.push_back("DEVICE_CONST");
-#endif
 #if defined(UMPIRE_ENABLE_PINNED)
   allocators.push_back("PINNED");
 #endif
