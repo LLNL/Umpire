@@ -24,7 +24,6 @@ set(UMPIRE_VERSION_RC "")
 include(cmake/SetupUmpireOptions.cmake)
 
 set(BLT_CXX_STD "c++17" CACHE STRING "Version of C++ standard")
-set(CMAKE_CUDA_STANDARD 17)
 
 if (UMPIRE_ENABLE_SYCL)
    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
