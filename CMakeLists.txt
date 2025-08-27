@@ -23,16 +23,39 @@ set(UMPIRE_VERSION_RC "")
 
 include(cmake/SetupUmpireOptions.cmake)
 
+# Default to c++17 if not specified by the user.
 set(BLT_CXX_STD "c++17" CACHE STRING "Version of C++ standard")
+
+# If BLT_CXX_STD is set by the user, check that it is at least 17.
+if("${BLT_CXX_STD}" STREQUAL "c++98" OR
+   "${BLT_CXX_STD}" STREQUAL "c++03" OR
+   "${BLT_CXX_STD}" STREQUAL "c++11" OR
+   "${BLT_CXX_STD}" STREQUAL "c++14")
+  message(FATAL_ERROR "Umpire requires minimum C++ standard of c++17. Please set BLT_CXX_STD accordingly.")
+endif()
+
+# If CMAKE_CUDA_STANDARD is set by the user, check that it is at least 17.
+# If it is not set, it will be set later by BLT to match BLT_CXX_STD.
+if ("${CMAKE_CUDA_STANDARD}" STREQUAL "98" OR
+    "${CMAKE_CUDA_STANDARD}" STREQUAL "03" OR
+    "${CMAKE_CUDA_STANDARD}" STREQUAL "11" OR
+    "${CMAKE_CUDA_STANDARD}" STREQUAL "14")
+  message(FATAL_ERROR "Umpire requires minimum CUDA standard of 17. Please set BLT_CXX_STD and/or CMAKE_CUDA_STANDARD accordingly.")
+endif()
+
+# If CMAKE_HIP_STANDARD is set by the user, check that it is at least 17.
+# If it is not set, it will be set later by BLT to match BLT_CXX_STD.
+if ("${CMAKE_HIP_STANDARD}" STREQUAL "98" OR
+    "${CMAKE_HIP_STANDARD}" STREQUAL "03" OR
+    "${CMAKE_HIP_STANDARD}" STREQUAL "11" OR
+    "${CMAKE_HIP_STANDARD}" STREQUAL "14")
+  message(FATAL_ERROR "Umpire requires minimum HIP standard of 17. Please set BLT_CXX_STD and/or CMAKE_HIP_STANDARD accordingly.")
+endif()
 
 if (UMPIRE_ENABLE_SYCL)
    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsycl")
    endif()
-endif()
-
-if("${BLT_CXX_STD}" STREQUAL "c++98" OR "${BLT_CXX_STD}" STREQUAL "c++11" OR "${BLT_CXX_STD}" STREQUAL "c++14")
-    message(FATAL_ERROR "Umpire requires minimum C++ standard of c++17. Please set BLT_CXX_STD appropriately.")
 endif()
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "PGI")
