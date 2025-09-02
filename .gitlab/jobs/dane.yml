@@ -49,3 +49,8 @@ gcc_11_2_1_ipc_no_mpi:
   variables:
     SPEC: "~shared +ipc_shmem tests=basic %gcc@=11.2.1"
   extends: .job_on_dane
+
+gcc_10_3_1_mpi3_and_ipc_shmem:
+  variables:
+    SPEC: "~shared +mpi3_shmem +ipc_shmem +mpi tests=basic %gcc@=10.3.1 ^mvapich2"
+  extends: .job_on_dane
