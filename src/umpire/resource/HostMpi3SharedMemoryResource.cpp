@@ -25,7 +25,7 @@ HostMpi3SharedMemoryResource::HostMpi3SharedMemoryResource(const std::string& na
   // by turning it into an int (as for Fortran) and then decoding that in the callback.
   int keyval = 0;
   MPI_Comm_create_keyval(MPI_COMM_NULL_COPY_FN, free_comm, &keyval, nullptr);
-  MPI_Comm_set_attr(MPI_COMM_SELF, keyval, (void *)(intptr_t)MPI_Comm_c2f(m_shared_comm));
+  MPI_Comm_set_attr(MPI_COMM_SELF, keyval, (void*)(intptr_t)MPI_Comm_c2f(m_shared_comm));
 }
 
 HostMpi3SharedMemoryResource::~HostMpi3SharedMemoryResource()
@@ -73,7 +73,7 @@ Platform HostMpi3SharedMemoryResource::getPlatform() noexcept
 }
 
 int HostMpi3SharedMemoryResource::free_comm(MPI_Comm UMPIRE_UNUSED_ARG(comm), int UMPIRE_UNUSED_ARG(keyval),
-    void* attribute_val, void* UMPIRE_UNUSED_ARG(extra_state))
+                                            void* attribute_val, void* UMPIRE_UNUSED_ARG(extra_state))
 {
   // Interpret attribute_val as a MPI_Fint comm number.
   const auto comm_number = (MPI_Fint)(intptr_t)(attribute_val);
