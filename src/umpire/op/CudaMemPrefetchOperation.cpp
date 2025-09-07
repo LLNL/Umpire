@@ -28,6 +28,9 @@ void CudaMemPrefetchOperation::apply(void* src_ptr, util::AllocationRecord* UMPI
     UMPIRE_ERROR(runtime_error, fmt::format("cudaGetDevice failed with error: {}", cudaGetErrorString(error)));
   }
   int gpu = (device != cudaCpuDeviceId) ? device : current_device;
+#if CUDART_VERSION >= 13000
+  cudaMemLocation loc = {(device == cudaCpuDeviceId) ? cudaMemLocationTypeHost : cudaMemLocationTypeDevice, device};
+#endif
 
   cudaDeviceProp properties;
   error = ::cudaGetDeviceProperties(&properties, gpu);
@@ -37,7 +40,11 @@ void CudaMemPrefetchOperation::apply(void* src_ptr, util::AllocationRecord* UMPI
   }
 
   if (properties.managedMemory == 1 && properties.concurrentManagedAccess == 1) {
+#if CUDART_VERSION >= 13000
+    error = ::cudaMemPrefetchAsync(src_ptr, length, loc, 0);
+#else
     error = ::cudaMemPrefetchAsync(src_ptr, length, device);
+#endif
 
     if (error != cudaSuccess) {
       UMPIRE_ERROR(runtime_error,
@@ -61,6 +68,9 @@ camp::resources::EventProxy<camp::resources::Resource> CudaMemPrefetchOperation:
     UMPIRE_ERROR(runtime_error, fmt::format("cudaGetDevice failed with error: {}", cudaGetErrorString(error)));
   }
   int gpu = (device != cudaCpuDeviceId) ? device : current_device;
+#if CUDART_VERSION >= 13000
+  cudaMemLocation loc = {(device == cudaCpuDeviceId) ? cudaMemLocationTypeHost : cudaMemLocationTypeDevice, device};
+#endif
 
   cudaDeviceProp properties;
   error = ::cudaGetDeviceProperties(&properties, gpu);
@@ -77,7 +87,11 @@ camp::resources::EventProxy<camp::resources::Resource> CudaMemPrefetchOperation:
   auto stream = resource->get_stream();
 
   if (properties.managedMemory == 1 && properties.concurrentManagedAccess == 1) {
+#if CUDART_VERSION >= 13000
+    error = ::cudaMemPrefetchAsync(src_ptr, length, loc, 0, stream);
+#else
     error = ::cudaMemPrefetchAsync(src_ptr, length, device, stream);
+#endif
 
     if (error != cudaSuccess) {
       UMPIRE_ERROR(

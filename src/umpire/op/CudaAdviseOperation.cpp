@@ -21,7 +21,19 @@ void CudaAdviseOperation::apply(void* src_ptr, util::AllocationRecord* UMPIRE_UN
                                 std::size_t length)
 {
   int device = val;
-  cudaError_t error = ::cudaMemAdvise(src_ptr, length, m_advice, device);
+  cudaError_t error;
+
+#if CUDART_VERSION >= 13000
+  int current_device;
+  error = cudaGetDevice(&current_device);
+  if (error != cudaSuccess) {
+    UMPIRE_ERROR(runtime_error, fmt::format("cudaGetDevice failed with error: {}", cudaGetErrorString(error)));
+  }
+  cudaMemLocation loc = {(device == cudaCpuDeviceId) ? cudaMemLocationTypeHost : cudaMemLocationTypeDevice, device};
+  error = ::cudaMemAdvise(src_ptr, length, m_advice, loc);
+#else
+  error = ::cudaMemAdvise(src_ptr, length, m_advice, device);
+#endif
 
   if (error != cudaSuccess) {
     UMPIRE_ERROR(runtime_error,
