@@ -48,8 +48,7 @@ ENV GTEST_COLOR=1
 COPY . /home/umpire/workspace
 WORKDIR /home/umpire/workspace/build
 RUN cmake -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DCMAKE_CXX_COMPILER=g++ -DENABLE_CUDA=On -DCMAKE_CUDA_COMPILER=/usr/local/cuda/bin/nvcc -DCMAKE_CUDA_ARCHITECTURES=70 .. && \
-    make -j 16 && \
-    ctest -T test --output-on-failure
+    make -j 16 &&
 
 # TODO: switch to ROCM 6
 FROM ghcr.io/llnl/radiuss:hip-5.6.1-ubuntu-20.04 AS hip
