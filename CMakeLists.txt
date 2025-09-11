@@ -4,11 +4,13 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
+cmake_minimum_required(VERSION 3.23)
 
 cmake_policy(SET CMP0025 NEW)
 cmake_policy(SET CMP0048 NEW)
 cmake_policy(SET CMP0057 NEW)
 cmake_policy(SET CMP0054 NEW)
+cmake_policy(SET CMP0096 OLD)
 
 include(CMakeDependentOption)
 include(CMakePackageConfigHelpers)
@@ -16,8 +18,6 @@ include(CMakePackageConfigHelpers)
 project(Umpire
   LANGUAGES CXX C
   VERSION 2025.09.0)
-
-cmake_minimum_required(VERSION 3.23)
 
 set(UMPIRE_VERSION_RC "")
 
