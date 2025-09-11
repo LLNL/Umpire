@@ -10,6 +10,7 @@ cmake_policy(SET CMP0025 NEW)
 cmake_policy(SET CMP0048 NEW)
 cmake_policy(SET CMP0057 NEW)
 cmake_policy(SET CMP0054 NEW)
+cmake_policy(SET CMP0096 OLD)
 
 include(CMakeDependentOption)
 include(CMakePackageConfigHelpers)
