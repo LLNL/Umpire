@@ -15,9 +15,12 @@ cmake_policy(SET CMP0096 OLD)
 include(CMakeDependentOption)
 include(CMakePackageConfigHelpers)
 
+file(READ "${CMAKE_CURRENT_SOURCE_DIR}/VERSION" VERSION_STRING)
+string(STRIP "${VERSION_STRING}" VERSION_STRING)
+
 project(Umpire
   LANGUAGES CXX C
-  VERSION 2025.09.0)
+  VERSION ${VERSION_STRING})
 
 set(UMPIRE_VERSION_RC "")
 
