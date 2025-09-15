@@ -4,8 +4,8 @@ jobs:
   build_docker:
     strategy:
       matrix:
-        target: [gcc, clang, hip, cuda, sycl, intel]
-    runs-on: ubuntu-latest
+        target: [gcc, clang, hip, sycl, intel]
+    runs-on: radiuss-cpu-runners
     steps:
     - run: |
         sudo rm -rf /usr/share/dotnet
@@ -20,6 +20,22 @@ jobs:
     - uses: docker/build-push-action@v6
       with:
         target: ${{ matrix.target }}
+  build_gpu:
+    runs-on: radiuss-cuda-runners
+    steps:
+    - run: |
+        sudo rm -rf /usr/share/dotnet
+        sudo rm -rf /usr/local/lib/android
+        sudo rm -rf /opt/ghc
+        sudo rm -rf /opt/hostedtoolcache/CodeQL
+        sudo docker image prune --all --force
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+    - uses: docker/setup-buildx-action@v3
+    - uses: docker/build-push-action@v6
+      with:
+        target: cuda
   build_mac:
     runs-on: macos-latest
     steps:
