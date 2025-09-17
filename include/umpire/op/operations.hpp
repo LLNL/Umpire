@@ -82,14 +82,14 @@ struct reallocate : public operation {
     std::size_t copy_size = (old_bytes > new_bytes) ? new_bytes : old_bytes;
 
     // Copy data from old to new location
-    rm.copy(new_ptr, current_ptr, copy_size);
+    umpire::copy(current_ptr, new_ptr, copy_size);
 
     // Deallocate old memory
     allocator.deallocate(current_ptr);
-    
+
     // Update the pointer
     *ptr = new_ptr;
-    
+
     return new_ptr;
   }
 
@@ -99,7 +99,7 @@ struct reallocate : public operation {
                                                                      camp::resources::Resource& ctx)
   {
     T* current_ptr = *ptr_ptr;
-    
+
     if (!current_ptr) {
       // If current pointer is null, just allocate
       auto& rm = ResourceManager::getInstance();
@@ -157,7 +157,7 @@ struct reallocate : public operation {
     // A better solution would be to have the ResourceManager wait on the event before returning
     // or implement a chained operation system.
     allocator.deallocate(current_ptr);
-    
+
     // Update the pointer
     *ptr_ptr = new_ptr;
 
@@ -168,7 +168,7 @@ struct reallocate : public operation {
   static void* exec(void** ptr_ptr, std::size_t new_size)
   {
     void* current_ptr = *ptr_ptr;
-    
+
     if (!current_ptr) {
       // If current pointer is null, just allocate
       auto& rm = ResourceManager::getInstance();
@@ -213,7 +213,7 @@ struct reallocate : public operation {
 
     // Deallocate old memory
     allocator.deallocate(current_ptr);
-    
+
     // Update the pointer
     *ptr_ptr = new_ptr;
 
@@ -225,7 +225,7 @@ struct reallocate : public operation {
                                                                      camp::resources::Resource& ctx)
   {
     void* current_ptr = *ptr_ptr;
-    
+
     if (!current_ptr) {
       // If current pointer is null, just allocate
       auto& rm = ResourceManager::getInstance();
@@ -271,7 +271,7 @@ struct reallocate : public operation {
 
     // Deallocate old memory
     allocator.deallocate(current_ptr);
-    
+
     // Update the pointer
     *ptr_ptr = new_ptr;
 

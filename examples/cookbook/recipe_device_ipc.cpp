@@ -12,6 +12,7 @@
 #include "umpire/Umpire.hpp"
 #include "umpire/strategy/DeviceIpcAllocator.hpp"
 #include "umpire/util/MemoryResourceTraits.hpp"
+#include "umpire/op.hpp"
 #if defined(UMPIRE_ENABLE_MPI)
 #include <mpi.h>
 #endif
@@ -59,7 +60,7 @@ int main(int argc, char** argv)
       }
 
       // Copy to device
-      rm.copy(data, host_data, size);
+      umpire::copy(host_data, data, size);
       host_allocator.deallocate(host_data);
     }
 
@@ -76,7 +77,7 @@ int main(int argc, char** argv)
     // All ranks can now access the data
     // Verify by copying a portion back to host
     float* value = static_cast<float*>(host_allocator.allocate(sizeof(float)));
-    rm.copy(value, data + 1, sizeof(float));
+    umpire::copy(data + 1, value, sizeof(float));
 
     std::cout << "Rank " << rank << ": second value is " << *value << std::endl;
 

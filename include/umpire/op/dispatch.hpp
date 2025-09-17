@@ -334,4 +334,42 @@ camp::resources::EventProxy<camp::resources::Resource> prefetch(T* ptr, int devi
   return op::op_caller<op::prefetch>::exec(ptr, device, size, ctx);
 }
 
+template <typename SrcPlatform, typename DstPlatform, typename T>
+void copy(T* src, T* dst, std::size_t len)
+{
+  op::copy<SrcPlatform, DstPlatform>::exec(src, dst, len);
+}
+
+template <typename SrcPlatform, typename DstPlatform, typename T>
+auto copy(T* src, T* dst, std::size_t len, camp::resources::Resource& ctx)
+{
+  return op::copy<SrcPlatform, DstPlatform>::exec(src, dst, len, ctx);
+}
+
+// Direct template memset functions
+template <typename Platform, typename T>
+void memset(T* ptr, int value, std::size_t len)
+{
+  op::memset<Platform>::exec(ptr, value, len);
+}
+
+template <typename Platform, typename T>
+auto memset(T* ptr, int value, std::size_t len, camp::resources::Resource& ctx)
+{
+  return op::memset<Platform>::exec(ptr, value, len, ctx);
+}
+
+// Direct template prefetch functions
+template <typename Platform, typename T>
+void prefetch(T* ptr, int device, std::size_t len)
+{
+  op::prefetch<Platform>::exec(ptr, device, len);
+}
+
+template <typename Platform, typename T>
+auto prefetch(T* ptr, int device, std::size_t len, camp::resources::Resource& ctx)
+{
+  return op::prefetch<Platform>::exec(ptr, device, len, ctx);
+}
+
 } // namespace umpire
