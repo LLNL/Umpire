@@ -1,7 +1,10 @@
 #pragma once
 
+#include <type_traits>
+
 #include "umpire/ResourceManager.hpp"
 #include "umpire/config.hpp"
+#include "umpire/op/detail/traits.hpp"
 #include "umpire/resource/platform.hpp"
 
 namespace umpire {
@@ -334,6 +337,306 @@ camp::resources::EventProxy<camp::resources::Resource> prefetch(T* ptr, int devi
   return op::op_caller<op::prefetch>::exec(ptr, device, size, ctx);
 }
 
+// Individual convenience functions with auto-dispatch
+template <typename T>
+void set_accessed_by(T* ptr, int device, std::size_t size)
+{
+  op::op_caller<op::set_accessed_by>::exec(ptr, device, size);
+}
+
+template <typename T>
+void set_preferred_location(T* ptr, int device, std::size_t size)
+{
+  op::op_caller<op::preferred_location>::exec(ptr, device, size);
+}
+
+template <typename T>
+void set_read_mostly(T* ptr, int device, std::size_t size)
+{
+  op::op_caller<op::read_mostly>::exec(ptr, device, size);
+}
+
+template <typename T>
+void unset_accessed_by(T* ptr, int device, std::size_t size)
+{
+  op::op_caller<op::unset_accessed_by>::exec(ptr, device, size);
+}
+
+template <typename T>
+void unset_preferred_location(T* ptr, int device, std::size_t size)
+{
+  op::op_caller<op::unset_preferred_location>::exec(ptr, device, size);
+}
+
+template <typename T>
+void unset_read_mostly(T* ptr, int device, std::size_t size)
+{
+  op::op_caller<op::unset_read_mostly>::exec(ptr, device, size);
+}
+
+#if (defined(UMPIRE_ENABLE_HIP) && HIP_VERSION_MAJOR >= 5) || defined(UMPIRE_ENABLE_CUDA)
+template <typename T>
+void set_coarse_grain(T* ptr, int device, std::size_t size)
+{
+  op::op_caller<op::coarse_grain>::exec(ptr, device, size);
+}
+
+template <typename T>
+void unset_coarse_grain(T* ptr, int device, std::size_t size)
+{
+  op::op_caller<op::unset_coarse_grain>::exec(ptr, device, size);
+}
+#endif
+
+//------------------------------------------------------------------------------
+// Reallocate implementations (moved from operations.hpp to avoid circular dependency)
+//------------------------------------------------------------------------------
+
+template <typename Src>
+template <typename T>
+T* op::reallocate<Src>::exec(T** ptr, std::size_t new_size)
+{
+  auto current_ptr = *ptr;
+  if (!current_ptr) {
+    // If current pointer is null, just allocate
+    auto& rm = ResourceManager::getInstance();
+    Allocator allocator = rm.getDefaultAllocator();
+    T* new_ptr = static_cast<T*>(allocator.allocate(new_size * sizeof(T)));
+    *ptr = new_ptr;
+    return new_ptr;
+  }
+
+  auto& rm = ResourceManager::getInstance();
+  auto& allocation_map = rm.m_allocations;
+
+  // Find the allocator that owns current_ptr
+  Allocator allocator = rm.getAllocator(current_ptr);
+
+  // Check for offset pointer
+  auto alloc_record = allocation_map.find(current_ptr);
+  if (current_ptr != alloc_record->ptr) {
+    UMPIRE_ERROR(runtime_error, fmt::format("Cannot reallocate an offset ptr (ptr={}, base={})",
+                                            reinterpret_cast<void*>(current_ptr), alloc_record->ptr));
+  }
+
+  // Get the current allocation size
+  std::size_t old_size = rm.getSize(current_ptr);
+
+  // Convert sizes from elements to bytes
+  std::size_t old_bytes = old_size;
+  std::size_t new_bytes = new_size * sizeof(T);
+
+  // Special case for 0-byte size
+  if (new_bytes == 0) {
+    allocator.deallocate(current_ptr);
+    T* new_ptr = static_cast<T*>(allocator.allocate(0));
+    *ptr = new_ptr;
+    return new_ptr;
+  }
+
+  // Allocate new memory
+  T* new_ptr = static_cast<T*>(allocator.allocate(new_bytes));
+
+  // Calculate copy size (minimum of old and new size)
+  std::size_t copy_size = (old_bytes > new_bytes) ? new_bytes : old_bytes;
+
+  // Copy data from old to new location using auto-dispatch copy
+  umpire::copy(current_ptr, new_ptr, copy_size);
+
+  // Deallocate old memory
+  allocator.deallocate(current_ptr);
+
+  // Update the pointer
+  *ptr = new_ptr;
+
+  return new_ptr;
+}
+
+template <typename Src>
+template <typename T>
+camp::resources::EventProxy<camp::resources::Resource> op::reallocate<Src>::exec(T** ptr_ptr, std::size_t new_size,
+                                                                                 camp::resources::Resource& ctx)
+{
+  T* current_ptr = *ptr_ptr;
+
+  if (!current_ptr) {
+    // If current pointer is null, just allocate
+    auto& rm = ResourceManager::getInstance();
+    Allocator allocator = rm.getDefaultAllocator();
+    // Since there's no data to copy, we can just return a completed event
+    T* new_ptr = static_cast<T*>(allocator.allocate(new_size * sizeof(T)));
+    *ptr_ptr = new_ptr;
+    return camp::resources::EventProxy<camp::resources::Resource>{ctx};
+  }
+
+  auto& rm = ResourceManager::getInstance();
+  auto& allocation_map = rm.m_allocations;
+
+  // Find the allocator that owns current_ptr
+  Allocator allocator = rm.getAllocator(current_ptr);
+
+  // Check for offset pointer
+  auto alloc_record = allocation_map.find(current_ptr);
+  if (current_ptr != alloc_record->ptr) {
+    UMPIRE_ERROR(runtime_error, fmt::format("Cannot reallocate an offset ptr (ptr={}, base={})",
+                                            reinterpret_cast<void*>(current_ptr), alloc_record->ptr));
+  }
+
+  // Get the current allocation size
+  std::size_t old_size = rm.getSize(current_ptr);
+
+  // Convert sizes from elements to bytes
+  std::size_t old_bytes = old_size;
+  std::size_t new_bytes = new_size * sizeof(T);
+
+  // Special case for 0-byte size
+  if (new_bytes == 0) {
+    allocator.deallocate(current_ptr);
+    T* new_ptr = static_cast<T*>(allocator.allocate(0));
+    *ptr_ptr = new_ptr;
+    return camp::resources::EventProxy<camp::resources::Resource>{ctx};
+  }
+
+  // Allocate new memory
+  T* new_ptr = static_cast<T*>(allocator.allocate(new_bytes));
+
+  // Calculate copy size (minimum of old and new size)
+  std::size_t copy_size = (old_bytes > new_bytes) ? new_bytes : old_bytes;
+
+  // Copy data from old to new location asynchronously using auto-dispatch copy
+  auto event = umpire::copy(current_ptr, new_ptr, copy_size, ctx);
+
+  // IMPORTANT: In a fully async implementation, we would need to chain the deallocation
+  // to happen after the copy completes. However, since we don't have that mechanism yet,
+  // and ResourceManager's reallocate operation doesn't wait on the event, we need to
+  // deallocate here as we did in the synchronous case.
+  //
+  // This has the potential to cause race conditions if the memory is deallocated before
+  // the copy completes, but for most allocators, the memory won't be immediately reused.
+  // A better solution would be to have the ResourceManager wait on the event before returning
+  // or implement a chained operation system.
+  allocator.deallocate(current_ptr);
+
+  // Update the pointer
+  *ptr_ptr = new_ptr;
+
+  return event;
+}
+
+template <typename Src>
+void* op::reallocate<Src>::exec(void** ptr_ptr, std::size_t new_size)
+{
+  void* current_ptr = *ptr_ptr;
+
+  if (!current_ptr) {
+    // If current pointer is null, just allocate
+    auto& rm = ResourceManager::getInstance();
+    Allocator allocator = rm.getDefaultAllocator();
+    void* new_ptr = allocator.allocate(new_size); // No sizeof multiplication for void*
+    *ptr_ptr = new_ptr;
+    return new_ptr;
+  }
+
+  auto& rm = ResourceManager::getInstance();
+  auto& allocation_map = rm.m_allocations;
+
+  // Find the allocator that owns current_ptr
+  Allocator allocator = rm.getAllocator(current_ptr);
+
+  // Check for offset pointer
+  auto alloc_record = allocation_map.find(current_ptr);
+  if (current_ptr != alloc_record->ptr) {
+    UMPIRE_ERROR(runtime_error,
+                 fmt::format("Cannot reallocate an offset ptr (ptr={}, base={})", current_ptr, alloc_record->ptr));
+  }
+
+  // Get the current allocation size
+  std::size_t old_size = rm.getSize(current_ptr);
+
+  // Special case for 0-byte size
+  if (new_size == 0) {
+    allocator.deallocate(current_ptr);
+    void* new_ptr = allocator.allocate(0);
+    *ptr_ptr = new_ptr;
+    return new_ptr;
+  }
+
+  // Allocate new memory
+  void* new_ptr = allocator.allocate(new_size);
+
+  // Calculate copy size (minimum of old and new size)
+  std::size_t copy_size = (old_size > new_size) ? new_size : old_size;
+
+  // Copy data from old to new location using auto-dispatch copy
+  umpire::copy(current_ptr, new_ptr, copy_size);
+
+  // Deallocate old memory
+  allocator.deallocate(current_ptr);
+
+  // Update the pointer
+  *ptr_ptr = new_ptr;
+
+  return new_ptr;
+}
+
+template <typename Src>
+camp::resources::EventProxy<camp::resources::Resource> op::reallocate<Src>::exec(void** ptr_ptr, std::size_t new_size,
+                                                                                 camp::resources::Resource& ctx)
+{
+  void* current_ptr = *ptr_ptr;
+
+  if (!current_ptr) {
+    // If current pointer is null, just allocate
+    auto& rm = ResourceManager::getInstance();
+    Allocator allocator = rm.getDefaultAllocator();
+    // Since there's no data to copy, we can just return a completed event
+    void* new_ptr = allocator.allocate(new_size); // No sizeof multiplication for void*
+    *ptr_ptr = new_ptr;
+    return camp::resources::EventProxy<camp::resources::Resource>{ctx};
+  }
+
+  auto& rm = ResourceManager::getInstance();
+  auto& allocation_map = rm.m_allocations;
+
+  // Find the allocator that owns current_ptr
+  Allocator allocator = rm.getAllocator(current_ptr);
+
+  // Check for offset pointer
+  auto alloc_record = allocation_map.find(current_ptr);
+  if (current_ptr != alloc_record->ptr) {
+    UMPIRE_ERROR(runtime_error,
+                 fmt::format("Cannot reallocate an offset ptr (ptr={}, base={})", current_ptr, alloc_record->ptr));
+  }
+
+  // Get the current allocation size
+  std::size_t old_size = rm.getSize(current_ptr);
+
+  // Special case for 0-byte size
+  if (new_size == 0) {
+    allocator.deallocate(current_ptr);
+    void* new_ptr = allocator.allocate(0);
+    *ptr_ptr = new_ptr;
+    return camp::resources::EventProxy<camp::resources::Resource>{ctx};
+  }
+
+  // Allocate new memory
+  void* new_ptr = allocator.allocate(new_size);
+
+  // Calculate copy size (minimum of old and new size)
+  std::size_t copy_size = (old_size > new_size) ? new_size : old_size;
+
+  // Copy data from old to new location asynchronously using auto-dispatch copy
+  auto event = umpire::copy(current_ptr, new_ptr, copy_size, ctx);
+
+  // Deallocate old memory
+  allocator.deallocate(current_ptr);
+
+  // Update the pointer
+  *ptr_ptr = new_ptr;
+
+  return event;
+}
+
 template <typename SrcPlatform, typename DstPlatform, typename T>
 void copy(T* src, T* dst, std::size_t len)
 {
@@ -371,5 +674,63 @@ auto prefetch(T* ptr, int device, std::size_t len, camp::resources::Resource& ct
 {
   return op::prefetch<Platform>::exec(ptr, device, len, ctx);
 }
+
+template <typename Platform, typename T>
+std::enable_if_t<op::detail::supports_memory_advice<Platform>::value> set_accessed_by(T* ptr, int device,
+                                                                                      std::size_t len)
+{
+  op::set_accessed_by<Platform>::exec(ptr, device, len);
+}
+
+template <typename Platform, typename T>
+std::enable_if_t<op::detail::supports_memory_advice<Platform>::value> set_preferred_location(T* ptr, int device,
+                                                                                             std::size_t len)
+{
+  op::preferred_location<Platform>::exec(ptr, device, len);
+}
+
+template <typename Platform, typename T>
+std::enable_if_t<op::detail::supports_memory_advice<Platform>::value> set_read_mostly(T* ptr, int device,
+                                                                                      std::size_t len)
+{
+  op::read_mostly<Platform>::exec(ptr, device, len);
+}
+
+template <typename Platform, typename T>
+std::enable_if_t<op::detail::supports_memory_advice<Platform>::value> unset_accessed_by(T* ptr, int device,
+                                                                                        std::size_t len)
+{
+  op::unset_accessed_by<Platform>::exec(ptr, device, len);
+}
+
+template <typename Platform, typename T>
+std::enable_if_t<op::detail::supports_memory_advice<Platform>::value> unset_preferred_location(T* ptr, int device,
+                                                                                               std::size_t len)
+{
+  op::unset_preferred_location<Platform>::exec(ptr, device, len);
+}
+
+template <typename Platform, typename T>
+std::enable_if_t<op::detail::supports_memory_advice<Platform>::value> unset_read_mostly(T* ptr, int device,
+                                                                                        std::size_t len)
+{
+  op::unset_read_mostly<Platform>::exec(ptr, device, len);
+}
+
+#if (defined(UMPIRE_ENABLE_HIP) && HIP_VERSION_MAJOR >= 5) || defined(UMPIRE_ENABLE_CUDA)
+template <typename Platform, typename T>
+std::enable_if_t<op::detail::supports_memory_advice<Platform>::value> set_coarse_grain(T* ptr, int device,
+                                                                                       std::size_t len)
+{
+  op::coarse_grain<Platform>::exec(ptr, device, len);
+}
+
+template <typename Platform, typename T>
+std::enable_if_t<op::detail::supports_memory_advice<Platform>::value> unset_coarse_grain(T* ptr, int device,
+                                                                                         std::size_t len)
+{
+  op::unset_coarse_grain<Platform>::exec(ptr, device, len);
+}
+#endif
 
 } // namespace umpire

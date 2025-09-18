@@ -5,7 +5,11 @@
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
 set(test_sources
-  copy_test.cpp)
+  copy_test.cpp
+  memset_test.cpp
+  reallocate_test.cpp
+  prefetch_test.cpp
+  advise_test.cpp)
 
 blt_add_executable(
   NAME op_tests
