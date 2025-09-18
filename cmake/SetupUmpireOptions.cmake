@@ -25,6 +25,7 @@ option(UMPIRE_ENABLE_NUMA "Build Umpire with NUMA support" Off)
 option(UMPIRE_ENABLE_OPENMP_TARGET "Build Umpire with OPENMP target" Off)
 
 option(UMPIRE_ENABLE_LOGGING "Build Umpire with Logging enabled" On)
+option(UMPIRE_ENABLE_BOUNDS_CHECKS "Enable bounds checking in memory operations" On)
 option(UMPIRE_ENABLE_SLIC "Build Umpire with SLIC logging" Off)
 option(UMPIRE_ENABLE_BACKTRACE "Build Umpire with allocation backtrace enabled" Off)
 option(UMPIRE_ENABLE_BACKTRACE_SYMBOLS "Build Umpire with symbol support" Off)

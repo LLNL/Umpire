@@ -155,6 +155,7 @@ struct op_caller {
     return std::get<N>(std::forward_as_tuple(args...));
   }
 
+#ifdef UMPIRE_ENABLE_BOUNDS_CHECKS
   // Boundary check for memset operations
   template <typename T, typename... Args>
   static void check_memset_bounds(T* src, const util::AllocationRecord* record, std::size_t length)
@@ -190,6 +191,7 @@ struct op_caller {
                    fmt::format("Not enough space in destination to copy {} bytes into {} bytes", size, dst_size));
     }
   }
+#endif // UMPIRE_ENABLE_BOUNDS_CHECKS
 
   // Single-pointer operations (synchronous)
   template <typename T, typename... Args>
@@ -205,7 +207,9 @@ struct op_caller {
       // For memset, we expect args to be {value, size}
       int value = get_arg<0>(args...);
       std::size_t length = get_arg<1>(args...);
+#ifdef UMPIRE_ENABLE_BOUNDS_CHECKS
       check_memset_bounds(src, src_record, length);
+#endif
     }
 
     // Dispatch based on platform
@@ -226,7 +230,9 @@ struct op_caller {
       // For memset, we expect args to be {value, size}
       int value = get_arg<0>(args...);
       std::size_t length = get_arg<1>(args...);
+#ifdef UMPIRE_ENABLE_BOUNDS_CHECKS
       check_memset_bounds(src, src_record, length);
+#endif
     }
 
     return detail::dispatch<Op>(p, src, args...);
@@ -249,7 +255,9 @@ struct op_caller {
                                  copy<resource::host_platform, resource::host_platform>>) {
       // For copy, we expect args to be {size}
       std::size_t size = get_arg<0>(args...);
+#ifdef UMPIRE_ENABLE_BOUNDS_CHECKS
       check_copy_bounds(src, dst, src_record, dst_record, size);
+#endif
     }
 
     // Dispatch based on source and destination platforms
@@ -273,7 +281,9 @@ struct op_caller {
                                  copy<resource::host_platform, resource::host_platform>>) {
       // For copy, we expect args to be {size}
       std::size_t size = get_arg<0>(args...);
+#ifdef UMPIRE_ENABLE_BOUNDS_CHECKS
       check_copy_bounds(src, dst, src_record, dst_record, size);
+#endif
     }
 
     return detail::dispatch<Op>(p1, p2, src, dst, args...);
