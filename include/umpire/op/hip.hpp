@@ -8,12 +8,6 @@
 #include "umpire/util/Platform.hpp"
 #include "umpire/util/error.hpp"
 
-// Forward declaration of kernel for launching directly in device code if needed
-extern "C" {
-__global__ void
-umpire_hip_fill(void* data, int value, std::size_t length);
-}
-
 namespace umpire {
 namespace op {
 
@@ -22,7 +16,7 @@ namespace detail {
 
 /**
  * @brief Get the HIP memory copy direction kind
- * 
+ *
  * @tparam SRC Source platform
  * @tparam DST Destination platform
  */
@@ -49,20 +43,19 @@ struct copy_kind<resource::hip_platform, resource::hip_platform> {
 
 /**
  * @brief Check if a HIP device supports managed memory features
- * 
+ *
  * @param device Device ID to check
  * @return true if the device supports managed memory
  * @return false if the device does not support managed memory
  */
-inline bool supports_managed_memory(int device) 
+inline bool supports_managed_memory(int device)
 {
   hipDeviceProp_t properties;
   hipError_t error = ::hipGetDeviceProperties(&properties, device);
 
   if (error != hipSuccess) {
-    UMPIRE_ERROR(runtime_error, 
-                umpire::fmt::format("hipGetDeviceProperties for device {} failed with error: {}",
-                                   device, hipGetErrorString(error)));
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("hipGetDeviceProperties for device {} failed with error: {}",
+                                                    device, hipGetErrorString(error)));
   }
 
   return (properties.managedMemory == 1 && properties.concurrentManagedAccess == 1);
@@ -70,7 +63,7 @@ inline bool supports_managed_memory(int device)
 
 /**
  * @brief Get HIP stream from a resource
- * 
+ *
  * @param resource The resource to get the stream from
  * @return hipStream_t The HIP stream
  */
@@ -78,16 +71,15 @@ inline hipStream_t get_stream(camp::resources::Resource& resource)
 {
   auto hip_resource = resource.try_get<camp::resources::Hip>();
   if (!hip_resource) {
-    UMPIRE_ERROR(resource_error, 
-                umpire::fmt::format("Expected resources::Hip, got resources::{}",
-                                   platform_to_string(resource.get_platform())));
+    UMPIRE_ERROR(resource_error, umpire::fmt::format("Expected resources::Hip, got resources::{}",
+                                                     platform_to_string(resource.get_platform())));
   }
   return hip_resource->get_stream();
 }
 
 /**
  * @brief Apply memory advice to a HIP managed memory allocation
- * 
+ *
  * @tparam T Type of memory
  * @param ptr Pointer to memory
  * @param count Number of elements
@@ -106,14 +98,14 @@ inline void advise(T* ptr, std::size_t count, int device, hipMemoryAdvise advice
 
   if (error != hipSuccess) {
     UMPIRE_ERROR(runtime_error,
-               umpire::fmt::format("hipMemAdvise(ptr={}, size={}, advice={}, device={}) failed with error: {}", 
-                                  ptr, size, static_cast<int>(advice), device, hipGetErrorString(error)));
+                 umpire::fmt::format("hipMemAdvise(ptr={}, size={}, advice={}, device={}) failed with error: {}", ptr,
+                                     size, static_cast<int>(advice), device, hipGetErrorString(error)));
   }
 }
 
 /**
  * @brief Synchronous memory copy implementation
- * 
+ *
  * @tparam T Type of memory
  * @param src Source pointer
  * @param dst Destination pointer
@@ -127,15 +119,14 @@ inline void copy(T* src, T* dst, std::size_t count, hipMemcpyKind kind)
 
   hipError_t error = ::hipMemcpy(dst, src, size, kind);
   if (error != hipSuccess) {
-    UMPIRE_ERROR(runtime_error,
-               umpire::fmt::format("hipMemcpy(dst={}, src={}, size={}, kind={}) failed with error: {}", 
-                                  dst, src, size, static_cast<int>(kind), hipGetErrorString(error)));
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("hipMemcpy(dst={}, src={}, size={}, kind={}) failed with error: {}",
+                                                    dst, src, size, static_cast<int>(kind), hipGetErrorString(error)));
   }
 }
 
 /**
  * @brief Asynchronous memory copy implementation
- * 
+ *
  * @tparam T Type of memory
  * @param src Source pointer
  * @param dst Destination pointer
@@ -145,19 +136,19 @@ inline void copy(T* src, T* dst, std::size_t count, hipMemcpyKind kind)
  * @return Event representing the asynchronous operation
  */
 template <typename T>
-inline camp::resources::EventProxy<camp::resources::Resource> 
-copy_async(T* src, T* dst, std::size_t count, camp::resources::Resource& resource, hipMemcpyKind kind)
+inline camp::resources::EventProxy<camp::resources::Resource> copy_async(T* src, T* dst, std::size_t count,
+                                                                         camp::resources::Resource& resource,
+                                                                         hipMemcpyKind kind)
 {
   auto stream = get_stream(resource);
   std::size_t size = detail::get_size<T>(count);
 
   hipError_t error = ::hipMemcpyAsync(dst, src, size, kind, stream);
   if (error != hipSuccess) {
-    UMPIRE_ERROR(runtime_error,
-               umpire::fmt::format(
-                   "hipMemcpyAsync(dst={}, src={}, size={}, kind={}, stream={}) failed with error: {}", 
-                   dst, src, size, static_cast<int>(kind), 
-                   static_cast<void*>(stream), hipGetErrorString(error)));
+    UMPIRE_ERROR(
+        runtime_error,
+        umpire::fmt::format("hipMemcpyAsync(dst={}, src={}, size={}, kind={}, stream={}) failed with error: {}", dst,
+                            src, size, static_cast<int>(kind), static_cast<void*>(stream), hipGetErrorString(error)));
   }
 
   return camp::resources::EventProxy<camp::resources::Resource>{resource};
@@ -165,7 +156,7 @@ copy_async(T* src, T* dst, std::size_t count, camp::resources::Resource& resourc
 
 /**
  * @brief Synchronous memory set implementation
- * 
+ *
  * @tparam T Type of memory
  * @param ptr Pointer to memory
  * @param value Value to set
@@ -178,15 +169,14 @@ inline void memset(T* ptr, int value, std::size_t count)
 
   hipError_t error = ::hipMemset(ptr, value, size);
   if (error != hipSuccess) {
-    UMPIRE_ERROR(runtime_error, 
-                umpire::fmt::format("hipMemset(ptr={}, value={}, size={}) failed with error: {}", 
-                                   ptr, value, size, hipGetErrorString(error)));
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("hipMemset(ptr={}, value={}, size={}) failed with error: {}", ptr,
+                                                    value, size, hipGetErrorString(error)));
   }
 }
 
 /**
  * @brief Asynchronous memory set implementation
- * 
+ *
  * @tparam T Type of memory
  * @param ptr Pointer to memory
  * @param value Value to set
@@ -195,8 +185,8 @@ inline void memset(T* ptr, int value, std::size_t count)
  * @return Event representing the asynchronous operation
  */
 template <typename T>
-inline camp::resources::EventProxy<camp::resources::Resource> 
-memset_async(T* ptr, int value, std::size_t count, camp::resources::Resource& resource)
+inline camp::resources::EventProxy<camp::resources::Resource> memset_async(T* ptr, int value, std::size_t count,
+                                                                           camp::resources::Resource& resource)
 {
   auto stream = get_stream(resource);
   std::size_t size = detail::get_size<T>(count);
@@ -204,9 +194,8 @@ memset_async(T* ptr, int value, std::size_t count, camp::resources::Resource& re
   hipError_t error = ::hipMemsetAsync(ptr, value, size, stream);
   if (error != hipSuccess) {
     UMPIRE_ERROR(runtime_error,
-               umpire::fmt::format(
-                   "hipMemsetAsync(ptr={}, value={}, size={}, stream={}) failed with error: {}", 
-                   ptr, value, size, static_cast<void*>(stream), hipGetErrorString(error)));
+                 umpire::fmt::format("hipMemsetAsync(ptr={}, value={}, size={}, stream={}) failed with error: {}", ptr,
+                                     value, size, static_cast<void*>(stream), hipGetErrorString(error)));
   }
 
   return camp::resources::EventProxy<camp::resources::Resource>{resource};
@@ -214,7 +203,7 @@ memset_async(T* ptr, int value, std::size_t count, camp::resources::Resource& re
 
 /**
  * @brief Synchronous memory prefetch implementation
- * 
+ *
  * @tparam T Type of memory
  * @param ptr Pointer to memory
  * @param device Device to prefetch to
@@ -234,16 +223,15 @@ inline void prefetch(T* ptr, int device, std::size_t count)
 
     if (error != hipSuccess) {
       UMPIRE_ERROR(runtime_error,
-                 umpire::fmt::format(
-                     "hipMemPrefetchAsync(ptr={}, size={}, device={}) failed with error: {}", 
-                     ptr, size, device, hipGetErrorString(error)));
+                   umpire::fmt::format("hipMemPrefetchAsync(ptr={}, size={}, device={}) failed with error: {}", ptr,
+                                       size, device, hipGetErrorString(error)));
     }
   }
 }
 
 /**
  * @brief Asynchronous memory prefetch implementation
- * 
+ *
  * @tparam T Type of memory
  * @param ptr Pointer to memory
  * @param device Device to prefetch to
@@ -252,8 +240,8 @@ inline void prefetch(T* ptr, int device, std::size_t count)
  * @return Event representing the asynchronous operation
  */
 template <typename T>
-inline camp::resources::EventProxy<camp::resources::Resource> 
-prefetch_async(T* ptr, int device, std::size_t count, camp::resources::Resource& resource)
+inline camp::resources::EventProxy<camp::resources::Resource> prefetch_async(T* ptr, int device, std::size_t count,
+                                                                             camp::resources::Resource& resource)
 {
   auto stream = get_stream(resource);
 
@@ -267,10 +255,10 @@ prefetch_async(T* ptr, int device, std::size_t count, camp::resources::Resource&
     hipError_t error = ::hipMemPrefetchAsync(ptr, size, device, stream);
 
     if (error != hipSuccess) {
-      UMPIRE_ERROR(runtime_error,
-                 umpire::fmt::format(
-                     "hipMemPrefetchAsync(ptr={}, size={}, device={}, stream={}) failed with error: {}", 
-                     ptr, size, device, static_cast<void*>(stream), hipGetErrorString(error)));
+      UMPIRE_ERROR(
+          runtime_error,
+          umpire::fmt::format("hipMemPrefetchAsync(ptr={}, size={}, device={}, stream={}) failed with error: {}", ptr,
+                              size, device, static_cast<void*>(stream), hipGetErrorString(error)));
     }
   }
 
@@ -288,7 +276,7 @@ template <>
 struct copy<resource::hip_platform, resource::hip_platform> {
   /**
    * @brief HIP to HIP synchronous copy
-   * 
+   *
    * @tparam T Type of data being copied
    * @param src Source pointer
    * @param dst Destination pointer
@@ -302,7 +290,7 @@ struct copy<resource::hip_platform, resource::hip_platform> {
 
   /**
    * @brief HIP to HIP asynchronous copy
-   * 
+   *
    * @tparam T Type of data being copied
    * @param src Source pointer
    * @param dst Destination pointer
@@ -311,11 +299,11 @@ struct copy<resource::hip_platform, resource::hip_platform> {
    * @return Event representing the asynchronous operation
    */
   template <typename T>
-  static camp::resources::EventProxy<camp::resources::Resource> exec(
-      T* src, T* dst, std::size_t len, camp::resources::Resource& resource)
+  static camp::resources::EventProxy<camp::resources::Resource> exec(T* src, T* dst, std::size_t len,
+                                                                     camp::resources::Resource& resource)
   {
-    return detail::copy_async(src, dst, len, resource, 
-                      detail::copy_kind<resource::hip_platform, resource::hip_platform>::value);
+    return detail::copy_async(src, dst, len, resource,
+                              detail::copy_kind<resource::hip_platform, resource::hip_platform>::value);
   }
 };
 
@@ -324,7 +312,7 @@ template <>
 struct copy<resource::hip_platform, resource::host_platform> {
   /**
    * @brief HIP to Host synchronous copy
-   * 
+   *
    * @tparam T Type of data being copied
    * @param src Source pointer
    * @param dst Destination pointer
@@ -338,7 +326,7 @@ struct copy<resource::hip_platform, resource::host_platform> {
 
   /**
    * @brief HIP to Host asynchronous copy
-   * 
+   *
    * @tparam T Type of data being copied
    * @param src Source pointer
    * @param dst Destination pointer
@@ -347,11 +335,11 @@ struct copy<resource::hip_platform, resource::host_platform> {
    * @return Event representing the asynchronous operation
    */
   template <typename T>
-  static camp::resources::EventProxy<camp::resources::Resource> exec(
-      T* src, T* dst, std::size_t len, camp::resources::Resource& resource)
+  static camp::resources::EventProxy<camp::resources::Resource> exec(T* src, T* dst, std::size_t len,
+                                                                     camp::resources::Resource& resource)
   {
-    return detail::copy_async(src, dst, len, resource, 
-                      detail::copy_kind<resource::hip_platform, resource::host_platform>::value);
+    return detail::copy_async(src, dst, len, resource,
+                              detail::copy_kind<resource::hip_platform, resource::host_platform>::value);
   }
 };
 
@@ -360,7 +348,7 @@ template <>
 struct copy<resource::host_platform, resource::hip_platform> {
   /**
    * @brief Host to HIP synchronous copy
-   * 
+   *
    * @tparam T Type of data being copied
    * @param src Source pointer
    * @param dst Destination pointer
@@ -374,7 +362,7 @@ struct copy<resource::host_platform, resource::hip_platform> {
 
   /**
    * @brief Host to HIP asynchronous copy
-   * 
+   *
    * @tparam T Type of data being copied
    * @param src Source pointer
    * @param dst Destination pointer
@@ -383,11 +371,11 @@ struct copy<resource::host_platform, resource::hip_platform> {
    * @return Event representing the asynchronous operation
    */
   template <typename T>
-  static camp::resources::EventProxy<camp::resources::Resource> exec(
-      T* src, T* dst, std::size_t len, camp::resources::Resource& resource)
+  static camp::resources::EventProxy<camp::resources::Resource> exec(T* src, T* dst, std::size_t len,
+                                                                     camp::resources::Resource& resource)
   {
-    return detail::copy_async(src, dst, len, resource, 
-                      detail::copy_kind<resource::host_platform, resource::hip_platform>::value);
+    return detail::copy_async(src, dst, len, resource,
+                              detail::copy_kind<resource::host_platform, resource::hip_platform>::value);
   }
 };
 
@@ -396,7 +384,7 @@ template <>
 struct memset<resource::hip_platform> {
   /**
    * @brief HIP synchronous memset
-   * 
+   *
    * @tparam T Type of memory being set
    * @param ptr Pointer to memory
    * @param val Value to set
@@ -410,7 +398,7 @@ struct memset<resource::hip_platform> {
 
   /**
    * @brief HIP asynchronous memset
-   * 
+   *
    * @tparam T Type of memory being set
    * @param ptr Pointer to memory
    * @param val Value to set
@@ -419,8 +407,8 @@ struct memset<resource::hip_platform> {
    * @return Event representing the asynchronous operation
    */
   template <typename T>
-  static camp::resources::EventProxy<camp::resources::Resource> exec(
-      T* ptr, int val, std::size_t len, camp::resources::Resource& resource)
+  static camp::resources::EventProxy<camp::resources::Resource> exec(T* ptr, int val, std::size_t len,
+                                                                     camp::resources::Resource& resource)
   {
     return detail::memset_async(ptr, val, len, resource);
   }
@@ -434,7 +422,7 @@ template <>
 struct prefetch<resource::hip_platform> {
   /**
    * @brief HIP synchronous prefetch
-   * 
+   *
    * @tparam T Type of memory being prefetched
    * @param ptr Pointer to memory
    * @param device Device to prefetch to
@@ -448,7 +436,7 @@ struct prefetch<resource::hip_platform> {
 
   /**
    * @brief HIP asynchronous prefetch
-   * 
+   *
    * @tparam T Type of memory being prefetched
    * @param ptr Pointer to memory
    * @param device Device to prefetch to
@@ -457,32 +445,33 @@ struct prefetch<resource::hip_platform> {
    * @return Event representing the asynchronous operation
    */
   template <typename T>
-  static camp::resources::EventProxy<camp::resources::Resource> exec(
-      T* ptr, int device, std::size_t len, camp::resources::Resource& resource)
+  static camp::resources::EventProxy<camp::resources::Resource> exec(T* ptr, int device, std::size_t len,
+                                                                     camp::resources::Resource& resource)
   {
     return detail::prefetch_async(ptr, device, len, resource);
   }
 };
 
 // Memory advice operations - using macro to reduce duplication
-#define DEFINE_HIP_ADVICE_OP(op_name, advice_flag) \
-template <> \
-struct op_name<resource::hip_platform> { \
-  /**
-   * @brief Apply memory advice operation
-   * 
-   * @tparam T Type of memory
-   * @param ptr Pointer to memory
-   * @param device Device to apply advice for
-   * @param len Number of elements
-   */ \
-  template <typename T> \
-  static inline void exec(T* ptr, int device, std::size_t len) noexcept { \
-    detail::advise(ptr, len, device, advice_flag); \
-  } \
-};
+#define DEFINE_HIP_ADVICE_OP(op_name, advice_flag)                        \
+  template <>                                                             \
+  struct op_name<resource::hip_platform> {                                \
+    /**                                                                   \
+     * @brief Apply memory advice operation                               \
+     *                                                                    \
+     * @tparam T Type of memory                                           \
+     * @param ptr Pointer to memory                                       \
+     * @param device Device to apply advice for                           \
+     * @param len Number of elements                                      \
+     */                                                                   \
+    template <typename T>                                                 \
+    static inline void exec(T* ptr, int device, std::size_t len) noexcept \
+    {                                                                     \
+      detail::advise(ptr, len, device, advice_flag);                      \
+    }                                                                     \
+  };
 
-DEFINE_HIP_ADVICE_OP(accessed_by, hipMemAdviseSetAccessedBy)
+DEFINE_HIP_ADVICE_OP(set_accessed_by, hipMemAdviseSetAccessedBy)
 DEFINE_HIP_ADVICE_OP(preferred_location, hipMemAdviseSetPreferredLocation)
 DEFINE_HIP_ADVICE_OP(read_mostly, hipMemAdviseSetReadMostly)
 DEFINE_HIP_ADVICE_OP(unset_accessed_by, hipMemAdviseUnsetAccessedBy)

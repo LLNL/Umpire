@@ -11,6 +11,7 @@
 #include "umpire/ResourceManager.hpp"
 #include "umpire/strategy/mixins/Inspector.hpp"
 #include "umpire/util/error.hpp"
+#include "umpire/op.hpp"
 
 namespace umpire {
 namespace op {
