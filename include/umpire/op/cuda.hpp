@@ -54,8 +54,8 @@ inline bool supports_managed_memory(int device)
   cudaError_t error = ::cudaGetDeviceProperties(&properties, device);
 
   if (error != cudaSuccess) {
-    UMPIRE_ERROR(runtime_error, umpire::fmt::format("cudaGetDeviceProperties for device {} failed with error: {}",
-                                                    device, cudaGetErrorString(error)));
+    UMPIRE_ERROR(runtime_error, fmt::format("cudaGetDeviceProperties for device {} failed with error: {}", device,
+                                            cudaGetErrorString(error)));
   }
 
   return (properties.managedMemory == 1 && properties.concurrentManagedAccess == 1);
@@ -71,8 +71,8 @@ inline cudaStream_t get_stream(camp::resources::Resource& resource)
 {
   auto cuda_resource = resource.try_get<camp::resources::Cuda>();
   if (!cuda_resource) {
-    UMPIRE_ERROR(resource_error, umpire::fmt::format("Expected resources::Cuda, got resources::{}",
-                                                     platform_to_string(resource.get_platform())));
+    UMPIRE_ERROR(resource_error, fmt::format("Expected resources::Cuda, got resources::{}",
+                                             platform_to_string(resource.get_platform())));
   }
   return cuda_resource->get_stream();
 }
@@ -98,8 +98,8 @@ inline void advise(T* ptr, std::size_t count, int device, cudaMemoryAdvise advic
 
   if (error != cudaSuccess) {
     UMPIRE_ERROR(runtime_error,
-                 umpire::fmt::format("cudaMemAdvise(ptr={}, size={}, advice={}, device={}) failed with error: {}", ptr,
-                                     size, static_cast<int>(advice), device, cudaGetErrorString(error)));
+                 fmt::format("cudaMemAdvise(ptr={}, size={}, advice={}, device={}) failed with error: {}", ptr, size,
+                             static_cast<int>(advice), device, cudaGetErrorString(error)));
   }
 }
 
@@ -119,9 +119,8 @@ inline void copy(T* src, T* dst, std::size_t count, cudaMemcpyKind kind)
 
   cudaError_t error = ::cudaMemcpy(dst, src, size, kind);
   if (error != cudaSuccess) {
-    UMPIRE_ERROR(runtime_error,
-                 umpire::fmt::format("cudaMemcpy(dst={}, src={}, size={}, kind={}) failed with error: {}", dst, src,
-                                     size, static_cast<int>(kind), cudaGetErrorString(error)));
+    UMPIRE_ERROR(runtime_error, fmt::format("cudaMemcpy(dst={}, src={}, size={}, kind={}) failed with error: {}", reinterpret_cast<void*>(dst),
+                                            reinterpret_cast<void*>(src), size, static_cast<int>(kind), cudaGetErrorString(error)));
   }
 }
 
@@ -146,10 +145,9 @@ inline camp::resources::EventProxy<camp::resources::Resource> copy_async(T* src,
 
   cudaError_t error = ::cudaMemcpyAsync(dst, src, size, kind, stream);
   if (error != cudaSuccess) {
-    UMPIRE_ERROR(
-        runtime_error,
-        umpire::fmt::format("cudaMemcpyAsync(dst={}, src={}, size={}, kind={}, stream={}) failed with error: {}", dst,
-                            src, size, static_cast<int>(kind), static_cast<void*>(stream), cudaGetErrorString(error)));
+    UMPIRE_ERROR(runtime_error,
+                 fmt::format("cudaMemcpyAsync(dst={}, src={}, size={}, kind={}, stream={}) failed with error: {}", dst,
+                             src, size, static_cast<int>(kind), static_cast<void*>(stream), cudaGetErrorString(error)));
   }
 
   return camp::resources::EventProxy<camp::resources::Resource>{resource};
@@ -170,8 +168,8 @@ inline void memset(T* ptr, int value, std::size_t count)
 
   cudaError_t error = ::cudaMemset(ptr, value, size);
   if (error != cudaSuccess) {
-    UMPIRE_ERROR(runtime_error, umpire::fmt::format("cudaMemset(ptr={}, value={}, size={}) failed with error: {}", ptr,
-                                                    value, size, cudaGetErrorString(error)));
+    UMPIRE_ERROR(runtime_error, fmt::format("cudaMemset(ptr={}, value={}, size={}) failed with error: {}", reinterpret_cast<void*>(ptr), value,
+                                            size, cudaGetErrorString(error)));
   }
 }
 
@@ -195,8 +193,8 @@ inline camp::resources::EventProxy<camp::resources::Resource> memset_async(T* pt
   cudaError_t error = ::cudaMemsetAsync(ptr, value, size, stream);
   if (error != cudaSuccess) {
     UMPIRE_ERROR(runtime_error,
-                 umpire::fmt::format("cudaMemsetAsync(ptr={}, value={}, size={}, stream={}) failed with error: {}", ptr,
-                                     value, size, static_cast<void*>(stream), cudaGetErrorString(error)));
+                 fmt::format("cudaMemsetAsync(ptr={}, value={}, size={}, stream={}) failed with error: {}", ptr, value,
+                             size, static_cast<void*>(stream), cudaGetErrorString(error)));
   }
 
   return camp::resources::EventProxy<camp::resources::Resource>{resource};
@@ -223,9 +221,8 @@ inline void prefetch(T* ptr, int device, std::size_t count)
     cudaError_t error = ::cudaMemPrefetchAsync(ptr, size, device, nullptr);
 
     if (error != cudaSuccess) {
-      UMPIRE_ERROR(runtime_error,
-                   umpire::fmt::format("cudaMemPrefetchAsync(ptr={}, size={}, device={}) failed with error: {}", ptr,
-                                       size, device, cudaGetErrorString(error)));
+      UMPIRE_ERROR(runtime_error, fmt::format("cudaMemPrefetchAsync(ptr={}, size={}, device={}) failed with error: {}",
+                                              reinterpret_cast<void*>(ptr), size, device, cudaGetErrorString(error)));
     }
   }
 }
@@ -256,10 +253,9 @@ inline camp::resources::EventProxy<camp::resources::Resource> prefetch_async(T* 
     cudaError_t error = ::cudaMemPrefetchAsync(ptr, size, device, stream);
 
     if (error != cudaSuccess) {
-      UMPIRE_ERROR(
-          runtime_error,
-          umpire::fmt::format("cudaMemPrefetchAsync(ptr={}, size={}, device={}, stream={}) failed with error: {}", ptr,
-                              size, device, static_cast<void*>(stream), cudaGetErrorString(error)));
+      UMPIRE_ERROR(runtime_error,
+                   fmt::format("cudaMemPrefetchAsync(ptr={}, size={}, device={}, stream={}) failed with error: {}", ptr,
+                               size, device, static_cast<void*>(stream), cudaGetErrorString(error)));
     }
   }
 
@@ -470,13 +466,11 @@ struct prefetch<resource::cuda_platform> {
   };
 
 DEFINE_CUDA_ADVICE_OP(set_accessed_by, cudaMemAdviseSetAccessedBy)
-DEFINE_CUDA_ADVICE_OP(preferred_location, cudaMemAdviseSetPreferredLocation)
-DEFINE_CUDA_ADVICE_OP(read_mostly, cudaMemAdviseSetReadMostly)
+DEFINE_CUDA_ADVICE_OP(set_preferred_location, cudaMemAdviseSetPreferredLocation)
+DEFINE_CUDA_ADVICE_OP(set_read_mostly, cudaMemAdviseSetReadMostly)
 DEFINE_CUDA_ADVICE_OP(unset_accessed_by, cudaMemAdviseUnsetAccessedBy)
 DEFINE_CUDA_ADVICE_OP(unset_preferred_location, cudaMemAdviseUnsetPreferredLocation)
 DEFINE_CUDA_ADVICE_OP(unset_read_mostly, cudaMemAdviseUnsetReadMostly)
-DEFINE_CUDA_ADVICE_OP(coarse_grain, cudaMemAdviseSetCoarseGrain)
-DEFINE_CUDA_ADVICE_OP(unset_coarse_grain, cudaMemAdviseUnsetCoarseGrain)
 
 #undef DEFINE_CUDA_ADVICE_OP
 

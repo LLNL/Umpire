@@ -11,7 +11,6 @@
 namespace umpire {
 namespace op {
 
-// Host-to-host copy operation
 template <>
 struct copy<resource::host_platform, resource::host_platform> {
   /**
@@ -43,7 +42,6 @@ struct copy<resource::host_platform, resource::host_platform> {
   }
 };
 
-// Host memset operation
 template <>
 struct memset<resource::host_platform> {
   /**
@@ -71,40 +69,6 @@ struct memset<resource::host_platform> {
                                                                      camp::resources::Resource& resource) noexcept
   {
     exec(ptr, val, len);
-    return detail::make_completed_event(resource);
-  }
-};
-
-// Note: Host platform uses the generic reallocate implementation from operations.hpp
-// since std::realloc is unsafe for memory pools and other allocator strategies
-
-// Host prefetch operation - no-op for host memory
-template <>
-struct prefetch<resource::host_platform> {
-  /**
-   * @brief Prefetch host memory (no-op)
-   *
-   * This is a no-op for host memory as prefetching isn't applicable.
-   */
-  template <typename T>
-  static void exec(T* UMPIRE_UNUSED_ARG(ptr), int UMPIRE_UNUSED_ARG(device),
-                   std::size_t UMPIRE_UNUSED_ARG(len)) noexcept
-  {
-    // No-op for host memory
-  }
-
-  /**
-   * @brief Asynchronous prefetch for host memory (no-op)
-   *
-   * This is a no-op that returns a completed event.
-   */
-  template <typename T>
-  static camp::resources::EventProxy<camp::resources::Resource> exec(T* UMPIRE_UNUSED_ARG(ptr),
-                                                                     int UMPIRE_UNUSED_ARG(device),
-                                                                     std::size_t UMPIRE_UNUSED_ARG(len),
-                                                                     camp::resources::Resource& resource) noexcept
-  {
-    // No-op for host memory
     return detail::make_completed_event(resource);
   }
 };

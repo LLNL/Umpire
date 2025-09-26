@@ -205,9 +205,8 @@ struct op_caller {
     // Operation-specific handling
     if constexpr (std::is_same_v<Op<resource::host_platform>, memset<resource::host_platform>>) {
       // For memset, we expect args to be {value, size}
-      int value = get_arg<0>(args...);
-      std::size_t length = get_arg<1>(args...);
 #ifdef UMPIRE_ENABLE_BOUNDS_CHECKS
+      std::size_t length = get_arg<1>(args...);
       check_memset_bounds(src, src_record, length);
 #endif
     }
@@ -228,9 +227,8 @@ struct op_caller {
     // Operation-specific handling
     if constexpr (std::is_same_v<Op<resource::host_platform>, memset<resource::host_platform>>) {
       // For memset, we expect args to be {value, size}
-      int value = get_arg<0>(args...);
-      std::size_t length = get_arg<1>(args...);
 #ifdef UMPIRE_ENABLE_BOUNDS_CHECKS
+      std::size_t length = get_arg<1>(args...);
       check_memset_bounds(src, src_record, length);
 #endif
     }
@@ -254,8 +252,8 @@ struct op_caller {
     if constexpr (std::is_same_v<Op<resource::host_platform, resource::host_platform>,
                                  copy<resource::host_platform, resource::host_platform>>) {
       // For copy, we expect args to be {size}
-      std::size_t size = get_arg<0>(args...);
 #ifdef UMPIRE_ENABLE_BOUNDS_CHECKS
+      std::size_t size = get_arg<0>(args...);
       check_copy_bounds(src, dst, src_record, dst_record, size);
 #endif
     }
@@ -279,9 +277,8 @@ struct op_caller {
     // Operation-specific handling for copy
     if constexpr (std::is_same_v<Op<resource::host_platform, resource::host_platform>,
                                  copy<resource::host_platform, resource::host_platform>>) {
-      // For copy, we expect args to be {size}
-      std::size_t size = get_arg<0>(args...);
 #ifdef UMPIRE_ENABLE_BOUNDS_CHECKS
+      std::size_t size = get_arg<0>(args...);
       check_copy_bounds(src, dst, src_record, dst_record, size);
 #endif
     }
@@ -357,13 +354,13 @@ void set_accessed_by(T* ptr, int device, std::size_t size)
 template <typename T>
 void set_preferred_location(T* ptr, int device, std::size_t size)
 {
-  op::op_caller<op::preferred_location>::exec(ptr, device, size);
+  op::op_caller<op::set_preferred_location>::exec(ptr, device, size);
 }
 
 template <typename T>
 void set_read_mostly(T* ptr, int device, std::size_t size)
 {
-  op::op_caller<op::read_mostly>::exec(ptr, device, size);
+  op::op_caller<op::set_read_mostly>::exec(ptr, device, size);
 }
 
 template <typename T>
@@ -384,11 +381,11 @@ void unset_read_mostly(T* ptr, int device, std::size_t size)
   op::op_caller<op::unset_read_mostly>::exec(ptr, device, size);
 }
 
-#if (defined(UMPIRE_ENABLE_HIP) && HIP_VERSION_MAJOR >= 5) || defined(UMPIRE_ENABLE_CUDA)
+#if (defined(UMPIRE_ENABLE_HIP) && HIP_VERSION_MAJOR >= 5)
 template <typename T>
 void set_coarse_grain(T* ptr, int device, std::size_t size)
 {
-  op::op_caller<op::coarse_grain>::exec(ptr, device, size);
+  op::op_caller<op::set_coarse_grain>::exec(ptr, device, size);
 }
 
 template <typename T>
@@ -696,14 +693,14 @@ template <typename Platform, typename T>
 std::enable_if_t<op::detail::supports_memory_advice<Platform>::value> set_preferred_location(T* ptr, int device,
                                                                                              std::size_t len)
 {
-  op::preferred_location<Platform>::exec(ptr, device, len);
+  op::set_preferred_location<Platform>::exec(ptr, device, len);
 }
 
 template <typename Platform, typename T>
 std::enable_if_t<op::detail::supports_memory_advice<Platform>::value> set_read_mostly(T* ptr, int device,
                                                                                       std::size_t len)
 {
-  op::read_mostly<Platform>::exec(ptr, device, len);
+  op::set_read_mostly<Platform>::exec(ptr, device, len);
 }
 
 template <typename Platform, typename T>
@@ -732,7 +729,7 @@ template <typename Platform, typename T>
 std::enable_if_t<op::detail::supports_memory_advice<Platform>::value> set_coarse_grain(T* ptr, int device,
                                                                                        std::size_t len)
 {
-  op::coarse_grain<Platform>::exec(ptr, device, len);
+  op::set_coarse_grain<Platform>::exec(ptr, device, len);
 }
 
 template <typename Platform, typename T>
