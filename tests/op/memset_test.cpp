@@ -167,7 +167,7 @@ TEST(Memset, CudaMemset)
   auto host_allocator = rm.getAllocator("HOST");
 
   // Allocate device buffer
-  void* device_ptr = cuda_allocator.allocate(size);
+  unsigned char* device_ptr = static_cast<unsigned char*>(cuda_allocator.allocate(size));
 
   // Allocate host buffer for verification
   unsigned char* host_ptr = static_cast<unsigned char*>(host_allocator.allocate(size));
@@ -198,7 +198,7 @@ TEST(Memset, ExplicitCudaMemset)
   auto host_allocator = rm.getAllocator("HOST");
 
   // Allocate device buffer
-  void* device_ptr = cuda_allocator.allocate(size);
+  unsigned char* device_ptr = static_cast<unsigned char*>(cuda_allocator.allocate(size));
 
   // Allocate host buffer for verification
   unsigned char* host_ptr = static_cast<unsigned char*>(host_allocator.allocate(size));
@@ -231,7 +231,7 @@ TEST(Memset, HipMemset)
   auto host_allocator = rm.getAllocator("HOST");
 
   // Allocate device buffer
-  void* device_ptr = hip_allocator.allocate(size);
+  unsigned char* device_ptr = static_cast<unsigned char*>(hip_allocator.allocate(size));
 
   // Allocate host buffer for verification
   unsigned char* host_ptr = static_cast<unsigned char*>(host_allocator.allocate(size));
@@ -262,7 +262,7 @@ TEST(Memset, ExplicitHipMemset)
   auto host_allocator = rm.getAllocator("HOST");
 
   // Allocate device buffer
-  void* device_ptr = hip_allocator.allocate(size);
+  unsigned char* device_ptr = static_cast<unsigned char*>(hip_allocator.allocate(size));
 
   // Allocate host buffer for verification
   unsigned char* host_ptr = static_cast<unsigned char*>(host_allocator.allocate(size));

@@ -54,8 +54,8 @@ inline bool supports_managed_memory(int device)
   hipError_t error = ::hipGetDeviceProperties(&properties, device);
 
   if (error != hipSuccess) {
-    UMPIRE_ERROR(runtime_error, umpire::fmt::format("hipGetDeviceProperties for device {} failed with error: {}",
-                                                    device, hipGetErrorString(error)));
+    UMPIRE_ERROR(runtime_error, fmt::format("hipGetDeviceProperties for device {} failed with error: {}", device,
+                                            hipGetErrorString(error)));
   }
 
   return (properties.managedMemory == 1 && properties.concurrentManagedAccess == 1);
@@ -71,8 +71,8 @@ inline hipStream_t get_stream(camp::resources::Resource& resource)
 {
   auto hip_resource = resource.try_get<camp::resources::Hip>();
   if (!hip_resource) {
-    UMPIRE_ERROR(resource_error, umpire::fmt::format("Expected resources::Hip, got resources::{}",
-                                                     platform_to_string(resource.get_platform())));
+    UMPIRE_ERROR(resource_error, fmt::format("Expected resources::Hip, got resources::{}",
+                                             platform_to_string(resource.get_platform())));
   }
   return hip_resource->get_stream();
 }
@@ -97,9 +97,9 @@ inline void advise(T* ptr, std::size_t count, int device, hipMemoryAdvise advice
   hipError_t error = ::hipMemAdvise(ptr, size, advice, device);
 
   if (error != hipSuccess) {
-    UMPIRE_ERROR(runtime_error,
-                 umpire::fmt::format("hipMemAdvise(ptr={}, size={}, advice={}, device={}) failed with error: {}", ptr,
-                                     size, static_cast<int>(advice), device, hipGetErrorString(error)));
+    UMPIRE_ERROR(runtime_error, fmt::format("hipMemAdvise(ptr={}, size={}, advice={}, device={}) failed with error: {}",
+                                            reinterpret_cast<void*>(ptr), size, static_cast<int>(advice), device,
+                                            hipGetErrorString(error)));
   }
 }
 
@@ -119,8 +119,9 @@ inline void copy(T* src, T* dst, std::size_t count, hipMemcpyKind kind)
 
   hipError_t error = ::hipMemcpy(dst, src, size, kind);
   if (error != hipSuccess) {
-    UMPIRE_ERROR(runtime_error, umpire::fmt::format("hipMemcpy(dst={}, src={}, size={}, kind={}) failed with error: {}",
-                                                    dst, src, size, static_cast<int>(kind), hipGetErrorString(error)));
+    UMPIRE_ERROR(runtime_error, fmt::format("hipMemcpy(dst={}, src={}, size={}, kind={}) failed with error: {}",
+                                            reinterpret_cast<void*>(dst), reinterpret_cast<void*>(src), size,
+                                            static_cast<int>(kind), hipGetErrorString(error)));
   }
 }
 
@@ -145,10 +146,9 @@ inline camp::resources::EventProxy<camp::resources::Resource> copy_async(T* src,
 
   hipError_t error = ::hipMemcpyAsync(dst, src, size, kind, stream);
   if (error != hipSuccess) {
-    UMPIRE_ERROR(
-        runtime_error,
-        umpire::fmt::format("hipMemcpyAsync(dst={}, src={}, size={}, kind={}, stream={}) failed with error: {}", dst,
-                            src, size, static_cast<int>(kind), static_cast<void*>(stream), hipGetErrorString(error)));
+    UMPIRE_ERROR(runtime_error,
+                 fmt::format("hipMemcpyAsync(dst={}, src={}, size={}, kind={}, stream={}) failed with error: {}", dst,
+                             src, size, static_cast<int>(kind), static_cast<void*>(stream), hipGetErrorString(error)));
   }
 
   return camp::resources::EventProxy<camp::resources::Resource>{resource};
@@ -169,8 +169,8 @@ inline void memset(T* ptr, int value, std::size_t count)
 
   hipError_t error = ::hipMemset(ptr, value, size);
   if (error != hipSuccess) {
-    UMPIRE_ERROR(runtime_error, umpire::fmt::format("hipMemset(ptr={}, value={}, size={}) failed with error: {}", ptr,
-                                                    value, size, hipGetErrorString(error)));
+    UMPIRE_ERROR(runtime_error, fmt::format("hipMemset(ptr={}, value={}, size={}) failed with error: {}",
+                                            reinterpret_cast<void*>(ptr), value, size, hipGetErrorString(error)));
   }
 }
 
@@ -194,8 +194,8 @@ inline camp::resources::EventProxy<camp::resources::Resource> memset_async(T* pt
   hipError_t error = ::hipMemsetAsync(ptr, value, size, stream);
   if (error != hipSuccess) {
     UMPIRE_ERROR(runtime_error,
-                 umpire::fmt::format("hipMemsetAsync(ptr={}, value={}, size={}, stream={}) failed with error: {}", ptr,
-                                     value, size, static_cast<void*>(stream), hipGetErrorString(error)));
+                 fmt::format("hipMemsetAsync(ptr={}, value={}, size={}, stream={}) failed with error: {}", ptr, value,
+                             size, static_cast<void*>(stream), hipGetErrorString(error)));
   }
 
   return camp::resources::EventProxy<camp::resources::Resource>{resource};
@@ -222,9 +222,8 @@ inline void prefetch(T* ptr, int device, std::size_t count)
     hipError_t error = ::hipMemPrefetchAsync(ptr, size, device, nullptr);
 
     if (error != hipSuccess) {
-      UMPIRE_ERROR(runtime_error,
-                   umpire::fmt::format("hipMemPrefetchAsync(ptr={}, size={}, device={}) failed with error: {}", ptr,
-                                       size, device, hipGetErrorString(error)));
+      UMPIRE_ERROR(runtime_error, fmt::format("hipMemPrefetchAsync(ptr={}, size={}, device={}) failed with error: {}",
+                                              reinterpret_cast<void*>(ptr), size, device, hipGetErrorString(error)));
     }
   }
 }
@@ -255,10 +254,9 @@ inline camp::resources::EventProxy<camp::resources::Resource> prefetch_async(T* 
     hipError_t error = ::hipMemPrefetchAsync(ptr, size, device, stream);
 
     if (error != hipSuccess) {
-      UMPIRE_ERROR(
-          runtime_error,
-          umpire::fmt::format("hipMemPrefetchAsync(ptr={}, size={}, device={}, stream={}) failed with error: {}", ptr,
-                              size, device, static_cast<void*>(stream), hipGetErrorString(error)));
+      UMPIRE_ERROR(runtime_error,
+                   fmt::format("hipMemPrefetchAsync(ptr={}, size={}, device={}, stream={}) failed with error: {}", ptr,
+                               size, device, static_cast<void*>(stream), hipGetErrorString(error)));
     }
   }
 
@@ -472,14 +470,14 @@ struct prefetch<resource::hip_platform> {
   };
 
 DEFINE_HIP_ADVICE_OP(set_accessed_by, hipMemAdviseSetAccessedBy)
-DEFINE_HIP_ADVICE_OP(preferred_location, hipMemAdviseSetPreferredLocation)
-DEFINE_HIP_ADVICE_OP(read_mostly, hipMemAdviseSetReadMostly)
+DEFINE_HIP_ADVICE_OP(set_preferred_location, hipMemAdviseSetPreferredLocation)
+DEFINE_HIP_ADVICE_OP(set_read_mostly, hipMemAdviseSetReadMostly)
 DEFINE_HIP_ADVICE_OP(unset_accessed_by, hipMemAdviseUnsetAccessedBy)
 DEFINE_HIP_ADVICE_OP(unset_preferred_location, hipMemAdviseUnsetPreferredLocation)
 DEFINE_HIP_ADVICE_OP(unset_read_mostly, hipMemAdviseUnsetReadMostly)
 
 #if HIP_VERSION_MAJOR >= 5
-DEFINE_HIP_ADVICE_OP(coarse_grain, hipMemAdviseSetCoarseGrain)
+DEFINE_HIP_ADVICE_OP(set_coarse_grain, hipMemAdviseSetCoarseGrain)
 DEFINE_HIP_ADVICE_OP(unset_coarse_grain, hipMemAdviseUnsetCoarseGrain)
 #endif
 

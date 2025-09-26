@@ -93,7 +93,6 @@ TEST(Reallocate, HostReallocateSameSize)
 
   // Allocate buffer
   int* ptr = static_cast<int*>(allocator.allocate(size));
-  int* original_ptr = ptr;
 
   // Fill with test data
   for (int i = 0; i < num_elements; ++i) {
@@ -138,7 +137,6 @@ TEST(Reallocate, HostReallocateToZero)
 TEST(Reallocate, HostReallocateFromNull)
 {
   constexpr std::size_t size = 1024;
-  constexpr int num_elements = size / sizeof(int);
 
   // Start with null pointer
   int* ptr = nullptr;
@@ -148,12 +146,12 @@ TEST(Reallocate, HostReallocateFromNull)
   ASSERT_NE(ptr, nullptr);
 
   // Should be able to write to the allocated memory
-  for (int i = 0; i < num_elements; ++i) {
+  for (int i = 0; i < static_cast<int>(size / sizeof(int)); ++i) {
     ptr[i] = i + 500;
   }
 
   // Verify data
-  for (int i = 0; i < num_elements; ++i) {
+  for (int i = 0; i < static_cast<int>(size / sizeof(int)); ++i) {
     ASSERT_EQ(ptr[i], i + 500) << "Data write failed at index " << i;
   }
 
@@ -223,7 +221,6 @@ TEST(Reallocate, CudaReallocate)
   constexpr std::size_t initial_size = 512;
   constexpr std::size_t final_size = 1024;
   constexpr int num_initial_elements = initial_size / sizeof(int);
-  constexpr int num_final_elements = final_size / sizeof(int);
 
   auto& rm = umpire::ResourceManager::getInstance();
   auto cuda_allocator = rm.getAllocator("DEVICE");

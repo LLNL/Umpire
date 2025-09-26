@@ -1,9 +1,8 @@
 #pragma once
 
 #include "umpire/config.hpp"
-
-#include "umpire/op/operations.hpp"
 #include "umpire/op/host.hpp"
+#include "umpire/op/operations.hpp"
 #if defined(UMPIRE_ENABLE_CUDA)
 #include "umpire/op/cuda.hpp"
 #endif

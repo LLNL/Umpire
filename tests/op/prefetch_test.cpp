@@ -94,7 +94,7 @@ TEST(Prefetch, CudaPrefetchToHost)
     auto host_allocator = rm.getAllocator("HOST");
 
     // Allocate managed memory
-    void* um_ptr = um_allocator.allocate(size);
+    unsigned char* um_ptr = static_cast<unsigned char*>(um_allocator.allocate(size));
 
     // Allocate host buffer for verification
     unsigned char* host_ptr = static_cast<unsigned char*>(host_allocator.allocate(size));
@@ -134,7 +134,7 @@ TEST(Prefetch, CudaPrefetchToDevice)
     auto host_allocator = rm.getAllocator("HOST");
 
     // Allocate managed memory
-    void* um_ptr = um_allocator.allocate(size);
+    unsigned char* um_ptr = static_cast<unsigned char*>(um_allocator.allocate(size));
 
     // Allocate host buffer for verification
     unsigned char* host_ptr = static_cast<unsigned char*>(host_allocator.allocate(size));
@@ -174,7 +174,7 @@ TEST(Prefetch, ExplicitCudaPrefetch)
     auto host_allocator = rm.getAllocator("HOST");
 
     // Allocate managed memory
-    void* um_ptr = um_allocator.allocate(size);
+    unsigned char* um_ptr = static_cast<unsigned char*>(um_allocator.allocate(size));
 
     // Allocate host buffer for verification
     unsigned char* host_ptr = static_cast<unsigned char*>(host_allocator.allocate(size));
@@ -216,7 +216,7 @@ TEST(Prefetch, HipPrefetchToHost)
     auto host_allocator = rm.getAllocator("HOST");
 
     // Allocate managed memory
-    void* um_ptr = um_allocator.allocate(size);
+    unsigned char* um_ptr = static_cast<unsigned char*>(um_allocator.allocate(size));
 
     // Allocate host buffer for verification
     unsigned char* host_ptr = static_cast<unsigned char*>(host_allocator.allocate(size));
@@ -256,7 +256,7 @@ TEST(Prefetch, HipPrefetchToDevice)
     auto host_allocator = rm.getAllocator("HOST");
 
     // Allocate managed memory
-    void* um_ptr = um_allocator.allocate(size);
+    unsigned char* um_ptr = static_cast<unsigned char*>(um_allocator.allocate(size));
 
     // Allocate host buffer for verification
     unsigned char* host_ptr = static_cast<unsigned char*>(host_allocator.allocate(size));
@@ -296,7 +296,7 @@ TEST(Prefetch, ExplicitHipPrefetch)
     auto host_allocator = rm.getAllocator("HOST");
 
     // Allocate managed memory
-    void* um_ptr = um_allocator.allocate(size);
+    unsigned char* um_ptr = static_cast<unsigned char*>(um_allocator.allocate(size));
 
     // Allocate host buffer for verification
     unsigned char* host_ptr = static_cast<unsigned char*>(host_allocator.allocate(size));
