@@ -33,6 +33,8 @@ class HostMpi3SharedMemoryResource : public MemoryResource {
   Platform getPlatform() noexcept override;
 
  private:
+  static int free_comm(MPI_Comm comm, int keyval, void* attribute_val, void* extra_state);
+
   MPI_Comm m_shared_comm;
   int m_local_rank;
   std::map<void*, MPI_Win> m_shared_windows;

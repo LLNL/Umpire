@@ -33,6 +33,20 @@ if (UMPIRE_ENABLE_IPC_SHARED_MEMORY)
       SOURCES recipe_shared_memory.cpp
       DEPENDS_ON ${cookbook_depends})
     list(APPEND umpire_cookbooks recipe_shared_memory)
+
+    if (UMPIRE_ENABLE_CUDA)
+        blt_add_executable(
+          NAME recipe_device_ipc
+          SOURCES recipe_device_ipc.cpp
+          DEPENDS_ON ${cookbook_depends} cuda_runtime)
+        list(APPEND umpire_cookbooks recipe_device_ipc)
+    elseif (UMPIRE_ENABLE_HIP)
+        blt_add_executable(
+          NAME recipe_device_ipc
+          SOURCES recipe_device_ipc.cpp
+          DEPENDS_ON ${cookbook_depends} blt::hip_runtime)
+        list(APPEND umpire_cookbooks recipe_device_ipc)
+    endif()
   endif()
 
   blt_add_executable(

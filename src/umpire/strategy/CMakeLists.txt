@@ -25,6 +25,12 @@ set (umpire_strategy_headers
   StdAllocator.hpp
   ThreadSafeAllocator.hpp)
 
+if (UMPIRE_ENABLE_MPI AND UMPIRE_ENABLE_IPC_SHARED_MEMORY AND (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP))
+  set (umpire_strategy_headers
+    ${umpire_strategy_headers}
+    DeviceIpcAllocator.hpp)
+endif()
+
 if (UMPIRE_ENABLE_NUMA)
   set (umpire_strategy_headers
     ${umpire_strategy_headers}
@@ -56,6 +62,12 @@ set (umpire_strategy_sources
   SizeLimiter.cpp
   SlotPool.cpp
   ThreadSafeAllocator.cpp)
+
+if (UMPIRE_ENABLE_MPI AND UMPIRE_ENABLE_IPC_SHARED_MEMORY AND (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP))
+  set (umpire_strategy_sources
+    ${umpire_strategy_sources}
+    DeviceIpcAllocator.cpp)
+endif()
 
 if (UMPIRE_ENABLE_NUMA)
   set (umpire_strategy_sources

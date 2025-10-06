@@ -5,23 +5,9 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 
-#include <algorithm>
-#include <chrono>
-#include <iostream>
-#include <random>
-#include <sstream>
-#include <string>
-#include <utility>
-#include <vector>
-
 #include "gtest/gtest.h"
 #include "mpi.h"
-#include "umpire/Allocator.hpp"
-#include "umpire/ResourceManager.hpp"
 #include "umpire/Umpire.hpp"
-#include "umpire/config.hpp"
-#include "umpire/resource/HostSharedMemoryResource.hpp"
-#include "umpire/util/MemoryResourceTraits.hpp"
 
 class MPISharedMemoryTest : public ::testing::Test {
  protected:
@@ -35,7 +21,7 @@ class MPISharedMemoryTest : public ::testing::Test {
   static void SetUpTestSuite()
   {
     auto& rm = umpire::ResourceManager::getInstance();
-    auto node_allocator = rm.makeResource("SHARED");
+    auto node_allocator = rm.makeResource("SHARED"); // Defaults to MPI3 Shared Memory
 
     shared_allocator_comm = umpire::get_communicator_for_allocator(node_allocator, MPI_COMM_WORLD);
     MPI_Comm_size(shared_allocator_comm, &num_ranks);
@@ -109,7 +95,7 @@ int main(int argc, char* argv[])
 
   result = RUN_ALL_TESTS();
 
-  // umpire::cleanup_cached_communicators();
+  umpire::cleanup_cached_communicators();
 
   MPI_Finalize();
 

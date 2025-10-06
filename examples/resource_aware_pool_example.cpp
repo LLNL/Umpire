@@ -95,7 +95,7 @@ int main(int, char**)
 #else
   UMPIRE_ASSERT(ptr1 == ptr2);
 #endif
-  std::cout << "Expected result returned!" << std::endl;
+  std::cout << "Expected result returned! Ptr1 = " << ptr1 << "; Ptr2 = " << ptr2 << ";" << std::endl;
 
   pool.deallocate(a); // Deallocation with no resource included
   return 0;
