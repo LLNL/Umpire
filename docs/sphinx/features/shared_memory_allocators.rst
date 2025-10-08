@@ -33,8 +33,8 @@ Enabling Both Shared Memory Allocators
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 As of v2025.09.0, users can enable both Shared Memory Allocators at the same time. Thus, we introduced a "default" shared memory
-resource. The default allows a shortcut for users to simply specify ``SHARED`` and that default shared memory resource will be used. 
-See table below which describes this default.
+resource cmake variable, `UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE`. The default allows a shortcut for users to simply specify 
+``SHARED`` and that default shared memory resource will be used. See table below which describes this default.
 
 +-------------+-------------+---------+
 | MPI3        | IPC         | Default |
@@ -52,6 +52,7 @@ As indicated in the table above, if both IPC and MPI3 Shared Memory is enabled, 
 assumed that MPI is enabled.) In order to use IPC shared memory, users need to be explicit when creating the allocator. For example:
 
 .. code-block:: cpp
+
    auto traits{umpire::get_default_resource_traits("SHARED::POSIX")};
    ...
    auto node_allocator{rm.makeResource("SHARED::POSIX::alloc", traits)};
@@ -60,6 +61,7 @@ Note that the ``SHARED::POSIX`` prefix is required to use IPC Shared Memory in t
 is an IPC Shared Memory allocator with the following code:
 
 .. code-block:: cpp
+
    if (umpire::util::matchesSharedMemoryResource("SHARED::POSIX::alloc", "POSIX")) {
      // The "SHARED::POSIX::alloc" allocator is indeed a POSIX(IPC) Shared Memory Allocator!
    }
