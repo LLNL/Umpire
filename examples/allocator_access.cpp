@@ -65,7 +65,9 @@ int main()
         data[i] = i * i;
       }
       UMPIRE_ASSERT(data[size - 1] == (size - 1) * (size - 1) && "Inequality found in array that should be accessible");
+      a.deallocate(data);
     }
   }
+
   return 0;
 }
