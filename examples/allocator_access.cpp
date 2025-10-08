@@ -67,6 +67,5 @@ int main()
       UMPIRE_ASSERT(data[size - 1] == (size - 1) * (size - 1) && "Inequality found in array that should be accessible");
     }
   }
-
   return 0;
 }
