@@ -35,5 +35,6 @@ int main(int, char**)
   void* ptr = shim.allocate(1024);
   std::cout << "Ptr = " << ptr << std::endl;
   shim.deallocate(ptr);
+
   return 0;
 }
