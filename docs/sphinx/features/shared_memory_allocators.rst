@@ -32,9 +32,9 @@ which set it apart from other Umpire allocators.
 Enabling Both Shared Memory Allocators
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-As of v2025.09.0, users can enable both Shared Memory Allocators at the same time. Thus, we introduced a "default" shared memory
-resource cmake variable, `UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE`. The default allows a shortcut for users to simply specify 
-``SHARED`` and that default shared memory resource will be used. See table below which describes this default.
+As of v2025.09.0, users can enable both Shared Memory allocators at the same time. Thus, we introduced a "default" shared memory
+resource cmake variable, ``UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE``. The default allows a shortcut for users to simply specify 
+``SHARED`` and then that default shared memory resource will be used. See table below which describes this default.
 
 +-------------+-------------+---------+
 | MPI3        | IPC         | Default |
@@ -48,7 +48,7 @@ resource cmake variable, `UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE`. The default al
 | disabled    | disabled    | N/A     |
 +-------------+-------------+---------+
 
-As indicated in the table above, if both IPC and MPI3 Shared Memory is enabled, then MPI3 is the default. (For the table above, it is
+As indicated in the table above, if both IPC and MPI3 Shared Memory are enabled, then MPI3 is the default. (For the table above, it is
 assumed that MPI is enabled.) In order to use IPC shared memory, users need to be explicit when creating the allocator. For example:
 
 .. code-block:: cpp
