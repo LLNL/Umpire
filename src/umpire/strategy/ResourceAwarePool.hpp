@@ -12,6 +12,8 @@
 #include <memory>
 #include <tuple>
 #include <unordered_map>
+#include <optional>
+#include <variant>
 
 #include "camp/camp.hpp"
 #include "camp/resource.hpp"
@@ -24,6 +26,22 @@
 
 using Resource = camp::resources::Resource;
 using Event = camp::resources::Event;
+
+namespace std {
+  // Hash function for variant Resource
+  template<>
+  struct hash<std::variant<std::monostate, Resource>> {
+    size_t operator()(const std::variant<std::monostate, Resource>& key) const {
+      if (std::holds_alternative<std::monostate>(key)) {
+        return 0; // Hash for no resource
+      }
+      // If there is a Resource, get it
+      const auto& resource = std::get<Resource>(key);
+      return std::hash<const void*>{}(&resource); // use the address of the resource object
+    }
+  };
+  // End of PendingMap definitions
+}
 
 namespace umpire {
 
@@ -183,7 +201,11 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
   };
 
   using PointerMap = std::unordered_map<void*, Chunk*>;
-  using PendingList = std::list<Chunk*>;
+
+  // PendingMap definitions
+  using ResourceKey = std::variant<std::monostate, Resource>;
+  using PendingMap = std::unordered_multimap<ResourceKey, Chunk*>;
+
   using SizeMap =
       std::multimap<std::size_t, Chunk*, std::less<std::size_t>, pool_allocator<std::pair<const std::size_t, Chunk*>>>;
 
@@ -214,6 +236,7 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
     Chunk* prev{nullptr};
     Chunk* next{nullptr};
     SizeMap::iterator size_map_it;
+    PendingMap::iterator pending_map_it;
     Resource resource;
     Event event;
   };
@@ -221,7 +244,7 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
  private:
   PointerMap m_used_map{};
   SizeMap m_free_map{};
-  PendingList m_pending_list{};
+  PendingMap m_pending_map{};
 
   util::FixedMallocPool m_chunk_pool{sizeof(Chunk)};
 
