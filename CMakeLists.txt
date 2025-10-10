@@ -131,8 +131,6 @@ endif()
 
 if(UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE)
   message(STATUS "Default Shared Memory Resource is ${UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE}")
-else()
-  message(STATUS "No Default Shared Memory Resource configured")
 endif()
 
 ########
