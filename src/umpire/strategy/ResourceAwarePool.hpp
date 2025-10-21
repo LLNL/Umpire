@@ -27,22 +27,6 @@
 using Resource = camp::resources::Resource;
 using Event = camp::resources::Event;
 
-namespace std {
-  // Hash function for variant Resource
-  template<>
-  struct hash<std::variant<std::monostate, Resource>> {
-    size_t operator()(const std::variant<std::monostate, Resource>& key) const {
-      if (std::holds_alternative<std::monostate>(key)) {
-        return 0; // Hash for no resource
-      }
-      // If there is a Resource, get it
-      const auto& resource = std::get<Resource>(key);
-      return std::hash<const void*>{}(&resource); // use the address of the resource object
-    }
-  };
-  // End of PendingMap definitions
-}
-
 namespace umpire {
 
 class Allocator;
@@ -201,11 +185,7 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
   };
 
   using PointerMap = std::unordered_map<void*, Chunk*>;
-
-  // PendingMap definitions
-  using ResourceKey = std::variant<std::monostate, Resource>;
-  using PendingMap = std::unordered_multimap<ResourceKey, Chunk*>;
-
+  using PendingMap = std::unordered_multimap<std::optional<Resource>, Chunk*>;
   using SizeMap =
       std::multimap<std::size_t, Chunk*, std::less<std::size_t>, pool_allocator<std::pair<const std::size_t, Chunk*>>>;
 
