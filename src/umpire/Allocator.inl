@@ -29,16 +29,49 @@ inline void* Allocator::do_allocate(std::size_t bytes)
     ret = allocateNull();
   } else {
     try {
+#ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
+      // Check if this allocator supports header mode
+      if (m_tracking && util::supportsHeaderIntrospection(m_allocator)) {
+        // Request extra space for header
+        std::size_t total_bytes = util::getTotalSize(bytes);
+        void* base_ptr = m_allocator->allocate(total_bytes);
+
+        // Insert header and get user pointer
+        ret = util::insertHeader(base_ptr, bytes, m_allocator);
+
+        // Update statistics (normally done by registerAllocation)
+        m_allocator->m_current_size += bytes;
+        m_allocator->m_allocation_count++;
+        if (m_allocator->m_current_size > m_allocator->m_high_watermark) {
+          m_allocator->m_high_watermark = m_allocator->m_current_size;
+        }
+      } else {
+        // Device-only memory or tracking disabled - use map-based tracking or no tracking
+        ret = m_allocator->allocate(bytes);
+        if (m_tracking) {
+          // Use fallback map for device-only allocations
+          getFallbackMap().insert(ret, {ret, bytes, m_allocator});
+
+          // Update statistics
+          m_allocator->m_current_size += bytes;
+          m_allocator->m_allocation_count++;
+          if (m_allocator->m_current_size > m_allocator->m_high_watermark) {
+            m_allocator->m_high_watermark = m_allocator->m_current_size;
+          }
+        }
+      }
+#else
+      // Original map-based path
       ret = m_allocator->allocate(bytes);
+      if (m_tracking) {
+        registerAllocation(ret, bytes, m_allocator);
+      }
+#endif
     } catch (umpire::out_of_memory_error& e) {
       e.set_allocator_id(this->getId());
       e.set_requested_size(bytes);
       throw;
     }
-  }
-
-  if (m_tracking) {
-    registerAllocation(ret, bytes, m_allocator);
   }
 
   umpire::event::record<umpire::event::allocate>(
@@ -88,11 +121,43 @@ inline void* Allocator::do_named_allocate(const std::string& name, std::size_t b
   if (0 == bytes) {
     ret = allocateNull();
   } else {
-    ret = m_allocator->allocate_named(name, bytes);
-  }
+#ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
+    // Check if this allocator supports header mode
+    if (m_tracking && util::supportsHeaderIntrospection(m_allocator)) {
+      // Request extra space for header
+      std::size_t total_bytes = util::getTotalSize(bytes);
+      void* base_ptr = m_allocator->allocate_named(name, total_bytes);
 
-  if (m_tracking) {
-    registerAllocation(ret, bytes, m_allocator, name);
+      // Insert header with name and get user pointer
+      ret = util::insertHeader(base_ptr, bytes, m_allocator, name);
+
+      // Update statistics
+      m_allocator->m_current_size += bytes;
+      m_allocator->m_allocation_count++;
+      if (m_allocator->m_current_size > m_allocator->m_high_watermark) {
+        m_allocator->m_high_watermark = m_allocator->m_current_size;
+      }
+    } else {
+      // Device-only memory or tracking disabled
+      ret = m_allocator->allocate_named(name, bytes);
+      if (m_tracking) {
+        getFallbackMap().insert(ret, {ret, bytes, m_allocator, name});
+
+        // Update statistics
+        m_allocator->m_current_size += bytes;
+        m_allocator->m_allocation_count++;
+        if (m_allocator->m_current_size > m_allocator->m_high_watermark) {
+          m_allocator->m_high_watermark = m_allocator->m_current_size;
+        }
+      }
+    }
+#else
+    // Original map-based path
+    ret = m_allocator->allocate_named(name, bytes);
+    if (m_tracking) {
+      registerAllocation(ret, bytes, m_allocator, name);
+    }
+#endif
   }
 
   umpire::event::record<umpire::event::named_allocate>(
@@ -111,11 +176,43 @@ inline void* Allocator::do_resource_allocate(std::size_t bytes, camp::resources:
   if (0 == bytes) {
     ret = allocateNull();
   } else {
-    ret = m_allocator->allocate_resource(bytes, r);
-  }
+#ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
+    // Check if this allocator supports header mode
+    if (m_tracking && util::supportsHeaderIntrospection(m_allocator)) {
+      // Request extra space for header
+      std::size_t total_bytes = util::getTotalSize(bytes);
+      void* base_ptr = m_allocator->allocate_resource(total_bytes, r);
 
-  if (m_tracking) {
-    registerAllocation(ret, bytes, m_allocator);
+      // Insert header and get user pointer
+      ret = util::insertHeader(base_ptr, bytes, m_allocator);
+
+      // Update statistics
+      m_allocator->m_current_size += bytes;
+      m_allocator->m_allocation_count++;
+      if (m_allocator->m_current_size > m_allocator->m_high_watermark) {
+        m_allocator->m_high_watermark = m_allocator->m_current_size;
+      }
+    } else {
+      // Device-only memory or tracking disabled
+      ret = m_allocator->allocate_resource(bytes, r);
+      if (m_tracking) {
+        getFallbackMap().insert(ret, {ret, bytes, m_allocator});
+
+        // Update statistics
+        m_allocator->m_current_size += bytes;
+        m_allocator->m_allocation_count++;
+        if (m_allocator->m_current_size > m_allocator->m_high_watermark) {
+          m_allocator->m_high_watermark = m_allocator->m_current_size;
+        }
+      }
+    }
+#else
+    // Original map-based path
+    ret = m_allocator->allocate_resource(bytes, r);
+    if (m_tracking) {
+      registerAllocation(ret, bytes, m_allocator);
+    }
+#endif
   }
 
   umpire::event::record<umpire::event::allocate_resource>(
@@ -132,17 +229,56 @@ inline void Allocator::do_deallocate(void* ptr)
   if (!ptr) {
     UMPIRE_LOG(Info, "Deallocating a null pointer (This behavior is intentionally allowed and ignored)");
     return;
-  } else {
-    if (m_tracking) {
-      auto record = deregisterAllocation(ptr, m_allocator);
-      if (!deallocateNull(ptr)) {
-        m_allocator->deallocate(ptr, record.size);
+  }
+
+  if (!deallocateNull(ptr)) {
+#ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
+    if (m_tracking && util::supportsHeaderIntrospection(m_allocator)) {
+      // Header mode - remove header and get base pointer
+      auto [record, base_ptr] = util::removeHeader(ptr);
+
+      // Validate strategy matches
+      if (record.strategy != m_allocator) {
+        UMPIRE_ERROR(runtime_error, fmt::format("{} was not allocated by {}", ptr, m_allocator->getName()));
       }
+
+      // Update statistics
+      m_allocator->m_current_size -= record.size;
+      m_allocator->m_allocation_count--;
+
+      // Deallocate with base pointer
+      m_allocator->deallocate(base_ptr, record.size);
     } else {
-      if (!deallocateNull(ptr)) {
+      // Device-only or tracking disabled
+      if (m_tracking) {
+        // Use fallback map
+        auto record = getFallbackMap().remove(ptr);
+
+        // Validate strategy matches
+        if (record.strategy != m_allocator) {
+          // Re-register and throw error
+          getFallbackMap().insert(ptr, record);
+          UMPIRE_ERROR(runtime_error, fmt::format("{} was not allocated by {}", ptr, m_allocator->getName()));
+        }
+
+        // Update statistics
+        m_allocator->m_current_size -= record.size;
+        m_allocator->m_allocation_count--;
+
+        m_allocator->deallocate(ptr, record.size);
+      } else {
         m_allocator->deallocate(ptr);
       }
     }
+#else
+    // Original map-based path
+    if (m_tracking) {
+      auto record = deregisterAllocation(ptr, m_allocator);
+      m_allocator->deallocate(ptr, record.size);
+    } else {
+      m_allocator->deallocate(ptr);
+    }
+#endif
   }
 }
 
@@ -156,17 +292,56 @@ inline void Allocator::do_resource_deallocate(void* ptr, camp::resources::Resour
   if (!ptr) {
     UMPIRE_LOG(Info, "Deallocating a null pointer (This behavior is intentionally allowed and ignored)");
     return;
-  } else {
-    if (m_tracking) {
-      auto record = deregisterAllocation(ptr, m_allocator);
-      if (!deallocateNull(ptr)) {
-        m_allocator->deallocate_resource(ptr, r, record.size);
+  }
+
+  if (!deallocateNull(ptr)) {
+#ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
+    if (m_tracking && util::supportsHeaderIntrospection(m_allocator)) {
+      // Header mode - remove header and get base pointer
+      auto [record, base_ptr] = util::removeHeader(ptr);
+
+      // Validate strategy matches
+      if (record.strategy != m_allocator) {
+        UMPIRE_ERROR(runtime_error, fmt::format("{} was not allocated by {}", ptr, m_allocator->getName()));
       }
+
+      // Update statistics
+      m_allocator->m_current_size -= record.size;
+      m_allocator->m_allocation_count--;
+
+      // Deallocate with base pointer
+      m_allocator->deallocate_resource(base_ptr, r, record.size);
     } else {
-      if (!deallocateNull(ptr)) {
+      // Device-only or tracking disabled
+      if (m_tracking) {
+        // Use fallback map
+        auto record = getFallbackMap().remove(ptr);
+
+        // Validate strategy matches
+        if (record.strategy != m_allocator) {
+          // Re-register and throw error
+          getFallbackMap().insert(ptr, record);
+          UMPIRE_ERROR(runtime_error, fmt::format("{} was not allocated by {}", ptr, m_allocator->getName()));
+        }
+
+        // Update statistics
+        m_allocator->m_current_size -= record.size;
+        m_allocator->m_allocation_count--;
+
+        m_allocator->deallocate_resource(ptr, r, record.size);
+      } else {
         m_allocator->deallocate_resource(ptr, r);
       }
     }
+#else
+    // Original map-based path
+    if (m_tracking) {
+      auto record = deregisterAllocation(ptr, m_allocator);
+      m_allocator->deallocate_resource(ptr, r, record.size);
+    } else {
+      m_allocator->deallocate_resource(ptr, r);
+    }
+#endif
   }
 }
 

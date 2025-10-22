@@ -37,6 +37,12 @@ if (UMPIRE_ENABLE_NUMA)
     numa.hpp)
 endif ()
 
+if (UMPIRE_ENABLE_HEADER_INTROSPECTION)
+  set (umpire_util_headers
+    ${umpire_util_headers}
+    HeaderIntrospection.hpp)
+endif ()
+
 set (umpire_util_sources
   AllocationMap.cpp
   FixedMallocPool.cpp
@@ -51,6 +57,12 @@ if (UMPIRE_ENABLE_NUMA)
   set (umpire_util_sources
     ${umpire_util_sources}
     numa.cpp)
+endif ()
+
+if (UMPIRE_ENABLE_HEADER_INTROSPECTION)
+  set (umpire_util_sources
+    ${umpire_util_sources}
+    HeaderIntrospection.cpp)
 endif ()
 
 set (umpire_util_depends camp umpire_event umpire_tpl_judy ${UMPIRE_FMT_TARGET})

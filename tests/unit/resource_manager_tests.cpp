@@ -6,6 +6,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "gtest/gtest.h"
 #include "umpire/ResourceManager.hpp"
+#include "umpire/config.hpp"
 #include "umpire/strategy/NamedAllocationStrategy.hpp"
 
 TEST(ResourceManager, Constructor)
@@ -23,20 +24,27 @@ TEST(ResourceManager, findAllocationRecord)
   auto alloc = rm.getAllocator("HOST");
 
   const std::size_t size = 1024 * 1024;
+#ifndef UMPIRE_ENABLE_HEADER_INTROSPECTION
   const std::size_t offset = 1024;
+#endif
 
   char* ptr = static_cast<char*>(alloc.allocate(size));
   const umpire::util::AllocationRecord* rec_begin = rm.findAllocationRecord(ptr);
+
+  ASSERT_EQ(ptr, rec_begin->ptr);
+
+#ifndef UMPIRE_ENABLE_HEADER_INTROSPECTION
+  // Header introspection does not support interior pointer queries
   const umpire::util::AllocationRecord* rec_middle = rm.findAllocationRecord(ptr + offset);
   const umpire::util::AllocationRecord* rec_end = rm.findAllocationRecord(ptr + (size - 1));
 
-  ASSERT_EQ(ptr, rec_begin->ptr);
   ASSERT_EQ(ptr, rec_middle->ptr);
   ASSERT_EQ(ptr, rec_end->ptr);
 
   ASSERT_THROW(rm.findAllocationRecord(ptr + size), umpire::runtime_error);
 
   ASSERT_THROW(rm.findAllocationRecord(ptr + size + 1), umpire::runtime_error);
+#endif
 
   alloc.deallocate(ptr);
 

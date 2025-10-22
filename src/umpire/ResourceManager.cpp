@@ -10,6 +10,7 @@
 #include <memory>
 #include <sstream>
 
+#include "umpire/Allocator.hpp"
 #include "umpire/Umpire.hpp"
 #include "umpire/config.hpp"
 #include "umpire/op/MemoryOperation.hpp"
@@ -375,13 +376,41 @@ util::AllocationRecord ResourceManager::deregisterAllocation(void* ptr)
 
 const util::AllocationRecord* ResourceManager::findAllocationRecord(void* ptr) const
 {
+#ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
+  if (ptr) {
+    // Try header introspection first
+    try {
+      auto* record = util::getRecord(ptr);
+      if (record && record->ptr == ptr) {
+        UMPIRE_LOG(Debug, "(Returning allocation record from header for ptr = " << ptr << ")");
+        return record;
+      }
+    } catch (...) {
+      // Not a header-tracked allocation, fall through to map
+    }
+
+    // Fall back to ResourceManager map (for non-tracked allocations in header mode)
+    // or fallback map (for device allocations in header mode)
+    try {
+      auto alloc_record = Allocator::getFallbackMap().find(ptr);
+      if (alloc_record->strategy) {
+        UMPIRE_LOG(Debug, "(Returning allocation record from fallback map for ptr = " << ptr << ")");
+        return alloc_record;
+      }
+    } catch (...) {
+      // Not in fallback map either
+    }
+  }
+#endif
+
+  // Use ResourceManager's m_allocations map (default mode or fallback)
   auto alloc_record = m_allocations.find(ptr);
 
   if (!alloc_record->strategy) {
     UMPIRE_ERROR(runtime_error, fmt::format("Cannot find allocator for {}", ptr));
   }
 
-  UMPIRE_LOG(Debug, "(Returning allocation record for ptr = " << ptr << ")");
+  UMPIRE_LOG(Debug, "(Returning allocation record from ResourceManager map for ptr = " << ptr << ")");
 
   return alloc_record;
 }
@@ -392,11 +421,12 @@ void ResourceManager::copy(void* dst_ptr, void* src_ptr, std::size_t size)
 
   auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
-  auto src_alloc_record = m_allocations.find(src_ptr);
+  // Use findAllocationRecord which handles header introspection fallback
+  auto src_alloc_record = findAllocationRecord(src_ptr);
   std::ptrdiff_t src_offset = static_cast<char*>(src_ptr) - static_cast<char*>(src_alloc_record->ptr);
   std::size_t src_size = src_alloc_record->size - src_offset;
 
-  auto dst_alloc_record = m_allocations.find(dst_ptr);
+  auto dst_alloc_record = findAllocationRecord(dst_ptr);
   std::ptrdiff_t dst_offset = static_cast<char*>(dst_ptr) - static_cast<char*>(dst_alloc_record->ptr);
   std::size_t dst_size = dst_alloc_record->size - dst_offset;
 
@@ -426,7 +456,9 @@ void ResourceManager::copy(void* dst_ptr, void* src_ptr, std::size_t size)
 
   auto op = op_registry.find("COPY", src_alloc_record->strategy, dst_alloc_record->strategy);
 
-  op->transform(src_ptr, &dst_ptr, src_alloc_record, dst_alloc_record, size);
+  // const_cast is safe here - copy operations don't modify allocation records
+  op->transform(src_ptr, &dst_ptr, const_cast<util::AllocationRecord*>(src_alloc_record),
+                const_cast<util::AllocationRecord*>(dst_alloc_record), size);
 }
 
 camp::resources::EventProxy<camp::resources::Resource> ResourceManager::copy(void* dst_ptr, void* src_ptr,
@@ -437,11 +469,12 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::copy(voi
 
   auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
-  auto src_alloc_record = m_allocations.find(src_ptr);
+  // Use findAllocationRecord which handles header introspection fallback
+  auto src_alloc_record = findAllocationRecord(src_ptr);
   std::ptrdiff_t src_offset = static_cast<char*>(src_ptr) - static_cast<char*>(src_alloc_record->ptr);
   std::size_t src_size = src_alloc_record->size - src_offset;
 
-  auto dst_alloc_record = m_allocations.find(dst_ptr);
+  auto dst_alloc_record = findAllocationRecord(dst_ptr);
   std::ptrdiff_t dst_offset = static_cast<char*>(dst_ptr) - static_cast<char*>(dst_alloc_record->ptr);
   std::size_t dst_size = dst_alloc_record->size - dst_offset;
 
@@ -471,7 +504,9 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::copy(voi
 
   auto op = op_registry.find("COPY", src_alloc_record->strategy, dst_alloc_record->strategy);
 
-  return op->transform_async(src_ptr, &dst_ptr, src_alloc_record, dst_alloc_record, size, ctx);
+  // const_cast is safe here - copy operations don't modify allocation records
+  return op->transform_async(src_ptr, &dst_ptr, const_cast<util::AllocationRecord*>(src_alloc_record),
+                             const_cast<util::AllocationRecord*>(dst_alloc_record), size, ctx);
 }
 
 void ResourceManager::memset(void* ptr, int value, std::size_t length)
@@ -874,7 +909,8 @@ void ResourceManager::deallocate(void* ptr)
 
 std::size_t ResourceManager::getSize(void* ptr) const
 {
-  auto record = m_allocations.find(ptr);
+  // Use findAllocationRecord which handles header introspection fallback
+  auto record = findAllocationRecord(ptr);
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ") returning " << record->size);
   return record->size;
 }
@@ -893,7 +929,8 @@ strategy::AllocationStrategy* ResourceManager::findAllocatorForId(int id)
 
 strategy::AllocationStrategy* ResourceManager::findAllocatorForPointer(void* ptr)
 {
-  auto allocation_record = m_allocations.find(ptr);
+  // Use findAllocationRecord which handles header introspection fallback
+  auto allocation_record = findAllocationRecord(ptr);
 
   if (!allocation_record->strategy) {
     UMPIRE_ERROR(runtime_error, fmt::format("Cannot find allocator for pointer: {}", ptr));

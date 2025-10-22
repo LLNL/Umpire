@@ -59,6 +59,16 @@ std::vector<util::AllocationRecord> get_allocator_records(Allocator allocator)
   auto strategy = allocator.getAllocationStrategy();
 
   std::vector<util::AllocationRecord> recs;
+
+#ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
+  // In header introspection mode, check the fallback map (used for device-only allocations)
+  // Note: Host-accessible allocations using headers are not tracked in a central map
+  auto& fallback_map = Allocator::getFallbackMap();
+  std::copy_if(fallback_map.begin(), fallback_map.end(), std::back_inserter(recs),
+               [strategy](const util::AllocationRecord& rec) { return rec.strategy == strategy; });
+#endif
+
+  // Also check ResourceManager's map (for non-header-introspection mode or mixed usage)
   std::copy_if(rm.m_allocations.begin(), rm.m_allocations.end(), std::back_inserter(recs),
                [strategy](const util::AllocationRecord& rec) { return rec.strategy == strategy; });
 

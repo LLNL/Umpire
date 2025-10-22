@@ -15,10 +15,16 @@
 
 #include "camp/camp.hpp"
 #include "camp/resource.hpp"
+#include "umpire/config.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/mixins/AllocateNull.hpp"
 #include "umpire/strategy/mixins/Inspector.hpp"
 #include "umpire/util/Platform.hpp"
+
+#ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
+#include "umpire/util/AllocationMap.hpp"
+#include "umpire/util/HeaderIntrospection.hpp"
+#endif
 
 class AllocatorTest;
 
@@ -187,6 +193,13 @@ class Allocator : private strategy::mixins::Inspector, strategy::mixins::Allocat
   Allocator() = default;
 
   friend std::ostream& operator<<(std::ostream&, const Allocator&);
+
+#ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
+  /*!
+   * \brief Get singleton AllocationMap for device-only allocations (fallback)
+   */
+  static util::AllocationMap& getFallbackMap();
+#endif
 
  private:
   /*!
