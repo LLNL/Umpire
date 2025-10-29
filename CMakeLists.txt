@@ -129,6 +129,10 @@ else()
   set (UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE "" CACHE STRING "")
 endif()
 
+if(UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE)
+  message(STATUS "Default Shared Memory Resource is ${UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE}")
+endif()
+
 ########
 
 cmake_dependent_option( UMPIRE_ENABLE_TESTS "Build Umpire tests" On
