@@ -24,9 +24,9 @@ variables:
 
 # Matrix
 # Arguments for top level allocation
-  MATRIX_SHARED_ALLOC: "--exclusive --time=8 --nodes=1"
+  MATRIX_SHARED_ALLOC: "--exclusive --partition=pdebug --time=8 --nodes=1"
 # Arguments for job level allocation
-  MATRIX_JOB_ALLOC: "--overlap --nodes=1"
+  MATRIX_JOB_ALLOC: "--partition=pdebug --overlap --nodes=1"
 # Project specific variants for matrix
   PROJECT_MATRIX_VARIANTS: "~shared +fortran +tools tests=basic +cuda cuda_arch=75"
 # Project specific deps for matrix
