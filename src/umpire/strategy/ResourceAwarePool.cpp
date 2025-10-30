@@ -181,7 +181,7 @@ void ResourceAwarePool::do_deallocate(Chunk* chunk, void* ptr) noexcept
   UMPIRE_USE_VAR(ptr);
   chunk->free = true;
 
-  // Remove chunk from pending
+  // Remove chunk from pending and invalidate iterator
   if (chunk->pending_map_it != m_pending_map.end()) {
     m_pending_map.erase(chunk->pending_map_it);
     chunk->pending_map_it = m_pending_map.end();
@@ -273,7 +273,7 @@ void ResourceAwarePool::deallocate_resource(void* ptr, camp::resources::Resource
   if (chunk->event.check()) {
     do_deallocate(chunk, ptr);
   } else {
-    // Chunk is now pending, add to pending map
+    // Chunk is now pending, add to pending map and set iterator
     auto it = m_pending_map.insert({std::optional<Resource>(chunk->resource), chunk});
     chunk->pending_map_it = it;
   }
@@ -293,51 +293,18 @@ void ResourceAwarePool::release()
   std::size_t prev_size{m_actual_bytes};
 #endif
 
-//TODO: double check this
-  auto it = m_pending_map.begin();
-  while (it != m_pending_map.end()) {
-    auto chunk = it->second;
-    UMPIRE_LOG(Debug, "Found chunk @ " << chunk->data);
-
-    // If we are destructing, wait for all deallocations to occur
-    if (m_is_destructing) {
+  // If we are destructing, wait for all deallocations to occur
+  if (m_is_destructing) {
+    // Wait for all pending operations
+    for (auto& [resource, chunk] : m_pending_map) {
       chunk->event.wait();
     }
-
-    // Otherwise, free all finished pending chunks
-    if (chunk->event.check()) {
-      if (chunk->size == chunk->chunk_size) {
-        UMPIRE_LOG(Debug, "Releasing chunk " << chunk->data);
-
-        m_actual_bytes -= chunk->chunk_size;
-        m_releasable_bytes -= chunk->chunk_size;
-        m_releasable_blocks--;
-        m_total_blocks--;
-
-        try {
-          aligned_deallocate(chunk->data);
-        } catch (...) {
-          if (m_is_destructing) {
-            //
-            // Ignore error in case the underlying vendor API has already shutdown
-            //
-            UMPIRE_LOG(Error, "Pool is destructing, runtime_error Ignored");
-          } else {
-            throw;
-          }
-        }
-
-        chunk->~Chunk(); // manually call destructor
-        m_chunk_pool.deallocate(chunk);
-        it = m_pending_map.erase(it);
-        chunk->pending_map_it = m_pending_map.end();
-      } else {
-        it = m_pending_map.erase(it);
-        chunk->pending_map_it = m_pending_map.end();
-        do_deallocate(chunk, chunk->data);
-      }
-    } else {
-      ++it;
+  
+    // Deallocate pending chunks (moves to free map)
+    while (!m_pending_map.empty()) {
+      auto it = m_pending_map.begin();
+      auto chunk = it->second;
+      do_deallocate(chunk, chunk->data);
     }
   }
 
@@ -430,34 +397,32 @@ Platform ResourceAwarePool::getPlatform() noexcept
 
 camp::resources::Resource ResourceAwarePool::getResource(void* ptr) const
 {
-  for (auto& [resource, chunk] : m_pending_map) { // check pending chunks
-    if (chunk->data == ptr) {
-      assert(resource.has_value()); //since resource is optional
-      return *resource;
-    }
-  }
-  auto it = m_used_map.find(ptr); // check used chunks
+  static camp::resources::Resource default_host_resource{camp::resources::Host::get_default()};
+
+  // First, check used chunks
+  auto it = m_used_map.find(ptr);
   if (it != m_used_map.end()) {
     auto chunk = it->second;
     return chunk->resource;
   }
-  for (auto pair = m_free_map.begin(); pair != m_free_map.end(); pair++) {
-    auto chunk = (*pair).second;
+
+  // If not found, check pending chunks
+  for (auto& [resource, chunk] : m_pending_map) {
     if (chunk->data == ptr) {
-      UMPIRE_LOG(
-          Warning,
-          fmt::format(
-              "Ptr {} corresponded to a free chunk in the ResourceAwarePool, so the resource may no longer be valid...",
-              ptr));
-      return chunk->resource;
+      if (!resource.has_value()) { //since resource is optional
+        UMPIRE_LOG(Error, fmt::format("Found ptr {} in pending_map but resource is null", ptr));
+        // Returning a default resource for the ResourceAwarePool
+        return default_host_resource;
+      }
+      return *resource;
     }
   }
 
-  UMPIRE_LOG(Warning, fmt::format("The pointer {} does not seem to be associated with the ResourceAwarePool."
-                                  "Returning the default Host resource...",
-                                  ptr));
+  UMPIRE_LOG(Warning, fmt::format("The pointer {} is either free or not associated with the ResourceAwarePool."
+                                  "Returning the default Host resource...", ptr));
 
-  return camp::resources::Host().get_default(); // Returning a default resource for the ResourceAwarePool
+  // Returning a default resource for the ResourceAwarePool
+  return default_host_resource;
 }
 
 MemoryResourceTraits ResourceAwarePool::getTraits() const noexcept
@@ -490,11 +455,12 @@ void ResourceAwarePool::coalesce() noexcept
   umpire::event::record([&](auto& event) {
     event.name("coalesce").category(event::category::operation).tag("allocator_name", getName()).tag("replay", "true");
   });
- 
+
+  // TODO: Do we need to check pending in coalescing function? 
   auto it = m_pending_map.begin();
   while (it != m_pending_map.end()) {
     auto pending_chunk = it->second;
-    if (pending_chunk->free == false && pending_chunk->event.check()) { // a pending chunk is finished...
+    if (pending_chunk->event.check()) { // a pending chunk is finished...
       auto next_it = std::next(it);
       do_deallocate(pending_chunk, pending_chunk->data);
       it = next_it;
