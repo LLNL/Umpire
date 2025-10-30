@@ -10,6 +10,7 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/Umpire.hpp"
+#include "umpire/util/MemoryResourceTraits.hpp"
 
 bool is_accessible_from_host(umpire::Allocator a)
 {
@@ -54,11 +55,17 @@ int main()
   const int size = 100;
   for (auto a : alloc) {
     if (is_accessible_from_host(a)) {
-      int* data = static_cast<int*>(a.allocate(size * sizeof(int)));
+      int* data;
+      if (a.getAllocationStrategy()->getTraits().resource == umpire::MemoryResourceTraits::resource_type::shared) {
+        data = static_cast<int*>(a.allocate("shared_alloc", size * sizeof(int)));
+      } else {
+        data = static_cast<int*>(a.allocate(size * sizeof(int)));
+      }
       for (int i = 0; i < size; i++) {
         data[i] = i * i;
       }
       UMPIRE_ASSERT(data[size - 1] == (size - 1) * (size - 1) && "Inequality found in array that should be accessible");
+      a.deallocate(data);
     }
   }
 
