@@ -17,7 +17,6 @@
 # In addition, each project should have:
 # - .gitlab/custom-jobs.yml - Job templates for child pipelines
 # - .gitlab/custom-variables.yml - Machine-specific variables
-# - .gitlab/subscribed-pipelines.yml - Machine subscription configuration
 # - .gitlab/jobs/${CI_MACHINE}.yml - Machine-specific job definitions
 ###############################################################################
 
@@ -98,5 +97,261 @@ include:
   # Local custom variables (used for component inputs and forwarded to child pipelines)
   - local: '.gitlab/custom-variables.yml'
 
-  # Machine pipelines subscribed by the project
-  - local: '.gitlab/machine-pipelines.yml'
+###############################################################################
+# MACHINE PIPELINES
+###############################################################################
+# Note: .machine-check template is provided by the base-pipeline component
+# and includes better error handling, validation, and GitHub status reporting.
+# Trigger a build-and-test pipeline for each machine.
+# Comment out the machine blocks you don't need.
+
+# One job to generate the job list for all the subpipelines
+generate-job-lists:
+  stage: prerequisites
+  tags: [shell, oslic]
+  variables:
+    RADIUSS_JOBS_PATH: "scripts/radiuss-spack-configs/gitlab/radiuss-jobs"
+    LOCAL_JOBS_PATH: ".gitlab/jobs"
+  script:
+    - cat ${RADIUSS_JOBS_PATH}/dane.yml ${LOCAL_JOBS_PATH}/dane.yml > dane-jobs.yml
+    - cat ${RADIUSS_JOBS_PATH}/matrix.yml ${LOCAL_JOBS_PATH}/matrix.yml > matrix-jobs.yml
+    - cat ${RADIUSS_JOBS_PATH}/lassen.yml ${LOCAL_JOBS_PATH}/lassen.yml > lassen-jobs.yml
+    - cat ${RADIUSS_JOBS_PATH}/corona.yml ${LOCAL_JOBS_PATH}/corona.yml > corona-jobs.yml
+    - cat ${RADIUSS_JOBS_PATH}/tioga.yml ${LOCAL_JOBS_PATH}/tioga.yml > tioga-jobs.yml
+    - cat ${RADIUSS_JOBS_PATH}/tuolumne.yml ${LOCAL_JOBS_PATH}/tuolumne.yml > tuolumne-jobs.yml
+  artifacts:
+    paths:
+      - dane-jobs.yml
+      - matrix-jobs.yml
+      - lassen-jobs.yml
+      - corona-jobs.yml
+      - tioga-jobs.yml
+      - tuolumne-jobs.yml
+
+# DANE
+dane-up-check:
+  variables:
+    CI_MACHINE: "dane"
+  extends: [.machine-check]
+  rules:
+    # Runs except if we explicitly deactivate dane by variable.
+    - if: '$ON_DANE == "OFF"'
+      when: never
+    - when: on_success
+
+dane-build-and-test:
+  stage: build-and-test
+  variables:
+    CI_MACHINE: "dane"
+  needs: [dane-up-check, generate-job-lists]
+  rules:
+    # Runs except if we explicitly deactivate dane by variable.
+    - if: '$ON_DANE == "OFF"'
+      when: never
+    - when: on_success
+  trigger:
+    include:
+      - local: '.gitlab/custom-jobs.yml'
+      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/dane-pipeline@woptim/migrate-to-components
+        inputs:
+          job_cmd: $JOB_CMD
+          shared_alloc: $DANE_SHARED_ALLOC
+          job_alloc: $DANE_JOB_ALLOC
+          github_project_name: $GITHUB_PROJECT_NAME
+          github_project_org: $GITHUB_PROJECT_ORG
+      - artifact: 'dane-jobs.yml'
+        job: 'generate-job-lists'
+    strategy: depend
+    forward:
+      pipeline_variables: true
+
+# MATRIX
+matrix-up-check:
+  variables:
+    CI_MACHINE: "matrix"
+  extends: [.machine-check]
+  rules:
+    # Runs except if we explicitly deactivate matrix by variable.
+    - if: '$ON_MATRIX == "OFF"'
+      when: never
+    - when: on_success
+
+matrix-build-and-test:
+  stage: build-and-test
+  variables:
+    CI_MACHINE: "matrix"
+  needs: [matrix-up-check, generate-job-lists]
+  rules:
+    # Runs except if we explicitly deactivate matrix by variable.
+    - if: '$ON_MATRIX == "OFF"'
+      when: never
+    - when: on_success
+  trigger:
+    include:
+      - local: '.gitlab/custom-jobs.yml'
+      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/matrix-pipeline@woptim/migrate-to-components
+        inputs:
+          job_cmd: $JOB_CMD
+          shared_alloc: $MATRIX_SHARED_ALLOC
+          job_alloc: $MATRIX_JOB_ALLOC
+          github_project_name: $GITHUB_PROJECT_NAME
+          github_project_org: $GITHUB_PROJECT_ORG
+      - artifact: 'matrix-jobs.yml'
+        job: 'generate-job-lists'
+    strategy: depend
+    forward:
+      pipeline_variables: true
+
+# CORONA
+corona-up-check:
+  variables:
+    CI_MACHINE: "corona"
+  extends: [.machine-check]
+  rules:
+    - if: '$ON_CORONA == "OFF"'
+      when: never
+    - when: on_success
+
+corona-build-and-test:
+  stage: build-and-test
+  variables:
+    CI_MACHINE: "corona"
+  needs: [corona-up-check, generate-job-lists]
+  rules:
+    - if: '$ON_CORONA == "OFF"'
+      when: never
+    - when: on_success
+  trigger:
+    include:
+      - local: '.gitlab/custom-jobs.yml'
+      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/corona-pipeline@woptim/migrate-to-components
+        inputs:
+          job_cmd: $JOB_CMD
+          shared_alloc: $CORONA_SHARED_ALLOC
+          job_alloc: $CORONA_JOB_ALLOC
+          github_project_name: $GITHUB_PROJECT_NAME
+          github_project_org: $GITHUB_PROJECT_ORG
+      - artifact: 'corona-jobs.yml'
+        job: 'generate-job-lists'
+    strategy: depend
+    forward:
+      pipeline_variables: true
+
+# TIOGA
+tioga-up-check:
+  variables:
+    CI_MACHINE: "tioga"
+  extends: [.machine-check]
+  rules:
+    - if: '$ON_TIOGA == "OFF"'
+      when: never
+    - when: on_success
+
+tioga-build-and-test:
+  stage: build-and-test
+  variables:
+    CI_MACHINE: "tioga"
+  needs: [tioga-up-check, generate-job-lists]
+  rules:
+    - if: '$ON_TIOGA == "OFF"'
+      when: never
+    - when: on_success
+  trigger:
+    include:
+      - local: '.gitlab/custom-jobs.yml'
+      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/tioga-pipeline@woptim/migrate-to-components
+        inputs:
+          job_cmd: $JOB_CMD
+          shared_alloc: $TIOGA_SHARED_ALLOC
+          job_alloc: $TIOGA_JOB_ALLOC
+          github_project_name: $GITHUB_PROJECT_NAME
+          github_project_org: $GITHUB_PROJECT_ORG
+      - artifact: 'tioga-jobs.yml'
+        job: 'generate-job-lists'
+    strategy: depend
+    forward:
+      pipeline_variables: true
+
+# TUOLUMNE
+tuolumne-up-check:
+  variables:
+    CI_MACHINE: "tuolumne"
+  extends: [.machine-check]
+  rules:
+    - if: '$ON_TUOLUMNE == "OFF"'
+      when: never
+    - when: on_success
+
+tuolumne-build-and-test:
+  stage: build-and-test
+  variables:
+    CI_MACHINE: "tuolumne"
+  needs: [tuolumne-up-check, generate-job-lists]
+  rules:
+    - if: '$ON_TUOLUMNE == "OFF"'
+      when: never
+    - when: on_success
+  trigger:
+    include:
+      - local: '.gitlab/custom-jobs.yml'
+      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/tuolumne-pipeline@woptim/migrate-to-components
+        inputs:
+          job_cmd: $JOB_CMD
+          shared_alloc: $TUOLUMNE_SHARED_ALLOC
+          job_alloc: $TUOLUMNE_JOB_ALLOC
+          github_project_name: $GITHUB_PROJECT_NAME
+          github_project_org: $GITHUB_PROJECT_ORG
+      - artifact: 'tuolumne-jobs.yml'
+        job: 'generate-job-lists'
+    strategy: depend
+    forward:
+      pipeline_variables: true
+
+# LASSEN
+lassen-up-check:
+  variables:
+    CI_MACHINE: "lassen"
+  extends: [.machine-check]
+  rules:
+    - if: '$ON_LASSEN == "OFF"'
+      when: never
+    - when: on_success
+
+lassen-build-and-test:
+  stage: build-and-test
+  variables:
+    CI_MACHINE: "lassen"
+  needs: [lassen-up-check, generate-job-lists]
+  rules:
+    - if: '$ON_LASSEN == "OFF"'
+      when: never
+    - when: on_success
+  trigger:
+    include:
+      - local: '.gitlab/custom-jobs.yml'
+      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/lassen-pipeline@woptim/migrate-to-components
+        inputs:
+          job_cmd: $JOB_CMD
+          job_alloc: $LASSEN_JOB_ALLOC
+          github_project_name: $GITHUB_PROJECT_NAME
+          github_project_org: $GITHUB_PROJECT_ORG
+      - artifact: 'lassen-jobs.yml'
+        job: 'generate-job-lists'
+    strategy: depend
+    forward:
+      pipeline_variables: true
+
+
+## If testing develop branch, trigger CHAI pipeline with this version of Umpire.
+## TODO: Once Spack allows to clone a specific commit on demand, then point to
+## the exact commit. This will prevent from sticking to a branch (here develop).
+# trigger-chai:
+#  stage: multi-project
+#  rules:
+#    - if: '$CI_COMMIT_BRANCH == "develop" || $MULTI_PROJECT == "ON"' #run only if ...
+#  variables:
+#    UPDATE_UMPIRE: develop
+#  trigger:
+#    project: radiuss/chai
+#    branch: develop
+#    strategy: depend
