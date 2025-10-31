@@ -11,18 +11,14 @@
 # at Lawrence Livermore National Laboratory (LLNL).
 # This entire pipeline is LLNL-specific
 #
-# Important note: This file is a template provided by llnl/radiuss-shared-ci.
-# Remains to set variable values, change the reference to the radiuss-shared-ci
-# repo, opt-in and out optional features. The project can then extend it with
-# additional stages.
+# This file uses GitLab CI Components from radiuss-shared-ci (requires GitLab 17.0+).
+# Components provide better versioning, type-safe inputs, and cleaner syntax.
 #
-# In addition, each project should copy over and complete:
-# - .gitlab/custom-jobs-and-variables.yml
-# - .gitlab/subscribed-pipelines.yml
-#
-# The jobs should be specified in a file local to the project,
-# - .gitlab/jobs/${CI_MACHINE}.yml
-# or generated (see LLNL/Umpire for an example).
+# In addition, each project should have:
+# - .gitlab/custom-jobs.yml - Job templates for child pipelines
+# - .gitlab/custom-variables.yml - Machine-specific variables
+# - .gitlab/subscribed-pipelines.yml - Machine subscription configuration
+# - .gitlab/jobs/${CI_MACHINE}.yml - Machine-specific job definitions
 ###############################################################################
 
 # We define the following GitLab pipeline variables:
@@ -56,6 +52,8 @@ variables:
   JOB_CMD:
     value: "./scripts/gitlab/build_and_test.sh"
     expand: false
+# Component version to use (using development branch for migration)
+  RADIUSS_SHARED_CI_REF: "woptim/migrate-to-components"
 # Override the pattern describing branches that will skip the "draft PR filter
 # test".  Add protected branches here. See default value in
 # preliminary-ignore-draft-pr.yml.
@@ -65,34 +63,40 @@ variables:
 # corresponds to a test batch on a given machine.
 
 # High level stages
+# IMPORTANT: You must define stages yourself to allow customization.
+# The following stages are REQUIRED by RADIUSS Shared CI components:
 stages:
-  - prerequisites
-  - build-and-test
-  - multi-project #TODO unused so far
-  - radiuss-spack-testing #TODO unused so far
+  - prerequisites           # Required: machine availability checks
+  - build-and-test          # Required: build and test jobs
+  - multi-project           #TODO unused so far
+  - radiuss-spack-testing   #TODO unused so far
 
-# Template for jobs triggering a build-and-test sub-pipeline:
-.build-and-test:
-  stage: build-and-test
-  trigger:
-    include:
-      - local: '.gitlab/custom-jobs-and-variables.yml'
-      - project: 'radiuss/radiuss-shared-ci'
-        ref: 'v2025.09.1'
-        file: 'pipelines/${CI_MACHINE}.yml'
-      - artifact: '${CI_MACHINE}-jobs.yml'
-        job: 'generate-job-lists'
-    strategy: depend
-    forward:
-      pipeline_variables: true
+###############################################################################
+# INCLUDES
+###############################################################################
 
 include:
   # Sets ID tokens for every job using `default:`
   - project: 'lc-templates/id_tokens'
     file: 'id_tokens.yml'
-  # [Optional] checks preliminary to running the actual CI test
-  #- project: 'radiuss/radiuss-shared-ci'
-  #  ref: 'v2025.09.1'
-  #  file: 'utilities/preliminary-ignore-draft-pr.yml'
-  # pipelines subscribed by the project
-  - local: '.gitlab/subscribed-pipelines.yml'
+
+  # Base pipeline templates and utilities
+  - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/base-pipeline@woptim/migrate-to-components
+    inputs:
+      github_project_name: $GITHUB_PROJECT_NAME
+      github_project_org: $GITHUB_PROJECT_ORG
+      github_token: $GITHUB_TOKEN
+      component_version: $RADIUSS_SHARED_CI_REF
+
+  # [Optional] Draft PR filter
+  #- component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/utility-draft-pr-filter@woptim/migrate-to-components
+  #  inputs:
+  #    github_token: $GITHUB_TOKEN
+  #    github_project_name: $GITHUB_PROJECT_NAME
+  #    github_project_org: $GITHUB_PROJECT_ORG
+
+  # Local custom variables (used for component inputs and forwarded to child pipelines)
+  - local: '.gitlab/custom-variables.yml'
+
+  # Machine pipelines subscribed by the project
+  - local: '.gitlab/machine-pipelines.yml'
