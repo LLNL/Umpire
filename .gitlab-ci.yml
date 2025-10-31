@@ -115,7 +115,6 @@ generate-job-lists:
   script:
     - cat ${RADIUSS_JOBS_PATH}/dane.yml ${LOCAL_JOBS_PATH}/dane.yml > dane-jobs.yml
     - cat ${RADIUSS_JOBS_PATH}/matrix.yml ${LOCAL_JOBS_PATH}/matrix.yml > matrix-jobs.yml
-    - cat ${RADIUSS_JOBS_PATH}/lassen.yml ${LOCAL_JOBS_PATH}/lassen.yml > lassen-jobs.yml
     - cat ${RADIUSS_JOBS_PATH}/corona.yml ${LOCAL_JOBS_PATH}/corona.yml > corona-jobs.yml
     - cat ${RADIUSS_JOBS_PATH}/tioga.yml ${LOCAL_JOBS_PATH}/tioga.yml > tioga-jobs.yml
     - cat ${RADIUSS_JOBS_PATH}/tuolumne.yml ${LOCAL_JOBS_PATH}/tuolumne.yml > tuolumne-jobs.yml
@@ -123,32 +122,18 @@ generate-job-lists:
     paths:
       - dane-jobs.yml
       - matrix-jobs.yml
-      - lassen-jobs.yml
       - corona-jobs.yml
       - tioga-jobs.yml
       - tuolumne-jobs.yml
 
 # DANE
 dane-up-check:
-  variables:
-    CI_MACHINE: "dane"
-  extends: [.machine-check]
-  rules:
-    # Runs except if we explicitly deactivate dane by variable.
-    - if: '$ON_DANE == "OFF"'
-      when: never
-    - when: on_success
+  extends: [.dane, .machine-check]
 
 dane-build-and-test:
   stage: build-and-test
-  variables:
-    CI_MACHINE: "dane"
+  extends: [.dane]
   needs: [dane-up-check, generate-job-lists]
-  rules:
-    # Runs except if we explicitly deactivate dane by variable.
-    - if: '$ON_DANE == "OFF"'
-      when: never
-    - when: on_success
   trigger:
     include:
       - local: '.gitlab/custom-jobs.yml'
@@ -167,25 +152,12 @@ dane-build-and-test:
 
 # MATRIX
 matrix-up-check:
-  variables:
-    CI_MACHINE: "matrix"
-  extends: [.machine-check]
-  rules:
-    # Runs except if we explicitly deactivate matrix by variable.
-    - if: '$ON_MATRIX == "OFF"'
-      when: never
-    - when: on_success
+  extends: [.matrix, .machine-check]
 
 matrix-build-and-test:
   stage: build-and-test
-  variables:
-    CI_MACHINE: "matrix"
+  extends: [.matrix]
   needs: [matrix-up-check, generate-job-lists]
-  rules:
-    # Runs except if we explicitly deactivate matrix by variable.
-    - if: '$ON_MATRIX == "OFF"'
-      when: never
-    - when: on_success
   trigger:
     include:
       - local: '.gitlab/custom-jobs.yml'
@@ -204,23 +176,12 @@ matrix-build-and-test:
 
 # CORONA
 corona-up-check:
-  variables:
-    CI_MACHINE: "corona"
-  extends: [.machine-check]
-  rules:
-    - if: '$ON_CORONA == "OFF"'
-      when: never
-    - when: on_success
+  extends: [.corona, .machine-check]
 
 corona-build-and-test:
   stage: build-and-test
-  variables:
-    CI_MACHINE: "corona"
+  extends: [.corona]
   needs: [corona-up-check, generate-job-lists]
-  rules:
-    - if: '$ON_CORONA == "OFF"'
-      when: never
-    - when: on_success
   trigger:
     include:
       - local: '.gitlab/custom-jobs.yml'
@@ -239,23 +200,12 @@ corona-build-and-test:
 
 # TIOGA
 tioga-up-check:
-  variables:
-    CI_MACHINE: "tioga"
-  extends: [.machine-check]
-  rules:
-    - if: '$ON_TIOGA == "OFF"'
-      when: never
-    - when: on_success
+  extends: [.tioga, .machine-check]
 
 tioga-build-and-test:
   stage: build-and-test
-  variables:
-    CI_MACHINE: "tioga"
+  extends: [.tioga]
   needs: [tioga-up-check, generate-job-lists]
-  rules:
-    - if: '$ON_TIOGA == "OFF"'
-      when: never
-    - when: on_success
   trigger:
     include:
       - local: '.gitlab/custom-jobs.yml'
@@ -274,23 +224,12 @@ tioga-build-and-test:
 
 # TUOLUMNE
 tuolumne-up-check:
-  variables:
-    CI_MACHINE: "tuolumne"
-  extends: [.machine-check]
-  rules:
-    - if: '$ON_TUOLUMNE == "OFF"'
-      when: never
-    - when: on_success
+  extends: [.tuolumne, .machine-check]
 
 tuolumne-build-and-test:
   stage: build-and-test
-  variables:
-    CI_MACHINE: "tuolumne"
+  extends: [.tuolumne]
   needs: [tuolumne-up-check, generate-job-lists]
-  rules:
-    - if: '$ON_TUOLUMNE == "OFF"'
-      when: never
-    - when: on_success
   trigger:
     include:
       - local: '.gitlab/custom-jobs.yml'
@@ -302,40 +241,6 @@ tuolumne-build-and-test:
           github_project_name: $GITHUB_PROJECT_NAME
           github_project_org: $GITHUB_PROJECT_ORG
       - artifact: 'tuolumne-jobs.yml'
-        job: 'generate-job-lists'
-    strategy: depend
-    forward:
-      pipeline_variables: true
-
-# LASSEN
-lassen-up-check:
-  variables:
-    CI_MACHINE: "lassen"
-  extends: [.machine-check]
-  rules:
-    - if: '$ON_LASSEN == "OFF"'
-      when: never
-    - when: on_success
-
-lassen-build-and-test:
-  stage: build-and-test
-  variables:
-    CI_MACHINE: "lassen"
-  needs: [lassen-up-check, generate-job-lists]
-  rules:
-    - if: '$ON_LASSEN == "OFF"'
-      when: never
-    - when: on_success
-  trigger:
-    include:
-      - local: '.gitlab/custom-jobs.yml'
-      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/lassen-pipeline@woptim/migrate-to-components
-        inputs:
-          job_cmd: $JOB_CMD
-          job_alloc: $LASSEN_JOB_ALLOC
-          github_project_name: $GITHUB_PROJECT_NAME
-          github_project_org: $GITHUB_PROJECT_ORG
-      - artifact: 'lassen-jobs.yml'
         job: 'generate-job-lists'
     strategy: depend
     forward:
