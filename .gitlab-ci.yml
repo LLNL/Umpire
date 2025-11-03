@@ -20,9 +20,13 @@
 # - .gitlab/jobs/${CI_MACHINE}.yml - Machine-specific job definitions
 ###############################################################################
 
-# We define the following GitLab pipeline variables:
+###############################################################################
+# VARIABLES
+###############################################################################
+
 variables:
-##### LC GITLAB CONFIGURATION
+
+# LC GITLAB CONFIGURATION
 # Use an LLNL service user to run CI. This prevents from running pipelines as
 # an actual user.
   LLNL_SERVICE_USER: umdev
@@ -30,14 +34,13 @@ variables:
 # at the same location whoever triggers a pipeline.
   CUSTOM_CI_BUILDS_DIR: /usr/workspace/umdev/gitlab-runner
 # Optimize submodules usage: only fetch the ones we need.
+# Note: We don't need to fetch dependencies handled by Spack.
   GIT_SUBMODULE_STRATEGY: normal
   GIT_SUBMODULE_DEPTH: 1
   GIT_SUBMODULE_UPDATE_FLAGS: --jobs 2
   GIT_SUBMODULE_PATHS: scripts/radiuss-spack-configs scripts/uberenv
 
-##### PROJECT VARIABLES
-
-##### SHARED_CI CONFIGURATION
+# SHARED_CI CONFIGURATION
 # Required information about GitHub repository
   GITHUB_PROJECT_NAME: "Umpire"
   GITHUB_PROJECT_ORG: "LLNL"
@@ -47,17 +50,13 @@ variables:
   JOB_CMD:
     value: "./scripts/gitlab/build_and_test.sh"
     expand: false
-# Override the pattern describing branches that will skip the "draft PR filter
-# test".  Add protected branches here. See default value in
-# preliminary-ignore-draft-pr.yml.
-#  ALWAYS_RUN_PATTERN: ""
 
-# We organize the build-and-test stage with sub-pipelines. Each sub-pipeline
-# corresponds to a test batch on a given machine.
-
-# High level stages
+###############################################################################
+# MAIN PIPELINE STAGES
+###############################################################################
 # IMPORTANT: You must define stages yourself to allow customization.
 # The following stages are REQUIRED by RADIUSS Shared CI components:
+
 stages:
   - prerequisites           # Required: machine availability checks
   - build-and-test          # Required: build and test jobs
@@ -80,19 +79,15 @@ include:
       github_project_org: $GITHUB_PROJECT_ORG
       github_token: $GITHUB_TOKEN
 
-  # [Optional] Draft PR filter
-  #- component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/utility-draft-pr-filter@woptim/migrate-to-components
-  #  inputs:
-  #    github_token: $GITHUB_TOKEN
-  #    github_project_name: $GITHUB_PROJECT_NAME
-  #    github_project_org: $GITHUB_PROJECT_ORG
-
   # Local custom variables (used for component inputs and forwarded to child pipelines)
   - local: '.gitlab/custom-variables.yml'
 
 ###############################################################################
 # MACHINE PIPELINES
 ###############################################################################
+# We organize the build-and-test stage with sub-pipelines. Each sub-pipeline
+# corresponds to a test batch on a given machine.
+#
 # Note: .machine-check template is provided by the base-pipeline component
 # and includes better error handling, validation, and GitHub status reporting.
 # Trigger a build-and-test pipeline for each machine.
@@ -238,7 +233,6 @@ tuolumne-build-and-test:
     strategy: depend
     forward:
       pipeline_variables: true
-
 
 ## If testing develop branch, trigger CHAI pipeline with this version of Umpire.
 ## TODO: Once Spack allows to clone a specific commit on demand, then point to
