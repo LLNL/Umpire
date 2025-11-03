@@ -36,10 +36,6 @@ variables:
   GIT_SUBMODULE_PATHS: scripts/radiuss-spack-configs scripts/uberenv
 
 ##### PROJECT VARIABLES
-# We build the projects in the CI clone directory. Used in
-# script/gitlab/build_and_test.sh script.
-# TODO: add a clean-up mechanism.
-  BUILD_ROOT: ${CI_PROJECT_DIR}
 
 ##### SHARED_CI CONFIGURATION
 # Required information about GitHub repository
