@@ -14,6 +14,7 @@
 #include "umpire/Umpire.hpp"
 #include "umpire/config.hpp"
 #include "umpire/strategy/ResourceAwarePool.hpp"
+#include "umpire/util/wrap_allocator.hpp"
 
 using namespace camp::resources;
 
@@ -239,21 +240,21 @@ TEST_P(ResourceAwarePoolTest, PendingToFreeTransition)
   m_pool.deallocate(ptr2, d1);
 }
 
-//TODO: do we need this to work?
-/*
 TEST_P(ResourceAwarePoolTest, ResourceMismatchOnDeallocate)
 {
   resource_type d1, d2;
   
   double* ptr = static_cast<double*>(m_pool.allocate(1024, d1));
   
-  // Try to deallocate with wrong resource
-  EXPECT_THROW(m_pool.deallocate(ptr, d2), umpire::runtime_error);
-  
   // Correct deallocation should work
   EXPECT_NO_THROW(m_pool.deallocate(ptr, d1));
+
+  double* ptr2 = static_cast<double*>(m_pool.allocate(2048, d1));
+  
+  // Try to deallocate with wrong resource
+  EXPECT_THROW(m_pool.deallocate(ptr2, d2), umpire::runtime_error);
+  
 }
-*/
 
 TEST_P(ResourceAwarePoolTest, MultiplePendingChunksSameResource)
 {
@@ -328,11 +329,9 @@ TEST_P(ResourceAwarePoolTest, ChunkSplittingAndMerging)
   m_pool.deallocate(large2, d1);
 }
 
-/*
 TEST_P(ResourceAwarePoolTest, GetResourceEdgeCases)
 {
   resource_type d1;
-  static camp::resources::Resource default_host_resource{camp::resources::Host::get_default()};
   
   double* ptr = static_cast<double*>(m_pool.allocate(1024, d1));
   
@@ -344,22 +343,28 @@ TEST_P(ResourceAwarePoolTest, GetResourceEdgeCases)
   m_pool.deallocate(ptr, d1);
   
   // Should still find it in pending
+  EXPECT_EQ(get_num_pending(m_pool), 1);
   EXPECT_EQ(get_resource(m_pool, ptr), Resource{d1});
   
   // Wait for completion
   d1.get_event().wait();
-  m_pool.release(); // Force processing of pending
+
+  // Force processing of pending 
+  // (release only processes pending chunks upon destruction, so call coalesce instead)
+  auto rap = umpire::util::unwrap_allocator<umpire::strategy::ResourceAwarePool>(m_pool);
+  rap->coalesce();
+
+  EXPECT_EQ(get_num_pending(m_pool), 0);
   
   // Now it's free - should return warning and default
   camp::resources::Resource res = get_resource(m_pool, ptr);
-  EXPECT_EQ(res, default_host_resource);
+  EXPECT_TRUE(res == camp::resources::Resource{Host{}});
   
   // Invalid pointer
   double* invalid_ptr = reinterpret_cast<double*>(0xDEADBEEF);
   res = get_resource(m_pool, invalid_ptr);
-  EXPECT_EQ(res, default_host_resource);
+  EXPECT_EQ(res, camp::resources::Resource{Host{}});
 }
-*/
 
 TEST_P(ResourceAwarePoolTest, StressTestMultipleResources)
 {

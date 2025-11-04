@@ -13,7 +13,6 @@
 #include <tuple>
 #include <unordered_map>
 #include <optional>
-#include <variant>
 
 #include "camp/camp.hpp"
 #include "camp/resource.hpp"

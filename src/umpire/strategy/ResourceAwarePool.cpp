@@ -54,6 +54,7 @@ void* ResourceAwarePool::allocate(std::size_t bytes)
 void* ResourceAwarePool::allocate_resource(std::size_t bytes, camp::resources::Resource r)
 {
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ")");
+  UMPIRE_LOG(Debug, "(Resource=" << camp::resources::to_string(r) << ")");
   const std::size_t rounded_bytes{aligned_round_up(bytes)};
   Chunk* chunk{nullptr};
 
@@ -397,7 +398,7 @@ Platform ResourceAwarePool::getPlatform() noexcept
 
 camp::resources::Resource ResourceAwarePool::getResource(void* ptr) const
 {
-  static camp::resources::Resource default_host_resource{camp::resources::Host::get_default()};
+  UMPIRE_LOG(Debug, "Calling getResource with (ptr=" << ptr << ")");
 
   // First, check used chunks
   auto it = m_used_map.find(ptr);
@@ -412,7 +413,7 @@ camp::resources::Resource ResourceAwarePool::getResource(void* ptr) const
       if (!resource.has_value()) { //since resource is optional
         UMPIRE_LOG(Error, fmt::format("Found ptr {} in pending_map but resource is null", ptr));
         // Returning a default resource for the ResourceAwarePool
-        return default_host_resource;
+        return camp::resources::Host::get_default();
       }
       return *resource;
     }
@@ -422,7 +423,7 @@ camp::resources::Resource ResourceAwarePool::getResource(void* ptr) const
                                   "Returning the default Host resource...", ptr));
 
   // Returning a default resource for the ResourceAwarePool
-  return default_host_resource;
+  return camp::resources::Host::get_default();
 }
 
 MemoryResourceTraits ResourceAwarePool::getTraits() const noexcept
@@ -456,11 +457,11 @@ void ResourceAwarePool::coalesce() noexcept
     event.name("coalesce").category(event::category::operation).tag("allocator_name", getName()).tag("replay", "true");
   });
 
-  // TODO: Do we need to check pending in coalescing function? 
   auto it = m_pending_map.begin();
   while (it != m_pending_map.end()) {
     auto pending_chunk = it->second;
-    if (pending_chunk->event.check()) { // a pending chunk is finished...
+    if (pending_chunk->event.check()) { 
+      // pending chunk is finished
       auto next_it = std::next(it);
       do_deallocate(pending_chunk, pending_chunk->data);
       it = next_it;
