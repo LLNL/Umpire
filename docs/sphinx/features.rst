@@ -11,6 +11,7 @@ Features
   features/allocator_accessibility
   features/device_allocators
   features/shared_memory_allocators
+  features/introspection
   features/backtrace
   features/file_output
   features/logging_and_replay
