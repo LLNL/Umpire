@@ -54,7 +54,11 @@ TEST_P(TypedAllocatorTest, AllocateDeallocateNothing)
 {
   double* data = m_allocator->allocate(m_nothing);
 
+#ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
+  ASSERT_EQ(nullptr, data);
+#else
   ASSERT_NE(nullptr, data);
+#endif
 
   m_allocator->deallocate(data, m_nothing);
 }

@@ -90,8 +90,14 @@ void StrategyTest<umpire::strategy::FixedPool>::SetUp()
   auto& rm = umpire::ResourceManager::getInstance();
   std::string name{"strategy_test_" + std::to_string(unique_strategy_id++)};
 
+  // When header introspection is enabled, FixedPool needs to account for the 64-byte header
+  std::size_t pool_obj_size = m_big * sizeof(double);
+#ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
+  pool_obj_size = umpire::get_allocation_size(pool_obj_size);
+#endif
+
   m_allocator = new umpire::Allocator(
-      rm.makeAllocator<umpire::strategy::FixedPool>(name, rm.getAllocator("HOST"), m_big * sizeof(double), 64));
+      rm.makeAllocator<umpire::strategy::FixedPool>(name, rm.getAllocator("HOST"), pool_obj_size, 64));
 
   m_parent_name = "HOST";
 }
@@ -116,8 +122,15 @@ void StrategyTest<umpire::strategy::SizeLimiter>::SetUp()
   auto& rm = umpire::ResourceManager::getInstance();
   std::string name{"strategy_test_" + std::to_string(unique_strategy_id++)};
 
+  // With header introspection, allocations need extra space: 8 allocs * (512 + 64) = 4608 bytes
+#ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
+  const std::size_t size_limit = 4608;
+#else
+  const std::size_t size_limit = 4 * 1024;  // 4096 bytes
+#endif
+
   m_allocator =
-      new umpire::Allocator(rm.makeAllocator<umpire::strategy::SizeLimiter>(name, rm.getAllocator("HOST"), 4 * 1024));
+      new umpire::Allocator(rm.makeAllocator<umpire::strategy::SizeLimiter>(name, rm.getAllocator("HOST"), size_limit));
 
   m_parent_name = "HOST";
 }
@@ -140,8 +153,15 @@ void StrategyTest<umpire::strategy::MonotonicAllocationStrategy>::SetUp()
   auto& rm = umpire::ResourceManager::getInstance();
   std::string name{"strategy_test_" + std::to_string(unique_strategy_id++)};
 
+  // With header introspection, allocations need extra space: 8 allocs * (512 + 64) = 4608 bytes
+#ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
+  const std::size_t capacity = 4608;
+#else
+  const std::size_t capacity = 4 * 1024;  // 4096 bytes
+#endif
+
   m_allocator = new umpire::Allocator(
-      rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>(name, rm.getAllocator("HOST"), 4 * 1024));
+      rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>(name, rm.getAllocator("HOST"), capacity));
 
   m_parent_name = "HOST";
 }
@@ -193,7 +213,11 @@ TYPED_TEST(StrategyTest, AllocateDeallocateNothing)
 {
   double* data = static_cast<double*>(this->m_allocator->allocate(this->m_nothing * sizeof(double)));
 
+#ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
+  ASSERT_EQ(nullptr, data);
+#else
   ASSERT_NE(nullptr, data);
+#endif
 
   this->m_allocator->deallocate(data);
 }
@@ -234,6 +258,8 @@ TYPED_TEST(StrategyTest, GetById)
 
 TYPED_TEST(StrategyTest, get_allocator_records)
 {
+#ifndef UMPIRE_ENABLE_HEADER_INTROSPECTION
+  // In header introspection mode, allocations are tracked in headers, not in a central map
   double* data = static_cast<double*>(this->m_allocator->allocate(this->m_big * sizeof(double)));
 
   auto records = umpire::get_allocator_records(*(this->m_allocator));
@@ -241,6 +267,9 @@ TYPED_TEST(StrategyTest, get_allocator_records)
   ASSERT_EQ(records.size(), 1);
 
   this->m_allocator->deallocate(data);
+#else
+  SUCCEED(); // Test not applicable in header introspection mode
+#endif
 }
 
 TYPED_TEST(StrategyTest, getCurrentSize)
@@ -249,7 +278,12 @@ TYPED_TEST(StrategyTest, getCurrentSize)
 
   void* data = this->m_allocator->allocate(this->m_big * sizeof(double));
 
-  ASSERT_EQ(this->m_allocator->getCurrentSize(), this->m_big * sizeof(double));
+  // With header introspection, getCurrentSize returns total bytes (user + 64-byte header)
+  std::size_t expected_size = this->m_big * sizeof(double);
+#ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
+  expected_size = umpire::get_allocation_size(expected_size);
+#endif
+  ASSERT_EQ(this->m_allocator->getCurrentSize(), expected_size);
 
   this->m_allocator->deallocate(data);
 }
@@ -272,11 +306,19 @@ class ReleaseTest : public ::testing::Test {
     std::string name{"release_test_" + std::to_string(unique_strategy_id++)};
     std::string limiter_name{"limiter_" + std::to_string(unique_strategy_id++)};
 
-    m_limiter_allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::SizeLimiter>(
-        limiter_name, rm.getAllocator("HOST"), max_alloc_size * num_allocs + padding));
+    // With header introspection, pool needs to accommodate header overhead
+    std::size_t pool_capacity = max_alloc_size * num_allocs;
+    std::size_t limiter_capacity = max_alloc_size * num_allocs + padding;
+#ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
+    pool_capacity = (max_alloc_size + 64) * num_allocs;  // Account for 64-byte headers
+    limiter_capacity = pool_capacity + padding;  // Limiter must be >= pool capacity + padding
+#endif
+
+    m_limiter_allocator = new umpire::Allocator(
+        rm.makeAllocator<umpire::strategy::SizeLimiter>(limiter_name, rm.getAllocator("HOST"), limiter_capacity));
 
     m_allocator =
-        new umpire::Allocator(rm.makeAllocator<T>(name, rm.getAllocator(limiter_name), max_alloc_size * num_allocs));
+        new umpire::Allocator(rm.makeAllocator<T>(name, rm.getAllocator(limiter_name), pool_capacity));
   }
 
   void TearDown() override
@@ -293,10 +335,15 @@ class ReleaseTest : public ::testing::Test {
   // num_allocs: The number of total allocations
   // padding: Some strategies have built-in alignment handling which will
   //  interfere will this test. Padding helps make sure we account for that.
+  //  With header introspection, we need additional padding for headers.
   ////////////////////////////////////////////////////////////////////////
   const int max_alloc_size = 1024;
   static const int num_allocs = 8;
+#ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
+  const int padding = 512 + (num_allocs * 64);  // Padding for pool block management + headers
+#else
   const int padding = 64;
+#endif
   void* test[num_allocs] = {0};
 
   umpire::Allocator* m_allocator;
@@ -310,11 +357,19 @@ void ReleaseTest<umpire::strategy::FixedPool>::SetUp()
   std::string name{"release_test_" + std::to_string(unique_strategy_id++)};
   std::string limiter_name{"limiter_" + std::to_string(unique_strategy_id++)};
 
-  m_limiter_allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::SizeLimiter>(
-      limiter_name, rm.getAllocator("HOST"), max_alloc_size * num_allocs));
+  // With header introspection, account for 64-byte header overhead
+  std::size_t pool_obj_size = max_alloc_size;
+  std::size_t limiter_size = max_alloc_size * num_allocs;
+#ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
+  pool_obj_size = umpire::get_allocation_size(pool_obj_size);
+  limiter_size = max_alloc_size * num_allocs + (num_allocs * 64);
+#endif
+
+  m_limiter_allocator = new umpire::Allocator(
+      rm.makeAllocator<umpire::strategy::SizeLimiter>(limiter_name, rm.getAllocator("HOST"), limiter_size));
 
   m_allocator = new umpire::Allocator(
-      rm.makeAllocator<umpire::strategy::FixedPool>(name, rm.getAllocator(limiter_name), max_alloc_size, 1));
+      rm.makeAllocator<umpire::strategy::FixedPool>(name, rm.getAllocator(limiter_name), pool_obj_size, 1));
 }
 
 using ReleaseStrategies =
@@ -352,7 +407,12 @@ TEST(MonotonicStrategy, Host)
   void* alloc = allocator.allocate(100);
   void* alloc2 = allocator.allocate(100);
 
-  ASSERT_EQ(static_cast<char*>(alloc2) - static_cast<char*>(alloc), 100);
+  // With header introspection, allocations are 64 bytes larger in the underlying strategy
+  std::size_t expected_distance = 100;
+#ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
+  expected_distance = umpire::get_allocation_size(100);  // 164 bytes
+#endif
+  ASSERT_EQ(static_cast<char*>(alloc2) - static_cast<char*>(alloc), expected_distance);
   ASSERT_GE(allocator.getCurrentSize(), 100);
   ASSERT_EQ(allocator.getSize(alloc), 100);
   ASSERT_GE(allocator.getHighWatermark(), 100);
@@ -451,15 +511,23 @@ TEST(FixedPool, Host)
 
   const int data_size = 100 * sizeof(int);
 
+  // With header introspection, FixedPool needs to account for the header
+  std::size_t pool_obj_size = data_size;
+  std::size_t expected_current_size = data_size;
+#ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
+  pool_obj_size = umpire::get_allocation_size(data_size);
+  expected_current_size = pool_obj_size;
+#endif
+
   auto allocator =
-      rm.makeAllocator<umpire::strategy::FixedPool>("host_fixed_pool", rm.getAllocator("HOST"), data_size, 64);
+      rm.makeAllocator<umpire::strategy::FixedPool>("host_fixed_pool", rm.getAllocator("HOST"), pool_obj_size, 64);
 
   void* alloc = allocator.allocate(data_size);
 
-  ASSERT_EQ(allocator.getCurrentSize(), data_size);
-  ASSERT_GE(allocator.getActualSize(), data_size * 64);
+  ASSERT_EQ(allocator.getCurrentSize(), expected_current_size);
+  ASSERT_GE(allocator.getActualSize(), pool_obj_size * 64);
   ASSERT_EQ(allocator.getSize(alloc), data_size);
-  ASSERT_GE(allocator.getHighWatermark(), data_size);
+  ASSERT_GE(allocator.getHighWatermark(), expected_current_size);
   ASSERT_EQ(allocator.getName(), "host_fixed_pool");
 
   allocator.deallocate(alloc);
@@ -480,10 +548,17 @@ TEST(MixedPool, Host)
     size *= 4;
   }
 
+  // With header introspection, getCurrentSize includes header overhead (9 allocs * 64 bytes)
+#ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
+  ASSERT_EQ(allocator.getCurrentSize(), total_size + (max_power * 64));
+  ASSERT_GT(allocator.getActualSize(), total_size + (max_power * 64));
+  ASSERT_GE(allocator.getHighWatermark(), total_size + (max_power * 64));
+#else
   ASSERT_EQ(allocator.getCurrentSize(), total_size);
   ASSERT_GT(allocator.getActualSize(), total_size);
-  ASSERT_EQ(allocator.getSize(alloc[max_power - 1]), size / 4);
   ASSERT_GE(allocator.getHighWatermark(), total_size);
+#endif
+  ASSERT_EQ(allocator.getSize(alloc[max_power - 1]), size / 4);
   ASSERT_EQ(allocator.getName(), "host_mixed_pool");
 
   for (std::size_t i = 0; i < max_power; ++i)
@@ -614,7 +689,12 @@ TEST(SizeLimiter, Host)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
+  // With header introspection, allocating 64 bytes requires 64 + 64 = 128 bytes total
+#ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
+  auto alloc = rm.makeAllocator<umpire::strategy::SizeLimiter>("size_limited_alloc", rm.getAllocator("HOST"), 128);
+#else
   auto alloc = rm.makeAllocator<umpire::strategy::SizeLimiter>("size_limited_alloc", rm.getAllocator("HOST"), 64);
+#endif
 
   void* data = nullptr;
 

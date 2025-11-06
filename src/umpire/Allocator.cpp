@@ -108,12 +108,4 @@ std::ostream& operator<<(std::ostream& os, const Allocator& allocator)
   return os;
 }
 
-#ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
-util::AllocationMap& Allocator::getFallbackMap()
-{
-  static util::AllocationMap instance;
-  return instance;
-}
-#endif
-
 } // end of namespace umpire

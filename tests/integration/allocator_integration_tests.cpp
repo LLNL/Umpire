@@ -65,7 +65,11 @@ TEST_P(AllocatorTest, AllocateDeallocateNothing)
   } else {
     double* data = static_cast<double*>(m_allocator->allocate(m_nothing * sizeof(double)));
 
+#ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
+    ASSERT_EQ(nullptr, data);
+#else
     ASSERT_NE(nullptr, data);
+#endif
 
     m_allocator->deallocate(data);
   }
@@ -90,7 +94,11 @@ TEST_P(AllocatorTest, GetSize)
 
   m_allocator->deallocate(data);
 
+#ifndef UMPIRE_ENABLE_HEADER_INTROSPECTION
+  // In header introspection mode, calling getSize on a deallocated pointer
+  // reads freed memory (undefined behavior), so we skip this check
   ASSERT_ANY_THROW(m_allocator->getSize(data));
+#endif
 }
 
 TEST_P(AllocatorTest, GetName)
@@ -114,6 +122,9 @@ TEST_P(AllocatorTest, GetById)
 
 TEST_P(AllocatorTest, get_allocator_records)
 {
+#ifndef UMPIRE_ENABLE_HEADER_INTROSPECTION
+  // In header introspection mode, allocations are tracked in headers, not in a central map,
+  // so get_allocator_records() cannot enumerate them
   double* data = static_cast<double*>(m_allocator->allocate(m_small * sizeof(double)));
 
   auto records = umpire::get_allocator_records(*m_allocator);
@@ -125,6 +136,9 @@ TEST_P(AllocatorTest, get_allocator_records)
   EXPECT_EQ(records.size(), 1);
 
   m_allocator->deallocate(data);
+#else
+  SUCCEED(); // Test not applicable in header introspection mode
+#endif
 }
 
 TEST_P(AllocatorTest, getCurrentSize)
@@ -133,7 +147,12 @@ TEST_P(AllocatorTest, getCurrentSize)
 
   void* data = m_allocator->allocate(128);
 
+  // With header introspection, getCurrentSize returns total allocated bytes (user + 64-byte header)
+#ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
+  ASSERT_EQ(m_allocator->getCurrentSize(), 192);  // 128 + 64
+#else
   ASSERT_EQ(m_allocator->getCurrentSize(), 128);
+#endif
 
   m_allocator->deallocate(data);
 }
@@ -144,7 +163,12 @@ TEST_P(AllocatorTest, getActualSize)
 
   void* data = m_allocator->allocate(128);
 
+  // With header introspection, getActualSize returns total allocated bytes (user + 64-byte header)
+#ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
+  ASSERT_EQ(m_allocator->getActualSize(), 192);  // 128 + 64
+#else
   ASSERT_EQ(m_allocator->getActualSize(), 128);
+#endif
 
   m_allocator->deallocate(data);
 }
@@ -276,7 +300,10 @@ TEST_P(AllocatorByResourceTest, AllocateDuplicateDeallocate)
 
   ASSERT_NO_THROW(m_allocator->deallocate(data));
 
+#ifndef UMPIRE_ENABLE_HEADER_INTROSPECTION
+  // In header introspection mode, double deallocation reads freed memory (undefined behavior)
   ASSERT_THROW(m_allocator->deallocate(data), umpire::runtime_error);
+#endif
 }
 
 const umpire::resource::MemoryResourceType resource_types[] = {umpire::resource::Host

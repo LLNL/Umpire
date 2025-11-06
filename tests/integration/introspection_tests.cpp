@@ -10,6 +10,10 @@
 
 TEST(IntrospectionTest, Overlaps)
 {
+#ifndef UMPIRE_ENABLE_HEADER_INTROSPECTION
+  // This test validates map-based allocation tracking by manually registering allocations.
+  // In header introspection mode, allocations are tracked via inline headers, not a central map.
+  // Manually registered allocations don't have headers, so pointer_overlaps would read invalid memory.
   auto& rm = umpire::ResourceManager::getInstance();
   umpire::Allocator allocator{rm.getAllocator("HOST")};
   umpire::strategy::AllocationStrategy* strategy{rm.getAllocator("HOST").getAllocationStrategy()};
@@ -65,10 +69,17 @@ TEST(IntrospectionTest, Overlaps)
   }
 
   allocator.deallocate(data);
+#else
+  SUCCEED(); // Test not applicable in header introspection mode
+#endif
 }
 
 TEST(IntrospectionTest, Contains)
 {
+#ifndef UMPIRE_ENABLE_HEADER_INTROSPECTION
+  // This test validates map-based allocation tracking by manually registering allocations.
+  // In header introspection mode, allocations are tracked via inline headers, not a central map.
+  // Manually registered allocations don't have headers, so pointer_contains would read invalid memory.
   auto& rm = umpire::ResourceManager::getInstance();
   umpire::Allocator allocator{rm.getAllocator("HOST")};
   umpire::strategy::AllocationStrategy* strategy{rm.getAllocator("HOST").getAllocationStrategy()};
@@ -86,10 +97,16 @@ TEST(IntrospectionTest, Contains)
   }
 
   allocator.deallocate(data);
+#else
+  SUCCEED(); // Test not applicable in header introspection mode
+#endif
 }
 
 TEST(IntrospectionTest, RegisterNull)
 {
+  // This test validates that manually registering nullptr throws an error in both introspection modes.
+  // Even though header introspection mode doesn't rely on manual registration as the primary tracking
+  // mechanism, the registerAllocation API should still properly reject nullptr as invalid input.
   auto& rm = umpire::ResourceManager::getInstance();
 
   umpire::strategy::AllocationStrategy* strategy{rm.getAllocator("HOST").getAllocationStrategy()};

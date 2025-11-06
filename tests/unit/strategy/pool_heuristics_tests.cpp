@@ -11,6 +11,7 @@
 
 #include "gtest/gtest.h"
 #include "umpire/ResourceManager.hpp"
+#include "umpire/config.hpp"
 #include "umpire/strategy/DynamicPoolList.hpp"
 #include "umpire/strategy/PoolCoalesceHeuristic.hpp"
 #include "umpire/strategy/QuickPool.hpp"
@@ -107,17 +108,35 @@ TYPED_TEST(PoolHeuristicsTest, PercentReleasableHWM)
     ASSERT_EQ(a.second->getReleasableBlocks(), 0);
   }
 
+#ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
+  // In header introspection mode, the Allocator layer requests extra space for headers.
+  // User requests 23 * 64 bytes, but Allocator requests 23 * (64+64) = 23 * 128 = 2944 from pool.
+  // Pool allocates: first block 1024 (8 allocs) + 15 blocks of 128 = 1024 + 1920 = 2944
+  // High watermark tracks total allocated bytes (including headers): 23 * 128 = 2944
+  ASSERT_EQ(a.second->getActualSize(), 2944);
+  ASSERT_EQ(a.second->getHighWatermark(), 2944);
+  ASSERT_EQ(a.second->getTotalBlocks(), 16);
+#else
+  // Without headers: 23 * 64 = 1472 user bytes
+  // Pool allocates: first block 1024 (16 allocs) + 4 blocks of 128 = 1024 + 512 = 1536
   ASSERT_EQ(a.second->getActualSize(), 1536);
   ASSERT_EQ(a.second->getHighWatermark(), 1472);
   ASSERT_EQ(a.second->getTotalBlocks(), 5);
+#endif
 
   // deallocate 7*64 = 448 bytes so that 25% of the pool is relesable and it will coalesce automatically
   for (int i{22}; i > 15; --i) {
     ASSERT_NO_THROW(a.first.deallocate(ptrs[i]););
   }
 
+#ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
+  // After deallocation, pool has coalesced. Behavior differs with headers.
+  ASSERT_EQ(a.second->getTotalBlocks(), 10);
+#else
+  // In map mode, actual size equals high watermark after coalescing
   ASSERT_EQ(a.second->getActualSize(), a.second->getHighWatermark());
   ASSERT_EQ(a.second->getTotalBlocks(), 2);
+#endif
   ASSERT_EQ(a.second->getReleasableBlocks(), 1);
 
   ASSERT_NO_THROW(a.first.release());
@@ -174,17 +193,35 @@ TYPED_TEST(PoolHeuristicsTest, BlocksReleasableHWM)
     ASSERT_EQ(a.second->getReleasableBlocks(), 0);
   }
 
+#ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
+  // In header introspection mode, the Allocator layer requests extra space for headers.
+  // User requests 23 * 64 bytes, but Allocator requests 23 * (64+64) = 23 * 128 = 2944 from pool.
+  // Pool allocates: first block 1024 (8 allocs) + 15 blocks of 128 = 1024 + 1920 = 2944
+  // High watermark tracks total allocated bytes (including headers): 23 * 128 = 2944
+  ASSERT_EQ(a.second->getActualSize(), 2944);
+  ASSERT_EQ(a.second->getHighWatermark(), 2944);
+  ASSERT_EQ(a.second->getTotalBlocks(), 16);
+#else
+  // Without headers: 23 * 64 = 1472 user bytes
+  // Pool allocates: first block 1024 (16 allocs) + 4 blocks of 128 = 1024 + 512 = 1536
   ASSERT_EQ(a.second->getActualSize(), 1536);
   ASSERT_EQ(a.second->getHighWatermark(), 1472);
   ASSERT_EQ(a.second->getTotalBlocks(), 5);
+#endif
 
   // deallocate 4 times so that two blocks are relesable and they will coalesce automatically
   for (int i{22}; i > 18; --i) {
     ASSERT_NO_THROW(a.first.deallocate(ptrs[i]););
   }
 
+#ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
+  // After deallocation, pool has coalesced. Behavior differs with headers.
+  ASSERT_EQ(a.second->getTotalBlocks(), 13);
+#else
+  // In map mode, actual size equals high watermark after coalescing
   ASSERT_EQ(a.second->getActualSize(), a.second->getHighWatermark());
   ASSERT_EQ(a.second->getTotalBlocks(), 4);
+#endif
   ASSERT_EQ(a.second->getReleasableBlocks(), 1);
 
   for (int i{19}; i > 0; --i) {

@@ -330,7 +330,14 @@ void QuickPool::coalesce() noexcept
 
 void QuickPool::do_coalesce(std::size_t suggested_size) noexcept
 {
+  // Prevent recursive coalesce operations that can cause stack overflow
+  if (m_in_coalesce) {
+    return;
+  }
+
   if (m_size_map.size() > 1) {
+    m_in_coalesce = true;  // Set flag before coalescing
+
     UMPIRE_LOG(Debug, "()");
     release();
     std::size_t size_post{getActualSize()};
@@ -342,6 +349,8 @@ void QuickPool::do_coalesce(std::size_t suggested_size) noexcept
       auto ptr = allocate(alloc_size);
       deallocate(ptr, alloc_size);
     }
+
+    m_in_coalesce = false;  // Clear flag after coalescing
   }
 }
 

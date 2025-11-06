@@ -8,13 +8,18 @@
 #include "umpire/strategy/DynamicPoolList.hpp"
 #include "umpire/strategy/FixedPool.hpp"
 
+#if defined(UMPIRE_ENABLE_HEADER_INTROSPECTION)
+#include "umpire/util/allocation_metadata.hpp"
+#endif
+
 static auto& rm = umpire::ResourceManager::getInstance();
 
 static auto alloc = rm.getAllocator("HOST");
 static auto dyn_pool_alloc = rm.makeAllocator<umpire::strategy::DynamicPoolList>("host_dyn_pool", alloc);
 #if defined(UMPIRE_ENABLE_HEADER_INTROSPECTION)
+// In header introspection mode, FixedPool must accommodate both user data and the aligned header
 static auto fixed_pool_alloc = rm.makeAllocator<umpire::strategy::FixedPool>(
-    "host_fixed_pool", alloc, 512 + sizeof(umpire::util::AllocationRecord*));
+    "host_fixed_pool", alloc, 512 + sizeof(umpire::util::allocation_header<umpire::util::AllocationRecord>));
 #else
 static auto fixed_pool_alloc = rm.makeAllocator<umpire::strategy::FixedPool>("host_fixed_pool", alloc, 512);
 #endif

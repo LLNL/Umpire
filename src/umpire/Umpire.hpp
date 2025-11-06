@@ -54,6 +54,28 @@ inline void* malloc(std::size_t size)
   return ResourceManager::getInstance().getDefaultAllocator().allocate(size);
 }
 
+#ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
+/*!
+ * \brief Calculate total size including metadata header overhead.
+ *
+ * When header introspection is enabled, allocations include a 64-byte
+ * metadata header. This function calculates the total size needed.
+ * Use this when creating FixedPool strategies to account for the header:
+ *
+ * Example:
+ *   // For 512-byte user allocations with header introspection:
+ *   auto pool = rm.makeAllocator<FixedPool>(
+ *     "my_pool", base_alloc, umpire::get_allocation_size(512));
+ *
+ * \param user_size The size of user data in bytes
+ * \return Total size including header overhead (user_size + 64)
+ */
+inline constexpr std::size_t get_allocation_size(std::size_t user_size) noexcept
+{
+  return user_size + 64;  // 64-byte header for metadata
+}
+#endif
+
 /*!
  * \brief Free any memory allocated with Umpire.
  *

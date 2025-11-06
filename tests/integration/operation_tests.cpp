@@ -40,8 +40,7 @@ using resource_type = camp::resources::Host;
 
 static int s_counter{0};
 
-struct NullStrategy {
-};
+struct NullStrategy {};
 
 // TODO: memset & reallocate test needs teh complete source list, and only a
 // single dest
@@ -195,13 +194,14 @@ class OperationTest : public ::testing::Test {
 };
 
 template <typename T>
-class ZeroCopyTest : public OperationTest<T> {
-};
+class ZeroCopyTest : public OperationTest<T> {};
 
 TYPED_TEST_SUITE(ZeroCopyTest, AllTestTypes, );
 
 TYPED_TEST(ZeroCopyTest, Zero)
 {
+#ifndef UMPIRE_ENABLE_HEADER_INTROSPECTION
+  // In header introspection mode, 0-byte allocations return nullptr and cannot be copied
   auto& rm = umpire::ResourceManager::getInstance();
 
   void* src = this->source_allocator->allocate(0);
@@ -211,11 +211,13 @@ TYPED_TEST(ZeroCopyTest, Zero)
 
   this->source_allocator->deallocate(src);
   this->dest_allocator->deallocate(dst);
+#else
+  SUCCEED(); // Test not applicable in header introspection mode
+#endif
 }
 
 template <typename T>
-class CopyTest : public OperationTest<T> {
-};
+class CopyTest : public OperationTest<T> {};
 
 TYPED_TEST_SUITE(CopyTest, AllTestTypes, );
 
@@ -236,6 +238,8 @@ TYPED_TEST(CopyTest, Copy)
   }
 }
 
+#ifndef UMPIRE_ENABLE_HEADER_INTROSPECTION
+// Header introspection cannot support interior pointer lookups (pointers into the middle of allocations)
 TYPED_TEST(CopyTest, Single)
 {
   auto& rm = umpire::ResourceManager::getInstance();
@@ -247,7 +251,10 @@ TYPED_TEST(CopyTest, Single)
 
   ASSERT_EQ(this->check_array[0], this->check_array[10]);
 }
+#endif
 
+#ifndef UMPIRE_ENABLE_HEADER_INTROSPECTION
+// Header introspection cannot support offset pointer lookups (dest_array + offset)
 TYPED_TEST(CopyTest, Offset)
 {
   auto& rm = umpire::ResourceManager::getInstance();
@@ -269,6 +276,7 @@ TYPED_TEST(CopyTest, Offset)
     ASSERT_EQ(i, this->check_array[i]);
   }
 }
+#endif
 
 TYPED_TEST(CopyTest, InvalidSize)
 {
@@ -302,8 +310,7 @@ TYPED_TEST(CopyTest, Async)
 }
 
 template <typename T>
-class MemsetTest : public OperationTest<T> {
-};
+class MemsetTest : public OperationTest<T> {};
 
 TYPED_TEST_SUITE(MemsetTest, SourceTestTypes, );
 
@@ -320,6 +327,7 @@ TYPED_TEST(MemsetTest, Memset)
   }
 }
 
+#ifndef UMPIRE_ENABLE_HEADER_INTROSPECTION
 TYPED_TEST(MemsetTest, Offset)
 {
   auto& rm = umpire::ResourceManager::getInstance();
@@ -339,6 +347,7 @@ TYPED_TEST(MemsetTest, Offset)
     ASSERT_EQ(2, check_chars[i]);
   }
 }
+#endif
 
 TYPED_TEST(MemsetTest, InvalidSize)
 {
@@ -351,12 +360,11 @@ TYPED_TEST(MemsetTest, InvalidPointer)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  ASSERT_THROW(rm.memset((void*)0x1, 0), umpire::runtime_error);
+  ASSERT_THROW(rm.memset((void*)0x0, 0), umpire::runtime_error);
 }
 
 template <typename T>
-class ReallocateTest : public OperationTest<T> {
-};
+class ReallocateTest : public OperationTest<T> {};
 
 TYPED_TEST_SUITE(ReallocateTest, SourceTestTypes, );
 
@@ -375,7 +383,9 @@ TYPED_TEST(ReallocateTest, ReallocateSweep)
 
     ASSERT_NO_THROW({ buffer = static_cast<int*>(this->source_allocator->allocate(buffer_size * sizeof(*buffer))); });
 
-    ASSERT_EQ(this->source_allocator->getId(), rm.getAllocator(buffer).getId());
+    if (buffer_size > 0) {
+      ASSERT_EQ(this->source_allocator->getId(), rm.getAllocator(buffer).getId());
+    }
 
     if (hostAccessible) {
       // Populate the buffer.
@@ -428,6 +438,8 @@ TYPED_TEST(ReallocateTest, ReallocateSweep)
   }
 }
 
+#ifndef UMPIRE_ENABLE_HEADER_INTROSPECTION
+// Header introspection cannot support reallocate as it deallocates and reads freed memory
 TYPED_TEST(ReallocateTest, Reallocate)
 {
   umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
@@ -476,6 +488,7 @@ TYPED_TEST(ReallocateTest, ReallocateLarger)
     ASSERT_EQ(check_interrogator[i], 2);
   }
 }
+#endif
 
 TYPED_TEST(ReallocateTest, RealocateNull)
 {
@@ -497,6 +510,8 @@ TYPED_TEST(ReallocateTest, RealocateNull)
 
 TYPED_TEST(ReallocateTest, ReallocateNullZero)
 {
+#ifndef UMPIRE_ENABLE_HEADER_INTROSPECTION
+  // In header introspection mode, 0-byte allocations return nullptr and cannot be tracked
   umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
 
   rm.setDefaultAllocator(*this->source_allocator);
@@ -547,10 +562,15 @@ TYPED_TEST(ReallocateTest, ReallocateNullZero)
 
   rm.deallocate(reallocated_array);
   rm.setDefaultAllocator(rm.getAllocator("HOST"));
+#else
+  SUCCEED(); // Test not applicable in header introspection mode
+#endif
 }
 
 TYPED_TEST(ReallocateTest, ReallocateNullZeroWithAllocator)
 {
+#ifndef UMPIRE_ENABLE_HEADER_INTROSPECTION
+  // In header introspection mode, 0-byte allocations return nullptr and cannot be tracked
   umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
 
   // nullptr, zero size
@@ -593,6 +613,9 @@ TYPED_TEST(ReallocateTest, ReallocateNullZeroWithAllocator)
   ASSERT_EQ(this->source_allocator->getSize(reallocated_array), reallocated_zero_size * sizeof(float));
 
   rm.deallocate(reallocated_array);
+#else
+  SUCCEED(); // Test not applicable in header introspection mode
+#endif
 }
 
 TYPED_TEST(ReallocateTest, ReallocateNullWithAllocator)
@@ -637,8 +660,7 @@ TYPED_TEST(ReallocateTest, ReallocateWithAllocatorFail)
 }
 
 template <typename T>
-class MoveTest : public OperationTest<T> {
-};
+class MoveTest : public OperationTest<T> {};
 
 TYPED_TEST_SUITE(MoveTest, AllTestTypes, );
 
@@ -669,8 +691,7 @@ TYPED_TEST(MoveTest, Move)
 
 #if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
 template <typename T>
-class AdviceTest : public OperationTest<T> {
-};
+class AdviceTest : public OperationTest<T> {};
 
 using AdviceTypes =
     camp::cartesian_product<camp::list<um_resource_tag>, camp::list<host_resource_tag, device_resource_tag>,

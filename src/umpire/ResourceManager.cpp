@@ -17,6 +17,7 @@
 #include "umpire/op/MemoryOperationRegistry.hpp"
 #include "umpire/resource/MemoryResourceRegistry.hpp"
 #include "umpire/strategy/FixedPool.hpp"
+#include "umpire/util/error.hpp"
 #if defined(UMPIRE_ENABLE_NUMA)
 #include "umpire/strategy/NumaPolicy.hpp"
 #endif
@@ -377,33 +378,16 @@ util::AllocationRecord ResourceManager::deregisterAllocation(void* ptr)
 const util::AllocationRecord* ResourceManager::findAllocationRecord(void* ptr) const
 {
 #ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
-  if (ptr) {
-    // Try header introspection first
-    try {
-      auto* record = util::getRecord(ptr);
-      if (record && record->ptr == ptr) {
-        UMPIRE_LOG(Debug, "(Returning allocation record from header for ptr = " << ptr << ")");
-        return record;
-      }
-    } catch (...) {
-      // Not a header-tracked allocation, fall through to map
-    }
-
-    // Fall back to ResourceManager map (for non-tracked allocations in header mode)
-    // or fallback map (for device allocations in header mode)
-    try {
-      auto alloc_record = Allocator::getFallbackMap().find(ptr);
-      if (alloc_record->strategy) {
-        UMPIRE_LOG(Debug, "(Returning allocation record from fallback map for ptr = " << ptr << ")");
-        return alloc_record;
-      }
-    } catch (...) {
-      // Not in fallback map either
-    }
+  // In header introspection mode, nullptr cannot have a valid header
+  if (!ptr) {
+    UMPIRE_ERROR(runtime_error, fmt::format("Cannot find allocator for {}", ptr));
   }
-#endif
 
-  // Use ResourceManager's m_allocations map (default mode or fallback)
+  const auto& record = util::allocation_metadata<util::AllocationRecord>(ptr);
+  UMPIRE_LOG(Debug, "(Returning allocation record from header for ptr = " << ptr << ")");
+  return &record;
+#else
+  // Use ResourceManager's m_allocations map
   auto alloc_record = m_allocations.find(ptr);
 
   if (!alloc_record->strategy) {
@@ -413,6 +397,7 @@ const util::AllocationRecord* ResourceManager::findAllocationRecord(void* ptr) c
   UMPIRE_LOG(Debug, "(Returning allocation record from ResourceManager map for ptr = " << ptr << ")");
 
   return alloc_record;
+#endif
 }
 
 void ResourceManager::copy(void* dst_ptr, void* src_ptr, std::size_t size)
@@ -515,7 +500,7 @@ void ResourceManager::memset(void* ptr, int value, std::size_t length)
 
   auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
-  auto alloc_record = m_allocations.find(ptr);
+  const util::AllocationRecord* alloc_record = findAllocationRecord(ptr);
 
   std::ptrdiff_t offset = static_cast<char*>(ptr) - static_cast<char*>(alloc_record->ptr);
   std::size_t size = alloc_record->size - offset;
@@ -541,7 +526,7 @@ void ResourceManager::memset(void* ptr, int value, std::size_t length)
 
   auto op = op_registry.find("MEMSET", alloc_record->strategy, alloc_record->strategy);
 
-  op->apply(ptr, alloc_record, value, length);
+  op->apply(ptr, const_cast<util::AllocationRecord*>(alloc_record), value, length);
 }
 
 camp::resources::EventProxy<camp::resources::Resource> ResourceManager::memset(void* ptr, int value,
@@ -552,7 +537,7 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::memset(v
 
   auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
-  auto alloc_record = m_allocations.find(ptr);
+  const util::AllocationRecord* alloc_record = findAllocationRecord(ptr);
 
   std::ptrdiff_t offset = static_cast<char*>(ptr) - static_cast<char*>(alloc_record->ptr);
   std::size_t size = alloc_record->size - offset;
@@ -579,7 +564,7 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::memset(v
 
   auto op = op_registry.find("MEMSET", alloc_record->strategy, alloc_record->strategy);
 
-  return op->apply_async(ptr, alloc_record, value, length, ctx);
+  return op->apply_async(ptr, const_cast<util::AllocationRecord*>(alloc_record), value, length, ctx);
 }
 
 void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size)
@@ -587,7 +572,7 @@ void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size)
   strategy::AllocationStrategy* strategy;
 
   if (current_ptr != nullptr) {
-    auto alloc_record = m_allocations.find(current_ptr);
+    const auto* alloc_record = findAllocationRecord(current_ptr);
     strategy = alloc_record->strategy;
   } else {
     strategy = getDefaultAllocator().getAllocationStrategy();
@@ -621,7 +606,7 @@ void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size, camp:
   strategy::AllocationStrategy* strategy;
 
   if (current_ptr != nullptr) {
-    auto alloc_record = m_allocations.find(current_ptr);
+    const auto* alloc_record = findAllocationRecord(current_ptr);
     strategy = alloc_record->strategy;
   } else {
     strategy = getDefaultAllocator().getAllocationStrategy();
@@ -716,7 +701,10 @@ void* ResourceManager::reallocate_impl(void* current_ptr, std::size_t new_size, 
   if (current_ptr == nullptr) {
     new_ptr = allocator.allocate(new_size);
   } else {
-    auto alloc_record = m_allocations.find(current_ptr);
+    const auto* alloc_record_const = findAllocationRecord(current_ptr);
+    // Make a mutable copy for transform operations
+    auto alloc_record_copy = *alloc_record_const;
+    auto* alloc_record = &alloc_record_copy;
     auto alloc = Allocator(alloc_record->strategy);
 
     if (alloc_record->strategy != allocator.getAllocationStrategy()) {
@@ -767,7 +755,10 @@ void* ResourceManager::reallocate_impl(void* current_ptr, std::size_t new_size, 
   if (current_ptr == nullptr) {
     new_ptr = allocator.allocate(new_size);
   } else {
-    auto alloc_record = m_allocations.find(current_ptr);
+    const auto* alloc_record_const = findAllocationRecord(current_ptr);
+    // Make a mutable copy for transform operations
+    auto alloc_record_copy = *alloc_record_const;
+    auto* alloc_record = &alloc_record_copy;
     auto alloc = Allocator(alloc_record->strategy);
 
     if (alloc_record->strategy != allocator.getAllocationStrategy()) {
@@ -808,7 +799,7 @@ void* ResourceManager::move(void* ptr, Allocator allocator)
 {
   UMPIRE_LOG(Debug, "(src_ptr=" << ptr << ", allocator=" << allocator.getName() << ")");
 
-  auto alloc_record = m_allocations.find(ptr);
+  auto alloc_record = findAllocationRecord(ptr);
 
   // short-circuit if ptr was allocated by 'allocator'
   if (alloc_record->strategy == allocator.getAllocationStrategy()) {
@@ -832,7 +823,7 @@ void* ResourceManager::move(void* ptr, Allocator allocator)
     if (dynamic_cast<strategy::NumaPolicy*>(base_strategy)) {
       auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
-      auto src_alloc_record = m_allocations.find(ptr);
+      const util::AllocationRecord* src_alloc_record = findAllocationRecord(ptr);
 
       const std::size_t size{src_alloc_record->size};
       util::AllocationRecord dst_alloc_record{nullptr, size, allocator.getAllocationStrategy()};
@@ -840,7 +831,7 @@ void* ResourceManager::move(void* ptr, Allocator allocator)
       if (size > 0) {
         auto op = op_registry.find("MOVE", src_alloc_record->strategy, dst_alloc_record.strategy);
         void* ret{nullptr};
-        op->transform(ptr, &ret, src_alloc_record, &dst_alloc_record, size);
+        op->transform(ptr, &ret, const_cast<util::AllocationRecord*>(src_alloc_record), &dst_alloc_record, size);
         UMPIRE_ASSERT(ret == ptr);
       }
 
@@ -886,7 +877,7 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::prefetch
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ", device=" << device << ")");
 
   auto& op_registry = op::MemoryOperationRegistry::getInstance();
-  auto alloc_record = m_allocations.find(ptr);
+  const util::AllocationRecord* alloc_record = findAllocationRecord(ptr);
 
   if (alloc_record->strategy->getTraits().resource != umpire::MemoryResourceTraits::resource_type::um) {
     UMPIRE_ERROR(runtime_error, "ResourceManager::prefetch only works on allocations from a UM resource.");
@@ -896,7 +887,7 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::prefetch
   std::size_t size = alloc_record->size - offset;
 
   auto op = op_registry.find("PREFETCH", alloc_record->strategy, alloc_record->strategy);
-  return op->apply_async(ptr, alloc_record, device, size, ctx);
+  return op->apply_async(ptr, const_cast<util::AllocationRecord*>(alloc_record), device, size, ctx);
 }
 
 void ResourceManager::deallocate(void* ptr)

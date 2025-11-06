@@ -51,7 +51,11 @@ TEST_P(AllocatorCTest, AllocateDeallocateSmall)
 TEST_P(AllocatorCTest, AllocateDeallocateNothing)
 {
   double* data = (double*)umpire_allocator_allocate(&m_allocator, m_nothing * sizeof(double));
+#ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
+  ASSERT_EQ(nullptr, data);
+#else
   ASSERT_NE(nullptr, data);
+#endif
 
   umpire_allocator_deallocate(&m_allocator, data);
 }
@@ -231,7 +235,11 @@ TEST_P(ListPoolAllocatorCTest, AllocateDeallocateSmall)
 TEST_P(ListPoolAllocatorCTest, AllocateDeallocateNothing)
 {
   double* data = (double*)umpire_allocator_allocate(&m_pool, m_nothing * sizeof(double));
+#ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
+  ASSERT_EQ(nullptr, data);
+#else
   ASSERT_NE(nullptr, data);
+#endif
 
   umpire_allocator_deallocate(&m_pool, data);
 }
@@ -289,7 +297,11 @@ TEST_P(QuickPoolAllocatorCTest, AllocateDeallocateSmall)
 TEST_P(QuickPoolAllocatorCTest, AllocateDeallocateNothing)
 {
   double* data = (double*)umpire_allocator_allocate(&m_pool, m_nothing * sizeof(double));
+#ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
+  ASSERT_EQ(nullptr, data);
+#else
   ASSERT_NE(nullptr, data);
+#endif
 
   umpire_allocator_deallocate(&m_pool, data);
 }
@@ -334,7 +346,11 @@ TEST_P(FixedPoolAllocatorCTest, AllocateDeallocateBig)
 TEST_P(FixedPoolAllocatorCTest, AllocateDeallocateNothing)
 {
   double* data = (double*)umpire_allocator_allocate(&m_pool, m_nothing * sizeof(double));
+#ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
+  ASSERT_EQ(nullptr, data);
+#else
   ASSERT_NE(nullptr, data);
+#endif
 
   umpire_allocator_deallocate(&m_pool, data);
 }
@@ -387,7 +403,11 @@ TEST_P(NamedAllocatorCTest, AllocateDeallocateSmall)
 TEST_P(NamedAllocatorCTest, AllocateDeallocateNothing)
 {
   double* data = (double*)umpire_allocator_allocate(&m_named_allocator, m_nothing * sizeof(double));
+#ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
+  ASSERT_EQ(nullptr, data);
+#else
   ASSERT_NE(nullptr, data);
+#endif
 
   umpire_allocator_deallocate(&m_named_allocator, data);
 }

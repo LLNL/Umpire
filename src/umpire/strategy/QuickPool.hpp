@@ -170,6 +170,7 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
   std::size_t m_releasable_bytes{0};
   std::size_t m_actual_highwatermark{0};
   bool m_is_destructing{false};
+  bool m_in_coalesce{false};  // Prevent recursive coalesce operations
 };
 
 std::ostream& operator<<(std::ostream& out, umpire::strategy::PoolCoalesceHeuristic<QuickPool>&);
