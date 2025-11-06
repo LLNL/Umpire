@@ -23,6 +23,11 @@ if (UMPIRE_ENABLE_CUDA)
     SOURCES resource_aware_pool_stress_test.cpp
     DEPENDS_ON umpire cuda)
 
+  blt_add_executable(
+    NAME resource_aware_pool_benchmarks
+    SOURCES resource_aware_pool_benchmarks.cpp
+    DEPENDS_ON umpire cuda)
+
   if (UMPIRE_ENABLE_DEVICE_ALLOCATOR)
   blt_add_executable(
     NAME device_allocator_stress_test
@@ -41,6 +46,11 @@ elseif (UMPIRE_ENABLE_HIP)
   blt_add_executable(
     NAME resource_aware_pool_stress_test
     SOURCES resource_aware_pool_stress_test.cpp
+    DEPENDS_ON umpire blt::hip blt::hip_runtime)
+
+  blt_add_executable(
+    NAME resource_aware_pool_benchmarks
+    SOURCES resource_aware_pool_benchmarks.cpp
     DEPENDS_ON umpire blt::hip blt::hip_runtime)
 
   if (UMPIRE_ENABLE_DEVICE_ALLOCATOR)
