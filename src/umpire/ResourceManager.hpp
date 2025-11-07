@@ -310,6 +310,8 @@ class ResourceManager {
    */
   std::size_t getSize(void* ptr) const;
 
+  std::size_t getInternalMemoryUsage() const;
+
   std::shared_ptr<op::MemoryOperation> getOperation(const std::string& operation_name, Allocator src_allocator,
                                                     Allocator dst_allocator);
 

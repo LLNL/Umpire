@@ -199,6 +199,22 @@ std::size_t MemoryMap<V>::size() const noexcept
 }
 
 template <typename V>
+std::size_t MemoryMap<V>::judyMemoryUsage() const noexcept
+{
+  std::size_t total = 0;
+  for (JudySeg* seg = m_array->seg; seg; seg = static_cast<JudySeg*>(seg->seg)) {
+    total += JUDY_seg;
+  }
+  return total;
+}
+
+template <typename V>
+std::size_t MemoryMap<V>::poolMemoryUsage() const noexcept
+{
+  return m_pool.totalBytes();
+}
+
+template <typename V>
 void MemoryMap<V>::removeLast()
 {
   auto v = reinterpret_cast<Value*>(*m_last);

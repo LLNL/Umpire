@@ -158,6 +158,11 @@ std::size_t get_process_memory_usage();
 std::size_t get_process_memory_usage_hwm();
 
 /*!
+ * \brief Get the current memory usage for internal Umpire data structures.
+ */
+std::size_t get_internal_memory_usage();
+
+/*!
  * \brief Mark an application-specific event string within Umpire life cycle.
  */
 void mark_event(const std::string& event);
