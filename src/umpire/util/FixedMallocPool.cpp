@@ -128,5 +128,10 @@ std::size_t FixedMallocPool::numPools() const noexcept
   return m_pool.size();
 }
 
+std::size_t FixedMallocPool::totalBytes() const noexcept
+{
+  return numPools() * m_data_bytes;
+}
+
 } // namespace util
 } // end of namespace umpire

@@ -171,6 +171,9 @@ class MemoryMap {
    */
   std::size_t size() const noexcept;
 
+  std::size_t judyMemoryUsage() const noexcept;
+  std::size_t poolMemoryUsage() const noexcept;
+
  private:
   // Helper method for public findOrBefore()
   Key doFindOrBefore(Key ptr) const noexcept;
