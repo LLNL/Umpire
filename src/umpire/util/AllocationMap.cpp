@@ -281,6 +281,11 @@ std::size_t AllocationMap::size() const
   return m_size;
 }
 
+std::size_t AllocationMap::internalMemoryUsage() const
+{
+  return m_block_pool.totalBytes() + m_map.poolMemoryUsage() + m_map.judyMemoryUsage();
+}
+
 void AllocationMap::print(const std::function<bool(const AllocationRecord&)>&& pred, std::ostream& os) const
 {
   for (auto p : m_map) {

@@ -41,6 +41,7 @@ class FixedMallocPool {
   void deallocate(void* ptr);
 
   std::size_t numPools() const noexcept;
+  std::size_t totalBytes() const noexcept;
 
  private:
   struct Pool {
