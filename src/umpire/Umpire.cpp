@@ -172,6 +172,11 @@ std::size_t get_process_memory_usage()
 #endif
 }
 
+std::size_t get_internal_memory_usage()
+{
+  return umpire::ResourceManager::getInstance().getInternalMemoryUsage();
+}
+
 void mark_event(const std::string& event)
 {
   umpire::event::record(

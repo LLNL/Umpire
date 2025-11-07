@@ -879,6 +879,11 @@ std::size_t ResourceManager::getSize(void* ptr) const
   return record->size;
 }
 
+std::size_t ResourceManager::getInternalMemoryUsage() const
+{
+  return m_allocations.internalMemoryUsage();
+}
+
 strategy::AllocationStrategy* ResourceManager::findAllocatorForId(int id)
 {
   auto allocator_i = m_allocators_by_id.find(id);
