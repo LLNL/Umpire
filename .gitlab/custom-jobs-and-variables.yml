@@ -7,7 +7,6 @@
 
 # We define the following GitLab pipeline variables:
 variables:
-  SPEC: "${SPEC} ^camp@git.52f70d977de9382ebd9923a25b19e234767b3cb0=https://github.com/LLNL/camp.git"
 # On LLNL's machine, this pipeline creates only one allocation shared among jobs
 # in order to save time and resources. This allocation has to be uniquely named
 # so that we are sure to retrieve it and avoid collisions.
