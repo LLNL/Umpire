@@ -8,6 +8,7 @@
 #include "umpire/resource/HostMpi3SharedMemoryResource.hpp"
 
 #include "umpire/resource/MemoryResource.hpp"
+#include "umpire/util/MPI.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/error.hpp"
 
@@ -18,7 +19,7 @@ HostMpi3SharedMemoryResource::HostMpi3SharedMemoryResource(const std::string& na
     : MemoryResource{name, id, traits}
 {
   constexpr int IGNORE_KEY{0};
-  MPI_Comm_split_type(MPI_COMM_WORLD, MPI_COMM_TYPE_SHARED, IGNORE_KEY, MPI_INFO_NULL, &m_shared_comm);
+  MPI_Comm_split_type(util::MPI::getCommunicator(), MPI_COMM_TYPE_SHARED, IGNORE_KEY, MPI_INFO_NULL, &m_shared_comm);
   MPI_Comm_rank(m_shared_comm, &m_local_rank);
 
   // Free the comm at exit during cleanup in MPI_Finalize. We pass the m_shared_comm
