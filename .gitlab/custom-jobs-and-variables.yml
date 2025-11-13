@@ -16,6 +16,7 @@ variables:
 # Arguments for top level allocation
   DANE_SHARED_ALLOC: "--exclusive --reservation=ci --time=8 --nodes=1"
 # Arguments for job level allocation
+# Note: We repeat the reservation, necessary when jobs are manually re-triggered.
   DANE_JOB_ALLOC: "--reservation=ci --overlap --nodes=1"
 # Project specific variants for dane
   PROJECT_DANE_VARIANTS: "~shared +fortran +tools tests=basic"
@@ -24,9 +25,10 @@ variables:
 
 # Matrix
 # Arguments for top level allocation
-  MATRIX_SHARED_ALLOC: "--exclusive --partition=pdebug --time=8 --nodes=1"
+  MATRIX_SHARED_ALLOC: "--exclusive --reservation=ci --time=8 --nodes=1"
 # Arguments for job level allocation
-  MATRIX_JOB_ALLOC: "--partition=pdebug --overlap --nodes=1"
+# Note: We repeat the reservation, necessary when jobs are manually re-triggered.
+  MATRIX_JOB_ALLOC: "--reservation=ci --overlap --nodes=1"
 # Project specific variants for matrix
   PROJECT_MATRIX_VARIANTS: "~shared +fortran +tools tests=basic +cuda cuda_arch=75"
 # Project specific deps for matrix
