@@ -14,14 +14,14 @@ Governance Policy
 Introduction
 ============
 
-Umpire is part of the RAJA Portability Suite and is an application-focused API for memory management on NUMA & GPU architectures. This governance policy 
+Umpire is an application-focused API for memory management on NUMA & GPU architectures. This governance policy 
 outlines the rules and processes that guide the development, contributions, and decision making of the Umpire project.
 
 Team Roles
 ==========
 
 - *Project Leads*: maintain the Umpire open source library and form the *Technical Steering Committee* of the Umpire Project.
-- *Team Members*: Regular contributors to Umpire and may be part of the RAJA Portability Suite
+- *Team Members*: Regular contributors to Umpire
 - *Collaborators*: Irregular contributors to Umpire
 
 Project Leads
@@ -92,11 +92,10 @@ Release Management
 Regular Releases
 ~~~~~~~~~~~~~~~~
 
-- Umpire follows a regular release schedule (see below)
+- Umpire follows a regular release schedule with about 2 releases per year
 - Each release includes a summary of changes, new features, and bug fixes
 - Umpire project leads will coordinate project releases according to the release schedule
-- Releases are coordinated with the RAJA and Camp teams as part of timely RAJA Portability Suite releases
-- The release names will correspond to the release names of RAJA and Camp as part of this process - Once the release has been merged, it will be published in the `Releases <https://github.com/LLNL/Umpire/releases>`_ section of the repo
+- Once the release has been merged, it will be published in the `Releases <https://github.com/LLNL/Umpire/releases>`_ section of the repo
 
 Communication Channels
 ======================
