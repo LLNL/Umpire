@@ -4,36 +4,61 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
+cmake_minimum_required(VERSION 3.23)
 
 cmake_policy(SET CMP0025 NEW)
 cmake_policy(SET CMP0048 NEW)
 cmake_policy(SET CMP0057 NEW)
 cmake_policy(SET CMP0054 NEW)
+cmake_policy(SET CMP0096 OLD)
 
 include(CMakeDependentOption)
 include(CMakePackageConfigHelpers)
 
+file(READ "${CMAKE_CURRENT_SOURCE_DIR}/VERSION" VERSION_STRING)
+string(STRIP "${VERSION_STRING}" VERSION_STRING)
+
 project(Umpire
   LANGUAGES CXX C
-  VERSION 2025.03.0)
-
-cmake_minimum_required(VERSION 3.23)
+  VERSION ${VERSION_STRING})
 
 set(UMPIRE_VERSION_RC "")
 
 include(cmake/SetupUmpireOptions.cmake)
 
+# Default to c++17 if not specified by the user.
 set(BLT_CXX_STD "c++17" CACHE STRING "Version of C++ standard")
-set(CMAKE_CUDA_STANDARD 17)
+
+# If BLT_CXX_STD is set by the user, check that it is at least 17.
+if("${BLT_CXX_STD}" STREQUAL "c++98" OR
+   "${BLT_CXX_STD}" STREQUAL "c++03" OR
+   "${BLT_CXX_STD}" STREQUAL "c++11" OR
+   "${BLT_CXX_STD}" STREQUAL "c++14")
+  message(FATAL_ERROR "Umpire requires a minimum C++ standard of c++17. Please set BLT_CXX_STD accordingly.")
+endif()
+
+# If CMAKE_CUDA_STANDARD is set by the user, check that it is at least 17.
+# If it is not set, it will be set later by BLT to match BLT_CXX_STD.
+if ("${CMAKE_CUDA_STANDARD}" STREQUAL "98" OR
+    "${CMAKE_CUDA_STANDARD}" STREQUAL "03" OR
+    "${CMAKE_CUDA_STANDARD}" STREQUAL "11" OR
+    "${CMAKE_CUDA_STANDARD}" STREQUAL "14")
+  message(FATAL_ERROR "Umpire requires a minimum CUDA standard of 17. Please set BLT_CXX_STD and/or CMAKE_CUDA_STANDARD accordingly.")
+endif()
+
+# If CMAKE_HIP_STANDARD is set by the user, check that it is at least 17.
+# If it is not set, it will be set later by BLT to match BLT_CXX_STD.
+if ("${CMAKE_HIP_STANDARD}" STREQUAL "98" OR
+    "${CMAKE_HIP_STANDARD}" STREQUAL "03" OR
+    "${CMAKE_HIP_STANDARD}" STREQUAL "11" OR
+    "${CMAKE_HIP_STANDARD}" STREQUAL "14")
+  message(FATAL_ERROR "Umpire requires a minimum HIP standard of 17. Please set BLT_CXX_STD and/or CMAKE_HIP_STANDARD accordingly.")
+endif()
 
 if (UMPIRE_ENABLE_SYCL)
    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsycl")
    endif()
-endif()
-
-if("${BLT_CXX_STD}" STREQUAL "c++98" OR "${BLT_CXX_STD}" STREQUAL "c++11" OR "${BLT_CXX_STD}" STREQUAL "c++14")
-    message(FATAL_ERROR "Umpire requires minimum C++ standard of c++17. Please set BLT_CXX_STD appropriately.")
 endif()
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "PGI")
@@ -102,6 +127,10 @@ elseif(UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
   set(UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE "MPI3" CACHE STRING "Default implementation for SHARED memory resource (MPI3)")
 else()
   set (UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE "" CACHE STRING "")
+endif()
+
+if(UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE)
+  message(STATUS "Default Shared Memory Resource is ${UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE}")
 endif()
 
 ########

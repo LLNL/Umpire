@@ -8,6 +8,7 @@
 #include "umpire/resource/HostMpi3SharedMemoryResource.hpp"
 
 #include "umpire/resource/MemoryResource.hpp"
+#include "umpire/util/MPI.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/error.hpp"
 
@@ -18,14 +19,19 @@ HostMpi3SharedMemoryResource::HostMpi3SharedMemoryResource(const std::string& na
     : MemoryResource{name, id, traits}
 {
   constexpr int IGNORE_KEY{0};
-  MPI_Comm_split_type(MPI_COMM_WORLD, MPI_COMM_TYPE_SHARED, IGNORE_KEY, MPI_INFO_NULL, &m_shared_comm);
+  MPI_Comm_split_type(util::MPI::getCommunicator(), MPI_COMM_TYPE_SHARED, IGNORE_KEY, MPI_INFO_NULL, &m_shared_comm);
   MPI_Comm_rank(m_shared_comm, &m_local_rank);
+
+  // Free the comm at exit during cleanup in MPI_Finalize. We pass the m_shared_comm
+  // by turning it into an int (as for Fortran) and then decoding that in the callback.
+  int keyval = 0;
+  MPI_Comm_create_keyval(MPI_COMM_NULL_COPY_FN, free_comm, &keyval, nullptr);
+  MPI_Comm_set_attr(MPI_COMM_SELF, keyval, (void*)(intptr_t)MPI_Comm_c2f(m_shared_comm));
 }
 
 HostMpi3SharedMemoryResource::~HostMpi3SharedMemoryResource()
 {
-  // TODO: Add finalize routine for cleanup pre MPI_Finalize
-  // MPI_Comm_free(&m_shared_comm);
+  // NOTE: m_shared_comm is freed at cleanup pre MPI_Finalize
 }
 
 void* HostMpi3SharedMemoryResource::allocate(std::size_t bytes)
@@ -65,6 +71,16 @@ bool HostMpi3SharedMemoryResource::isAccessibleFrom(Platform p) noexcept
 Platform HostMpi3SharedMemoryResource::getPlatform() noexcept
 {
   return Platform::host;
+}
+
+int HostMpi3SharedMemoryResource::free_comm(MPI_Comm UMPIRE_UNUSED_ARG(comm), int UMPIRE_UNUSED_ARG(keyval),
+                                            void* attribute_val, void* UMPIRE_UNUSED_ARG(extra_state))
+{
+  // Interpret attribute_val as a MPI_Fint comm number.
+  const auto comm_number = (MPI_Fint)(intptr_t)(attribute_val);
+  MPI_Comm comm_to_free = MPI_Comm_f2c(comm_number);
+  MPI_Comm_free(&comm_to_free);
+  return MPI_SUCCESS;
 }
 
 } // end of namespace resource

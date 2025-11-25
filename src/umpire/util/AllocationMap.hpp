@@ -148,6 +148,8 @@ class AllocationMap {
   // Returns number of entries
   std::size_t size() const;
 
+  std::size_t internalMemoryUsage() const;
+
   // Print methods -- either matching a predicate or all records
   void print(const std::function<bool(const AllocationRecord&)>&& predicate, std::ostream& os = std::cout) const;
 

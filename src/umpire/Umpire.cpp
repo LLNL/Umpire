@@ -172,6 +172,11 @@ std::size_t get_process_memory_usage()
 #endif
 }
 
+std::size_t get_internal_memory_usage()
+{
+  return umpire::ResourceManager::getInstance().getInternalMemoryUsage();
+}
+
 void mark_event(const std::string& event)
 {
   umpire::event::record(
@@ -205,8 +210,7 @@ std::size_t get_device_memory_usage(int device_id)
   int current_device;
   cudaError_t err = cudaGetDevice(&current_device);
   if (err != cudaSuccess) {
-    UMPIRE_ERROR(umpire::runtime_error,
-                 fmt::format("Error when trying to get CUDA Device: {}", cudaGetErrorString(err)));
+    UMPIRE_ERROR(umpire::runtime_error, fmt::format("cudaGetDevice failed with error: {}", cudaGetErrorString(err)));
   }
 
   err = cudaSetDevice(device_id);
@@ -217,8 +221,7 @@ std::size_t get_device_memory_usage(int device_id)
 
   err = cudaMemGetInfo(&mem_free, &mem_tot);
   if (err != cudaSuccess) {
-    UMPIRE_ERROR(umpire::runtime_error,
-                 fmt::format("Error when trying to get CUDA Device Info: {}", cudaGetErrorString(err)));
+    UMPIRE_ERROR(umpire::runtime_error, fmt::format("cudaMemGetInfo failed with error: {}", cudaGetErrorString(err)));
   }
 
   err = cudaSetDevice(current_device);
@@ -235,7 +238,7 @@ std::size_t get_device_memory_usage(int device_id)
   int current_device;
   hipError_t err = hipGetDevice(&current_device);
   if (err != hipSuccess) {
-    UMPIRE_ERROR(umpire::runtime_error, fmt::format("Error when trying to get HIP Device: {}", hipGetErrorString(err)));
+    UMPIRE_ERROR(umpire::runtime_error, fmt::format("hipGetDevice failed with error: {}", hipGetErrorString(err)));
   }
 
   err = hipSetDevice(device_id);
@@ -245,8 +248,7 @@ std::size_t get_device_memory_usage(int device_id)
 
   err = hipMemGetInfo(&mem_free, &mem_tot);
   if (err != hipSuccess) {
-    UMPIRE_ERROR(umpire::runtime_error,
-                 fmt::format("Error when trying to get HIP Device info: {}", hipGetErrorString(err)));
+    UMPIRE_ERROR(umpire::runtime_error, fmt::format("hipMemGetInfo failed with error: {}", hipGetErrorString(err)));
   }
 
   err = hipSetDevice(current_device);

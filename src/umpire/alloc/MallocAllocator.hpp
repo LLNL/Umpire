@@ -71,8 +71,7 @@ struct MallocAllocator {
     int cdev = 0;
     cudaError_t err = cudaGetDevice(&cdev);
     if (err != cudaSuccess) {
-      UMPIRE_ERROR(umpire::runtime_error,
-                   fmt::format("Error when trying to get CUDA Device: {}", cudaGetErrorString(err)));
+      UMPIRE_ERROR(umpire::runtime_error, fmt::format("cudaGetDevice failed with error: {}", cudaGetErrorString(err)));
     }
 
     // Device supports coherently accessing pageable memory

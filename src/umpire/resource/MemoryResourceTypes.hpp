@@ -127,14 +127,14 @@ inline int resource_to_device_id(const std::string& resource)
 #if defined(UMPIRE_ENABLE_CUDA)
     cudaError_t err = cudaGetDevice(&device_id);
     if (err != cudaSuccess) {
-      UMPIRE_ERROR(runtime_error, fmt::format("Error when trying to get CUDA Device: {}", cudaGetErrorString(err)));
+      UMPIRE_ERROR(runtime_error, fmt::format("cudaGetDevice failed with error: {}", cudaGetErrorString(err)));
     }
 #endif /* UMPIRE_ENABLE_CUDA */
 
 #if defined(UMPIRE_ENABLE_HIP)
     hipError_t err = hipGetDevice(&device_id);
     if (err != hipSuccess) {
-      UMPIRE_ERROR(runtime_error, fmt::format("Error when trying to get HIP Device: {}", hipGetErrorString(err)));
+      UMPIRE_ERROR(runtime_error, fmt::format("hipGetDevice failed with error: {}", hipGetErrorString(err)));
     }
 #endif /* UMPIRE_ENABLE_HIP */
   }

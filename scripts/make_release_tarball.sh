@@ -7,7 +7,9 @@
 ##############################################################################
 
 TAR_CMD=gtar
-VERSION=2025.03.0
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+VERSION=$(cat "${SCRIPT_DIR}/../VERSION" | tr -d '[:space:]')
 
 git archive --prefix=umpire-${VERSION}/ -o umpire-${VERSION}.tar HEAD 2> /dev/null
 

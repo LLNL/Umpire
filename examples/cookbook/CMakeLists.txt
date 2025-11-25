@@ -39,13 +39,14 @@ if (UMPIRE_ENABLE_IPC_SHARED_MEMORY)
           NAME recipe_device_ipc
           SOURCES recipe_device_ipc.cpp
           DEPENDS_ON ${cookbook_depends} cuda_runtime)
+        list(APPEND umpire_cookbooks recipe_device_ipc)
     elseif (UMPIRE_ENABLE_HIP)
         blt_add_executable(
           NAME recipe_device_ipc
           SOURCES recipe_device_ipc.cpp
           DEPENDS_ON ${cookbook_depends} blt::hip_runtime)
+        list(APPEND umpire_cookbooks recipe_device_ipc)
     endif()
-    list(APPEND umpire_cookbooks recipe_device_ipc)
   endif()
 
   blt_add_executable(

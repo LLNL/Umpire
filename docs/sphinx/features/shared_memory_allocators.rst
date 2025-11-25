@@ -28,7 +28,46 @@ which set it apart from other Umpire allocators.
 6. For some LC machines, running Shared Memory Allocators on the login node may produce runtime errors because the login node may not have access to the correct files. If you get an error on the login node, try a compute node instead.
 7. MPI3 Shared Memory Allocators only support a `shared_scope` trait of `node`. For IPC Shared Memory, there is an option for either `node` or `socket`.
 8. MPI3 Shared Memory Allocators do not need an explicit name during creation like IPC Shared Memory Allocators do.
-9. Users can only use one type of Shared Memory Allocator at a time, not both.
+
+Enabling Both Shared Memory Allocators
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+As of v2025.09.0, users can enable both Shared Memory allocators at the same time. Thus, we introduced a "default" shared memory
+resource cmake variable, ``UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE``. The default allows a shortcut for users to simply specify 
+``SHARED`` and then that default shared memory resource will be used. See table below which describes this default.
+
++-------------+-------------+---------+
+| MPI3        | IPC         | Default |
++=============+=============+=========+
+| enabled     | disabled    | MPI3    |
++-------------+-------------+---------+
+| disabled    | enabled     | IPC     |
++-------------+-------------+---------+
+| enabled     | enabled     | MPI3    |
++-------------+-------------+---------+
+| disabled    | disabled    | N/A     |
++-------------+-------------+---------+
+
+As indicated in the table above, if both IPC and MPI3 Shared Memory are enabled, then MPI3 is the default. (For the table above, it is
+assumed that MPI is enabled.) In order to use IPC shared memory, users need to be explicit when creating the allocator. For example:
+
+.. code-block:: cpp
+
+   auto traits{umpire::get_default_resource_traits("SHARED::POSIX")};
+   ...
+   auto node_allocator{rm.makeResource("SHARED::POSIX::alloc", traits)};
+
+Note that the ``SHARED::POSIX`` prefix is required to use IPC Shared Memory in this case. You can confirm that your allocator
+is an IPC Shared Memory allocator with the following code:
+
+.. code-block:: cpp
+
+   if (umpire::util::matchesSharedMemoryResource("SHARED::POSIX::alloc", "POSIX")) {
+     // The "SHARED::POSIX::alloc" allocator is indeed a POSIX(IPC) Shared Memory Allocator!
+   }
+
+Other Shared Memory Helper Functions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 There are a few helper functions provided in the ``Umpire.hpp`` header that will be useful when working with 
 Shared Memory allocators. For example, you can grab the MPI communicator for a particular Shared Memory allocator with:
@@ -36,9 +75,6 @@ Shared Memory allocators. For example, you can grab the MPI communicator for a p
 .. code-block:: cpp
 
    MPI_Comm shared_allocator_comm = umpire::get_communicator_for_allocator(node_allocator, MPI_COMM_WORLD);
-
-Note that the ``node_allocator`` is the IPC Shared Memory allocator we created above. You can also refer to
-the full example of the IPC Shared Memory cookbook recipe below.
 
 .. warning::
    If you use the ``umpire::get_communicators_for_allocator(...)`` helper function then you MUST
@@ -51,3 +87,4 @@ Additionally, we can double check that an allocator has the ``SHARED`` memory re
 
   UMPIRE_ASSERT(node_allocator.getAllocationStrategy()->getTraits().resource == umpire::MemoryResourceTraits::resource_type::shared);
 
+Check out the cookbook for more Shared Memory examples.
