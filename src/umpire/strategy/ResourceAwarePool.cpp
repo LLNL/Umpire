@@ -59,6 +59,7 @@ void* ResourceAwarePool::allocate_resource(std::size_t bytes, camp::resources::R
   Chunk* chunk{nullptr};
 
   auto range = m_pending_map.equal_range(std::optional<Resource>(r));
+  bool was_pending = false;
   for (auto it = range.first; it != range.second; ++it) {
     auto pending_chunk = it->second;
     if (pending_chunk->size >= rounded_bytes) {
@@ -69,6 +70,7 @@ void* ResourceAwarePool::allocate_resource(std::size_t bytes, camp::resources::R
         // delete from pending map and invalidate the iterator
         m_pending_map.erase(it);
         chunk->pending_map_it = m_pending_map.end();
+        was_pending = true; // If we split the chunk later, we need this info
         break;
     }
   } 
@@ -153,8 +155,16 @@ void* ResourceAwarePool::allocate_resource(std::size_t bytes, camp::resources::R
       split_chunk->next->prev = split_chunk;
 
     chunk->size = rounded_bytes;
-    split_chunk->size_map_it = m_free_map.insert(std::make_pair(remaining, split_chunk));
-    split_chunk->free = true;
+
+    // We are actually splitting up a pending chunk that is being reused, so split chunk is pending too
+//    if (was_pending) {
+//      split_chunk->pending_map_it = m_pending_map.insert({std::optional<Resource>(r), split_chunk});
+      // TODO should the split_chunk also have the same event as chunk in this case?
+//      split_chunk->free = false;
+//    } else { // Chunk we are splitting up is not pending, so split_chunk is free
+      split_chunk->size_map_it = m_free_map.insert(std::make_pair(remaining, split_chunk));
+      split_chunk->free = true;
+//    }
   }
 
   m_aligned_bytes += rounded_bytes;
