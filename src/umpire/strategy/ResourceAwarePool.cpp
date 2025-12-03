@@ -139,7 +139,7 @@ void* ResourceAwarePool::allocate_resource(std::size_t bytes, camp::resources::R
 
   chunk->free = false;
 
-  if (rounded_bytes != chunk->size) {
+  if ((rounded_bytes != chunk->size) && !was_pending) { // Don't split a reused pending chunk
     std::size_t remaining{chunk->size - rounded_bytes};
     UMPIRE_LOG(Debug, "Splitting chunk " << chunk->size << "into " << rounded_bytes << " and " << remaining);
 
@@ -155,16 +155,8 @@ void* ResourceAwarePool::allocate_resource(std::size_t bytes, camp::resources::R
       split_chunk->next->prev = split_chunk;
 
     chunk->size = rounded_bytes;
-
-    // We are actually splitting up a pending chunk that is being reused, so split chunk is pending too
-//    if (was_pending) {
-//      split_chunk->pending_map_it = m_pending_map.insert({std::optional<Resource>(r), split_chunk});
-      // TODO should the split_chunk also have the same event as chunk in this case?
-//      split_chunk->free = false;
-//    } else { // Chunk we are splitting up is not pending, so split_chunk is free
-      split_chunk->size_map_it = m_free_map.insert(std::make_pair(remaining, split_chunk));
-      split_chunk->free = true;
-//    }
+    split_chunk->size_map_it = m_free_map.insert(std::make_pair(remaining, split_chunk));
+    split_chunk->free = true;
   }
 
   m_aligned_bytes += rounded_bytes;
