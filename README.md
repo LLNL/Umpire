@@ -51,9 +51,10 @@ To be sent an invite to the slack group, email us at [umpire-dev@llnl.gov](mailt
 We welcome all kinds of contributions: new features, bug fixes, documentation edits; it's all great!
 
 To contribute, make a [pull request](https://github.com/LLNL/Umpire/compare), with `develop` as the destination branch.
-We use Travis to run CI tests, and your branch must pass these tests before being merged.
+We have a series of tests and a CI pipeline, and your branch must pass all of these tests before being merged.
 
-For more information, see the [contributing guide](https://github.com/LLNL/Umpire/blob/develop/CONTRIBUTING.md).
+For more information, see the [contributing guide](https://github.com/LLNL/Umpire/blob/develop/CONTRIBUTING.md) and the
+[governance policy](https://github.com/LLNL/Umpire/blob/develop/docs/sphinx/governance.rst).
 
 # Authors
 
