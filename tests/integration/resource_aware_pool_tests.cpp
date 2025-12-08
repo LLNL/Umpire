@@ -14,6 +14,7 @@
 #include "umpire/Umpire.hpp"
 #include "umpire/config.hpp"
 #include "umpire/strategy/ResourceAwarePool.hpp"
+#include "umpire/util/wrap_allocator.hpp"
 
 using namespace camp::resources;
 
@@ -186,6 +187,214 @@ TEST_P(ResourceAwarePoolTest, ReleaseCheck)
   EXPECT_EQ(get_num_pending(m_pool), 1);
 
   EXPECT_NO_THROW(m_pool.release());
+}
+
+TEST_P(ResourceAwarePoolTest, CoalescingAdjacentChunks)
+{
+  resource_type d1;
+  
+  // Allocate two adjacent chunks
+  void* ptr1 = m_pool.allocate(1024, d1);
+  void* ptr2 = m_pool.allocate(1024, d1);
+  void* ptr3 = m_pool.allocate(1024, d1);
+  
+  // Deallocate non-adjacent chunks
+  m_pool.deallocate(ptr1, d1);
+  m_pool.deallocate(ptr3, d1);
+  
+  // Wait for any pending ops
+  d1.get_event().wait();
+  
+  // Deallocate middle chunk - should trigger coalescing
+  m_pool.deallocate(ptr2, d1);
+  
+  // Force coalesce
+  m_pool.release();
+  
+  // Should be able to allocate a larger chunk now
+  void* large_ptr = m_pool.allocate(3072, d1);
+  EXPECT_NE(large_ptr, nullptr);
+  
+  m_pool.deallocate(large_ptr, d1);
+}
+
+TEST_P(ResourceAwarePoolTest, PendingToFreeTransition)
+{
+  resource_type d1, d2;
+  
+  double* ptr = static_cast<double*>(m_pool.allocate(2048, d1));
+  
+  // Start async operation
+  do_sleep<<<1, 32, 0, d1.get_stream()>>>(ptr);
+  
+  // Deallocate - goes to pending
+  m_pool.deallocate(ptr, d1);
+  EXPECT_EQ(get_num_pending(m_pool), 1);
+  
+  // Try to allocate same size with same resource while pending
+  double* ptr2 = static_cast<double*>(m_pool.allocate(2048, d1));
+  
+  // Should reuse the pending chunk if it's done, or get new chunk
+  EXPECT_EQ(get_num_pending(m_pool), 0); // pending chunk was reused
+  
+  m_pool.deallocate(ptr2, d1);
+}
+
+TEST_P(ResourceAwarePoolTest, ResourceMismatchOnDeallocate)
+{
+  resource_type d1, d2;
+  
+  double* ptr = static_cast<double*>(m_pool.allocate(1024, d1));
+  
+  // Correct deallocation should work
+  EXPECT_NO_THROW(m_pool.deallocate(ptr, d1));
+
+  double* ptr2 = static_cast<double*>(m_pool.allocate(2048, d1));
+  
+  // Try to deallocate with wrong resource
+  EXPECT_THROW(m_pool.deallocate(ptr2, d2), umpire::runtime_error);
+  
+}
+
+TEST_P(ResourceAwarePoolTest, MultiplePendingChunksSameResource)
+{
+  resource_type d1;
+  Resource r1{d1};
+  
+  // Create multiple allocations
+  std::vector<double*> ptrs;
+  for (int i = 0; i < 5; ++i) {
+    ptrs.push_back(static_cast<double*>(m_pool.allocate(1024, r1)));
+    do_sleep<<<1, 32, 0, d1.get_stream()>>>(ptrs[i]);
+  }
+  
+  // Deallocate all - should create multiple pending entries
+  for (auto ptr : ptrs) {
+    m_pool.deallocate(ptr, r1);
+  }
+  
+  EXPECT_EQ(get_num_pending(m_pool), 5);
+  
+  // Allocate with same resource - should reuse pending
+  double* new_ptr = static_cast<double*>(m_pool.allocate(1024, r1));
+  EXPECT_LT(get_num_pending(m_pool), 5); // One was reused
+  
+  m_pool.deallocate(new_ptr, r1);
+}
+
+TEST_P(ResourceAwarePoolTest, DestructorWithPendingChunks)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  {
+    auto pool = rm.makeAllocator<umpire::strategy::ResourceAwarePool>(
+        "temp-pool" + GetParam(), rm.getAllocator(GetParam()));
+    
+    resource_type d1;
+    double* ptr = static_cast<double*>(pool.allocate(1024, d1));
+    
+    do_sleep<<<1, 32, 0, d1.get_stream()>>>(ptr);
+    
+    pool.deallocate(ptr, d1);
+    EXPECT_EQ(get_num_pending(pool), 1);
+    
+    // Pool destructor should handle pending chunks correctly
+  } // Pool destroyed here
+  
+  // Should not crash or leak
+}
+
+TEST_P(ResourceAwarePoolTest, ChunkSplittingAndMerging)
+{
+  resource_type d1;
+  
+  // Allocate large chunk
+  void* large = m_pool.allocate(4096, d1);
+  m_pool.deallocate(large, d1);
+  d1.get_event().wait();
+  
+  // Allocate smaller chunk - should split
+  void* small1 = m_pool.allocate(1024, d1);
+  void* small2 = m_pool.allocate(1024, d1);
+  
+  // Deallocate in order that promotes merging
+  m_pool.deallocate(small1, d1);
+  d1.get_event().wait();
+  m_pool.deallocate(small2, d1);
+  d1.get_event().wait();
+  
+  // Should be able to allocate large chunk again
+  void* large2 = m_pool.allocate(4096, d1);
+  EXPECT_NE(large2, nullptr);
+  
+  m_pool.deallocate(large2, d1);
+}
+
+TEST_P(ResourceAwarePoolTest, GetResourceEdgeCases)
+{
+  resource_type d1;
+  
+  double* ptr = static_cast<double*>(m_pool.allocate(1024, d1));
+  
+  // Valid pointer in used map
+  EXPECT_EQ(get_resource(m_pool, ptr), Resource{d1});
+  
+  // After deallocation - goes to pending
+  do_sleep<<<1, 32, 0, d1.get_stream()>>>(ptr);
+  m_pool.deallocate(ptr, d1);
+  
+  // Should still find it in pending
+  EXPECT_EQ(get_num_pending(m_pool), 1);
+  EXPECT_EQ(get_resource(m_pool, ptr), Resource{d1});
+  
+  // Wait for completion
+  d1.get_event().wait();
+
+  // Force processing of pending 
+  // (release only processes pending chunks upon destruction, so call coalesce instead)
+  auto rap = umpire::util::unwrap_allocator<umpire::strategy::ResourceAwarePool>(m_pool);
+  rap->coalesce();
+
+  EXPECT_EQ(get_num_pending(m_pool), 0);
+  
+  // Now it's free - should return warning and default
+  camp::resources::Resource res = get_resource(m_pool, ptr);
+  EXPECT_TRUE(res == camp::resources::Resource{Host{}});
+  
+  // Invalid pointer
+  double* invalid_ptr = reinterpret_cast<double*>(0xDEADBEEF);
+  res = get_resource(m_pool, invalid_ptr);
+  EXPECT_EQ(res, camp::resources::Resource{Host{}});
+}
+
+TEST_P(ResourceAwarePoolTest, StressTestMultipleResources)
+{
+  const int num_iterations = 100;
+  std::vector<resource_type> resources(4);
+  std::vector<void*> allocations;
+  std::vector<Resource> allocation_resources;
+  
+  for (int i = 0; i < num_iterations; ++i) {
+    int res_idx = i % resources.size();
+    resource_type& res = resources[res_idx];
+    
+    void* ptr = m_pool.allocate(512 + (i * 128) % 2048, res);
+    allocations.push_back(ptr);
+    allocation_resources.push_back(Resource{res});
+    
+    // Deallocate some
+    if (i > 10 && i % 3 == 0) {
+      int idx = (i - 10) / 2;
+      m_pool.deallocate(allocations[idx], allocation_resources[idx]);
+      allocations[idx] = nullptr;
+    }
+  }
+  
+  // Clean up remaining
+  for (size_t i = 0; i < allocations.size(); ++i) {
+    if (allocations[i]) {
+      m_pool.deallocate(allocations[i], allocation_resources[i]);
+    }
+  }
 }
 
 INSTANTIATE_TEST_SUITE_P(ResourceAwarePoolTests, ResourceAwarePoolTest, ::testing::ValuesIn(get_allocator_strings()));
