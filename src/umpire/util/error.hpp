@@ -119,13 +119,27 @@ class resource_error : public umpire::runtime_error {
 #elif defined(__HIP_DEVICE_COMPILE__)
 #define UMPIRE_ERROR(type, msg) abort();
 #else
-#define UMPIRE_ERROR(type, msg, ...)                             \
-  {                                                              \
-    type e{msg, std::string{__FILE__}, __LINE__, ##__VA_ARGS__}; \
-    UMPIRE_LOG(Error, e.what());                                 \
-    umpire::util::flush_files();                                 \
-    throw e;                                                     \
+#define UMPIRE_ERROR_IMPL_2(type, msg)                                    \
+  {                                                                       \
+    type e{msg, std::string{__FILE__}, __LINE__};                         \
+    UMPIRE_LOG(Error, e.what());                                          \
+    umpire::util::flush_files();                                          \
+    throw e;                                                              \
   }
+
+#define UMPIRE_ERROR_IMPL_3(type, msg, ...)                               \
+  {                                                                       \
+    type e{msg, std::string{__FILE__}, __LINE__, __VA_ARGS__};            \
+    UMPIRE_LOG(Error, e.what());                                          \
+    umpire::util::flush_files();                                          \
+    throw e;                                                              \
+  }
+
+#define UMPIRE_GET_MACRO(_1,_2,_3,NAME,...) NAME
+
+#define UMPIRE_ERROR(...)                                                 \
+  UMPIRE_GET_MACRO(__VA_ARGS__, UMPIRE_ERROR_IMPL_3, UMPIRE_ERROR_IMPL_2) \
+  (__VA_ARGS__)
 #endif
 
 #endif // UMPIRE_runtime_error_HPP
