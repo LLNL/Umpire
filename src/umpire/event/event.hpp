@@ -59,9 +59,17 @@ namespace umpire {
 namespace event {
 
 namespace {
-static const char* replay_env{std::getenv("UMPIRE_REPLAY")};
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4996)
+#endif
+// Ignore warning from MSC compiler
+static const char* replay_env{std::getenv_s("UMPIRE_REPLAY")};
+static const char* event_env{std::getenv_s("UMPIRE_EVENTS")};
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 static const bool enable_replay{(replay_env != NULL)};
-static const char* event_env{std::getenv("UMPIRE_EVENTS")};
 static const bool enable_event{(event_env != NULL)};
 static const bool event_build_enabled{enable_replay || enable_event};
 } // namespace
