@@ -29,3 +29,6 @@ set(HIP_ROOT_DIR "@HIP_ROOT_DIR" CACHE PATH "")
 set(ROCM_ROOT_DIR "@ROCM_ROOT_DIR" CACHE PATH "")
 
 set(umpire_DIR        "@CMAKE_INSTALL_FULL_LIBDIR@/cmake/umpire" CACHE PATH "")
+
+# CUDA
+set(CMAKE_CUDA_COMPILER "@CUDAToolkit_ROOT@/bin/nvcc" CACHE PATH "")
