@@ -64,8 +64,8 @@ namespace {
 #pragma warning(disable: 4996)
 #endif
 // Ignore warning from MSC compiler
-static const char* replay_env{std::getenv_s("UMPIRE_REPLAY")};
-static const char* event_env{std::getenv_s("UMPIRE_EVENTS")};
+static const char* replay_env{std::getenv("UMPIRE_REPLAY")};
+static const char* event_env{std::getenv("UMPIRE_EVENTS")};
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
