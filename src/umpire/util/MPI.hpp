@@ -35,6 +35,10 @@ class MPI {
 
   static bool isInitialized();
 
+#if defined(UMPIRE_ENABLE_MPI)
+  static MPI_Comm getCommunicator();
+#endif
+
  private:
   static int s_rank;
   static int s_world_size;

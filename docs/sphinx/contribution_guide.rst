@@ -9,6 +9,8 @@ bugfixes to Umpire. It assumes you have some familiarity with git and GitHub.
 It will discuss what a good pull request (PR) looks like, and the tests that
 your PR must pass before it can be merged into Umpire.
 
+For additional details, be sure to checkout our :ref:`governance-policy`
+
 --------------
 Forking Umpire
 --------------
