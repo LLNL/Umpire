@@ -164,7 +164,7 @@ blt_add_executable(
   DEPENDS_ON ${integration_tests_depends})
 
 set_source_files_properties(operation_tests.cpp PROPERTIES COMPILE_FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
-if(MSVC)
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   set_source_files_properties(operation_tests.cpp PROPERTIES COMPILE_FLAGS /bigobj)
 endif()
 
