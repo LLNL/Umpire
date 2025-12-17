@@ -1,3 +1,15 @@
+# v2025.12.0
+
+## Improvements
+
+- Added `getInternalMemoryUsage` method to track Umpire's internal memory usage for metadata
+
+- Improved/Optimized how the ResourceAwarePool handles Pending chunks
+
+- Added Default Shared Memory resource clarifications in cmake and examples
+
+- Added CUDA 13 Support
+
 # v2025.09.0
 
 ## Changes Impacting Builds
