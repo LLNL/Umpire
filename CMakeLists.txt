@@ -177,16 +177,6 @@ include(cmake/SetupCMakeBasics.cmake)
 include(cmake/SetupCompilerFlags.cmake)
 include(cmake/SetupUmpireThirdParty.cmake)
 
-if (WIN32)
-  if ((NOT UMPIRE_ENABLE_FILESYSTEM) OR (CMAKE_CXX_STANDARD LESS 20))
-    message(FATAL_ERROR "\
-    Windows builds require the FileSystem to be enabled \
-    and the C/C++ standard to be set to 20 or higher. \
-    Please re-configure with UMPIRE_ENABLE_FILESYSTEM=ON, \
-    with BLT_CXX_STD=c++20 or greater.")
-  endif()
-endif()
-
 add_subdirectory(src)
 
 configure_package_config_file(
