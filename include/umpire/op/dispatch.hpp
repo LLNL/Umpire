@@ -289,9 +289,39 @@ struct op_caller {
 
 } // namespace op
 
+//------------------------------------------------------------------------------
+// Public API Semantics for Copy and Reallocate Operations
+//------------------------------------------------------------------------------
+//
+// The following functions use different semantics for size parameters based on
+// pointer type, matching standard C++ conventions:
+//
+// COPY OPERATIONS:
+//   - umpire::copy(T* src, T* dst, std::size_t len) for non-void T:
+//     len is a COUNT OF ELEMENTS (will be multiplied by sizeof(T) internally)
+//
+//   - umpire::copy(void* src, void* dst, std::size_t len):
+//     len is BYTES (used directly, no sizeof multiplication)
+//
+// REALLOCATE OPERATIONS:
+//   - umpire::reallocate(T** ptr, std::size_t new_size) for non-void T:
+//     new_size is a COUNT OF ELEMENTS (will be multiplied by sizeof(T) internally)
+//
+//   - umpire::reallocate(void** ptr, std::size_t new_size):
+//     new_size is BYTES (used directly, no sizeof multiplication)
+//
+// RATIONALE:
+//   This matches how detail::get_size<T>(count) works:
+//   - For void: returns count as-is (bytes)
+//   - For typed pointers: returns count * sizeof(T) (elements to bytes)
+//
+// This keeps the API consistent with C++ idioms where typed operations work
+// with element counts and void* operations work with byte counts.
+//------------------------------------------------------------------------------
+
 // Global operation implementations that use the op_caller
 template <typename T>
-auto copy(T* src, T* dst, std::size_t len)
+void copy(T* src, T* dst, std::size_t len)
 {
   op::op_caller<op::copy>::exec(src, dst, len);
 }
@@ -318,6 +348,10 @@ camp::resources::EventProxy<camp::resources::Resource> memset(T* src, int v, std
 template <typename T>
 inline T* reallocate(T** src, std::size_t size)
 {
+  // Handle nullptr specially - op_caller can't look up null in allocation map
+  if (*src == nullptr) {
+    return op::reallocate<resource::host_platform>::exec(src, size);
+  }
   return op::op_caller<op::reallocate>::exec(src, size);
 }
 
@@ -326,6 +360,10 @@ template <typename T>
 inline camp::resources::EventProxy<camp::resources::Resource> reallocate(T** src, std::size_t size,
                                                                          camp::resources::Resource& ctx)
 {
+  // Handle nullptr specially - op_caller can't look up null in allocation map
+  if (*src == nullptr) {
+    return op::reallocate<resource::host_platform>::exec(src, size, ctx);
+  }
   return op::op_caller<op::reallocate>::exec(src, size, ctx);
 }
 
@@ -444,11 +482,12 @@ T* op::reallocate<Src>::exec(T** ptr, std::size_t new_size)
   // Allocate new memory
   T* new_ptr = static_cast<T*>(allocator.allocate(new_bytes));
 
-  // Calculate copy size (minimum of old and new size)
-  std::size_t copy_size = (old_bytes > new_bytes) ? new_bytes : old_bytes;
+  // Calculate copy size in bytes (minimum of old and new size)
+  std::size_t copy_bytes = (old_bytes > new_bytes) ? new_bytes : old_bytes;
 
-  // Copy data from old to new location using auto-dispatch copy
-  umpire::copy(current_ptr, new_ptr, copy_size);
+  // Copy data using void* to pass bytes directly (avoids sizeof(T) multiplication in copy)
+  // Note: We cast to void* so that detail::get_size<void>(len) returns len as-is (bytes)
+  umpire::copy(static_cast<void*>(current_ptr), static_cast<void*>(new_ptr), copy_bytes);
 
   // Deallocate old memory
   allocator.deallocate(current_ptr);
@@ -507,11 +546,12 @@ camp::resources::EventProxy<camp::resources::Resource> op::reallocate<Src>::exec
   // Allocate new memory
   T* new_ptr = static_cast<T*>(allocator.allocate(new_bytes));
 
-  // Calculate copy size (minimum of old and new size)
-  std::size_t copy_size = (old_bytes > new_bytes) ? new_bytes : old_bytes;
+  // Calculate copy size in bytes (minimum of old and new size)
+  std::size_t copy_bytes = (old_bytes > new_bytes) ? new_bytes : old_bytes;
 
-  // Copy data from old to new location asynchronously using auto-dispatch copy
-  auto event = umpire::copy(current_ptr, new_ptr, copy_size, ctx);
+  // Copy data using void* to pass bytes directly (avoids sizeof(T) multiplication in copy)
+  // Note: We cast to void* so that detail::get_size<void>(len) returns len as-is (bytes)
+  auto event = umpire::copy(static_cast<void*>(current_ptr), static_cast<void*>(new_ptr), copy_bytes, ctx);
 
   // IMPORTANT: In a fully async implementation, we would need to chain the deallocation
   // to happen after the copy completes. However, since we don't have that mechanism yet,
@@ -571,11 +611,11 @@ void* op::reallocate<Src>::exec(void** ptr_ptr, std::size_t new_size)
   // Allocate new memory
   void* new_ptr = allocator.allocate(new_size);
 
-  // Calculate copy size (minimum of old and new size)
-  std::size_t copy_size = (old_size > new_size) ? new_size : old_size;
+  // Calculate copy size in bytes (minimum of old and new size)
+  std::size_t copy_bytes = (old_size > new_size) ? new_size : old_size;
 
-  // Copy data from old to new location using auto-dispatch copy
-  umpire::copy(current_ptr, new_ptr, copy_size);
+  // Copy data from old to new location (void* naturally uses bytes)
+  umpire::copy(static_cast<void*>(current_ptr), static_cast<void*>(new_ptr), copy_bytes);
 
   // Deallocate old memory
   allocator.deallocate(current_ptr);
@@ -629,11 +669,11 @@ camp::resources::EventProxy<camp::resources::Resource> op::reallocate<Src>::exec
   // Allocate new memory
   void* new_ptr = allocator.allocate(new_size);
 
-  // Calculate copy size (minimum of old and new size)
-  std::size_t copy_size = (old_size > new_size) ? new_size : old_size;
+  // Calculate copy size in bytes (minimum of old and new size)
+  std::size_t copy_bytes = (old_size > new_size) ? new_size : old_size;
 
-  // Copy data from old to new location asynchronously using auto-dispatch copy
-  auto event = umpire::copy(current_ptr, new_ptr, copy_size, ctx);
+  // Copy data from old to new location asynchronously (void* naturally uses bytes)
+  auto event = umpire::copy(static_cast<void*>(current_ptr), static_cast<void*>(new_ptr), copy_bytes, ctx);
 
   // Deallocate old memory
   allocator.deallocate(current_ptr);

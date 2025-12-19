@@ -145,4 +145,68 @@ TEST(Copy, ZeroSize)
   allocator.deallocate(dest_ptr);
 }
 
+// Test to validate that typed copy uses element counts, not bytes
+TEST(Copy, TypedCopySemantics)
+{
+  constexpr std::size_t num_elements = 100;
+
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto allocator = rm.getAllocator("HOST");
+
+  // Allocate buffers for int*
+  int* source = static_cast<int*>(allocator.allocate(num_elements * sizeof(int)));
+  int* dest = static_cast<int*>(allocator.allocate(num_elements * sizeof(int)));
+
+  // Fill source with known pattern
+  for (std::size_t i = 0; i < num_elements; ++i) {
+    source[i] = static_cast<int>(i * 7 + 13);
+  }
+
+  // Zero out destination
+  std::memset(dest, 0, num_elements * sizeof(int));
+
+  // Copy using element count (not bytes)
+  umpire::copy(source, dest, num_elements);
+
+  // Verify exactly num_elements were copied
+  for (std::size_t i = 0; i < num_elements; ++i) {
+    ASSERT_EQ(dest[i], static_cast<int>(i * 7 + 13)) << "Element " << i << " not copied correctly";
+  }
+
+  // Cleanup
+  allocator.deallocate(source);
+  allocator.deallocate(dest);
+}
+
+// Test to validate void* copy uses bytes, not elements
+TEST(Copy, VoidVsTypedSemantics)
+{
+  constexpr std::size_t byte_count = 100;
+
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto allocator = rm.getAllocator("HOST");
+
+  // Allocate as void*
+  void* void_src = allocator.allocate(byte_count);
+  void* void_dst = allocator.allocate(byte_count);
+
+  // Fill with byte pattern
+  std::memset(void_src, 0xAB, byte_count);
+  std::memset(void_dst, 0xCD, byte_count);
+
+  // Copy exact byte count
+  umpire::copy(void_src, void_dst, byte_count);
+
+  // Verify byte-for-byte copy
+  unsigned char* src_bytes = static_cast<unsigned char*>(void_src);
+  unsigned char* dst_bytes = static_cast<unsigned char*>(void_dst);
+  for (std::size_t i = 0; i < byte_count; ++i) {
+    ASSERT_EQ(dst_bytes[i], src_bytes[i]) << "Byte " << i << " not copied correctly";
+  }
+
+  // Cleanup
+  allocator.deallocate(void_src);
+  allocator.deallocate(void_dst);
+}
+
 // Additional tests for async copy operations could be added here

@@ -56,13 +56,12 @@ TEST(Memset, TypedMemsetInt)
     ptr[i] = static_cast<int>(i);
   }
 
-  // Use umpire::memset to zero out
-  umpire::memset(ptr, value, num_elements * sizeof(int));
+  // Use umpire::memset to zero out (pass element count for typed pointer)
+  umpire::memset(ptr, value, num_elements);
 
-  // Verify each byte is zero
-  unsigned char* byte_ptr = static_cast<unsigned char*>(static_cast<void*>(ptr));
-  for (std::size_t i = 0; i < num_elements * sizeof(int); ++i) {
-    ASSERT_EQ(byte_ptr[i], 0) << "Memset failed at byte " << i;
+  // Verify each int is zero
+  for (std::size_t i = 0; i < num_elements; ++i) {
+    ASSERT_EQ(ptr[i], 0) << "Memset failed at element " << i;
   }
 
   // Cleanup

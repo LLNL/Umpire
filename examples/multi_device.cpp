@@ -68,7 +68,7 @@ int main(int, char**)
   }
 #endif
 
-  umpire::copy(a, b, NUM_THREADS * sizeof(double));
+  umpire::copy(a, b, NUM_THREADS);
   b = static_cast<double*>(rm.move(b, rm.getAllocator("HOST")));
 
   UMPIRE_ASSERT(b[BLOCK_SIZE] == (BLOCK_SIZE * MULTIPLE) && "Error: incorrect value!");

@@ -72,7 +72,7 @@ TEST(Reallocate, HostReallocateShrink)
   }
 
   // Reallocate to smaller size
-  ptr = static_cast<int*>(umpire::reallocate(&ptr, final_size));
+  ptr = umpire::reallocate(&ptr, num_final_elements);
 
   // Verify preserved data is correct
   for (int i = 0; i < num_final_elements; ++i) {
@@ -100,7 +100,7 @@ TEST(Reallocate, HostReallocateSameSize)
   }
 
   // Reallocate to same size
-  ptr = static_cast<int*>(umpire::reallocate(&ptr, size));
+  ptr = umpire::reallocate(&ptr, num_elements);
 
   // Verify all data is preserved
   for (int i = 0; i < num_elements; ++i) {
@@ -137,12 +137,13 @@ TEST(Reallocate, HostReallocateToZero)
 TEST(Reallocate, HostReallocateFromNull)
 {
   constexpr std::size_t size = 1024;
+  constexpr int num_elements = size / sizeof(int);
 
   // Start with null pointer
   int* ptr = nullptr;
 
   // Reallocate from null - should work like malloc
-  ptr = static_cast<int*>(umpire::reallocate(&ptr, size));
+  ptr = umpire::reallocate(&ptr, num_elements);
   ASSERT_NE(ptr, nullptr);
 
   // Should be able to write to the allocated memory
@@ -177,7 +178,7 @@ TEST(Reallocate, TypedReallocate)
   }
 
   // Reallocate to larger size
-  ptr = static_cast<double*>(umpire::reallocate(&ptr, final_elements * sizeof(double)));
+  ptr = umpire::reallocate(&ptr, final_elements);
 
   // Verify original data is preserved
   for (std::size_t i = 0; i < initial_elements; ++i) {
@@ -221,6 +222,7 @@ TEST(Reallocate, CudaReallocate)
   constexpr std::size_t initial_size = 512;
   constexpr std::size_t final_size = 1024;
   constexpr int num_initial_elements = initial_size / sizeof(int);
+  constexpr int num_final_elements = final_size / sizeof(int);
 
   auto& rm = umpire::ResourceManager::getInstance();
   auto cuda_allocator = rm.getAllocator("DEVICE");
@@ -238,13 +240,13 @@ TEST(Reallocate, CudaReallocate)
   }
 
   // Copy initial data to device
-  umpire::copy(host_ptr, device_ptr, initial_size);
+  umpire::copy(host_ptr, device_ptr, num_initial_elements);
 
   // Reallocate device memory
-  device_ptr = static_cast<int*>(umpire::reallocate(&device_ptr, final_size));
+  device_ptr = umpire::reallocate(&device_ptr, num_final_elements);
 
   // Copy back to host for verification
-  umpire::copy(device_ptr, host_ptr, final_size);
+  umpire::copy(device_ptr, host_ptr, num_final_elements);
 
   // Verify original data is preserved
   for (int i = 0; i < num_initial_elements; ++i) {
@@ -281,13 +283,13 @@ TEST(Reallocate, HipReallocate)
   }
 
   // Copy initial data to device
-  umpire::copy(host_ptr, device_ptr, initial_size);
+  umpire::copy(host_ptr, device_ptr, num_initial_elements);
 
   // Reallocate device memory
-  device_ptr = static_cast<int*>(umpire::reallocate(&device_ptr, final_size));
+  device_ptr = umpire::reallocate(&device_ptr, num_final_elements);
 
   // Copy back to host for verification
-  umpire::copy(device_ptr, host_ptr, final_size);
+  umpire::copy(device_ptr, host_ptr, num_final_elements);
 
   // Verify original data is preserved
   for (int i = 0; i < num_initial_elements; ++i) {
@@ -299,3 +301,43 @@ TEST(Reallocate, HipReallocate)
   host_allocator.deallocate(host_ptr);
 }
 #endif // UMPIRE_ENABLE_HIP
+
+// Test typed reallocate with element count that's not a power of 2
+TEST(Reallocate, TypedReallocateOddElements)
+{
+  constexpr std::size_t initial_elements = 77;  // Not a power of 2
+  constexpr std::size_t final_elements = 133;   // Not a power of 2
+
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto allocator = rm.getAllocator("HOST");
+
+  // Allocate buffer for long*
+  long* ptr = static_cast<long*>(allocator.allocate(initial_elements * sizeof(long)));
+
+  // Fill with recognizable pattern
+  for (std::size_t i = 0; i < initial_elements; ++i) {
+    ptr[i] = static_cast<long>(i * 1000 + 7);
+  }
+
+  // Reallocate using element count
+  ptr = umpire::reallocate(&ptr, final_elements);
+
+  // Verify all original data preserved
+  for (std::size_t i = 0; i < initial_elements; ++i) {
+    ASSERT_EQ(ptr[i], static_cast<long>(i * 1000 + 7))
+        << "Element " << i << " corrupted during reallocate";
+  }
+
+  // Verify we can write to new elements
+  for (std::size_t i = initial_elements; i < final_elements; ++i) {
+    ptr[i] = static_cast<long>(i * 2000);
+  }
+
+  // Verify writes succeeded
+  for (std::size_t i = initial_elements; i < final_elements; ++i) {
+    ASSERT_EQ(ptr[i], static_cast<long>(i * 2000)) << "New element " << i << " write failed";
+  }
+
+  // Cleanup
+  allocator.deallocate(ptr);
+}

@@ -41,7 +41,7 @@ int main(int, char**)
     std::cout << "Reallocating data (" << data << ") to size " << REALLOCATED_SIZE << "...";
 
     // _sphinx_tag_tut_realloc_start
-    data = static_cast<double*>(umpire::reallocate(&data, REALLOCATED_SIZE * sizeof(double)));
+    data = umpire::reallocate(&data, REALLOCATED_SIZE);
     // _sphinx_tag_tut_realloc_end
 
     std::cout << "done.  Reallocated data (" << data << ")" << std::endl;

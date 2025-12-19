@@ -73,5 +73,38 @@ struct memset<resource::host_platform> {
   }
 };
 
+template <>
+struct prefetch<resource::host_platform> {
+  /**
+   * @brief Host memory prefetch (no-op)
+   *
+   * Prefetch is a no-op for host memory since the CPU has direct access.
+   * This implementation exists for API compatibility and to avoid throwing errors.
+   *
+   * @tparam T Type of data being prefetched
+   * @param ptr Pointer to memory (unused)
+   * @param device Device ID (unused)
+   * @param len Number of bytes to prefetch (unused)
+   */
+  template <typename T>
+  static void exec(T* /*ptr*/, int /*device*/, std::size_t /*len*/) noexcept
+  {
+    // No-op: CPU already has direct access to host memory
+  }
+
+  /**
+   * @brief Asynchronous host memory prefetch (no-op)
+   *
+   * Returns a completed event immediately since this is a no-op.
+   */
+  template <typename T>
+  static camp::resources::EventProxy<camp::resources::Resource> exec(T* /*ptr*/, int /*device*/, std::size_t /*len*/,
+                                                                     camp::resources::Resource& resource) noexcept
+  {
+    // No-op: CPU already has direct access to host memory
+    return detail::make_completed_event(resource);
+  }
+};
+
 } // namespace op
 } // namespace umpire
