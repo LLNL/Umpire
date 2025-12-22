@@ -217,7 +217,7 @@ struct op_caller {
 
   // Single-pointer operations (asynchronous)
   template <typename T, typename... Args>
-  inline static auto exec(T* src, camp::resources::Resource& ctx, Args... args)
+  inline static auto exec(T* src, Args... args, camp::resources::Resource& ctx)
   {
     auto& rm = ResourceManager::getInstance();
     auto& allocation_map = rm.m_allocations;
@@ -233,7 +233,7 @@ struct op_caller {
 #endif
     }
 
-    return detail::dispatch<Op>(p, src, args...);
+    return detail::dispatch<Op>(p, src, std::forward<Args>(args)..., ctx);
   }
 
   // Dual-pointer operations (synchronous)
@@ -283,7 +283,7 @@ struct op_caller {
 #endif
     }
 
-    return detail::dispatch<Op>(p1, p2, src, dst, args...);
+    return detail::dispatch<Op>(p1, p2, src, dst, std::forward<Args>(args)..., ctx);
   }
 };
 
