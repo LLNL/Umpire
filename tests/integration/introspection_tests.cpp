@@ -115,3 +115,32 @@ TEST(IntrospectionTest, RegisterNull)
 
   EXPECT_THROW(rm.registerAllocation(nullptr, record), umpire::runtime_error);
 }
+
+TEST(IntrospectionTest, ZeroByteAllocation)
+{
+  // This test documents the intentional behavior difference for zero-byte allocations between
+  // map-based and header-based introspection modes.
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto allocator = rm.getAllocator("HOST");
+
+  void* ptr = allocator.allocate(0);
+
+#ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
+  // Header mode: returns nullptr, not tracked
+  ASSERT_EQ(ptr, nullptr);
+  ASSERT_FALSE(rm.hasAllocator(ptr));
+
+  // getSize(nullptr) should throw
+  ASSERT_THROW(rm.getSize(ptr), umpire::runtime_error);
+
+  // Deallocate nullptr should be safe (no-op)
+  ASSERT_NO_THROW(allocator.deallocate(ptr));
+#else
+  // Map mode: returns unique non-null pointer, tracked
+  ASSERT_NE(ptr, nullptr);
+  ASSERT_TRUE(rm.hasAllocator(ptr));
+  ASSERT_EQ(rm.getSize(ptr), 0);
+
+  ASSERT_NO_THROW(allocator.deallocate(ptr));
+#endif
+}

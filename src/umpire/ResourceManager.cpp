@@ -384,6 +384,21 @@ const util::AllocationRecord* ResourceManager::findAllocationRecord(void* ptr) c
   }
 
   const auto& record = util::allocation_metadata<util::AllocationRecord>(ptr);
+
+  // Debug check: Verify ptr matches the recorded pointer (detects interior pointers)
+#if defined(UMPIRE_ENABLE_ASSERTIONS)
+  if (record.ptr != ptr) {
+    UMPIRE_LOG(Warning, "Interior pointer detected in header introspection mode: "
+                        << "ptr=" << ptr << " does not match allocation base=" << record.ptr
+                        << ". This results in undefined behavior. "
+                        << "Header introspection requires exact pointers from allocate().");
+    // Optionally, make this fatal with an environment variable:
+    // if (std::getenv("UMPIRE_STRICT_HEADER_INTROSPECTION")) {
+    //   UMPIRE_ERROR(runtime_error, "Interior pointer used in header introspection mode");
+    // }
+  }
+#endif
+
   UMPIRE_LOG(Debug, "(Returning allocation record from header for ptr = " << ptr << ")");
   return &record;
 #else

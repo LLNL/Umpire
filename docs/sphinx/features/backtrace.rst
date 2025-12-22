@@ -43,3 +43,32 @@ An example for checking and displaying the information this information
 logged above may be found here:
 
 .. literalinclude:: ../../../examples/backtrace_example.cpp
+
+Header Introspection Mode Limitations
+--------------------------------------
+
+When Umpire is built with header-based introspection (``UMPIRE_ENABLE_HEADER_INTROSPECTION=On``),
+allocation backtraces and leak reporting have important limitations:
+
+**Limited Backtrace Support**:
+  - Allocation backtraces are only stored for allocations registered in the ResourceManager's
+    map (``m_allocations``)
+  - Header-tracked allocations bypass map registration and therefore have no backtraces
+  - Only manually registered allocations and untracked allocator allocations appear in
+    backtrace reports
+
+**Affected Functions**:
+  - ``umpire::print_allocator_records(allocator)`` - Only prints map-registered allocations
+  - ``umpire::get_allocator_records(allocator)`` - Only returns map-registered allocations
+  - ``umpire::get_leaked_allocations(allocator)`` - Only detects map-registered leaks
+  - ``umpire::get_backtrace(ptr)`` - Only works if ptr was registered in the map
+
+**Recommendation**:
+  For comprehensive leak detection and backtrace reporting, use map-based introspection
+  (``UMPIRE_ENABLE_HEADER_INTROSPECTION=Off``). Header-based introspection prioritizes
+  performance over debugging capabilities.
+
+.. note::
+   This is a fundamental architectural tradeoff: header-based introspection eliminates the
+   global allocation map to improve performance, which also eliminates the central registry
+   needed for leak enumeration and backtrace storage.

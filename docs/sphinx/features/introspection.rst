@@ -90,15 +90,30 @@ Technical Details
   - Less contention than map-based for introspection queries
 
 **Memory Type Support:**
-  - **LIMITED** - Only host-accessible memory types:
+  - **Single Memory Space Requirement**: Header-based introspection requires that all tracked
+    allocations come from memory accessible via a single, unified virtual address space from
+    the CPU. This includes:
 
     - Host memory (always supported)
-    - CUDA Unified/Managed memory
-    - HIP Managed memory
-    - SYCL USM Shared memory
+    - CUDA Unified/Managed memory (cudaMallocManaged)
+    - HIP Managed memory (hipMallocManaged)
+    - SYCL USM Shared memory (malloc_shared)
+    - Other GPU systems with unified addressing where device memory is directly CPU-accessible
 
-  - **NOT supported:** Pure device memory, OpenMP target memory
-  - The function ``supportsHeaderIntrospection(strategy)`` determines compatibility
+  - **Unsupported Memory Types**: Pure device memory without host accessibility:
+
+    - CUDA device memory (cudaMalloc) without unified addressing
+    - HIP device memory (hipMalloc) without managed memory
+    - SYCL device-only memory (malloc_device)
+    - OpenMP target device memory
+
+  - **Runtime Detection**: Use ``umpire::util::supportsHeaderIntrospection(strategy)`` to
+    check if a specific allocator's memory supports header introspection. This function
+    returns ``true`` only for memory types that satisfy the single memory space requirement.
+
+  - **Behavior with Unsupported Memory**: If header introspection is enabled but used with
+    unsupported memory types, the behavior is **undefined**. Allocations may fail, or
+    introspection queries may return incorrect results or crash.
 
 ------------------------
 Feature Comparison
@@ -139,8 +154,10 @@ Feature Comparison
      - Higher (every operation locks global map)
      - Lower (metadata pool lock only)
    * - **Zero-Byte Allocations**
-     - Returns unique non-null pointer
-     - Returns ``nullptr``
+     - Returns unique non-null pointer from dedicated pool. Tracked in allocation map.
+       Can be passed to ``getSize()`` (returns 0) and ``hasAllocator()`` (returns true).
+     - Returns ``nullptr``. Not tracked. Calling ``getSize(nullptr)`` throws an exception.
+       ``hasAllocator(nullptr)`` returns ``false``.
    * - **Reallocate Operations**
      - ✓ Fully supported
      - ⚠ Limited support
@@ -209,9 +226,23 @@ Header-Based Introspection Limitations
 ---------------------------------------
 
 .. warning::
-   **No Interior Pointer Support**: Header-based introspection cannot lookup allocations
-   from interior pointers. Operations like ``Copy::Offset`` and ``Memset::Offset`` are
-   not supported. You must use the exact pointer returned by ``allocate()``.
+   **No Interior Pointer Support**: Header-based introspection **requires the exact pointer
+   returned by allocate()**. Interior pointers (addresses within an allocation) result in
+   **undefined behavior**. Affected operations include:
+
+   - ``getAllocator(void* ptr)`` - Must pass exact allocation pointer
+   - ``getSize(void* ptr)`` - Must pass exact allocation pointer
+   - ``copy(dst, src, size)`` - Both dst and src must be exact allocation pointers (offset
+     operations not supported)
+   - ``memset(ptr, val, length)`` - ptr must be exact allocation pointer (offset operations
+     not supported)
+   - ``prefetch(ptr, size)`` - ptr must be exact allocation pointer
+   - ``pointer_overlaps(lhs, rhs)`` - Both pointers must be exact allocation pointers
+   - ``pointer_contains(lhs, rhs)`` - Both pointers must be exact allocation pointers
+
+   **Rationale**: Headers are stored at fixed offsets before the allocation. Interior pointers
+   cannot be reliably mapped back to the header location. Map-based introspection supports
+   interior pointers by maintaining a searchable map of allocation ranges.
 
 .. warning::
    **Use-After-Free Vulnerability**: Calling ``getSize()`` or other introspection
@@ -220,8 +251,9 @@ Header-Based Introspection Limitations
 
 .. warning::
    **Memory Type Restrictions**: Header-based introspection only works with host-accessible
-   memory. Pure device allocations will fall back to untracked mode or may not work correctly
-   with some strategies.
+   memory. Using header introspection with pure device or otherwise unsupported memory types
+   is **unsupported** and results in **undefined behavior** (allocations may fail, or
+   introspection queries may return incorrect results or crash).
 
 .. warning::
    **Increased Memory Overhead**: Every allocation adds 64 bytes overhead. For applications
@@ -234,9 +266,21 @@ Header-Based Introspection Limitations
    with header introspection.
 
 .. warning::
-   **No Alignment Validation**: Large alignment requests (>64 bytes) with ``AlignedAllocator``
-   may not be correctly aligned. This can cause crashes on architectures with strict
-   alignment requirements.
+   **Alignment Requirements >64 bytes**: Large alignment requests (>64 bytes) with
+   ``AlignedAllocator`` are supported in header mode, but only under the assumption of a
+   64-byte header. The implementation compensates for header offset to guarantee correct
+   alignment. If the header size changes in the future, the ``AlignedAllocator`` logic must
+   be updated accordingly. See the static assertion in ``AlignedAllocator.cpp`` for details.
+
+.. warning::
+   **Zero-Byte Allocation Difference**: Map-based and header-based introspection handle
+   zero-byte allocations differently:
+
+   - **Map-based**: Returns a unique non-null pointer that can be queried and deallocated
+   - **Header-based**: Returns ``nullptr`` with no tracking
+
+   Code that relies on zero-byte allocations returning a valid pointer may need modification
+   when switching to header-based introspection.
 
 Map-Based Introspection Limitations
 ------------------------------------
@@ -258,6 +302,24 @@ Common Considerations
    **Untracked Allocators**: Allocators created with ``Tracking::Untracked`` bypass all
    introspection mechanisms (both map and header-based). This is useful for performance-critical
    paths where introspection is not needed.
+
+.. note::
+   **hasAllocator() Behavior**: The ``hasAllocator(void* ptr)`` function has different
+   semantics depending on introspection mode:
+
+   - **Map-based mode**: Returns ``true`` if the pointer is registered in the global
+     allocation map. This includes all tracked allocations.
+
+   - **Header-based mode**: Returns ``true`` only if the pointer is registered in the map.
+     Since header-tracked allocations are NOT in the map, ``hasAllocator()`` returns
+     ``false`` for normal header-tracked allocations. It only returns ``true`` for:
+
+     - Manually registered allocations (via ``registerAllocation()``)
+     - Allocations from untracked allocators that were manually registered
+
+   **Recommendation**: In header-based mode, use ``getAllocator(ptr)`` directly instead of
+   checking ``hasAllocator()`` first. If the allocation doesn't exist, ``getAllocator()``
+   will throw an exception.
 
 .. note::
    **Compile-Time Decision**: The introspection method is selected at compile time and
@@ -320,3 +382,28 @@ You can check if a strategy supports header introspection:
        std::cout << "Warning: Allocator does not support header introspection" << std::endl;
    }
    #endif
+
+Pool Sizing with Header Introspection
+--------------------------------------
+
+When header introspection is enabled, pool strategies that pre-allocate fixed-size blocks
+must account for the 64-byte header overhead. Umpire provides the ``allocation_size()``
+helper function for this purpose:
+
+.. code-block:: c++
+
+   #include "umpire/util/allocation_metadata.hpp"
+
+   // Calculate total memory needed for N-byte allocations
+   std::size_t user_size = 1024;
+
+   #ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
+   std::size_t total_size = umpire::util::allocation_size(user_size);  // Returns 1088
+   #else
+   std::size_t total_size = user_size;  // Returns 1024
+   #endif
+
+   // Use total_size when configuring pool block sizes
+
+**Built-in pool strategies** (QuickPool, DynamicPool, FixedPool) automatically handle
+header overhead. This is only relevant for custom strategies or manual pool sizing.

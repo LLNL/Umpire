@@ -115,6 +115,12 @@ inline std::string get_rc_version()
  *
  * \param allocator source Allocator.
  * \param os output stream
+ *
+ * \note When UMPIRE_ENABLE_HEADER_INTROSPECTION is enabled, this function only
+ *       prints allocations registered in the ResourceManager's map. Normal
+ *       header-tracked allocations are NOT included. This function is primarily
+ *       useful for debugging untracked allocators or manual registrations in
+ *       header introspection mode.
  */
 void print_allocator_records(Allocator allocator, std::ostream& os = std::cout);
 
@@ -122,6 +128,10 @@ void print_allocator_records(Allocator allocator, std::ostream& os = std::cout);
  * \brief Returns vector of AllocationRecords created by the allocator.
  *
  * \param allocator source Allocator.
+ *
+ * \note When UMPIRE_ENABLE_HEADER_INTROSPECTION is enabled, this function only
+ *       returns allocations registered in the ResourceManager's map. Normal
+ *       header-tracked allocations are NOT included.
  */
 std::vector<util::AllocationRecord> get_allocator_records(Allocator allocator);
 
@@ -133,6 +143,10 @@ std::vector<util::AllocationRecord> get_allocator_records(Allocator allocator);
  *
  * \param left Pointer to left allocation
  * \param right Poniter to right allocation
+ *
+ * \note When UMPIRE_ENABLE_HEADER_INTROSPECTION is enabled, both pointers must
+ *       be exact pointers returned by allocate(). Interior pointers result in
+ *       undefined behavior.
  */
 bool pointer_overlaps(void* left, void* right);
 
@@ -144,6 +158,10 @@ bool pointer_overlaps(void* left, void* right);
  *
  * \param left Pointer to left allocation
  * \param right Poniter to right allocation
+ *
+ * \note When UMPIRE_ENABLE_HEADER_INTROSPECTION is enabled, both pointers must
+ *       be exact pointers returned by allocate(). Interior pointers result in
+ *       undefined behavior.
  */
 bool pointer_contains(void* left, void* right);
 
@@ -164,6 +182,10 @@ bool is_accessible(Platform p, Allocator a);
  * \brief Get the backtrace associated with the allocation of ptr
  *
  * The string may be empty if backtraces are not enabled.
+ *
+ * \note When UMPIRE_ENABLE_HEADER_INTROSPECTION is enabled, backtraces are only
+ *       available for allocations registered in the ResourceManager's map. Normal
+ *       header-tracked allocations do not have stored backtraces.
  */
 std::string get_backtrace(void* ptr);
 
@@ -197,6 +219,11 @@ std::size_t get_device_memory_usage(int device_id);
 
 /*!
  * \brief Get all the leaked (active) allocations associated with allocator.
+ *
+ * \note When UMPIRE_ENABLE_HEADER_INTROSPECTION is enabled, this function only
+ *       detects leaks from allocations registered in the ResourceManager's map.
+ *       Header-tracked allocations cannot be detected by this function. For
+ *       comprehensive leak detection, use map-based introspection mode.
  */
 std::vector<util::AllocationRecord> get_leaked_allocations(Allocator allocator);
 

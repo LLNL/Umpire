@@ -41,6 +41,10 @@ namespace umpire {
 
 void print_allocator_records(Allocator allocator, std::ostream& os)
 {
+  // NOTE: In header introspection mode (UMPIRE_ENABLE_HEADER_INTROSPECTION=On),
+  // this function only prints allocations registered in m_allocations map.
+  // Normal header-tracked allocations are NOT included because they bypass the map.
+
   std::stringstream ss;
   auto& rm = umpire::ResourceManager::getInstance();
 
@@ -55,6 +59,9 @@ void print_allocator_records(Allocator allocator, std::ostream& os)
 
 std::vector<util::AllocationRecord> get_allocator_records(Allocator allocator)
 {
+  // NOTE: In header introspection mode, only returns map-registered allocations.
+  // Header-tracked allocations (the majority) are not enumerable via this function.
+
   auto& rm = umpire::ResourceManager::getInstance();
   auto strategy = allocator.getAllocationStrategy();
 
@@ -262,6 +269,9 @@ std::size_t get_device_memory_usage(int device_id)
 
 std::vector<util::AllocationRecord> get_leaked_allocations(Allocator allocator)
 {
+  // NOTE: In header introspection mode, only detects leaks from map-registered
+  // allocations. Header-tracked allocations cannot be detected by this function.
+
   return get_allocator_records(allocator);
 }
 

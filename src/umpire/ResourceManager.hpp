@@ -166,6 +166,10 @@ class ResourceManager {
    *
    * \param ptr Pointer to find the Allocator for.
    * \return Allocator for the given ptr.
+   *
+   * \note When UMPIRE_ENABLE_HEADER_INTROSPECTION is enabled, this function must
+   *       be called with the exact pointer returned by allocate(). Interior pointers
+   *       (addresses within an allocation) will result in undefined behavior.
    */
   Allocator getAllocator(void* ptr);
 
@@ -177,6 +181,12 @@ class ResourceManager {
    * \brief Does the given pointer have an associated Allocator.
    *
    * \return True if the pointer has an associated Allocator.
+   *
+   * \note In map-based introspection mode, returns true for all tracked allocations.
+   *       In header-based introspection mode, returns true only for allocations
+   *       registered in the map (manual registrations or untracked allocators).
+   *       Normal header-tracked allocations return false. Consider using
+   *       getAllocator(ptr) directly instead, which works correctly in both modes.
    */
   bool hasAllocator(void* ptr);
 
@@ -196,6 +206,10 @@ class ResourceManager {
    * \brief Find the allocation record associated with an address ptr.
    *
    * \return the record if found, or throws an exception if not found.
+   *
+   * \note When UMPIRE_ENABLE_HEADER_INTROSPECTION is enabled, ptr must be the
+   *       exact pointer returned by allocate(). Interior pointers result in
+   *       undefined behavior.
    */
   const util::AllocationRecord* findAllocationRecord(void* ptr) const;
 
@@ -210,6 +224,10 @@ class ResourceManager {
    * \param dst_ptr Destination pointer.
    * \param src_ptr Source pointer.
    * \param size Size in bytes.
+   *
+   * \note When UMPIRE_ENABLE_HEADER_INTROSPECTION is enabled, both dst_ptr and
+   *       src_ptr must be exact pointers returned by allocate(). Interior pointers
+   *       and offset operations are NOT supported and will result in undefined behavior.
    */
   void copy(void* dst_ptr, void* src_ptr, std::size_t size = 0);
 
@@ -222,6 +240,10 @@ class ResourceManager {
    * \param ptr Pointer to data.
    * \param val Value to set.
    * \param length Number of bytes to set to val.
+   *
+   * \note When UMPIRE_ENABLE_HEADER_INTROSPECTION is enabled, ptr must be the
+   *       exact pointer returned by allocate(). Offset operations are NOT
+   *       supported and will result in undefined behavior.
    */
   void memset(void* ptr, int val, std::size_t length = 0);
 
@@ -297,6 +319,10 @@ class ResourceManager {
    * \param ptr Pointer to prefech
    * \param device Device to prefetch data to
    * \param ctx Resource to use for asynchronous operation
+   *
+   * \note When UMPIRE_ENABLE_HEADER_INTROSPECTION is enabled, ptr must be the
+   *       exact pointer returned by allocate(). Interior pointers result in
+   *       undefined behavior.
    */
   camp::resources::EventProxy<camp::resources::Resource> prefetch(void* ptr, int device,
                                                                   camp::resources::Resource& ctx);
@@ -307,6 +333,10 @@ class ResourceManager {
    * \param ptr Pointer to find size of.
    *
    * \return Size of allocation in bytes.
+   *
+   * \note When UMPIRE_ENABLE_HEADER_INTROSPECTION is enabled, this function must
+   *       be called with the exact pointer returned by allocate(). Interior pointers
+   *       (addresses within an allocation) will result in undefined behavior.
    */
   std::size_t getSize(void* ptr) const;
 

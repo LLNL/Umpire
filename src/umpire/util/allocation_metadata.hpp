@@ -226,16 +226,30 @@ std::pair<Metadata, void*> destruct_allocation(void* user_ptr)
 }
 
 /*!
- * \brief Check if this strategy supports header-based allocation tracking
+ * \brief Check if a strategy supports header-based introspection
  *
- * Header-based tracking only works with host-accessible memory:
- *  - Host memory
- *  - CUDA unified/managed memory
- *  - HIP managed memory
- *  - SYCL USM shared memory
+ * Header introspection requires that memory is directly accessible from the CPU
+ * (single memory space). This function determines if a strategy's memory type
+ * satisfies this requirement.
  *
- * \param strategy AllocationStrategy to check
- * \return true if header-based tracking is supported
+ * \param strategy The allocation strategy to check
+ * \return true if the strategy supports header introspection, false otherwise
+ *
+ * \note This function is a SANITY CHECK, not a fallback mechanism. When this
+ *       returns false, it indicates that the strategy allocates memory that
+ *       CANNOT support header introspection (e.g., pure device memory). Using
+ *       header introspection with such strategies results in undefined behavior.
+ *
+ * \note When UMPIRE_ENABLE_HEADER_INTROSPECTION is OFF, this function still
+ *       exists but is not used by the introspection system (which uses map-based
+ *       introspection instead).
+ *
+ * Supported memory types:
+ *   - Host memory (Platform::host) - always returns true
+ *   - CUDA Unified/Managed (Platform::cuda with traits.unified) - returns true
+ *   - HIP Managed (Platform::hip with traits.unified) - returns true
+ *   - SYCL USM Shared (Platform::sycl with shared resource type) - returns true
+ *   - All other memory types - returns false
  */
 bool supportsHeaderIntrospection(strategy::AllocationStrategy* strategy);
 

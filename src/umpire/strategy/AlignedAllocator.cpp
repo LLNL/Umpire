@@ -9,6 +9,15 @@
 #include "umpire/config.hpp"
 #include "umpire/util/Macros.hpp"
 
+#ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
+#include "umpire/util/allocation_metadata.hpp"
+
+// Verify that the header size assumption matches allocation_alignment
+// This is critical for the header introspection alignment math below
+static_assert(umpire::util::allocation_alignment == 64,
+              "AlignedAllocator header introspection logic assumes 64-byte headers");
+#endif
+
 namespace umpire {
 namespace strategy {
 
@@ -32,10 +41,19 @@ AlignedAllocator::AlignedAllocator(const std::string& name, int id, Allocator al
 void* AlignedAllocator::allocate(std::size_t bytes)
 {
 #ifdef UMPIRE_ENABLE_HEADER_INTROSPECTION
-  // With header introspection, the Allocator layer adds a 64-byte header BEFORE the pointer
-  // we return. So if alignment > 64, we need to ensure the final user pointer (our_return + 64)
-  // is aligned. We do this by over-allocating and returning a pointer where (ptr + 64) is aligned.
-  constexpr std::size_t header_size = 64;
+  // HEADER INTROSPECTION ALIGNMENT COMPENSATION:
+  // The Allocator layer will add a 64-byte header BEFORE our returned pointer.
+  // This means the final user pointer will be at (our_return + 64).
+  // To guarantee that (our_return + 64) is aligned to m_alignment, we must
+  // adjust our allocation and alignment calculations.
+  //
+  // Example: If m_alignment is 128 bytes:
+  //   1. We allocate: bytes + sizeof(void*) + 128 + 64
+  //   2. We calculate: aligned_ptr such that (aligned_ptr + 64) % 128 == 0
+  //   3. Allocator layer returns: aligned_ptr + 64 to user (guaranteed 128-aligned)
+  //
+  // If the header size changes, this logic MUST be updated. See static_assert above.
+  constexpr std::size_t header_size = 64; // Must match util::allocation_alignment
 
   if (m_alignment > header_size) {
     // Need extra space to align the user pointer (which will be header_size bytes after our return)
