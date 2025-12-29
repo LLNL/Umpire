@@ -6,7 +6,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
-#include "umpire/strategy/DynamicPoolList.hpp"
+#include "umpire/strategy/QuickPool.hpp"
 
 void allocate_and_deallocate_pool(const std::string& resource, std::size_t initial_size, std::size_t min_block_size)
 {
@@ -17,9 +17,9 @@ void allocate_and_deallocate_pool(const std::string& resource, std::size_t initi
   auto allocator = rm.getAllocator(resource);
 
   // _sphinx_tag_tut_allocator_tuning_start
-  auto pooled_allocator = rm.makeAllocator<umpire::strategy::DynamicPoolList>(resource + "_pool", allocator,
-                                                                              initial_size, /* default = 512Mb*/
-                                                                              min_block_size /* default = 1Mb */);
+  auto pooled_allocator = rm.makeAllocator<umpire::strategy::QuickPool>(resource + "_pool", allocator,
+                                                                        initial_size, /* default = 512Mb*/
+                                                                        min_block_size /* default = 1Mb */);
   // _sphinx_tag_tut_allocator_tuning_end
 
   double* data = static_cast<double*>(pooled_allocator.allocate(SIZE * sizeof(double)));

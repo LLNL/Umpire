@@ -15,7 +15,7 @@ As with the native C++ interface, all allocators are accessed via the
 :class:`umpire::ResourceManager`. In the FORTRAN API, there is a corresponding
 ``UmpireResourceManager`` type. To get an ``UmpireAllocator``:
 
-.. literalinclude:: ../../../../examples/tutorial/fortran/tut_allocator.f
+.. literalinclude:: ../../../../examples/tutorial/fortran/tut_allocator.F
    :start-after: _sphinx_tag_tut_get_allocator_start
    :end-before: _sphinx_tag_tut_get_allocator_end
    :language: FORTRAN
@@ -24,7 +24,7 @@ In this example we fetch the allocator by id, using 0 means you will always get
 a host allocator. Once you have an ``UmpireAllocator``, you can use it to allocate and
 deallocate memory:
 
-.. literalinclude:: ../../../../examples/tutorial/fortran/tut_allocator.f
+.. literalinclude:: ../../../../examples/tutorial/fortran/tut_allocator.F
    :start-after: _sphinx_tag_tut_allocate_start
    :end-before: _sphinx_tag_tut_allocate_end
    :language: FORTRAN

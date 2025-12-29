@@ -1,7 +1,7 @@
-.. _dynamic_pool:
+.. _quick_pool:
 
 =============
-Dynamic Pools
+QuickPools
 =============
 
 Frequently allocating and deallocating memory can be quite costly, especially
@@ -9,10 +9,10 @@ when you are making large allocations or allocating on different memory
 resources. To mitigate this, Umpire provides allocation strategies that can be
 used to customize how data is obtained from the system.
 
-In this example, we will look at the :class:`umpire::strategy::DynamicPoolList`
+In this example, we will look at the :class:`umpire::strategy::QuickPool`
 strategy. This is a simple pooling algorithm that can fulfill requests for
 allocations of any size. To create a new ``Allocator`` using the
-:class:`umpire::strategy::DynamicPoolList` strategy:
+:class:`umpire::strategy::QuickPool` strategy:
 
 .. literalinclude:: ../../../examples/tutorial/tut_dynamic_pool_1.cpp
    :start-after: _sphinx_tag_tut_makepool_start
@@ -33,7 +33,7 @@ function. Here is another example of this, but using a strategy:
    
 The purpose of this example is to show that the ``getAllocator`` function
 can be used more than just to get an initial allocator. The ``addon_allocator`` will
-be a dynamic pool allocator that is limited to 2098 bytes. Another good use case
+be a quick pool allocator that is limited to 2098 bytes. Another good use case
 for the ``getAllocator``  function is grabbing each available allocator in a loop and
 querying some property. (Note that ``addon_allocator`` in the above example will be 
 created with the same memory resource as ``pooled_allocator`` was.) 
@@ -60,12 +60,12 @@ Don't forget, these strategies can be created on top of any valid Allocator:
    :language: C++
 
 Most Umpire users will make allocations that use the GPU via the
-:class:`umpire::strategy::DynamicPoolList`, to help mitigate the cost of allocating
+:class:`umpire::strategy::QuickPool`, to help mitigate the cost of allocating
 memory on these devices.
 
-You can tune the way that :class:`umpire::strategy::DynamicPoolList` allocates
+You can tune the way that :class:`umpire::strategy::QuickPool` allocates
 memory using two parameters: the initial size, and the minimum size. The
-initial size controls how large the first underly allocation made will be,
+initial size controls how large the first underlying allocation made will be,
 regardless of the requested size. The minimum size controls the minimum size of
 any future underlying allocations. These two parameters can be passed when
 constructing a pool:
