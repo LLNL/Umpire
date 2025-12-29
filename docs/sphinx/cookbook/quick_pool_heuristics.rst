@@ -1,4 +1,4 @@
-.. _dynamic_pool_heuristics:
+.. _quick_pool_heuristics:
 
 ===========================================================
 Improving QuickPool Performance with a Coalesce Heuristic
@@ -64,7 +64,7 @@ A heuristic of 0 will cause the QuickPool to never automatically coalesce.
 
 Creation of the heuristic function is accomplished by:
 
-.. literalinclude:: ../../../examples/cookbook/recipe_dynamic_pool_heuristic.cpp
+.. literalinclude:: ../../../examples/cookbook/recipe_quick_pool_heuristic.cpp
    :start-after: _sphinx_tag_tut_creat_heuristic_fun_start
    :end-before: _sphinx_tag_tut_creat_heuristic_fun_end
    :language: C++
@@ -72,11 +72,12 @@ Creation of the heuristic function is accomplished by:
 In this example, we are using the `Percent Releasable` heuristic. The heuristic 
 function is then provided as a parameter when the object is instantiated:
 
-.. literalinclude:: ../../../examples/cookbook/recipe_dynamic_pool_heuristic.cpp
+.. literalinclude:: ../../../examples/cookbook/recipe_quick_pool_heuristic.cpp
    :start-after: _sphinx_tag_tut_use_heuristic_fun_start
    :end-before: _sphinx_tag_tut_use_heuristic_fun_end
    :language: C++
 
 The complete example is included below:
 
-.. literalinclude:: ../../../examples/cookbook/recipe_dynamic_pool_heuristic.cpp
+.. literalinclude:: ../../../examples/cookbook/recipe_quick_pool_heuristic.cpp
+

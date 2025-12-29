@@ -28,7 +28,7 @@ int main(int, char**)
    *  getAllocator function.
    */
   umpire::Tracking tracking{umpire::Tracking::Untracked};
-  auto alloc = rm.makeAllocator<umpire::strategy::QuickPool>("host_dynamic_pool", tracking, rm.getAllocator("HOST"));
+  auto alloc = rm.makeAllocator<umpire::strategy::QuickPool>("host_quick_pool", tracking, rm.getAllocator("HOST"));
 
   alloc =
       rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>("MONOTONIC 1024", rm.getAllocator("HOST"), 1024);
