@@ -64,7 +64,6 @@ bool HostMpi3SharedMemoryResource::isAccessibleFrom(Platform p) noexcept
 {
   if (p == Platform::host)
     return true;
-  // Host MPI-3 shared memory is only directly accessible from the host.
   else
     return false;
 }

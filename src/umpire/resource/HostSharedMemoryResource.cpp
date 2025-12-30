@@ -82,8 +82,6 @@ bool HostSharedMemoryResource::isAccessibleFrom(Platform p) noexcept
     return true;
   else if (p == Platform::cuda)
     return isPageable();
-  else if (p == Platform::omp_target)
-    return false;
   else
     return false;
 }
