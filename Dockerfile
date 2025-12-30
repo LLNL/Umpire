@@ -57,8 +57,7 @@ WORKDIR /home/umpire/workspace/build
 RUN cmake -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DCMAKE_CXX_COMPILER=g++ -DENABLE_CUDA=On -DCMAKE_CUDA_COMPILER=/usr/local/cuda/bin/nvcc -DCMAKE_CUDA_ARCHITECTURES=75 .. && \
     make -j 16
 
-# TODO: switch to ROCM 6
-FROM ghcr.io/llnl/radiuss:hip-5.6.1-ubuntu-20.04 AS hip
+FROM ghcr.io/llnl/radiuss:hip-6.2.0-ubuntu-20.04 AS hip
 ENV GTEST_COLOR=1
 ENV HCC_AMDGPU_TARGET=gfx900
 COPY . /home/umpire/workspace
@@ -82,4 +81,3 @@ RUN /bin/bash -c "source /opt/intel/oneapi/setvars.sh 2>&1 > /dev/null && \
     cmake -DCMAKE_CXX_COMPILER=icpx -DCMAKE_C_COMPILER=icx -DENABLE_WARNINGS_AS_ERRORS=Off -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On .. && \
     make -j 16 && \
     ctest -T test --output-on-failure"
-
