@@ -57,7 +57,7 @@ WORKDIR /home/umpire/workspace/build
 RUN cmake -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DCMAKE_CXX_COMPILER=g++ -DENABLE_CUDA=On -DCMAKE_CUDA_COMPILER=/usr/local/cuda/bin/nvcc -DCMAKE_CUDA_ARCHITECTURES=75 .. && \
     make -j 16
 
-FROM ghcr.io/llnl/radiuss:hip-6.2.0-ubuntu-20.04 AS hip
+FROM ghcr.io/llnl/radiuss:hip-6.4.3-ubuntu-24.04 AS hip
 ENV GTEST_COLOR=1
 ENV HCC_AMDGPU_TARGET=gfx900
 COPY . /home/umpire/workspace
