@@ -174,8 +174,10 @@ bool FileMemoryResource::isAccessibleFrom(Platform p) noexcept
 {
   if (p == Platform::host)
     return true;
-  else if (p == Platform::cuda) // TODO: Implement omp_target specific test
+  else if (p == Platform::cuda)
     return isPageable();
+  else if (p == Platform::omp_target)
+    return false;
   else
     return false;
 }

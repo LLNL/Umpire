@@ -214,8 +214,9 @@ class Allocator : private strategy::mixins::Inspector, strategy::mixins::Allocat
    * allocation sequence including zero-byte-allocation check, allocation,
    * and tracking bookkeeping.
    *
-   * TODO: This is a temporary workaround until we update the Allocator API to
-   * automatically do this based upon type and/or policy information.
+   * This implementation relies on an explicit thread-safe flag and may be
+   * extended in the future to select synchronization based on allocator type
+   * or policy information.
    */
   inline void* thread_safe_allocate(std::size_t bytes);
   inline void* thread_safe_named_allocate(const std::string& name, std::size_t bytes);
