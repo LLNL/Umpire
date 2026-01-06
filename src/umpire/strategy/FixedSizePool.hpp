@@ -38,19 +38,6 @@ class FixedSizePool {
 
   std::size_t numBlocks;
 
-  void reversePools()
-  {
-    struct Pool* prev = nullptr;
-    struct Pool* curr = pool;
-    while (curr) {
-      struct Pool* next = curr->next;
-      curr->next = prev;
-      prev = curr;
-      curr = next;
-    }
-    pool = prev;
-  }
-
   void newPool(struct Pool **pnew)
   {
     struct Pool *p = static_cast<struct Pool *>(IA::allocate(sizeof(struct Pool) + NP * sizeof(unsigned int)));
@@ -122,8 +109,8 @@ class FixedSizePool {
 
     if (!ptr) {
       newPool(&prev->next);
-      reversePools();
       ptr = allocate();
+      // TODO: In this case we should reverse the linked list for optimality
     } else {
       numBlocks++;
     }
