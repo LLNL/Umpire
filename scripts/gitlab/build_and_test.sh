@@ -7,7 +7,7 @@ then
 fi
 
 ###############################################################################
-# Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
