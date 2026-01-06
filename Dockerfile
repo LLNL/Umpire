@@ -57,12 +57,13 @@ WORKDIR /home/umpire/workspace/build
 RUN cmake -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DCMAKE_CXX_COMPILER=g++ -DENABLE_CUDA=On -DCMAKE_CUDA_COMPILER=/usr/local/cuda/bin/nvcc -DCMAKE_CUDA_ARCHITECTURES=75 .. && \
     make -j 16
 
-FROM ghcr.io/llnl/radiuss:hip-6.4.3-ubuntu-24.04 AS hip
+# TODO: switch to ROCM 6
+FROM ghcr.io/llnl/radiuss:hip-5.6.1-ubuntu-20.04 AS hip
 ENV GTEST_COLOR=1
 ENV HCC_AMDGPU_TARGET=gfx900
 COPY . /home/umpire/workspace
 WORKDIR /home/umpire/workspace/build
-RUN cmake -DENABLE_WARNINGS_AS_ERRORS=Off -DCMAKE_CXX_COMPILER=/opt/rocm-6.4.3/bin/amdclang++ -DROCM_PATH=/opt/rocm-6.4.3 -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DENABLE_HIP=On .. && \
+RUN cmake -DENABLE_WARNINGS_AS_ERRORS=Off -DCMAKE_CXX_COMPILER=/opt/rocm-5.6.1/bin/amdclang++ -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DENABLE_HIP=On .. && \
     make -j 16 VERBOSE=1
 
 FROM ghcr.io/llnl/radiuss:intel-2024.0-ubuntu-20.04 AS sycl
