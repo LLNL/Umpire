@@ -43,8 +43,8 @@ static int s_counter{0};
 struct NullStrategy {
 };
 
-// TODO: memset & reallocate test needs teh complete source list, and only a
-// single dest
+// Note: memset & reallocate tests currently require the complete source list
+// and only support a single destination.
 using HostAccessibleResources = camp::list<host_resource_tag
 #if defined(UMPIRE_ENABLE_UM)
                                            ,
