@@ -86,6 +86,6 @@ Percent-Releasable heuristic is passed an integer value for the percent of bytes
 should be "releasable" before coalescing.
 
 More information about how to use these functions can be found in the Doxygen references. 
-There is also an example of using the coalescing heuristic to improve DynamicPool performance `here <https://umpire.readthedocs.io/en/task-um-1018-add-hwm-coalesce-funcs/sphinx/cookbook/dynamic_pool_heuristics.html>`_.
+There is also an example of using the coalescing heuristic to improve QuickPool performance `here <https://umpire.readthedocs.io/en/develop/sphinx/cookbook/quick_pool_heuristics.html>`_.
 
 .. literalinclude:: ../../../examples/cookbook/recipe_coalesce_pool.cpp

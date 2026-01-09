@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -183,12 +183,11 @@ if (UMPIRE_ENABLE_HIP)
   endif ()
 endif ()
 
-
 blt_add_executable(
-  NAME recipe_dynamic_pool_heuristic
-  SOURCES recipe_dynamic_pool_heuristic.cpp
+  NAME recipe_quick_pool_heuristic
+  SOURCES recipe_quick_pool_heuristic.cpp
   DEPENDS_ON ${cookbook_depends})
-list(APPEND umpire_cookbooks recipe_dynamic_pool_heuristic)
+list(APPEND umpire_cookbooks recipe_quick_pool_heuristic)
 
 blt_add_executable(
   NAME recipe_coalesce_pool

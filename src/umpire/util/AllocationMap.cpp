@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -279,6 +279,11 @@ void AllocationMap::clear()
 std::size_t AllocationMap::size() const
 {
   return m_size;
+}
+
+std::size_t AllocationMap::internalMemoryUsage() const
+{
+  return m_block_pool.totalBytes() + m_map.poolMemoryUsage() + m_map.judyMemoryUsage();
 }
 
 void AllocationMap::print(const std::function<bool(const AllocationRecord&)>&& pred, std::ostream& os) const

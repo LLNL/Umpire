@@ -1,4 +1,4 @@
-# <img src="https://cdn.rawgit.com/LLNL/Umpire/develop/share/umpire/logo/umpire-logo.png" width="128" valign="middle" alt="Umpire"/>  Umpire v2025.09.0
+# <img src="https://cdn.rawgit.com/LLNL/Umpire/develop/share/umpire/logo/umpire-logo.png" width="128" valign="middle" alt="Umpire"/> Umpire
 
 [![Documentation Status](https://readthedocs.org/projects/umpire/badge/?version=develop)](https://umpire.readthedocs.io/en/develop/?badge=develop)
 [![Github Actions Build Status](https://github.com/LLNL/Umpire/actions/workflows/build.yml/badge.svg)](https://github.com/LLNL/Umpire/actions/workflows/build.yml)
@@ -51,9 +51,10 @@ To be sent an invite to the slack group, email us at [umpire-dev@llnl.gov](mailt
 We welcome all kinds of contributions: new features, bug fixes, documentation edits; it's all great!
 
 To contribute, make a [pull request](https://github.com/LLNL/Umpire/compare), with `develop` as the destination branch.
-We use Travis to run CI tests, and your branch must pass these tests before being merged.
+We have a series of tests and a CI pipeline, and your branch must pass all of these tests before being merged.
 
-For more information, see the [contributing guide](https://github.com/LLNL/Umpire/blob/develop/CONTRIBUTING.md).
+For more information, see the [contributing guide](https://github.com/LLNL/Umpire/blob/develop/CONTRIBUTING.md) and the
+[governance policy](https://github.com/LLNL/Umpire/blob/develop/docs/sphinx/governance.rst).
 
 # Authors
 

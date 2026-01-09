@@ -1,23 +1,26 @@
 ##############################################################################
-# Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
+cmake_minimum_required(VERSION 3.23)
 
 cmake_policy(SET CMP0025 NEW)
 cmake_policy(SET CMP0048 NEW)
 cmake_policy(SET CMP0057 NEW)
 cmake_policy(SET CMP0054 NEW)
+cmake_policy(SET CMP0096 OLD)
 
 include(CMakeDependentOption)
 include(CMakePackageConfigHelpers)
 
+file(READ "${CMAKE_CURRENT_SOURCE_DIR}/VERSION" VERSION_STRING)
+string(STRIP "${VERSION_STRING}" VERSION_STRING)
+
 project(Umpire
   LANGUAGES CXX C
-  VERSION 2025.09.0)
-
-cmake_minimum_required(VERSION 3.23)
+  VERSION ${VERSION_STRING})
 
 set(UMPIRE_VERSION_RC "")
 
@@ -124,6 +127,10 @@ elseif(UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
   set(UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE "MPI3" CACHE STRING "Default implementation for SHARED memory resource (MPI3)")
 else()
   set (UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE "" CACHE STRING "")
+endif()
+
+if(UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE)
+  message(STATUS "Default Shared Memory Resource is ${UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE}")
 endif()
 
 ########

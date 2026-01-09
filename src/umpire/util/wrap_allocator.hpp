@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -36,6 +36,11 @@ std::unique_ptr<strategy::AllocationStrategy> wrap_allocator(std::unique_ptr<str
 template <typename Strategy>
 Strategy* unwrap_allocation_strategy(strategy::AllocationStrategy* base_strategy)
 {
+  if (!base_strategy) {
+    UMPIRE_ERROR(runtime_error, fmt::format("Cannot unwrap null allocator to strategy \"{}\"",
+                                            typeid(Strategy).name()));
+  }
+
   Strategy* strategy{dynamic_cast<Strategy*>(base_strategy)};
 
   if (!strategy) {

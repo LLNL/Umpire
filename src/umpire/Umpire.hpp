@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -156,6 +156,11 @@ std::size_t get_process_memory_usage();
  * system-dependent calls)
  */
 std::size_t get_process_memory_usage_hwm();
+
+/*!
+ * \brief Get the current memory usage for internal Umpire data structures.
+ */
+std::size_t get_internal_memory_usage();
 
 /*!
  * \brief Mark an application-specific event string within Umpire life cycle.

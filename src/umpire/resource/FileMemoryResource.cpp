@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -174,7 +174,7 @@ bool FileMemoryResource::isAccessibleFrom(Platform p) noexcept
 {
   if (p == Platform::host)
     return true;
-  else if (p == Platform::cuda) // TODO: Implement omp_target specific test
+  else if (p == Platform::cuda)
     return isPageable();
   else
     return false;

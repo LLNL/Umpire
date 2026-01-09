@@ -1,0 +1,69 @@
+###############################################################################
+# Copyright (c) 2022-25, Lawrence Livermore National Security, LLC and RADIUSS
+# project contributors. See the COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: (MIT)
+###############################################################################
+
+# This file defines project-specific VARIABLES ONLY.
+# It is included in the PARENT pipeline (.gitlab-ci.yml) to provide
+# variables that are passed as component inputs and forwarded to child pipelines.
+
+###############################################################################
+# MACHINE-SPECIFIC ALLOCATION VARIABLES
+###############################################################################
+
+variables:
+  # Allocation name (used for shared allocations)
+  ALLOC_NAME: ${CI_PROJECT_NAME}_ci_${CI_PIPELINE_ID}
+
+  # Dane (SLURM) allocation settings
+  DANE_SHARED_ALLOC: "--exclusive --reservation=ci --time=8 --nodes=1"
+  # Note: We repeat the reservation, helpful when jobs are manually re-triggered.
+  DANE_JOB_ALLOC: "--reservation=ci --overlap --nodes=1"
+  # Project specific variants for dane
+  PROJECT_DANE_VARIANTS: "~shared +fortran +tools tests=basic"
+  # Project specific deps for dane
+  PROJECT_DANE_DEPS: ""
+
+  # Matrix (SLURM) allocation settings
+  MATRIX_SHARED_ALLOC: "--exclusive --partition=pci --time=8 --nodes=1"
+  # Note: We repeat the reservation, helpful when jobs are manually re-triggered.
+  MATRIX_JOB_ALLOC: "--partition=pci --overlap --nodes=1"
+  # Project specific variants for matrix
+  PROJECT_MATRIX_VARIANTS: "~shared +fortran +tools tests=basic +cuda cuda_arch=90"
+  # Project specific deps for matrix
+  PROJECT_MATRIX_DEPS: ""
+
+  # Corona (flux) allocation settings
+  CORONA_SHARED_ALLOC: "--exclusive --time-limit=12m --nodes=1 -o per-resource.count=2"
+  CORONA_JOB_ALLOC: "--nodes=1 --begin-time=+5s"
+  # Project specific variants for corona
+  PROJECT_CORONA_VARIANTS: "~shared +fortran +device_alloc tests=basic "
+  # Project specific deps for corona
+  PROJECT_CORONA_DEPS: ""
+
+  # Tioga (flux) allocation settings
+  TIOGA_SHARED_ALLOC: "--queue=pci --exclusive --time-limit=20m --nodes=1 -o per-resource.count=2"
+  TIOGA_JOB_ALLOC: "--nodes=1 --begin-time=+5s"
+  # Project specific variants for tioga
+  PROJECT_TIOGA_VARIANTS: "~shared +fortran +device_alloc tests=basic "
+  # Project specific deps for tioga
+  PROJECT_TIOGA_DEPS: ""
+
+  # Tuolumne (flux) allocation settings
+  TUOLUMNE_SHARED_ALLOC: "--queue=pci --exclusive --time-limit=20m --nodes=1 -o per-resource.count=2"
+  TUOLUMNE_JOB_ALLOC: "--nodes=1 --begin-time=+5s"
+  # Project specific variants for tuolumne
+  PROJECT_TUOLUMNE_VARIANTS: "~shared +fortran +device_alloc tests=basic "
+  # Project specific deps for tuolumne
+  PROJECT_TUOLUMNE_DEPS: ""
+
+  # Lassen (LSF) allocation settings
+  # Lassen and Butte use a different job scheduler (spectrum lsf) that does not
+  # allow pre-allocation the same way slurm does.
+  LASSEN_JOB_ALLOC: "1 -W 10 -q pci"
+  # Project specific variants for lassen
+  PROJECT_LASSEN_VARIANTS: "~shared +fortran +tools tests=basic "
+  # Project specific deps for lassen
+  PROJECT_LASSEN_DEPS: ""
