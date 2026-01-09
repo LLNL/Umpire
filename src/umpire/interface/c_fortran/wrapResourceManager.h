@@ -61,6 +61,11 @@ umpire_allocator * umpire_resourcemanager_make_allocator_quick_pool(
     umpire_allocator allocator, size_t initial_size, size_t block,
     umpire_allocator * SHC_rv);
 
+umpire_allocator * umpire_resourcemanager_make_allocator_quick_pool_untracked(
+    umpire_resourcemanager * self, const char * name,
+    umpire_allocator allocator, size_t initial_size, size_t block,
+    umpire_allocator * SHC_rv);
+
 umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_quick_pool(
     umpire_resourcemanager * self, const char * name, int Lname,
     umpire_allocator allocator, size_t initial_size, size_t block,
