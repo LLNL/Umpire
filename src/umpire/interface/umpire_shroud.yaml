@@ -261,6 +261,49 @@ declarations:
               template_suffix: _prefetcher
               function_suffix: ""
 
+      - decl: template <typename T, bool B> Allocator makeAllocator(const std::string& name, Allocator allocator, size_t initial_size, size_t block);
+        options:
+          F_create_generic: False
+        cxx_template:
+        - instantiation: <umpire::strategy::DynamicPoolList, false>
+          format:
+            template_suffix: _list_pool_untracked
+            function_suffix: ""
+        - instantiation: <umpire::strategy::QuickPool, false>
+          format:
+            template_suffix: _quick_pool_untracked
+            function_suffix: ""
+        - instantiation: <umpire::strategy::ResourceAwarePool, false>
+          format:
+            template_suffix: _resource_aware_pool_untracked
+            function_suffix: ""
+
+      - decl: template <typename T, bool B> Allocator makeAllocator(const std::string& name, Allocator allocator, size_t object_size);
+        options:
+          F_create_generic: False
+        cxx_template:
+          - instantiation: <umpire::strategy::FixedPool, false>
+            format:
+              template_suffix: _fixed_pool_untracked
+              function_suffix: ""
+          - instantiation: <umpire::strategy::MonotonicAllocationStrategy, false>
+            format:
+              template_suffix: _monotonic_untracked
+              function_suffix: ""
+          - instantiation: <umpire::strategy::SlotPool, false>
+            format:
+              template_suffix: _slot_pool_untracked
+              function_suffix: ""
+
+      - decl: template <typename T, bool B> Allocator makeAllocator(const std::string& name, Allocator allocator, size_t smallest_fixed_obj_size, size_t largest_fixed_obj_size, size_t max_initial_fixed_pool_size, size_t fixed_size_multiplier, size_t quick_pool_initial_alloc_size, size_t quick_pool_min_alloc_size, size_t quick_pool_align_bytes);
+        options:
+          F_create_generic: False
+        cxx_template:
+          - instantiation: <umpire::strategy::MixedPool, false>
+            format:
+              template_suffix: _mixed_pool_untracked
+              function_suffix: ""
+
       - decl: void addAlias(const std::string& name, Allocator allocator)
       - decl: void removeAlias(const std::string& name, Allocator allocator)
 
