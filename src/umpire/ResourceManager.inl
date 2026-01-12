@@ -61,6 +61,52 @@ Allocator ResourceManager::makeAllocator(const std::string& name, Args&&... args
   return makeAllocator<Strategy>(name, tracked, std::forward<Args>(args)...);
 }
 
+template <typename T>
+T* ResourceManager::allocate_and_fill(std::size_t n, const T& value, Allocator allocator)
+{
+  const std::size_t size = n * sizeof(T);
+
+  // Fast paths for memset-compatible patterns.
+  if (value == T{}) {
+    return static_cast<T*>(allocate_and_memset(size, 0, allocator));
+  }
+
+  if (std::is_integral<T>::value && value == static_cast<T>(-1)) {
+    return static_cast<T*>(allocate_and_memset(size, 0xFF, allocator));
+  }
+
+  void* device_ptr = allocator.allocate(size);
+
+  try {
+    auto host_alloc = getAllocator("HOST");
+    T* host_ptr = static_cast<T*>(host_alloc.allocate(size));
+
+    try {
+      for (std::size_t i = 0; i < n; ++i) {
+        host_ptr[i] = value;
+      }
+
+      copy(device_ptr, host_ptr, size);
+    } catch (...) {
+      host_alloc.deallocate(host_ptr);
+      throw;
+    }
+
+    host_alloc.deallocate(host_ptr);
+  } catch (...) {
+    allocator.deallocate(device_ptr);
+    throw;
+  }
+
+  return static_cast<T*>(device_ptr);
+}
+
+template <typename T>
+T* ResourceManager::allocate_and_fill(std::size_t n, const T& value)
+{
+  return allocate_and_fill<T>(n, value, getDefaultAllocator());
+}
+
 } // end of namespace umpire
 
 #endif // UMPIRE_ResourceManager_INL

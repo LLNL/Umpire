@@ -100,3 +100,64 @@ TEST(ResourceManager, aliases)
 
   EXPECT_THROW({ rm.removeAlias("NAMED_ALLOCATOR", named_alloc); }, umpire::runtime_error);
 }
+
+TEST(ResourceManager, AllocateAndMemsetHostDefaultAllocatorZero)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  constexpr std::size_t size = 1024;
+
+  int* ptr = static_cast<int*>(rm.allocate_and_memset(size * sizeof(int), 0));
+
+  for (std::size_t i = 0; i < size; ++i) {
+    ASSERT_EQ(ptr[i], 0);
+  }
+
+  rm.deallocate(ptr);
+}
+
+TEST(ResourceManager, AllocateAndFillDefaultAllocatorZero)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  constexpr std::size_t size = 1024;
+
+  double* ptr = rm.allocate_and_fill<double>(size, 0.0);
+
+  for (std::size_t i = 0; i < size; ++i) {
+    ASSERT_EQ(ptr[i], 0.0);
+  }
+
+  rm.deallocate(ptr);
+}
+
+TEST(ResourceManager, AllocateAndFillDefaultAllocatorMinusOne)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  constexpr std::size_t size = 1024;
+
+  int* ptr = rm.allocate_and_fill<int>(size, -1);
+
+  for (std::size_t i = 0; i < size; ++i) {
+    ASSERT_EQ(ptr[i], -1);
+  }
+
+  rm.deallocate(ptr);
+}
+
+TEST(ResourceManager, AllocateAndFillDefaultAllocatorGeneralValue)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  constexpr std::size_t size = 1024;
+  const float value = 3.25f;
+
+  float* ptr = rm.allocate_and_fill<float>(size, value);
+
+  for (std::size_t i = 0; i < size; ++i) {
+    ASSERT_EQ(ptr[i], value);
+  }
+
+  rm.deallocate(ptr);
+}
