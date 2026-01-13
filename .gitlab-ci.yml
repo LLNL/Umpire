@@ -79,6 +79,14 @@ include:
       github_project_org: $GITHUB_PROJECT_ORG
       github_token: $GITHUB_TOKEN
 
+  # Job override checker
+  - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/utility-job-override-check@ci-job-override-check
+    inputs:
+      submodule_path: "scripts/radiuss-spack-configs"
+      shared_jobs_path: "gitlab/radiuss-jobs"
+      local_jobs_path: ".gitlab/jobs"
+      machine_files: "dane.yml matrix.yml corona.yml tioga.yml tuolumne.yml"
+
   # Local custom variables (used for component inputs and forwarded to child pipelines)
   - local: '.gitlab/custom-variables.yml'
 
