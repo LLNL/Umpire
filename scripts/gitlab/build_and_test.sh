@@ -44,6 +44,22 @@ timed_message ()
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 }
 
+# GitLab CI collapsible section helpers
+section_start ()
+{
+    local section_id="${1}"
+    local section_title="${2}"
+    local timestamp=$(date +%s)
+    echo -e "\e[0Ksection_start:${timestamp}:${section_id}\r\e[0K${section_title}"
+}
+
+section_end ()
+{
+    local section_id="${1}"
+    local timestamp=$(date +%s)
+    echo -e "\e[0Ksection_end:${timestamp}:${section_id}\r\e[0K"
+}
+
 if [[ ${debug_mode} == true ]]
 then
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
@@ -100,6 +116,7 @@ fi
 if [[ "${option}" != "--build-only" && "${option}" != "--test-only" ]]
 then
     timed_message "Building dependencies"
+    section_start "dependencies" "Building Dependencies"
 
     if [[ -z ${spec} ]]
     then
@@ -136,6 +153,7 @@ then
         ${spack_cmd} -D ${spack_env_path} buildcache push --only dependencies gitlab_ci
     fi
 
+    section_end "dependencies"
     timed_message "Dependencies built"
 fi
 
@@ -209,19 +227,29 @@ then
         cmake_options="-DBLT_MPI_COMMAND_APPEND:STRING=--overlap"
     fi
 
+    section_start "cmake_config" "CMake Configuration"
     $cmake_exe \
       -C ${hostconfig_path} \
       ${cmake_options} \
       -DCMAKE_INSTALL_PREFIX=${install_dir} \
       ${project_dir}
+    section_end "cmake_config"
+
+    section_start "build" "Building Umpire"
     if ! $cmake_exe --build . -j ${core_counts[$truehostname]}
     then
+        section_end "build"
         echo "[Error]: Compilation failed, building with verbose output..."
         timed_message "Re-building with --verbose"
+        section_start "build_verbose" "Verbose Rebuild"
         $cmake_exe --build . --verbose -j 1
+        section_end "build_verbose"
     else
+        section_end "build"
         timed_message "Installing"
+        section_start "install" "Installing Umpire"
         $cmake_exe --install .
+        section_end "install"
     fi
 
     timed_message "Umpire built and installed"
@@ -239,6 +267,7 @@ then
     cd ${build_dir}
 
     timed_message "Testing Umpire"
+    section_start "tests" "Running Tests"
     ctest --output-on-failure --no-compress-output -T test -VV 2>&1 | tee tests_output.txt
 
     # If Developer benchmarks enabled, run the no-op benchmark and show output
@@ -248,6 +277,7 @@ then
         ctest --verbose -C Benchmark -R no-op_stress_test
         date
     fi
+    section_end "tests"
 
     no_test_str="No tests were found!!!"
     if [[ "$(tail -n 1 tests_output.txt)" == "${no_test_str}" ]]
@@ -256,9 +286,11 @@ then
     fi
 
     timed_message "Preparing tests xml reports for export"
+    section_start "test_xml" "Processing Test XML Reports"
     tree Testing
     xsltproc -o junit.xml ${project_dir}/scripts/radiuss-spack-configs/utilities/ctest-to-junit.xsl Testing/*/Test.xml
     mv junit.xml ${project_dir}/junit.xml
+    section_end "test_xml"
 
     if grep -q "Errors while running CTest" ./tests_output.txt
     then
@@ -274,6 +306,7 @@ then
             echo "[Error]: Install directory not found : ${install_dir}" && exit 1
         fi
 
+        section_start "install_test" "Testing Installed Examples"
         cd ${install_dir}/examples/umpire/using-with-cmake
         mkdir build && cd build
         if ! $cmake_exe -C ../host-config.cmake ..; then
@@ -283,6 +316,7 @@ then
         if ! make; then
             echo "[Error]: Running make for using-with-cmake test" && exit 1
         fi
+        section_end "install_test"
     fi
 
     timed_message "Umpire tests completed"
