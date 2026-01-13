@@ -19,6 +19,8 @@
 #include "umpire/strategy/NamedAllocationStrategy.hpp"
 #include "umpire/strategy/QuickPool.hpp"
 #include "umpire/util/AllocationRecord.hpp"
+#include "umpire/util/shared_memory_helper.hpp"
+#include "umpire/Umpire.hpp"
 #include "umpire/util/wrap_allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "ReplayMacros.hpp"
@@ -334,8 +336,35 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
 
   switch (alloc->type) {
   case ReplayFile::rtype::MEMORY_RESOURCE:
-    alloc->allocator = new umpire::Allocator(rm.getAllocator(alloc->name));
+  {
+    std::string allocator_name{alloc->name};
+
+#if defined(UMPIRE_ENABLE_IPC_SHARED_MEMORY) || defined(UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
+    bool is_shared_memory_resource{
+#if defined(UMPIRE_ENABLE_IPC_SHARED_MEMORY)
+        umpire::util::matchesSharedMemoryResource(allocator_name, "POSIX")
+#endif
+#if defined(UMPIRE_ENABLE_IPC_SHARED_MEMORY) && defined(UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
+        ||
+#endif
+#if defined(UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
+        umpire::util::matchesSharedMemoryResource(allocator_name, "MPI3")
+#endif
+    };
+#else
+    bool is_shared_memory_resource{false};
+#endif
+
+    if (is_shared_memory_resource && alloc->argv.memory_resource.size != 0) {
+      auto traits = umpire::get_default_resource_traits(allocator_name);
+      traits.size = alloc->argv.memory_resource.size;
+
+      alloc->allocator = new umpire::Allocator(rm.makeResource(allocator_name, traits));
+    } else {
+      alloc->allocator = new umpire::Allocator(rm.getAllocator(alloc->name));
+    }
     break;
+  }
 
   case ReplayFile::rtype::ALLOCATION_ADVISOR:
     if (alloc->argv.advisor.device_id >= 0) { // Optional device ID specified

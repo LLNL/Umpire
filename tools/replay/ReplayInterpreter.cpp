@@ -376,6 +376,7 @@ void ReplayInterpreter::compile_make_memory_resource()
 {
   const std::string allocator_name{ m_event.tags["allocator_name"] };
   const uint64_t obj_p { getPointer( m_event.string_args["allocator_ref"] ) };
+  const bool introspection{m_event.numeric_args["introspection"] == 1};
   ReplayFile::Header* hdr = m_ops->getOperationsTable();
 
   m_allocator_indices[obj_p] = hdr->num_allocators;
@@ -384,9 +385,16 @@ void ReplayInterpreter::compile_make_memory_resource()
 
   alloc->type = ReplayFile::rtype::MEMORY_RESOURCE;
   alloc->line_number = m_line_number;
-  alloc->introspection = true;
+  alloc->introspection = introspection;
   alloc->argc = 0;
   m_ops->copyString(allocator_name, alloc->name);
+
+  auto size_it = m_event.numeric_args.find("size");
+  if (size_it != m_event.numeric_args.end()) {
+    alloc->argv.memory_resource.size = size_it->second;
+  } else {
+    alloc->argv.memory_resource.size = 0;
+  }
 
   ReplayFile::Operation* op = &hdr->ops[hdr->num_operations];
   memset(op, 0, sizeof(*op));

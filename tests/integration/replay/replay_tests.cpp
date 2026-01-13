@@ -324,6 +324,21 @@ static void runTest()
                                              "external array"));
     umpire::deregister_external_allocation(data);
   }
+
+#if defined(UMPIRE_ENABLE_IPC_SHARED_MEMORY)
+  // Basic shared memory allocator exercise to ensure replay correctly
+  // tracks and replays shared-memory resources, including their size.
+  {
+    auto traits = umpire::get_default_resource_traits("SHARED::POSIX");
+    traits.size = 1 * 1024 * 1024;
+
+    auto shared_allocator =
+        rm.makeResource("SHARED::POSIX::replay_shared_memory_allocator", traits);
+
+    void* ptr = shared_allocator.allocate(256);
+    shared_allocator.deallocate(ptr);
+  }
+#endif
 }
 
 } // namespace replay_test

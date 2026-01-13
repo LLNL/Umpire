@@ -49,6 +49,9 @@ public:
         char accessing_allocator[max_name_length]{0};
       } advisor;
       struct {
+        std::size_t size{0};
+      } memory_resource;
+      struct {
         int node{0};
       } numa;
       struct {

@@ -167,6 +167,7 @@ Allocator ResourceManager::makeResource(const std::string& name, MemoryResourceT
         .category(event::category::operation)
         .arg("allocator_ref", (void*)allocator.get())
         .arg("introspection", traits.tracking)
+        .arg("size", traits.size)
         .tag("allocator_name", name)
         .tag("replay", "true");
   });
