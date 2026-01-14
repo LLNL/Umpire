@@ -40,61 +40,71 @@ export ci_registry_token=${CI_JOB_TOKEN:-"${registry_token}"}
 # Track script start time for elapsed time calculations
 script_start_time=$(date +%s)
 
-# Format seconds to HH:MM:SS
-format_time ()
-{
-    local total_seconds=${1}
-    local hours=$((total_seconds / 3600))
-    local minutes=$(( (total_seconds % 3600) / 60 ))
-    local seconds=$((total_seconds % 60))
-    printf "%02d:%02d:%02d" ${hours} ${minutes} ${seconds}
-}
-
-# Storage for section start times (non-nested)
+# Storage for section start times (supports nesting)
 declare -A section_start_times
 
-# Legacy timed_message function (to be replaced with timed sections in future)
-timed_message ()
-{
-    echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    echo "~ $(date --rfc-3339=seconds) ~ ${1}"
-    echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-}
+# Section stack for tracking nested sections
+section_id_stack=()
+section_counter=0
+section_indent=""
 
-# GitLab CI collapsible section helpers
+# GitLab CI collapsible section helpers with nesting support
 section_start ()
 {
-    local section_id="${1}"
+    local section_name="${1}"
     local section_title="${2}"
+
+    # Generate unique section ID
+    section_counter=$((section_counter + 1))
+    local section_id="${section_name}_${section_counter}"
+
     local timestamp=$(date +%s)
-    local current_time=$(date --rfc-3339=seconds)
+    local current_time=$(date -d @${timestamp} --rfc-3339=seconds)
     local total_elapsed=$((timestamp - script_start_time))
-    local total_elapsed_formatted=$(format_time ${total_elapsed})
+    local total_elapsed_formatted=$(date -d @${total_elapsed} -u +%H:%M:%S)
 
     # Store section start time for later calculation
     section_start_times[${section_id}]=${timestamp}
 
+    # Push section ID onto stack
+    section_id_stack+=("${section_id}")
+
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
     echo "~ TIME                      | TOTAL    | SECTION  "
-    echo "~ ${current_time} | ${total_elapsed_formatted} | ${section_title}"
-    echo -e "\e[0Ksection_start:${timestamp}:${section_id}\r\e[0K~ ${section_title}"
+    echo "~ ${current_time} | ${total_elapsed_formatted} | ${section_indent}${section_title}"
+    echo -e "\e[0Ksection_start:${timestamp}:${section_id}\r\e[0K~ ${section_indent}${section_title}"
+
+    # Increase indentation for nested sections
+    section_indent="${section_indent}  "
 }
 
 section_end ()
 {
-    local section_id="${1}"
+    # Pop section ID from stack
+    if [[ ${#section_id_stack[@]} -eq 0 ]]; then
+        echo "[Warning]: section_end called with empty stack"
+        return 1
+    fi
+
+    # Decrease indentation before displaying
+    section_indent="${section_indent%  }"
+
+    local stack_index=$((${#section_id_stack[@]} - 1))
+    local section_id="${section_id_stack[$stack_index]}"
+    unset section_id_stack[$stack_index]
+
     local timestamp=$(date +%s)
-    local current_time=$(date --rfc-3339=seconds)
+    local current_time=$(date -d @${timestamp} --rfc-3339=seconds)
     local total_elapsed=$((timestamp - script_start_time))
-    local total_elapsed_formatted=$(format_time ${total_elapsed})
+    local total_elapsed_formatted=$(date -d @${total_elapsed} -u +%H:%M:%S)
 
     # Calculate section elapsed time
     local section_start=${section_start_times[${section_id}]:-${timestamp}}
     local section_elapsed=$((timestamp - section_start))
-    local section_elapsed_formatted=$(format_time ${section_elapsed})
+    local section_elapsed_formatted=$(date -d @${section_elapsed} -u +%H:%M:%S)
 
     echo -e "\e[0Ksection_end:${timestamp}:${section_id}\r\e[0K"
-    echo "~ ${current_time} | ${total_elapsed_formatted} | ${section_elapsed_formatted}"
+    echo "~ ${current_time} | ${total_elapsed_formatted} | ${section_indent}${section_elapsed_formatted}"
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
     # Clean up stored time
@@ -116,8 +126,9 @@ fi
 
 if [[ -n ${module_list} ]]
 then
-    timed_message "Modules to load: ${module_list}"
+    section_start "module_load" "Loading modules: ${module_list}"
     module load ${module_list}
+    section_end
 fi
 
 prefix=""
@@ -156,7 +167,6 @@ fi
 # Dependencies
 if [[ "${option}" != "--build-only" && "${option}" != "--test-only" ]]
 then
-    timed_message "Building dependencies"
     section_start "dependencies" "Building Dependencies"
 
     if [[ -z ${spec} ]]
@@ -176,26 +186,29 @@ then
     mkdir -p ${spack_user_cache}
 
     # generate cmake cache file with uberenv and radiuss spack package
-    timed_message "Spack setup and environment"
+    section_start "spack_setup" "Spack setup and environment"
     ${uberenv_cmd} --setup-and-env-only --spec="${spec}" ${prefix_opt}
+    section_end
 
     if [[ -n ${ci_registry_token} ]]
     then
-        timed_message "GitLab registry as Spack Buildcache"
+        section_start "registry_setup" "GitLab registry as Spack Buildcache"
         ${spack_cmd} -D ${spack_env_path} mirror add --unsigned --oci-username-variable ci_registry_user --oci-password-variable ci_registry_token gitlab_ci oci://${ci_registry_image}
+        section_end
     fi
 
-    timed_message "Spack build of dependencies"
+    section_start "spack_build" "Spack build of dependencies"
     ${uberenv_cmd} --skip-setup-and-env --spec="${spec}" ${prefix_opt}
+    section_end
 
     if [[ -n ${ci_registry_token} && ${push_to_registry} == true ]]
     then
-        timed_message "Push dependencies to buildcache"
+        section_start "buildcache_push" "Push dependencies to buildcache"
         ${spack_cmd} -D ${spack_env_path} buildcache push --only dependencies gitlab_ci
+        section_end
     fi
 
-    section_end "dependencies"
-    timed_message "Dependencies built"
+    section_end
 fi
 
 # Find cmake cache file (hostconfig)
@@ -246,8 +259,8 @@ then
     echo "~~~~~ Install Dir: ${install_dir}"
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
     echo ""
-    timed_message "Cleaning working directory"
 
+    section_start "clean" "Cleaning working directory"
     # Map CPU core allocations
     declare -A core_counts=(["lassen"]=40 ["poodle"]=28 ["dane"]=28 ["matrix"]=28 ["corona"]=32 ["rzansel"]=48 ["tioga"]=32 ["tuolumne"]=48)
 
@@ -257,8 +270,8 @@ then
     #       use max cores.
     rm -rf ${build_dir} 2>/dev/null
     mkdir -p ${build_dir} && cd ${build_dir}
+    section_end
 
-    timed_message "Building Umpire"
     # We set the MPI tests command to allow overlapping.
     # Shared allocation: Allows build_and_test.sh to run within a sub-allocation (see CI config).
     # Use /dev/shm: Prevent MPI tests from running on a node where the build dir doesn't exist.
@@ -274,26 +287,22 @@ then
       ${cmake_options} \
       -DCMAKE_INSTALL_PREFIX=${install_dir} \
       ${project_dir}
-    section_end "cmake_config"
+    section_end
 
     section_start "build" "Building Umpire"
     if ! $cmake_exe --build . -j ${core_counts[$truehostname]}
     then
-        section_end "build"
+        section_end
         echo "[Error]: Compilation failed, building with verbose output..."
-        timed_message "Re-building with --verbose"
         section_start "build_verbose" "Verbose Rebuild"
         $cmake_exe --build . --verbose -j 1
-        section_end "build_verbose"
+        section_end
     else
-        section_end "build"
-        timed_message "Installing"
+        section_end
         section_start "install" "Installing Umpire"
         $cmake_exe --install .
-        section_end "install"
+        section_end
     fi
-
-    timed_message "Umpire built and installed"
 fi
 
 # Test
@@ -307,7 +316,6 @@ then
 
     cd ${build_dir}
 
-    timed_message "Testing Umpire"
     section_start "tests" "Running Tests"
     ctest --output-on-failure --no-compress-output -T test -VV 2>&1 | tee tests_output.txt
 
@@ -318,7 +326,7 @@ then
         ctest --verbose -C Benchmark -R no-op_stress_test
         date
     fi
-    section_end "tests"
+    section_end
 
     no_test_str="No tests were found!!!"
     if [[ "$(tail -n 1 tests_output.txt)" == "${no_test_str}" ]]
@@ -326,12 +334,11 @@ then
         echo "[Error]: No tests were found" && exit 1
     fi
 
-    timed_message "Preparing tests xml reports for export"
     section_start "test_xml" "Processing Test XML Reports"
     tree Testing
     xsltproc -o junit.xml ${project_dir}/scripts/radiuss-spack-configs/utilities/ctest-to-junit.xsl Testing/*/Test.xml
     mv junit.xml ${project_dir}/junit.xml
-    section_end "test_xml"
+    section_end
 
     if grep -q "Errors while running CTest" ./tests_output.txt
     then
@@ -357,10 +364,8 @@ then
         if ! make; then
             echo "[Error]: Running make for using-with-cmake test" && exit 1
         fi
-        section_end "install_test"
+        section_end
     fi
-
-    timed_message "Umpire tests completed"
 fi
 
 #timed_message "Cleaning up"
@@ -368,4 +373,6 @@ fi
 
 cd ${project_dir}
 
-timed_message "Build and test completed"
+echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+echo "~ Build and test completed"
+echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
