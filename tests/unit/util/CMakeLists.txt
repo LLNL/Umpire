@@ -72,3 +72,14 @@ blt_add_executable(
 blt_add_test(
   NAME allocation_record_v2_tests
   COMMAND allocation_record_v2_tests)
+
+blt_add_executable(
+  NAME platform_v2_tests
+  SOURCES platform_v2_tests.cpp
+  DEPENDS_ON umpire gtest)
+
+blt_add_test(
+  NAME platform_v2_tests
+  COMMAND platform_v2_tests)
+  NAME allocation_record_v2_tests
+  COMMAND allocation_record_v2_tests)
