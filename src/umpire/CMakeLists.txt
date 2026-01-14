@@ -30,6 +30,7 @@ set (umpire_headers
 
 set (umpire_sources
   Allocator.cpp
+  detail/registry.cpp
   ResourceManager.cpp
   Umpire.cpp)
 

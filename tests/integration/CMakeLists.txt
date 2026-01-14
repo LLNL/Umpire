@@ -192,6 +192,15 @@ blt_add_test(
   COMMAND reallocate_tests)
 
 blt_add_executable(
+  NAME api_v2_registry_threading_tests
+  SOURCES api_v2/test_registry_threading.cpp
+  DEPENDS_ON ${integration_tests_depends})
+
+blt_add_test(
+  NAME api_v2_registry_threading_tests
+  COMMAND api_v2_registry_threading_tests)
+
+blt_add_executable(
   NAME free_functions_integration_tests
   SOURCES free_functions_integration_tests.cpp
   DEPENDS_ON ${integration_tests_depends})

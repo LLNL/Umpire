@@ -37,6 +37,15 @@ blt_add_test(
   NAME umpire_tests
   COMMAND umpire_tests)
 
+blt_add_executable(
+  NAME api_v2_registry_tests
+  SOURCES api_v2/test_registry.cpp
+  DEPENDS_ON ${unit_depends})
+
+blt_add_test(
+  NAME api_v2_registry_tests
+  COMMAND api_v2_registry_tests)
+
 add_subdirectory(alloc)
 add_subdirectory(op)
 add_subdirectory(resource)

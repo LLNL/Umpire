@@ -81,5 +81,3 @@ blt_add_executable(
 blt_add_test(
   NAME platform_v2_tests
   COMMAND platform_v2_tests)
-  NAME allocation_record_v2_tests
-  COMMAND allocation_record_v2_tests)
