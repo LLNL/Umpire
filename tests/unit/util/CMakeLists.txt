@@ -63,3 +63,12 @@ blt_add_executable(
 blt_add_test(
   NAME find_first_set_tests
   COMMAND find_first_set_tests)
+
+blt_add_executable(
+  NAME allocation_record_v2_tests
+  SOURCES allocation_record_v2_tests.cpp
+  DEPENDS_ON umpire gtest)
+
+blt_add_test(
+  NAME allocation_record_v2_tests
+  COMMAND allocation_record_v2_tests)
