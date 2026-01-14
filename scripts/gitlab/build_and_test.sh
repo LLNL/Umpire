@@ -37,6 +37,23 @@ ci_registry_image=${CI_REGISTRY_IMAGE:-"czregistry.llnl.gov:5050/radiuss/umpire"
 export ci_registry_user=${CI_REGISTRY_USER:-"${USER}"}
 export ci_registry_token=${CI_JOB_TOKEN:-"${registry_token}"}
 
+# Track script start time for elapsed time calculations
+script_start_time=$(date +%s)
+
+# Format seconds to HH:MM:SS
+format_time ()
+{
+    local total_seconds=${1}
+    local hours=$((total_seconds / 3600))
+    local minutes=$(( (total_seconds % 3600) / 60 ))
+    local seconds=$((total_seconds % 60))
+    printf "%02d:%02d:%02d" ${hours} ${minutes} ${seconds}
+}
+
+# Storage for section start times (non-nested)
+declare -A section_start_times
+
+# Legacy timed_message function (to be replaced with timed sections in future)
 timed_message ()
 {
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
@@ -50,14 +67,38 @@ section_start ()
     local section_id="${1}"
     local section_title="${2}"
     local timestamp=$(date +%s)
-    echo -e "\e[0Ksection_start:${timestamp}:${section_id}\r\e[0K${section_title}"
+    local current_time=$(date --rfc-3339=seconds)
+    local total_elapsed=$((timestamp - script_start_time))
+    local total_elapsed_formatted=$(format_time ${total_elapsed})
+
+    # Store section start time for later calculation
+    section_start_times[${section_id}]=${timestamp}
+
+    echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    echo "~ TIME                      | TOTAL    | SECTION  "
+    echo "~ ${current_time} | ${total_elapsed_formatted} | ${section_title}"
+    echo -e "\e[0Ksection_start:${timestamp}:${section_id}\r\e[0K~ ${section_title}"
 }
 
 section_end ()
 {
     local section_id="${1}"
     local timestamp=$(date +%s)
+    local current_time=$(date --rfc-3339=seconds)
+    local total_elapsed=$((timestamp - script_start_time))
+    local total_elapsed_formatted=$(format_time ${total_elapsed})
+
+    # Calculate section elapsed time
+    local section_start=${section_start_times[${section_id}]:-${timestamp}}
+    local section_elapsed=$((timestamp - section_start))
+    local section_elapsed_formatted=$(format_time ${section_elapsed})
+
     echo -e "\e[0Ksection_end:${timestamp}:${section_id}\r\e[0K"
+    echo "~ ${current_time} | ${total_elapsed_formatted} | ${section_elapsed_formatted}"
+    echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+
+    # Clean up stored time
+    unset section_start_times[${section_id}]
 }
 
 if [[ ${debug_mode} == true ]]
