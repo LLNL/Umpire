@@ -80,7 +80,7 @@ include:
       github_token: $GITHUB_TOKEN
 
   # Job override checker
-  - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/utility-job-override-check@ci-job-override-check
+  - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/utility-job-override-check@woptim/ci-job-override-check
     inputs:
       submodule_path: "scripts/radiuss-spack-configs"
       shared_jobs_path: "gitlab/radiuss-jobs"
