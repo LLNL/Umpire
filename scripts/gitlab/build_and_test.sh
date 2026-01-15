@@ -69,10 +69,10 @@ section_start ()
     # Push section ID onto stack
     section_id_stack+=("${section_id}")
 
-    echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    echo "~ TIME                      | TOTAL    | SECTION  "
-    echo "~ ${current_time} | ${total_elapsed_formatted} | ${section_indent}${section_title}"
-    echo -e "\e[0Ksection_start:${timestamp}:${section_id}\r\e[0K~ ${section_indent}${section_title}"
+    echo "${section_indent}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    echo "${section_indent}~ TIME                      | TOTAL    | SECTION  "
+    echo "${section_indent}~ ${current_time} | ${total_elapsed_formatted} | ${section_indent}${section_title}"
+    echo -e "\e[0Ksection_start:${timestamp}:${section_id}\r\e[0K${section_indent}~ ${section_title}"
 
     # Increase indentation for nested sections
     section_indent="${section_indent}  "
@@ -104,8 +104,8 @@ section_end ()
     local section_elapsed_formatted=$(date -d @${section_elapsed} -u +%H:%M:%S)
 
     echo -e "\e[0Ksection_end:${timestamp}:${section_id}\r\e[0K"
-    echo "~ ${current_time} | ${total_elapsed_formatted} | ${section_indent}${section_elapsed_formatted}"
-    echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    echo "${section_indent}~ ${current_time} | ${total_elapsed_formatted} | ${section_elapsed_formatted}"
+    echo "${section_indent}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
     # Clean up stored time
     unset section_start_times[${section_id}]
@@ -126,9 +126,8 @@ fi
 
 if [[ -n ${module_list} ]]
 then
-    section_start "module_load" "Loading modules: ${module_list}"
+    echo "Loading modules: ${module_list}"
     module load ${module_list}
-    section_end
 fi
 
 prefix=""
