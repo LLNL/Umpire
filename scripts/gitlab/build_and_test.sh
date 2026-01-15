@@ -53,9 +53,10 @@ section_start ()
 {
     local section_name="${1}"
     local section_title="${2}"
+    local section_state="${3:-""}"
 
     local collapsed="false"
-    if [[ "${3}" == "collapsed" ]]
+    if [[ "${section_state}" == "collapsed" ]]
     then
         local collapsed="true"
     fi
