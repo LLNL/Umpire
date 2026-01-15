@@ -54,6 +54,12 @@ section_start ()
     local section_name="${1}"
     local section_title="${2}"
 
+    local collapsed="false"
+    if [[ "${3}" == "collapsed" ]]
+    then
+        local collapsed="true"
+    fi
+
     # Generate unique section ID
     section_counter=$((section_counter + 1))
     local section_id="${section_name}_${section_counter}"
@@ -72,7 +78,7 @@ section_start ()
     echo "${section_indent}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
     echo "${section_indent}~ TIME                      | TOTAL    | SECTION  "
     echo "${section_indent}~ ${current_time} | ${total_elapsed_formatted} | ${section_indent}${section_title}"
-    echo -e "\e[0Ksection_start:${timestamp}:${section_id}\r\e[0K${section_indent}~ ${section_title}"
+    echo -e "\e[0Ksection_start:${timestamp}:${section_id}[collapsed=${collapsed}]\r\e[0K${section_indent}~ ${section_title}"
 
     # Increase indentation for nested sections
     section_indent="${section_indent}  "
@@ -185,24 +191,24 @@ then
     mkdir -p ${spack_user_cache}
 
     # generate cmake cache file with uberenv and radiuss spack package
-    section_start "spack_setup" "Spack setup and environment"
+    section_start "spack_setup" "Spack setup and environment" "collapsed"
     ${uberenv_cmd} --setup-and-env-only --spec="${spec}" ${prefix_opt}
     section_end
 
     if [[ -n ${ci_registry_token} ]]
     then
-        section_start "registry_setup" "GitLab registry as Spack Buildcache"
+        section_start "registry_setup" "GitLab registry as Spack Buildcache" "collapsed"
         ${spack_cmd} -D ${spack_env_path} mirror add --unsigned --oci-username-variable ci_registry_user --oci-password-variable ci_registry_token gitlab_ci oci://${ci_registry_image}
         section_end
     fi
 
-    section_start "spack_build" "Spack build of dependencies"
+    section_start "spack_build" "Spack build of dependencies" "collapsed"
     ${uberenv_cmd} --skip-setup-and-env --spec="${spec}" ${prefix_opt}
     section_end
 
     if [[ -n ${ci_registry_token} && ${push_to_registry} == true ]]
     then
-        section_start "buildcache_push" "Push dependencies to buildcache"
+        section_start "buildcache_push" "Push dependencies to buildcache" "collapsed"
         ${spack_cmd} -D ${spack_env_path} buildcache push --only dependencies gitlab_ci
         section_end
     fi
@@ -259,7 +265,7 @@ then
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
     echo ""
 
-    section_start "clean" "Cleaning working directory"
+    section_start "clean" "Cleaning working directory" "collapsed"
     # Map CPU core allocations
     declare -A core_counts=(["lassen"]=40 ["poodle"]=28 ["dane"]=28 ["matrix"]=28 ["corona"]=32 ["rzansel"]=48 ["tioga"]=32 ["tuolumne"]=48)
 
@@ -280,25 +286,38 @@ then
         cmake_options="-DBLT_MPI_COMMAND_APPEND:STRING=--overlap"
     fi
 
-    section_start "cmake_config" "CMake Configuration"
-    $cmake_exe \
+    section_start "cmake_config" "CMake Configuration" "collapsed"
+    if ! $cmake_exe \
       -C ${hostconfig_path} \
       ${cmake_options} \
       -DCMAKE_INSTALL_PREFIX=${install_dir} \
       ${project_dir}
-    section_end
+      then
+        section_end
+        echo "[Error]: CMake configuration failed, dumping output..."
+        section_start "cmake_config_verbose" "Verbose CMake Configuration"
+        $cmake_exe \
+          -C ${hostconfig_path} \
+          ${cmake_options} \
+          -DCMAKE_INSTALL_PREFIX=${install_dir} \
+          ${project_dir} --debug-output --trace-expand
+        section_end
+        exit 1
+      else
+        section_end
+    fi
 
-    section_start "build" "Building Umpire"
+    section_start "build" "Building Umpire" "collapsed"
     if ! $cmake_exe --build . -j ${core_counts[$truehostname]}
     then
         section_end
         echo "[Error]: Compilation failed, building with verbose output..."
-        section_start "build_verbose" "Verbose Rebuild"
+        section_start "build_verbose" "Verbose Rebuild" "collapsed"
         $cmake_exe --build . --verbose -j 1
         section_end
     else
         section_end
-        section_start "install" "Installing Umpire"
+        section_start "install" "Installing Umpire" "collapsed"
         $cmake_exe --install .
         section_end
     fi
@@ -315,7 +334,7 @@ then
 
     cd ${build_dir}
 
-    section_start "tests" "Running Tests"
+    section_start "tests" "Running Tests" "collapsed"
     ctest --output-on-failure --no-compress-output -T test -VV 2>&1 | tee tests_output.txt
 
     # If Developer benchmarks enabled, run the no-op benchmark and show output
@@ -325,7 +344,6 @@ then
         ctest --verbose -C Benchmark -R no-op_stress_test
         date
     fi
-    section_end
 
     no_test_str="No tests were found!!!"
     if [[ "$(tail -n 1 tests_output.txt)" == "${no_test_str}" ]]
@@ -333,7 +351,7 @@ then
         echo "[Error]: No tests were found" && exit 1
     fi
 
-    section_start "test_xml" "Processing Test XML Reports"
+    section_start "test_xml" "Processing Test XML Reports" "collapsed"
     tree Testing
     xsltproc -o junit.xml ${project_dir}/scripts/radiuss-spack-configs/utilities/ctest-to-junit.xsl Testing/*/Test.xml
     mv junit.xml ${project_dir}/junit.xml
@@ -343,9 +361,12 @@ then
     then
         echo "[Error]: Failure(s) while running CTest" && exit 1
     fi
+    section_end
 
+    section_start "install_test" "Testing Installed Examples" "collapsed"
     if grep -q -i "ENABLE_HIP.*ON" ${hostconfig_path}
     then
+        section_end
         echo "[Warning]: Not testing install with HIP"
     else
         if [[ ! -d ${install_dir} ]]
@@ -353,7 +374,6 @@ then
             echo "[Error]: Install directory not found : ${install_dir}" && exit 1
         fi
 
-        section_start "install_test" "Testing Installed Examples"
         cd ${install_dir}/examples/umpire/using-with-cmake
         mkdir build && cd build
         if ! $cmake_exe -C ../host-config.cmake ..; then
