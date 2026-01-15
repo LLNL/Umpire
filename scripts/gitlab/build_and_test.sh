@@ -78,7 +78,7 @@ section_start ()
 
     echo "${section_indent}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
     echo "${section_indent}~ TIME                      | TOTAL    | SECTION  "
-    echo "${section_indent}~ ${current_time} | ${total_elapsed_formatted} | ${section_indent}${section_title}"
+    echo "${section_indent}~ ${current_time} | ${total_elapsed_formatted} | ${section_title}"
     echo -e "\e[0Ksection_start:${timestamp}:${section_id}[collapsed=${collapsed}]\r\e[0K${section_indent}~ ${section_title}"
 
     # Increase indentation for nested sections
@@ -120,12 +120,10 @@ section_end ()
 
 if [[ ${debug_mode} == true ]]
 then
-    echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    echo "~~~~~ Debug mode:"
-    echo "~~~~~ - Spack debug mode."
-    echo "~~~~~ - Deactivated shared memory."
-    echo "~~~~~ - Do not push to buildcache."
-    echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    echo "[Information]: Debug mode:"
+    echo "[Information]: - Spack debug mode."
+    echo "[Information]: - Deactivated shared memory."
+    echo "[Information]: - Do not push to buildcache."
     use_dev_shm=false
     spack_debug=true
     push_to_registry=false
@@ -133,7 +131,7 @@ fi
 
 if [[ -n ${module_list} ]]
 then
-    echo "Loading modules: ${module_list}"
+    echo "[Information]: Loading modules: ${module_list}"
     module load ${module_list}
 fi
 
@@ -156,8 +154,8 @@ else
     prefix="${project_dir}/../spack-and-build-root"
 fi
 
-echo "Creating directory ${prefix}"
-echo "project_dir: ${project_dir}"
+echo "[Information]: Creating directory ${prefix}"
+echo "[Information]: project_dir: ${project_dir}"
 
 mkdir -p ${prefix}
 
@@ -257,14 +255,11 @@ cmake_exe=`grep 'CMake executable' ${hostconfig_path} | cut -d ':' -f 2 | xargs`
 # Build
 if [[ "${option}" != "--deps-only" && "${option}" != "--test-only" ]]
 then
-    echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    echo "~~~~~ Prefix: ${prefix}"
-    echo "~~~~~ Host-config: ${hostconfig_path}"
-    echo "~~~~~ Build Dir:   ${build_dir}"
-    echo "~~~~~ Project Dir: ${project_dir}"
-    echo "~~~~~ Install Dir: ${install_dir}"
-    echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    echo ""
+    echo "[Information]: Prefix       ${prefix}"
+    echo "[Information]: Host-config  ${hostconfig_path}"
+    echo "[Information]: Build Dir    ${build_dir}"
+    echo "[Information]: Project Dir  ${project_dir}"
+    echo "[Information]: Install Dir  ${install_dir}"
 
     section_start "clean" "Cleaning working directory" "collapsed"
     # Map CPU core allocations
@@ -352,11 +347,9 @@ then
         echo "[Error]: No tests were found" && exit 1
     fi
 
-    section_start "test_xml" "Processing Test XML Reports" "collapsed"
     tree Testing
     xsltproc -o junit.xml ${project_dir}/scripts/radiuss-spack-configs/utilities/ctest-to-junit.xsl Testing/*/Test.xml
     mv junit.xml ${project_dir}/junit.xml
-    section_end
 
     if grep -q "Errors while running CTest" ./tests_output.txt
     then
