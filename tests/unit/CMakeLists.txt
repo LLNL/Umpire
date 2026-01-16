@@ -73,6 +73,15 @@ blt_add_test(
   NAME api_v2_allocation_strategy_tests
   COMMAND api_v2_allocation_strategy_tests)
 
+blt_add_executable(
+  NAME api_v2_host_memory_tests
+  SOURCES api_v2/resources/test_host_memory.cpp
+  DEPENDS_ON ${unit_depends})
+
+blt_add_test(
+  NAME api_v2_host_memory_tests
+  COMMAND api_v2_host_memory_tests)
+
 add_subdirectory(alloc)
 add_subdirectory(op)
 add_subdirectory(resource)
