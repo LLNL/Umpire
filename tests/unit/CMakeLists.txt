@@ -64,6 +64,15 @@ blt_add_test(
   NAME api_v2_memory_resource_tests
   COMMAND api_v2_memory_resource_tests)
 
+blt_add_executable(
+  NAME api_v2_allocation_strategy_tests
+  SOURCES api_v2/test_allocation_strategy.cpp
+  DEPENDS_ON ${unit_depends})
+
+blt_add_test(
+  NAME api_v2_allocation_strategy_tests
+  COMMAND api_v2_allocation_strategy_tests)
+
 add_subdirectory(alloc)
 add_subdirectory(op)
 add_subdirectory(resource)
