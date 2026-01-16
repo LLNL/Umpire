@@ -101,63 +101,32 @@ TEST(ResourceManager, aliases)
   EXPECT_THROW({ rm.removeAlias("NAMED_ALLOCATOR", named_alloc); }, umpire::runtime_error);
 }
 
-TEST(ResourceManager, AllocateAndMemsetHostDefaultAllocatorZero)
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
+TEST(ResourceManager, DeviceMemsetDeviceAllocator)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  constexpr std::size_t size = 1024;
-
-  int* ptr = static_cast<int*>(rm.allocate_and_memset(size * sizeof(int), 0));
-
-  for (std::size_t i = 0; i < size; ++i) {
-    ASSERT_EQ(ptr[i], 0);
+  if (!rm.isAllocator("DEVICE")) {
+    GTEST_SKIP() << "DEVICE allocator not available in this build.";
   }
 
-  rm.deallocate(ptr);
-}
+  auto device_alloc = rm.getAllocator("DEVICE");
+  auto host_alloc = rm.getAllocator("HOST");
 
-TEST(ResourceManager, AllocateAndFillDefaultAllocatorZero)
-{
-  auto& rm = umpire::ResourceManager::getInstance();
+  constexpr std::size_t n = 256;
+  constexpr double value = 3.14;
 
-  constexpr std::size_t size = 1024;
+  double* d_ptr = static_cast<double*>(device_alloc.allocate(n * sizeof(double)));
+  double* h_ptr = static_cast<double*>(host_alloc.allocate(n * sizeof(double)));
 
-  double* ptr = rm.allocate_and_fill<double>(size, 0.0);
+  rm.deviceMemset(d_ptr, n, value);
+  rm.copy(h_ptr, d_ptr, n * sizeof(double));
 
-  for (std::size_t i = 0; i < size; ++i) {
-    ASSERT_EQ(ptr[i], 0.0);
+  for (std::size_t i = 0; i < n; ++i) {
+    ASSERT_EQ(h_ptr[i], value);
   }
 
-  rm.deallocate(ptr);
+  device_alloc.deallocate(d_ptr);
+  host_alloc.deallocate(h_ptr);
 }
-
-TEST(ResourceManager, AllocateAndFillDefaultAllocatorMinusOne)
-{
-  auto& rm = umpire::ResourceManager::getInstance();
-
-  constexpr std::size_t size = 1024;
-
-  int* ptr = rm.allocate_and_fill<int>(size, -1);
-
-  for (std::size_t i = 0; i < size; ++i) {
-    ASSERT_EQ(ptr[i], -1);
-  }
-
-  rm.deallocate(ptr);
-}
-
-TEST(ResourceManager, AllocateAndFillDefaultAllocatorGeneralValue)
-{
-  auto& rm = umpire::ResourceManager::getInstance();
-
-  constexpr std::size_t size = 1024;
-  const float value = 3.25f;
-
-  float* ptr = rm.allocate_and_fill<float>(size, value);
-
-  for (std::size_t i = 0; i < size; ++i) {
-    ASSERT_EQ(ptr[i], value);
-  }
-
-  rm.deallocate(ptr);
-}
+#endif

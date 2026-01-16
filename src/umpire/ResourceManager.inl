@@ -62,49 +62,30 @@ Allocator ResourceManager::makeAllocator(const std::string& name, Args&&... args
 }
 
 template <typename T>
-T* ResourceManager::allocate_and_fill(std::size_t n, const T& value, Allocator allocator)
+void ResourceManager::deviceMemset(T* ptr, std::size_t n, const T& value)
 {
-  const std::size_t size = n * sizeof(T);
+  UMPIRE_LOG(Debug, "(ptr=" << static_cast<void*>(ptr) << ", n=" << n << ")");
 
-  // Fast paths for memset-compatible patterns.
-  if (value == T{}) {
-    return static_cast<T*>(allocate_and_memset(size, 0, allocator));
+  if (!ptr || n == 0) {
+    return;
   }
 
-  if (std::is_integral<T>::value && value == static_cast<T>(-1)) {
-    return static_cast<T*>(allocate_and_memset(size, 0xFF, allocator));
-  }
+   void* raw_ptr = static_cast<void*>(ptr);
 
-  void* device_ptr = allocator.allocate(size);
+   if (!hasAllocator(raw_ptr)) {
+     UMPIRE_ERROR(resource_error,
+                  "ResourceManager::deviceMemset called on pointer that is not managed by any Umpire allocator.");
+   }
 
-  try {
-    auto host_alloc = getAllocator("HOST");
-    T* host_ptr = static_cast<T*>(host_alloc.allocate(size));
+   auto owning_allocator = getAllocator(raw_ptr);
+   auto platform = owning_allocator.getPlatform();
 
-    try {
-      for (std::size_t i = 0; i < n; ++i) {
-        host_ptr[i] = value;
-      }
+   if (platform != Platform::cuda && platform != Platform::hip) {
+     UMPIRE_ERROR(resource_error,
+                  "ResourceManager::deviceMemset is only supported for CUDA or HIP DEVICE allocations.");
+   }
 
-      copy(device_ptr, host_ptr, size);
-    } catch (...) {
-      host_alloc.deallocate(host_ptr);
-      throw;
-    }
-
-    host_alloc.deallocate(host_ptr);
-  } catch (...) {
-    allocator.deallocate(device_ptr);
-    throw;
-  }
-
-  return static_cast<T*>(device_ptr);
-}
-
-template <typename T>
-T* ResourceManager::allocate_and_fill(std::size_t n, const T& value)
-{
-  return allocate_and_fill<T>(n, value, getDefaultAllocator());
+  device_memset(ptr, n, value);
 }
 
 } // end of namespace umpire

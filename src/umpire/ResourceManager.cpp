@@ -547,27 +547,6 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::memset(v
   return op->apply_async(ptr, alloc_record, value, length, ctx);
 }
 
-void* ResourceManager::allocate_and_memset(std::size_t size, int value, Allocator allocator)
-{
-  UMPIRE_LOG(Debug, "(size=" << size << ", value=" << value << ", allocator=" << allocator.getName() << ")");
-
-  void* ptr = allocator.allocate(size);
-
-  try {
-    memset(ptr, value, size);
-  } catch (...) {
-    allocator.deallocate(ptr);
-    throw;
-  }
-
-  return ptr;
-}
-
-void* ResourceManager::allocate_and_memset(std::size_t size, int value)
-{
-  return allocate_and_memset(size, value, getDefaultAllocator());
-}
-
 void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size)
 {
   strategy::AllocationStrategy* strategy;

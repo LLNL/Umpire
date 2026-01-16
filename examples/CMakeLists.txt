@@ -96,6 +96,12 @@ blt_add_executable(
 list(APPEND umpire_examples allocator)
 
 blt_add_executable(
+  NAME device_memset
+  SOURCES device_memset.cpp
+  DEPENDS_ON ${example_depends})
+list(APPEND umpire_examples device_memset)
+
+blt_add_executable(
   NAME backtrace_example
   SOURCES backtrace_example.cpp
   DEPENDS_ON ${example_depends})

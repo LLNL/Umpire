@@ -15,6 +15,7 @@
 
 #include "camp/camp.hpp"
 #include "camp/resource.hpp"
+#include "umpire/device_zero_kernel.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/mixins/AllocateNull.hpp"
 #include "umpire/strategy/mixins/Inspector.hpp"
@@ -84,6 +85,20 @@ class Allocator : private strategy::mixins::Inspector, strategy::mixins::Allocat
   inline void deallocate(void* ptr);
 
   inline void deallocate(void* ptr, camp::resources::Resource const& r);
+
+  /*!
+   * \brief Set n elements of DEVICE memory to value using a GPU kernel.
+   *
+   * This is intended for DEVICE (or other GPU-accessible) allocations obtained
+   * from this Allocator. The value can be any representable T (e.g., 0, -1, NaN).
+   *
+   * \tparam T Element type of the allocation.
+   * \param ptr Pointer to DEVICE memory (T*).
+   * \param n Number of elements.
+   * \param value Value to assign to each element.
+   */
+  template <typename T>
+  inline void deviceMemset(T* ptr, std::size_t n, const T& value);
 
   /*!
    * \brief Release any and all unused memory held by this Allocator.

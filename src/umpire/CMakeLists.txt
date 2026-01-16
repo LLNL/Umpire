@@ -21,6 +21,7 @@ endif()
 set (umpire_headers
   Allocator.hpp
   Allocator.inl
+  device_zero_kernel.hpp
   ResourceManager.hpp
   ResourceManager.inl
   Tracking.hpp

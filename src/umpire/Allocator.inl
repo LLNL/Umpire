@@ -195,6 +195,24 @@ inline void Allocator::deallocate(void* ptr, camp::resources::Resource const& r)
   m_thread_safe ? thread_safe_resource_deallocate(ptr, r) : do_resource_deallocate(ptr, r);
 }
 
+template <typename T>
+inline void Allocator::deviceMemset(T* ptr, std::size_t n, const T& value)
+{
+  UMPIRE_LOG(Debug, "(ptr=" << static_cast<void*>(ptr) << ", n=" << n << ")");
+
+  if (!ptr || n == 0) {
+    return;
+  }
+
+  auto platform = m_allocator->getPlatform();
+  if (platform != Platform::cuda && platform != Platform::hip) {
+    UMPIRE_ERROR(resource_error,
+                 "Allocator::deviceMemset is only supported for CUDA or HIP DEVICE allocators.");
+  }
+
+  device_memset(ptr, n, value);
+}
+
 } // end of namespace umpire
 
 #endif // UMPIRE_Allocator_INL

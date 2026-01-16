@@ -218,6 +218,20 @@ class ResourceManager {
                                                               camp::resources::Resource& ctx, std::size_t size = 0);
 
   /*!
+   * \brief Set n elements of DEVICE memory to value using a GPU kernel.
+   *
+   * This is intended for DEVICE (or other GPU-accessible) allocations managed
+   * by Umpire. The value can be any representable T (e.g., 0, -1, NaN).
+   *
+   * \tparam T Element type of the allocation.
+   * \param ptr Pointer to DEVICE memory (T*).
+   * \param n Number of elements.
+   * \param value Value to assign to each element.
+   */
+  template <typename T>
+  void deviceMemset(T* ptr, std::size_t n, const T& value);
+
+  /*!
    * \brief Set the first length bytes of ptr to the value val.
    *
    * \param ptr Pointer to data.
@@ -228,65 +242,6 @@ class ResourceManager {
 
   camp::resources::EventProxy<camp::resources::Resource> memset(void* ptr, int val, camp::resources::Resource& ctx,
                                                                 std::size_t length = 0);
-
-  /*!
-   * \brief Allocate size bytes from allocator and initialize them with val.
-   *
-   * This is a convenience wrapper that performs an allocation followed by a
-   * memset on the returned pointer. If the memset operation fails, the
-   * allocation is freed and the error is rethrown.
-   *
-   * \param size Number of bytes to allocate.
-   * \param val Value to initialize each byte with.
-   * \param allocator Allocator used for the allocation.
-   *
-   * \return Pointer to the newly allocated and initialized memory.
-   */
-  void* allocate_and_memset(std::size_t size, int val, Allocator allocator);
-
-  /*!
-   * \brief Allocate size bytes from the default allocator and initialize them with val.
-   *
-   * This is equivalent to calling allocate_and_memset(size, val, getDefaultAllocator()).
-   *
-   * \param size Number of bytes to allocate.
-   * \param val Value to initialize each byte with.
-   *
-   * \return Pointer to the newly allocated and initialized memory.
-   */
-  void* allocate_and_memset(std::size_t size, int val);
-
-  /*!
-   * \brief Allocate n elements of type T and initialize them with value.
-   *
-   * For values that can be represented by a single-byte pattern (e.g., zero or
-   * -1 for integer types), this will use allocate_and_memset for efficiency.
-   * For other values (including NaN), this will allocate a temporary HOST
-   * buffer, initialize it on the host, and copy it to the target allocation.
-   *
-   * \tparam T Element type.
-   * \param n Number of elements.
-   * \param value Value to initialize each element with.
-   * \param allocator Allocator used for the allocation.
-   *
-   * \return Pointer to the newly allocated and initialized memory.
-   */
-  template <typename T>
-  T* allocate_and_fill(std::size_t n, const T& value, Allocator allocator);
-
-  /*!
-   * \brief Allocate n elements of type T from the default allocator and initialize them with value.
-   *
-   * This is equivalent to calling allocate_and_fill<T>(n, value, getDefaultAllocator()).
-   *
-   * \tparam T Element type.
-   * \param n Number of elements.
-   * \param value Value to initialize each element with.
-   *
-   * \return Pointer to the newly allocated and initialized memory.
-   */
-  template <typename T>
-  T* allocate_and_fill(std::size_t n, const T& value);
 
   /*!
    * \brief Reallocate current_ptr to new_size.
