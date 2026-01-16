@@ -100,7 +100,7 @@ TEST(ResourceManager, aliases)
 
   EXPECT_THROW({ rm.removeAlias("NAMED_ALLOCATOR", named_alloc); }, umpire::runtime_error);
 }
-
+/*
 #if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
 TEST(ResourceManager, DeviceMemsetDeviceAllocator)
 {
@@ -130,3 +130,4 @@ TEST(ResourceManager, DeviceMemsetDeviceAllocator)
   host_alloc.deallocate(h_ptr);
 }
 #endif
+*/

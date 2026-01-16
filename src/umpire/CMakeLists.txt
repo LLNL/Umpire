@@ -21,7 +21,6 @@ endif()
 set (umpire_headers
   Allocator.hpp
   Allocator.inl
-  device_zero_kernel.hpp
   ResourceManager.hpp
   ResourceManager.inl
   Tracking.hpp
@@ -33,6 +32,21 @@ set (umpire_sources
   Allocator.cpp
   ResourceManager.cpp
   Umpire.cpp)
+
+
+if ((UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP))
+  set(umpire_device_memset_headers
+    device_memset_kernel.hpp)
+
+  if (UMPIRE_ENABLE_CUDA)
+    set_source_files_properties(device_memset_kernel.hpp
+                              PROPERTIES
+                              LANGUAGE CUDA)
+    set(umpire_device_memset_depends camp cuda umpire)
+  elseif (UMPIRE_ENABLE_HIP)
+    set(umpire_device_memset_depends camp blt::hip umpire)
+  endif()
+endif()
 
 if (UMPIRE_ENABLE_DEVICE_ALLOCATOR AND (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP))
   set(umpire_device_headers
@@ -62,9 +76,9 @@ if (UMPIRE_ENABLE_DEVICE_ALLOCATOR AND (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP)
 
   blt_add_library(
     NAME umpire_device
-    HEADERS ${umpire_device_headers}
+    HEADERS ${umpire_device_headers} ${umpire_device_memset_headers}
     SOURCES ${umpire_device_sources}
-    DEPENDS_ON ${umpire_device_depends})
+    DEPENDS_ON ${umpire_device_depends} ${umpire_device_memset_depends})
 
   target_include_directories(
     umpire_device

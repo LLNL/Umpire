@@ -15,7 +15,7 @@
 
 #include "camp/camp.hpp"
 #include "camp/resource.hpp"
-#include "umpire/device_zero_kernel.hpp"
+#include "umpire/device_memset_kernel.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/mixins/AllocateNull.hpp"
 #include "umpire/strategy/mixins/Inspector.hpp"

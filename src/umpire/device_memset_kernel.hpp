@@ -4,31 +4,38 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_device_zero_kernel_HPP
-#define UMPIRE_device_zero_kernel_HPP
+#ifndef UMPIRE_device_memset_kernel_HPP
+#define UMPIRE_device_memset_kernel_HPP
 
 #include <cstddef>
 
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/error.hpp"
 
-namespace umpire {
-
 #if defined(UMPIRE_ENABLE_CUDA)
 #include <cuda_runtime_api.h>
+using stream_type = cudaStream_t;
 #elif defined(UMPIRE_ENABLE_HIP)
 #include <hip/hip_runtime.h>
+using stream_type = hipStream_t;
 #endif
+
+namespace umpire {
 
 #if defined (UMPIRE_ENABLE_CUDA) || defined (UMPIRE_ENABLE_HIP)
 
+// Forward declare kernel for host code
+template <typename T>
+__global__ void umpire_device_memset_kernel(T* data, std::size_t n, T value);
+
+#if defined(__CUDACC__) || defined(__HIPCC__)
 /*!
  * \brief device kernel to set elements to a value.
  *
  * T is typically a scalar type (e.g., int, float, double).
  */
 template <typename T>
-static __global__ void umpire_device_memset_kernel(T* data, std::size_t n, T value)
+__global__ void umpire_device_memset_kernel(T* data, std::size_t n, T value)
 {
   const std::size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
   const std::size_t stride = blockDim.x * gridDim.x;
@@ -37,6 +44,7 @@ static __global__ void umpire_device_memset_kernel(T* data, std::size_t n, T val
     data[i] = value;
   }
 }
+#endif
 
 /*!
  * \brief Launch a device kernel to set DEVICE memory to a value.
@@ -48,7 +56,7 @@ static __global__ void umpire_device_memset_kernel(T* data, std::size_t n, T val
  * \param stream CUDA stream to use (defaults to the null stream).
  */
 template <typename T>
-inline void device_memset(T* ptr, std::size_t n, T value, cudaStream_t stream = nullptr)
+inline void device_memset(T* ptr, std::size_t n, T value, stream_type stream = 0)
 {
   if (!ptr || n == 0) {
     return;
@@ -64,7 +72,7 @@ inline void device_memset(T* ptr, std::size_t n, T value, cudaStream_t stream = 
   }
 
 #if defined(UMPIRE_ENABLE_CUDA)
-  umpire_device_memset_kernel<<<static_cast<unsigned int>(grid_size), block_size, 0, stream>>>(
+  umpire_device_memset_kernel<T><<<static_cast<unsigned int>(grid_size), block_size, 0, stream>>>(
       ptr, n, value);
 
   cudaError_t err = cudaGetLastError();
@@ -105,4 +113,4 @@ inline void device_memset(T* UMPIRE_UNUSED_ARG(ptr), std::size_t UMPIRE_UNUSED_A
 
 } // end of namespace umpire
 
-#endif // UMPIRE_device_zero_kernel_HPP
+#endif // UMPIRE_device_memset_kernel_HPP
