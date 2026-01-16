@@ -16,10 +16,11 @@
 #include "umpire/allocation_record.hpp"
 
 namespace umpire {
-
-namespace detail {
-
 class memory;
+}
+
+namespace umpire {
+namespace detail {
 
 class registry {
 private:
