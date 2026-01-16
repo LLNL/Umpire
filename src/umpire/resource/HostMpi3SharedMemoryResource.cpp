@@ -64,7 +64,7 @@ bool HostMpi3SharedMemoryResource::isAccessibleFrom(Platform p) noexcept
 {
   if (p == Platform::host)
     return true;
-  else // TODO: check this
+  else
     return false;
 }
 
