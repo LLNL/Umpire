@@ -6,6 +6,8 @@
 namespace umpire {
 namespace resource {
 
+using Platform = camp::resources::Platform;
+
 template <typename Platform>
 struct platform_for {};
 
