@@ -56,7 +56,12 @@ if (UMPIRE_ENABLE_HIP)
     SOURCES multi_device.cpp
     DEPENDS_ON umpire blt::hip)
 
-  list(APPEND umpire_examples multi_device)
+  blt_add_executable(
+    NAME device_memset_example
+    SOURCES device_memset_example.cpp
+    DEPENDS_ON umpire blt::hip)
+
+  list(APPEND umpire_examples multi_device device_memset_example)
 endif()
 
 blt_add_executable(
@@ -156,15 +161,22 @@ if (UMPIRE_ENABLE_CUDA)
     SOURCES multi_device.cpp
     DEPENDS_ON umpire cuda)
 
+  blt_add_executable(
+    NAME device_memset_example
+    SOURCES device_memset_example.cpp
+    DEPENDS_ON umpire cuda)
+
   set_source_files_properties(
     multi_device.cpp
+    device_memset_example.cpp
     PROPERTIES CUDA_SEPARABLE_COMPILATION On)
 
   set_target_properties(
     multi_device
+    device_memset_example
     PROPERTIES CUDA_SEPARABLE_COMPILATION On)
 
-  list(APPEND umpire_examples multi_device)
+  list(APPEND umpire_examples multi_device device_memset_example)
 endif()
 
 install(TARGETS ${umpire_examples} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
