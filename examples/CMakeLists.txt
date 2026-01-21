@@ -59,7 +59,7 @@ if (UMPIRE_ENABLE_HIP)
   blt_add_executable(
     NAME device_memset_example
     SOURCES device_memset_example.cpp
-    DEPENDS_ON umpire blt::hip)
+    DEPENDS_ON umpire umpire_device_memset blt::hip)
 
   list(APPEND umpire_examples multi_device device_memset_example)
 endif()

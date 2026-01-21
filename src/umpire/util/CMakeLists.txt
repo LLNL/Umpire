@@ -102,7 +102,6 @@ if (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP)
     target_link_options(umpire_device_memset PUBLIC -fgpu-rdc)
     target_compile_options(umpire_device_memset PUBLIC -fgpu-rdc)
   endif ()
-
 endif()
 
 if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")

@@ -8,15 +8,11 @@
 #include <limits>
 
 #include "umpire/ResourceManager.hpp"
+#include "umpire/util/device_memset_kernel.hpp"
 
 int main()
 {
   auto& rm = umpire::ResourceManager::getInstance();
-
-  if (!rm.isAllocator("DEVICE")) {
-    std::cout << "DEVICE allocator is not available in this build.\n";
-    return 0;
-  }
 
   auto dev_alloc = rm.getAllocator("DEVICE");
   constexpr std::size_t n = 1024;
@@ -26,7 +22,7 @@ int main()
 
   // Fill the DEVICE allocation with a value using the deviceMemset helper.
   const double value = 0.0;
-  dev_alloc.deviceMemset(d_ptr, n, value);
+  umpire::device_memset(d_ptr, n, value);
 
   // Allocate HOST memory to verify the contents with a copy back to host.
   auto host_alloc = rm.getAllocator("HOST");
@@ -39,6 +35,8 @@ int main()
       break;
     }
   }
+
+  std::cout << "DeviceMemset to " << value << " SUCCEEDED!" << std::endl;
 
   host_alloc.deallocate(h_ptr);
   dev_alloc.deallocate(d_ptr);

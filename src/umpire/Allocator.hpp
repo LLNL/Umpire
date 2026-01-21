@@ -15,9 +15,6 @@
 
 #include "camp/camp.hpp"
 #include "camp/resource.hpp"
-#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
-#include "umpire/device_memset_kernel.hpp"
-#endif
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/mixins/AllocateNull.hpp"
 #include "umpire/strategy/mixins/Inspector.hpp"
