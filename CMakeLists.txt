@@ -4,7 +4,7 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
-cmake_minimum_required(VERSION 3.25.2)
+cmake_minimum_required(VERSION 3.24.2)
 
 cmake_policy(SET CMP0025 NEW)
 cmake_policy(SET CMP0048 NEW)
