@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -339,6 +339,8 @@ class ResourceManager {
    * \return Size of allocation in bytes.
    */
   std::size_t getSize(void* ptr) const;
+
+  std::size_t getInternalMemoryUsage() const;
 
   std::shared_ptr<op::MemoryOperation> getOperation(const std::string& operation_name, Allocator src_allocator,
                                                     Allocator dst_allocator);

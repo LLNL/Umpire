@@ -21,6 +21,9 @@ jobs:
       with:
         target: ${{ matrix.target }}
   build_gpu:
+    strategy:
+      matrix:
+        target: [cuda, cuda13]
     runs-on: radiuss-cuda-runners
     steps:
     - run: |
@@ -35,7 +38,7 @@ jobs:
     - uses: docker/setup-buildx-action@v3
     - uses: docker/build-push-action@v6
       with:
-        target: cuda
+        target: ${{ matrix.target }}
   build_mac:
     runs-on: macos-latest
     steps:

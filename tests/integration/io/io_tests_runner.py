@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -69,7 +69,7 @@ def run_io_test(test_env, file_uid, expect_logging):
         cmd_args.append('--enable-logging')
 
     env = os.environ.copy()
-    #TODO: toss4 slurm only?
+    # Clear PMI_FD to avoid SLURM PMI interference when launching io_tests.
     env.pop('PMI_FD', None)
 
     test_program = subprocess.Popen(cmd_args,

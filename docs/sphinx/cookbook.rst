@@ -20,7 +20,7 @@ that have introspection disabled for improved performance, and applying CUDA
    cookbook/pool_advice.rst
    cookbook/advice_device_id.rst
    cookbook/move_to_managed.rst
-   cookbook/dynamic_pool_heuristics.rst
+   cookbook/quick_pool_heuristics.rst
    cookbook/move_between_numa.rst
    cookbook/get_largest_available_block_in_pool.rst
    cookbook/coalesce_pool.rst

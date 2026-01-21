@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -170,6 +170,11 @@ std::size_t get_process_memory_usage()
   long page_size{::sysconf(_SC_PAGE_SIZE)};
   return std::size_t{resident * page_size};
 #endif
+}
+
+std::size_t get_internal_memory_usage()
+{
+  return umpire::ResourceManager::getInstance().getInternalMemoryUsage();
 }
 
 void mark_event(const std::string& event)

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -12,6 +12,7 @@
 #include <memory>
 #include <tuple>
 #include <unordered_map>
+#include <optional>
 
 #include "camp/camp.hpp"
 #include "camp/resource.hpp"
@@ -183,7 +184,7 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
   };
 
   using PointerMap = std::unordered_map<void*, Chunk*>;
-  using PendingList = std::list<Chunk*>;
+  using PendingMap = std::unordered_multimap<std::optional<Resource>, Chunk*>;
   using SizeMap =
       std::multimap<std::size_t, Chunk*, std::less<std::size_t>, pool_allocator<std::pair<const std::size_t, Chunk*>>>;
 
@@ -214,6 +215,7 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
     Chunk* prev{nullptr};
     Chunk* next{nullptr};
     SizeMap::iterator size_map_it;
+    PendingMap::iterator pending_map_it;
     Resource resource;
     Event event;
   };
@@ -221,7 +223,7 @@ class ResourceAwarePool : public AllocationStrategy, private mixins::AlignedAllo
  private:
   PointerMap m_used_map{};
   SizeMap m_free_map{};
-  PendingList m_pending_list{};
+  PendingMap m_pending_map{};
 
   util::FixedMallocPool m_chunk_pool{sizeof(Chunk)};
 

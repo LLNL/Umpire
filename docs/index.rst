@@ -38,3 +38,4 @@ Any questions? File an issue on GitHub, or email umpire-dev@llnl.gov
 
   sphinx/contribution_guide
   sphinx/developer_guide
+  sphinx/governance

@@ -1,12 +1,12 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
-#include "umpire/strategy/DynamicPoolList.hpp"
+#include "umpire/strategy/QuickPool.hpp"
 
 void allocate_and_deallocate_pool(const std::string& resource)
 {
@@ -15,7 +15,7 @@ void allocate_and_deallocate_pool(const std::string& resource)
   auto allocator = rm.getAllocator(resource);
 
   // _sphinx_tag_tut_makepool_start
-  auto pooled_allocator = rm.makeAllocator<umpire::strategy::DynamicPoolList>(resource + "_pool", allocator);
+  auto pooled_allocator = rm.makeAllocator<umpire::strategy::QuickPool>(resource + "_pool", allocator);
   // _sphinx_tag_tut_makepool_end
 
   constexpr std::size_t SIZE = 1024;
@@ -52,3 +52,4 @@ int main(int, char**)
 
   return 0;
 }
+
