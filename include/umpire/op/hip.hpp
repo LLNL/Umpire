@@ -214,7 +214,13 @@ inline void prefetch(T* ptr, int device, std::size_t count)
 {
   // Use current device for properties if device is CPU
   int current_device;
-  hipGetDevice(&current_device);
+  hipError_t error = hipGetDevice(&current_device);
+
+  if (error != hipSuccess) {
+    UMPIRE_ERROR(runtime_error,
+                 fmt::format("hipGetDevice failed with error: {}", hipGetErrorString(error)));
+  }
+
   int gpu = (device != hipCpuDeviceId) ? device : current_device;
 
   if (supports_managed_memory(gpu)) {
@@ -246,7 +252,13 @@ inline camp::resources::EventProxy<camp::resources::Resource> prefetch_async(T* 
 
   // Use current device for properties if device is CPU
   int current_device;
-  hipGetDevice(&current_device);
+  hipError_t error = hipGetDevice(&current_device);
+
+  if (error != hipSuccess) {
+    UMPIRE_ERROR(runtime_error,
+                 fmt::format("hipGetDevice failed with error: {}", hipGetErrorString(error)));
+  }
+
   int gpu = (device != hipCpuDeviceId) ? device : current_device;
 
   if (supports_managed_memory(gpu)) {
