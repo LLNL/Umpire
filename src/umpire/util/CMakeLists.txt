@@ -55,6 +55,56 @@ endif ()
 
 set (umpire_util_depends camp umpire_event umpire_tpl_judy ${UMPIRE_FMT_TARGET})
 
+if (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP)
+  set(umpire_device_memset_headers
+    device_memset_kernel.hpp)
+
+  set(umpire_device_memset_sources
+    device_memset_kernel.cpp)
+
+  if (UMPIRE_ENABLE_CUDA)
+    set_source_files_properties(device_memset_kernel.cpp
+                              PROPERTIES
+                              LANGUAGE CUDA)
+    set(umpire_device_memset_depends camp cuda umpire)
+  elseif (UMPIRE_ENABLE_HIP)
+    set(umpire_device_memset_depends camp blt::hip umpire)
+  endif()
+
+  blt_add_library(
+    NAME umpire_device_memset
+    HEADERS ${umpire_device_memset_headers}
+    SOURCES ${umpire_device_memset_sources}
+    DEPENDS_ON ${umpire_device_memset_depends})
+
+  target_include_directories(
+    umpire_device_memset
+    PUBLIC
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+    $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
+    $<INSTALL_INTERFACE:include>)
+
+  install(TARGETS
+    umpire_device_memset
+    EXPORT umpire-targets
+    RUNTIME DESTINATION lib
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib)
+
+  install(FILES
+    ${umpire_device_memset_headers}
+    DESTINATION include/umpire)
+
+  if (UMPIRE_ENABLE_CUDA)
+    set_target_properties(umpire_device_memset PROPERTIES
+      CUDA_SEPARABLE_COMPILATION On)
+  else ()
+    target_link_options(umpire_device_memset PUBLIC -fgpu-rdc)
+    target_compile_options(umpire_device_memset PUBLIC -fgpu-rdc)
+  endif ()
+
+endif()
+
 if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   set (umpire_util_depends
     ${umpire_util_depends}

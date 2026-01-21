@@ -16,17 +16,14 @@ namespace umpire {
 
 /*!
  * \brief device kernel to set elements to a value.
- *
- * T is typically a scalar type (e.g., int, float, double).
  */
 #if defined(__CUDA_ARCH__) || defined(__HIP_DEVICE_COMPILE__)
-template <typename T>
-__global__ void umpire_device_memset_kernel(T* data, std::size_t n, T value)
+__global__ void umpire_device_memset_kernel(void* data, std::size_t count, int value)
 {
   const std::size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
   const std::size_t stride = blockDim.x * gridDim.x;
 
-  for (std::size_t i = idx; i < n; i += stride) {
+  for (std::size_t i = idx; i < count; i += stride) {
     data[i] = value;
   }
 }
@@ -35,14 +32,11 @@ __global__ void umpire_device_memset_kernel(T* data, std::size_t n, T value)
 /*!
  * \brief Launch a device kernel to set DEVICE memory to a value.
  *
- * \tparam T Element type of the DEVICE allocation.
- * \param ptr Pointer to DEVICE memory (T*).
- * \param n Number of elements.
+ * \param ptr Void pointer to DEVICE memory.
+ * \param count Number of elements.
  * \param value Value to assign to each element (may be 0, -1, NaN, etc.).
- * \param stream CUDA stream to use (defaults to the null stream).
  */
-template <typename T>
-inline void device_memset(Umpire::Allocator alloc, std::size_t n, T value)
+void device_memset_kernel_impl(void* ptr, std::size_t count, int value);
 {
   if (!alloc || n == 0) {
     return;
@@ -58,27 +52,34 @@ inline void device_memset(Umpire::Allocator alloc, std::size_t n, T value)
   }
 
 #if defined(__CUDA_ARCH__)
-  umpire_device_memset_kernel<T><<<static_cast<unsigned int>(grid_size), block_size, 0, stream>>>(
-      ptr, n, value);
+  umpire_device_memset_kernel<<<static_cast<unsigned int>(grid_size), block_size, 0, stream>>>(
+      ptr, count, value);
 
   cudaError_t err = cudaGetLastError();
   if (err != cudaSuccess) {
     UMPIRE_ERROR(runtime_error,
-                 fmt::format("device_memset kernel launch failed for ptr = {}, n = {} with error: {}",
-                             static_cast<void*>(ptr), n, cudaGetErrorString(err)));
+                 fmt::format("device_memset kernel launch failed for ptr = {}, count = {} with error: {}",
+                             static_cast<void*>(ptr), count, cudaGetErrorString(err)));
   }
 #elif defined(__HIP_DEVICE_COMPILE__)
-  hipLaunchKernelGGL(umpire_device_memset_kernel<T>, dim3(static_cast<unsigned int>(grid_size)),
-                     dim3(block_size), 0, stream, ptr, n, value);
+  hipLaunchKernelGGL(umpire_device_memset_kernel, dim3(static_cast<unsigned int>(grid_size)),
+                     dim3(block_size), 0, stream, ptr, count, value);
 
   hipError_t err = hipGetLastError();
   if (err != hipSuccess) {
     UMPIRE_ERROR(runtime_error,
-                 fmt::format("device_memset kernel launch failed for ptr = {}, n = {} with error: {}",
-                             static_cast<void*>(ptr), n, hipGetErrorString(err)));
+                 fmt::format("device_memset kernel launch failed for ptr = {}, count = {} with error: {}",
+                             static_cast<void*>(ptr), count, hipGetErrorString(err)));
   }
 #endif
 }
+
+void device_memset_kernel_nan_impl(static_cast<void*>(ptr), n * sizeof(T))
+{
+
+
+}
+
 } // end of namespace umpire
 
 #endif // UMPIRE_device_memset_kernel_HPP

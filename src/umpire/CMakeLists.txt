@@ -33,10 +33,6 @@ set (umpire_sources
   ResourceManager.cpp
   Umpire.cpp)
 
-if (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP)
-  list (APPEND umpire_headers device_memset_kernel.hpp)
-endif()
-
 if (UMPIRE_ENABLE_DEVICE_ALLOCATOR AND (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP))
   set(umpire_device_headers
     DeviceAllocator.hpp
