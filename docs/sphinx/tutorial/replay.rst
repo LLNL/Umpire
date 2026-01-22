@@ -8,10 +8,10 @@ performance of particular allocation patterns and reproduce bugs.
 
 Input Example
 -------------
-A log can be captured and stored as a JSON file, then used as input to the
-``replay`` application (available under the ``bin`` directory). The ``replay``
-program will read the replay log, and recreate the events that occured as part
-of the run that generated the log.
+When replay is enabled, Umpire captures replay events and writes them as
+JSON-formatted lines into a ``.stats`` file. This file can be used as input to
+the ``replay`` application (available under the ``bin`` directory), which will
+recreate the events that occurred as part of the run that generated the log.
 
 The file ``tut_replay.cpp`` makes a :class:`umpire::strategy::QuickPool`:
 
@@ -39,16 +39,18 @@ Running this program:
 
 .. code-block:: bash
 
-   UMPIRE_REPLAY="On" ./bin/examples/tutorial/tut_replay > tut_replay_log.json
+   UMPIRE_REPLAY="On" ./bin/examples/tutorial/tut_replay
 
-will write Umpire replay events to the file ``tut_replay_log.json``. You can
-see that this file contains JSON formatted lines.
+will write Umpire replay events to a file with a name like
+``umpire.<pid>.<uid>.stats`` in the current directory (or in the directory
+specified by ``UMPIRE_OUTPUT_DIR``). This file contains JSON formatted lines.
 
 Replaying the session
 ---------------------
-Loading this file with the ``replay`` program will replay this sequence of
-:class:`umpire::Allocator` creation, allocations, and deallocations:
+Loading this ``.stats`` file with the ``replay`` program will replay this
+sequence of :class:`umpire::Allocator` creation, allocations, and
+deallocations:
 
 .. code-block:: bash
 
-   ./bin/replay -i ../tutorial/examples/tut_replay_log.json
+   ./bin/replay -i umpire.<pid>.<uid>.stats
