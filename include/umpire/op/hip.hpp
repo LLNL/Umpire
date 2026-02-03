@@ -174,6 +174,55 @@ inline void memset(T* ptr, int value, std::size_t count)
   }
 }
 
+/*!
+ * \brief device kernel to set elements to a value.
+ */
+template <typename T>
+__global__ void umpire_device_memset_kernel(T* data, int value, std::size_t size)
+{
+  const std::size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+  const std::size_t stride = blockDim.x * gridDim.x;
+
+  for (std::size_t i = idx; i < size; i += stride) {
+    data[i] = value;
+  }
+}
+
+/**
+ * @brief Synchronous memory set implementation in device kernel
+ *
+ * @tparam T Type of memory
+ * @param ptr Pointer to memory
+ * @param value Value to set
+ * @param count Number of elements
+ */
+template <typename T>
+inline void device_memset(T* ptr, int value, std::size_t count)
+{
+  std::size_t size = detail::get_size<T>(count);
+
+  if (!ptr || size == 0) {
+    return;
+  }
+
+  constexpr int block_size = 256;
+  std::size_t grid_size = (size + block_size - 1) / block_size;
+
+  const std::size_t max_blocks = 65535;
+  if (grid_size > max_blocks) {
+    grid_size = max_blocks;
+  }
+
+  hipLaunchKernelGGL(umpire_device_memset_kernel, dim3(grid_size), dim3(block_size), 0, 0, ptr, value, size);
+
+  hipError_t err = hipGetLastError();
+  if (err != hipSuccess) {
+    UMPIRE_ERROR(runtime_error,
+                 fmt::format("device_memset kernel launch failed: {}", hipGetErrorString(err)));
+  }
+
+}
+
 /**
  * @brief Asynchronous memory set implementation
  *
@@ -421,6 +470,24 @@ struct memset<resource::hip_platform> {
                                                                      camp::resources::Resource& resource)
   {
     return detail::memset_async(ptr, val, len, resource);
+  }
+};
+
+// HIP device memset operation
+template <>
+struct device_memset<resource::hip_platform> {
+  /**
+   * @brief HIP synchronous device memset
+   *
+   * @tparam T Type of memory being set
+   * @param ptr Pointer to memory
+   * @param val Value to set
+   * @param len Number of elements to set
+   */
+  template <typename T>
+  static void exec(T* ptr, int val, std::size_t len) noexcept
+  {
+    detail::device_memset(ptr, val, len);
   }
 };
 

@@ -29,6 +29,12 @@ struct memset : public operation {
 };
 
 template <typename Src>
+struct device_memset : public operation {
+  static constexpr int arity = 1;
+  static constexpr const char* name = "DEVICE_MEMSET";
+};
+
+template <typename Src>
 struct reallocate : public operation {
   static constexpr int arity = 1;
   static constexpr const char* name = "REALLOCATE";
