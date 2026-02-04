@@ -675,6 +675,246 @@ umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_prefetcher(
     // splicer end class.ResourceManager.method.make_allocator_bufferify_prefetcher
 }
 
+umpire_allocator * umpire_resourcemanager_make_allocator_list_pool_untracked(
+    umpire_resourcemanager * self, const char * name,
+    umpire_allocator allocator, size_t initial_size, size_t block,
+    umpire_allocator * SHC_rv)
+{
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    // splicer begin class.ResourceManager.method.make_allocator_list_pool_untracked
+    umpire::Allocator *SHCXX_allocator = static_cast<umpire::Allocator *>(allocator.addr);
+    SHCXX_rv = SH_this->makeAllocator<umpire::strategy::DynamicPoolList, false>(name, *SHCXX_allocator, initial_size, block);
+    // splicer end class.ResourceManager.method.make_allocator_list_pool_untracked
+}
+
+umpire_allocator * umpire_resourcemanager_make_allocator_list_pool_untracked_bufferify(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    umpire_allocator allocator, size_t initial_size, size_t block,
+    umpire_allocator * SHC_rv)
+{
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    // splicer begin class.ResourceManager.method.make_allocator_list_pool_untracked_bufferify
+    const std::string SHCXX_name(name, Lname);
+    umpire::Allocator * SHCXX_allocator =
+        static_cast<umpire::Allocator *>(allocator.addr);
+    umpire::Allocator * SHCXX_rv = new umpire::Allocator;
+    *SHCXX_rv = SH_this->makeAllocator_list_pool_untracked(SHCXX_name,
+        *SHCXX_allocator, initial_size, block);
+    SHC_rv->addr = SHCXX_rv;
+    SHC_rv->idtor = 1;
+    return SHC_rv;
+    // splicer end class.ResourceManager.method.make_allocator_list_pool_untracked_bufferify
+}
+
+umpire_allocator * umpire_resourcemanager_make_allocator_quick_pool_untracked(
+    umpire_resourcemanager * self, const char * name,
+    umpire_allocator allocator, size_t initial_size, size_t block,
+    umpire_allocator * SHC_rv)
+{
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    // splicer begin class.ResourceManager.method.make_allocator_quick_pool_untracked
+    umpire::Allocator *SHCXX_allocator = static_cast<umpire::Allocator *>(allocator.addr);
+    SHCXX_rv = SH_this->makeAllocator<umpire::strategy::QuickPool, false>(name, *SHCXX_allocator, initial_size, block);
+    // splicer end class.ResourceManager.method.make_allocator_quick_pool_untracked
+}
+
+umpire_allocator * umpire_resourcemanager_make_allocator_quick_pool_untracked_bufferify(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    umpire_allocator allocator, size_t initial_size, size_t block,
+    umpire_allocator * SHC_rv)
+{
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    // splicer begin class.ResourceManager.method.make_allocator_quick_pool_untracked_bufferify
+    const std::string SHCXX_name(name, Lname);
+    umpire::Allocator * SHCXX_allocator =
+        static_cast<umpire::Allocator *>(allocator.addr);
+    umpire::Allocator * SHCXX_rv = new umpire::Allocator;
+    *SHCXX_rv = SH_this->makeAllocator_quick_pool_untracked(SHCXX_name,
+        *SHCXX_allocator, initial_size, block);
+    SHC_rv->addr = SHCXX_rv;
+    SHC_rv->idtor = 1;
+    return SHC_rv;
+    // splicer end class.ResourceManager.method.make_allocator_quick_pool_untracked_bufferify
+}
+
+umpire_allocator * umpire_resourcemanager_make_allocator_resource_aware_pool_untracked(
+    umpire_resourcemanager * self, const char * name,
+    umpire_allocator allocator, size_t initial_size, size_t block,
+    umpire_allocator * SHC_rv)
+{
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    // splicer begin class.ResourceManager.method.make_allocator_resource_aware_pool_untracked
+    umpire::Allocator *SHCXX_allocator = static_cast<umpire::Allocator *>(allocator.addr);
+    SHCXX_rv = SH_this->makeAllocator<umpire::strategy::ResourceAwarePool, false>(name, *SHCXX_allocator, initial_size, block);
+    // splicer end class.ResourceManager.method.make_allocator_resource_aware_pool_untracked
+}
+
+umpire_allocator * umpire_resourcemanager_make_allocator_resource_aware_pool_untracked_bufferify(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    umpire_allocator allocator, size_t initial_size, size_t block,
+    umpire_allocator * SHC_rv)
+{
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    // splicer begin class.ResourceManager.method.make_allocator_resource_aware_pool_untracked_bufferify
+    const std::string SHCXX_name(name, Lname);
+    umpire::Allocator * SHCXX_allocator =
+        static_cast<umpire::Allocator *>(allocator.addr);
+    umpire::Allocator * SHCXX_rv = new umpire::Allocator;
+    *SHCXX_rv = SH_this->makeAllocator_resource_aware_pool_untracked(
+        SHCXX_name, *SHCXX_allocator, initial_size, block);
+    SHC_rv->addr = SHCXX_rv;
+    SHC_rv->idtor = 1;
+    return SHC_rv;
+    // splicer end class.ResourceManager.method.make_allocator_resource_aware_pool_untracked_bufferify
+}
+
+umpire_allocator * umpire_resourcemanager_make_allocator_fixed_pool_untracked(
+    umpire_resourcemanager * self, const char * name,
+    umpire_allocator allocator, size_t object_size,
+    umpire_allocator * SHC_rv)
+{
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    // splicer begin class.ResourceManager.method.make_allocator_fixed_pool_untracked
+    umpire::Allocator *SHCXX_allocator = static_cast<umpire::Allocator *>(allocator.addr);
+    SHCXX_rv = SH_this->makeAllocator<umpire::strategy::FixedPool, false>(name, *SHCXX_allocator, object_size);
+    // splicer end class.ResourceManager.method.make_allocator_fixed_pool_untracked
+}
+
+umpire_allocator * umpire_resourcemanager_make_allocator_fixed_pool_untracked_bufferify(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    umpire_allocator allocator, size_t object_size,
+    umpire_allocator * SHC_rv)
+{
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    // splicer begin class.ResourceManager.method.make_allocator_fixed_pool_untracked_bufferify
+    const std::string SHCXX_name(name, Lname);
+    umpire::Allocator * SHCXX_allocator =
+        static_cast<umpire::Allocator *>(allocator.addr);
+    umpire::Allocator * SHCXX_rv = new umpire::Allocator;
+    *SHCXX_rv = SH_this->makeAllocator_fixed_pool_untracked(SHCXX_name,
+        *SHCXX_allocator, object_size);
+    SHC_rv->addr = SHCXX_rv;
+    SHC_rv->idtor = 1;
+    return SHC_rv;
+    // splicer end class.ResourceManager.method.make_allocator_fixed_pool_untracked_bufferify
+}
+
+umpire_allocator * umpire_resourcemanager_make_allocator_monotonic_untracked(
+    umpire_resourcemanager * self, const char * name,
+    umpire_allocator allocator, size_t object_size,
+    umpire_allocator * SHC_rv)
+{
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    // splicer begin class.ResourceManager.method.make_allocator_monotonic_untracked
+    umpire::Allocator *SHCXX_allocator = static_cast<umpire::Allocator *>(allocator.addr);
+    SHCXX_rv = SH_this->makeAllocator<umpire::strategy::MonotonicAllocationStrategy, false>(name, *SHCXX_allocator, object_size);
+    // splicer end class.ResourceManager.method.make_allocator_monotonic_untracked
+}
+
+umpire_allocator * umpire_resourcemanager_make_allocator_monotonic_untracked_bufferify(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    umpire_allocator allocator, size_t object_size,
+    umpire_allocator * SHC_rv)
+{
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    // splicer begin class.ResourceManager.method.make_allocator_monotonic_untracked_bufferify
+    const std::string SHCXX_name(name, Lname);
+    umpire::Allocator * SHCXX_allocator =
+        static_cast<umpire::Allocator *>(allocator.addr);
+    umpire::Allocator * SHCXX_rv = new umpire::Allocator;
+    *SHCXX_rv = SH_this->makeAllocator_monotonic_untracked(SHCXX_name,
+        *SHCXX_allocator, object_size);
+    SHC_rv->addr = SHCXX_rv;
+    SHC_rv->idtor = 1;
+    return SHC_rv;
+    // splicer end class.ResourceManager.method.make_allocator_monotonic_untracked_bufferify
+}
+
+umpire_allocator * umpire_resourcemanager_make_allocator_slot_pool_untracked(
+    umpire_resourcemanager * self, const char * name,
+    umpire_allocator allocator, size_t object_size,
+    umpire_allocator * SHC_rv)
+{
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    // splicer begin class.ResourceManager.method.make_allocator_slot_pool_untracked
+    umpire::Allocator *SHCXX_allocator = static_cast<umpire::Allocator *>(allocator.addr);
+    SHCXX_rv = SH_this->makeAllocator<umpire::strategy::SlotPool, false>(name, *SHCXX_allocator, object_size);
+    // splicer end class.ResourceManager.method.make_allocator_slot_pool_untracked
+}
+
+umpire_allocator * umpire_resourcemanager_make_allocator_slot_pool_untracked_bufferify(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    umpire_allocator allocator, size_t object_size,
+    umpire_allocator * SHC_rv)
+{
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    // splicer begin class.ResourceManager.method.make_allocator_slot_pool_untracked_bufferify
+    const std::string SHCXX_name(name, Lname);
+    umpire::Allocator * SHCXX_allocator =
+        static_cast<umpire::Allocator *>(allocator.addr);
+    umpire::Allocator * SHCXX_rv = new umpire::Allocator;
+    *SHCXX_rv = SH_this->makeAllocator_slot_pool_untracked(SHCXX_name,
+        *SHCXX_allocator, object_size);
+    SHC_rv->addr = SHCXX_rv;
+    SHC_rv->idtor = 1;
+    return SHC_rv;
+    // splicer end class.ResourceManager.method.make_allocator_slot_pool_untracked_bufferify
+}
+
+umpire_allocator * umpire_resourcemanager_make_allocator_mixed_pool_untracked(
+    umpire_resourcemanager * self, const char * name,
+    umpire_allocator allocator, size_t smallest_fixed_obj_size,
+    size_t largest_fixed_obj_size, size_t max_initial_fixed_pool_size,
+    size_t fixed_size_multiplier, size_t quick_pool_initial_alloc_size,
+    size_t quick_pool_min_alloc_size, size_t quick_pool_align_bytes,
+    umpire_allocator * SHC_rv)
+{
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    // splicer begin class.ResourceManager.method.make_allocator_mixed_pool_untracked
+    umpire::Allocator *SHCXX_allocator = static_cast<umpire::Allocator *>(allocator.addr);
+    SHCXX_rv = SH_this->makeAllocator<umpire::strategy::MixedPool, false>(name, *SHCXX_allocator, smallest_fixed_obj_size, largest_fixed_obj_size, max_initial_fixed_pool_size, fixed_size_multiplier, quick_pool_initial_alloc_size, quick_pool_min_alloc_size, quick_pool_align_bytes);
+    // splicer end class.ResourceManager.method.make_allocator_mixed_pool_untracked
+}
+
+umpire_allocator * umpire_resourcemanager_make_allocator_mixed_pool_untracked_bufferify(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    umpire_allocator allocator, size_t smallest_fixed_obj_size,
+    size_t largest_fixed_obj_size, size_t max_initial_fixed_pool_size,
+    size_t fixed_size_multiplier, size_t quick_pool_initial_alloc_size,
+    size_t quick_pool_min_alloc_size, size_t quick_pool_align_bytes,
+    umpire_allocator * SHC_rv)
+{
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    // splicer begin class.ResourceManager.method.make_allocator_mixed_pool_untracked_bufferify
+    const std::string SHCXX_name(name, Lname);
+    umpire::Allocator * SHCXX_allocator =
+        static_cast<umpire::Allocator *>(allocator.addr);
+    umpire::Allocator * SHCXX_rv = new umpire::Allocator;
+    *SHCXX_rv = SH_this->makeAllocator_mixed_pool_untracked(SHCXX_name,
+        *SHCXX_allocator, smallest_fixed_obj_size,
+        largest_fixed_obj_size, max_initial_fixed_pool_size,
+        fixed_size_multiplier, quick_pool_initial_alloc_size,
+        quick_pool_min_alloc_size, quick_pool_align_bytes);
+    SHC_rv->addr = SHCXX_rv;
+    SHC_rv->idtor = 1;
+    return SHC_rv;
+    // splicer end class.ResourceManager.method.make_allocator_mixed_pool_untracked_bufferify
+}
+
 void umpire_resourcemanager_add_alias(umpire_resourcemanager * self,
     const char * name, umpire_allocator allocator)
 {
