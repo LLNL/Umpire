@@ -26,7 +26,7 @@ set(UMPIRE_VERSION_RC "")
 
 include(cmake/SetupUmpireOptions.cmake)
 
-# Default to c++20 if not specified by the user.
+# Default to C++20 if not specified by the user.
 set(BLT_CXX_STD "c++20" CACHE STRING "Version of C++ standard")
 
 # If BLT_CXX_STD is set by the user, check that it is at least 20.
