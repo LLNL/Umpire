@@ -210,7 +210,6 @@ struct op_caller {
       check_memset_bounds(src, src_record, length);
 #endif
     } else if constexpr (std::is_same_v<Op<resource::host_platform>, device_memset<resource::host_platform>>) {
-      // For device_memset, we expect args to be {value, size}
 #ifdef UMPIRE_ENABLE_BOUNDS_CHECKS
       std::size_t length = get_arg<1>(args...);
       check_memset_bounds(src, src_record, length);
@@ -238,7 +237,6 @@ struct op_caller {
       check_memset_bounds(src, src_record, length);
 #endif
     } else if constexpr (std::is_same_v<Op<resource::host_platform>, device_memset<resource::host_platform>>) {
-      // For device_memset, we expect args to be {value, size}
 #ifdef UMPIRE_ENABLE_BOUNDS_CHECKS
       std::size_t length = get_arg<1>(args...);
       check_memset_bounds(src, src_record, length);

@@ -12,7 +12,6 @@
 namespace umpire {
 namespace op {
 
-// Forward declaration of device kernel (defined in hip.cpp with explicit instantiations)
 namespace detail {
 template <typename T>
 __global__ void umpire_device_memset_kernel(T* data, T value, std::size_t count);
@@ -189,12 +188,8 @@ inline void memset(T* ptr, int value, std::size_t count)
  *
  * @tparam T Type of array elements
  * @param ptr Pointer to array
- * @param value Value to set each element to (will be cast to type T)
+ * @param value Value to set each element to
  * @param count Number of elements to set
- *
- * @note Example: device_memset(int_array, 5, 10) sets 10 ints to value 5
- * @note The kernel must be explicitly instantiated in hip.cpp for type T
- * @note Implementation is in hip.cpp (compiled as HIP code)
  */
 template <typename T>
 void device_memset(T* ptr, T value, std::size_t count);
@@ -455,15 +450,10 @@ struct device_memset<resource::hip_platform> {
   /**
    * @brief HIP synchronous device memset using kernel
    *
-   * Sets each element of the array to the specified value using a HIP device kernel.
-   * Unlike standard memset which sets bytes, this sets typed elements.
-   *
    * @tparam T Type of array elements
    * @param ptr Pointer to array
    * @param val Value to set each element to
    * @param len Number of elements to set
-   *
-   * @note Example: exec(int_array, 5, 10) sets 10 ints to value 5
    */
   template <typename T>
   static void exec(T* ptr, T val, std::size_t len) noexcept

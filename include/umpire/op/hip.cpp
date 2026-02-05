@@ -16,9 +16,6 @@ namespace detail {
  * \param data Pointer to the array
  * \param value The value to set each element to
  * \param count The number of elements to set
- *
- * Example: If data is an int array with 10 elements and value is 5,
- *          this will set all 10 ints to the value 5.
  */
 template <typename T>
 __global__ void umpire_device_memset_kernel(T* data, T value, std::size_t count)
@@ -31,12 +28,6 @@ __global__ void umpire_device_memset_kernel(T* data, T value, std::size_t count)
   }
 }
 
-/**
- * @brief Implementation of device_memset - compiled as HIP code
- *
- * This implementation is in the .cpp file (not header) because it uses
- * hipLaunchKernelGGL, which requires HIP compiler support.
- */
 template <typename T>
 void device_memset(T* ptr, T value, std::size_t count)
 {
@@ -52,7 +43,6 @@ void device_memset(T* ptr, T value, std::size_t count)
     grid_size = max_blocks;
   }
 
-  // Launch kernel to set elements (not bytes)
   hipLaunchKernelGGL(umpire_device_memset_kernel<T>, dim3(grid_size), dim3(block_size), 0, 0,
                      ptr, value, count);
 
@@ -71,7 +61,6 @@ void device_memset(T* ptr, T value, std::size_t count)
 }
 
 // Explicit template instantiations for common types
-// Add more instantiations here as needed for your use cases
 template __global__ void umpire_device_memset_kernel<char>(char*, char, std::size_t);
 template __global__ void umpire_device_memset_kernel<unsigned char>(unsigned char*, unsigned char, std::size_t);
 template __global__ void umpire_device_memset_kernel<short>(short*, short, std::size_t);
