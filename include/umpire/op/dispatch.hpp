@@ -209,6 +209,12 @@ struct op_caller {
       std::size_t length = get_arg<1>(args...);
       check_memset_bounds(src, src_record, length);
 #endif
+    } else if constexpr (std::is_same_v<Op<resource::host_platform>, device_memset<resource::host_platform>>) {
+      // For device_memset, we expect args to be {value, size}
+#ifdef UMPIRE_ENABLE_BOUNDS_CHECKS
+      std::size_t length = get_arg<1>(args...);
+      check_memset_bounds(src, src_record, length);
+#endif
     }
 
     // Dispatch based on platform
@@ -227,6 +233,12 @@ struct op_caller {
     // Operation-specific handling
     if constexpr (std::is_same_v<Op<resource::host_platform>, memset<resource::host_platform>>) {
       // For memset, we expect args to be {value, size}
+#ifdef UMPIRE_ENABLE_BOUNDS_CHECKS
+      std::size_t length = get_arg<1>(args...);
+      check_memset_bounds(src, src_record, length);
+#endif
+    } else if constexpr (std::is_same_v<Op<resource::host_platform>, device_memset<resource::host_platform>>) {
+      // For device_memset, we expect args to be {value, size}
 #ifdef UMPIRE_ENABLE_BOUNDS_CHECKS
       std::size_t length = get_arg<1>(args...);
       check_memset_bounds(src, src_record, length);
@@ -343,6 +355,12 @@ camp::resources::EventProxy<camp::resources::Resource> memset(T* src, int v, std
                                                               camp::resources::Resource& ctx)
 {
   return op::op_caller<op::memset>::exec(src, v, len, ctx);
+}
+
+template <typename T, typename V>
+void device_memset(T* ptr, V v, std::size_t len)
+{
+  op::op_caller<op::device_memset>::exec(ptr, v, len);
 }
 
 template <typename T>
@@ -707,6 +725,12 @@ template <typename Platform, typename T>
 auto memset(T* ptr, int value, std::size_t len, camp::resources::Resource& ctx)
 {
   return op::memset<Platform>::exec(ptr, value, len, ctx);
+}
+
+template <typename Platform, typename T>
+void device_memset(T* ptr, T value, std::size_t len)
+{
+  op::device_memset<Platform>::exec(ptr, value, len);
 }
 
 // Direct template prefetch functions

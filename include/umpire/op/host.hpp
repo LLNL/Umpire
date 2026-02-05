@@ -74,6 +74,25 @@ struct memset<resource::host_platform> {
 };
 
 template <>
+struct device_memset<resource::host_platform> {
+  /**
+   * @brief device_memset is not supported for host memory
+   *
+   * This operation is only valid for device memory. Use memset for host memory instead.
+   *
+   * @tparam T Type of data being set
+   * @param ptr Pointer to memory (unused)
+   * @param val Value to set (unused)
+   * @param len Number of elements to set (unused)
+   */
+  template <typename T>
+  static void exec(T* /*ptr*/, int /*val*/, std::size_t /*len*/)
+  {
+    UMPIRE_ERROR(runtime_error, "device_memset cannot be used on host memory. Use memset instead.");
+  }
+};
+
+template <>
 struct prefetch<resource::host_platform> {
   /**
    * @brief Host memory prefetch (no-op)
