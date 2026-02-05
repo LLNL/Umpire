@@ -27,7 +27,7 @@ __host__ DeviceAllocator::DeviceAllocator(Allocator allocator, size_t size, cons
   auto device_alloc = rm.getAllocator("UM");
 
   m_counter = static_cast<unsigned int*>(device_alloc.allocate(sizeof(unsigned int)));
-  umpire::memset(m_counter, 0);
+  umpire::memset(m_counter, 0, 1);
 
   // convert the string name to a char name
   const char* name = old_name.c_str();
