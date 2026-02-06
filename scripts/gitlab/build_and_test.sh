@@ -58,7 +58,7 @@ section_start ()
     local collapsed="false"
     if [[ "${section_state}" == "collapsed" ]]
     then
-        local collapsed="true"
+        collapsed="true"
     fi
 
     # Generate unique section ID
