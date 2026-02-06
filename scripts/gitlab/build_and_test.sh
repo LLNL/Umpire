@@ -292,11 +292,16 @@ then
         section_end
         echo "[Error]: CMake configuration failed, dumping output..."
         section_start "cmake_config_verbose" "Verbose CMake Configuration"
-        $cmake_exe \
+        if ! $cmake_exe \
           -C ${hostconfig_path} \
           ${cmake_options} \
           -DCMAKE_INSTALL_PREFIX=${install_dir} \
           ${project_dir} --debug-output --trace-expand
+        then
+          verbose_status=$?
+          section_end
+          exit ${verbose_status}
+        fi
         section_end
         exit 1
       else
