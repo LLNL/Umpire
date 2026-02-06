@@ -314,7 +314,12 @@ then
     else
         section_end
         section_start "install" "Installing Umpire" "collapsed"
-        $cmake_exe --install .
+        if ! $cmake_exe --install .
+        then
+            section_end
+            echo "[Error]: Installation failed."
+            exit 1
+        fi
         section_end
     fi
 fi
