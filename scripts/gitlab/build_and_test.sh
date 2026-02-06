@@ -365,8 +365,8 @@ then
     section_start "install_test" "Testing Installed Examples" "collapsed"
     if grep -q -i "ENABLE_HIP.*ON" ${hostconfig_path}
     then
-        section_end
         echo "[Warning]: Not testing install with HIP"
+        section_end
     else
         if [[ ! -d ${install_dir} ]]
         then
