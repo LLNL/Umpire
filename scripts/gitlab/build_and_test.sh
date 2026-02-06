@@ -342,6 +342,12 @@ then
 
     section_start "tests" "Running Tests" "collapsed"
     ctest --output-on-failure --no-compress-output -T test -VV 2>&1 | tee tests_output.txt
+    ctest_status=${PIPESTATUS[0]}
+    if [[ ${ctest_status} -ne 0 ]]
+    then
+        section_end
+        exit ${ctest_status}
+    fi
 
     # If Developer benchmarks enabled, run the no-op benchmark and show output
     if [[ "${option}" != "--build-only" ]] && grep -q -i "UMPIRE_ENABLE_DEVELOPER_BENCHMARKS.*ON" ${hostconfig_path}
