@@ -48,6 +48,13 @@ section_id_stack=()
 section_counter=0
 section_indent=""
 
+# Helper function to print errors in red
+print_error ()
+{
+    local error_msg="${1}"
+    echo -e "\e[31m[Error]: ${error_msg}\e[0m"
+}
+
 # GitLab CI collapsible section helpers with nesting support
 section_start ()
 {
@@ -175,7 +182,8 @@ then
 
     if [[ -z ${spec} ]]
     then
-        echo "[Error]: SPEC is undefined, aborting..."
+        section_end
+        print_error "SPEC is undefined, aborting..."
         exit 1
     fi
 
@@ -226,13 +234,13 @@ then
         hostconfig_path=${hostconfigs[0]}
     elif [[ ${#hostconfigs[@]} == 0 ]]
     then
-        echo "[Error]: No result for: ${project_dir}/*.cmake"
-        echo "[Error]: Spack generated host-config not found."
+        print_error "No result for: ${project_dir}/*.cmake"
+        print_error "Spack generated host-config not found."
         exit 1
     else
-        echo "[Error]: More than one result for: ${project_dir}/*.cmake"
-        echo "[Error]: ${hostconfigs[@]}"
-        echo "[Error]: Please specify one with HOST_CONFIG variable"
+        print_error "More than one result for: ${project_dir}/*.cmake"
+        print_error "${hostconfigs[@]}"
+        print_error "Please specify one with HOST_CONFIG variable"
         exit 1
     fi
 else
@@ -290,7 +298,7 @@ then
       ${project_dir}
       then
         section_end
-        echo "[Error]: CMake configuration failed, dumping output..."
+        print_error "CMake configuration failed, dumping output..."
         section_start "cmake_config_verbose" "Verbose CMake Configuration"
         if ! $cmake_exe \
           -C ${hostconfig_path} \
@@ -312,7 +320,7 @@ then
     if ! $cmake_exe --build . -j ${core_counts[$truehostname]}
     then
         section_end
-        echo "[Error]: Compilation failed, building with verbose output..."
+        print_error "Compilation failed, building with verbose output..."
         section_start "build_verbose" "Verbose Rebuild" "collapsed"
         $cmake_exe --build . --verbose -j 1
         section_end
@@ -322,7 +330,7 @@ then
         if ! $cmake_exe --install .
         then
             section_end
-            echo "[Error]: Installation failed."
+            print_error "Installation failed."
             exit 1
         fi
         section_end
@@ -335,7 +343,8 @@ then
 
     if [[ ! -d ${build_dir} ]]
     then
-        echo "[Error]: Build directory not found : ${build_dir}" && exit 1
+        print_error "Build directory not found : ${build_dir}"
+        exit 1
     fi
 
     cd ${build_dir}
@@ -360,7 +369,9 @@ then
     no_test_str="No tests were found!!!"
     if [[ "$(tail -n 1 tests_output.txt)" == "${no_test_str}" ]]
     then
-        echo "[Error]: No tests were found" && exit 1
+        section_end
+        print_error "No tests were found"
+        exit 1
     fi
 
     tree Testing
@@ -369,7 +380,9 @@ then
 
     if grep -q "Errors while running CTest" ./tests_output.txt
     then
-        echo "[Error]: Failure(s) while running CTest" && exit 1
+        section_end
+        print_error "Failure(s) while running CTest"
+        exit 1
     fi
     section_end
 
@@ -381,17 +394,23 @@ then
     else
         if [[ ! -d ${install_dir} ]]
         then
-            echo "[Error]: Install directory not found : ${install_dir}" && exit 1
+            section_end
+            print_error "Install directory not found : ${install_dir}"
+            exit 1
         fi
 
         cd ${install_dir}/examples/umpire/using-with-cmake
         mkdir build && cd build
         if ! $cmake_exe -C ../host-config.cmake ..; then
-            echo "[Error]: Running $cmake_exe for using-with-cmake test" && exit 1
+            section_end
+            print_error "Running $cmake_exe for using-with-cmake test"
+            exit 1
         fi
 
         if ! make; then
-            echo "[Error]: Running make for using-with-cmake test" && exit 1
+            section_end
+            print_error "Running make for using-with-cmake test"
+            exit 1
         fi
         section_end
     fi
