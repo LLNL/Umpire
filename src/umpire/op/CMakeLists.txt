@@ -67,7 +67,12 @@ if (UMPIRE_ENABLE_HIP)
     ${umpire_op_sources}
     HipAdviseOperation.cpp
     HipCopyOperation.cpp
-    HipMemsetOperation.cpp)
+    HipMemsetOperation.cpp
+    ${PROJECT_SOURCE_DIR}/include/umpire/op/hip.cpp)
+
+  set_source_files_properties(
+    ${PROJECT_SOURCE_DIR}/include/umpire/op/hip.cpp
+    PROPERTIES LANGUAGE HIP)
 
   set (umpire_op_depends
     ${umpire_op_depends}

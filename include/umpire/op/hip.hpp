@@ -1,5 +1,6 @@
 #pragma once
 
+#include <hip/hip_runtime.h>
 #include <type_traits>
 
 #include "umpire/op/detail/utils.hpp"
@@ -10,6 +11,11 @@
 
 namespace umpire {
 namespace op {
+
+namespace detail {
+template <typename T>
+__global__ void umpire_device_memset_kernel(T* data, T value, std::size_t count);
+}
 
 // HIP implementation helpers
 namespace detail {
@@ -173,6 +179,20 @@ inline void memset(T* ptr, int value, std::size_t count)
                                             reinterpret_cast<void*>(ptr), value, size, hipGetErrorString(error)));
   }
 }
+
+/**
+ * @brief Synchronous memory set implementation using device kernel
+ *
+ * Sets each element in the array to the specified value using a HIP kernel
+ * Unlike standard memset which operates on bytes, this operates on typed elements.
+ *
+ * @tparam T Type of array elements
+ * @param ptr Pointer to array
+ * @param value Value to set each element to
+ * @param count Number of elements to set
+ */
+template <typename T>
+void device_memset(T* ptr, T value, std::size_t count);
 
 /**
  * @brief Asynchronous memory set implementation
@@ -421,6 +441,24 @@ struct memset<resource::hip_platform> {
                                                                      camp::resources::Resource& resource)
   {
     return detail::memset_async(ptr, val, len, resource);
+  }
+};
+
+// HIP device memset operation
+template <>
+struct device_memset<resource::hip_platform> {
+  /**
+   * @brief HIP synchronous device memset using kernel
+   *
+   * @tparam T Type of array elements
+   * @param ptr Pointer to array
+   * @param val Value to set each element to
+   * @param len Number of elements to set
+   */
+  template <typename T>
+  static void exec(T* ptr, T val, std::size_t len) noexcept
+  {
+    detail::device_memset(ptr, val, len);
   }
 };
 

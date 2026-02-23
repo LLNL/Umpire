@@ -345,6 +345,12 @@ camp::resources::EventProxy<camp::resources::Resource> memset(T* src, int v, std
   return op::op_caller<op::memset>::exec(src, v, len, ctx);
 }
 
+template <typename T, typename V>
+void device_memset(T* ptr, V v, std::size_t len)
+{
+  op::op_caller<op::device_memset>::exec(ptr, v, len);
+}
+
 template <typename T>
 inline T* reallocate(T** src, std::size_t size)
 {
@@ -707,6 +713,12 @@ template <typename Platform, typename T>
 auto memset(T* ptr, int value, std::size_t len, camp::resources::Resource& ctx)
 {
   return op::memset<Platform>::exec(ptr, value, len, ctx);
+}
+
+template <typename Platform, typename T>
+void device_memset(T* ptr, T value, std::size_t len)
+{
+  op::device_memset<Platform>::exec(ptr, value, len);
 }
 
 // Direct template prefetch functions

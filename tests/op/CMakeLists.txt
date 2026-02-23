@@ -7,6 +7,7 @@
 set(test_sources
   copy_test.cpp
   memset_test.cpp
+  device_memset.cpp
   reallocate_test.cpp
   prefetch_test.cpp
   advise_test.cpp)
