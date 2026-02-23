@@ -183,7 +183,7 @@ inline void memset(T* ptr, int value, std::size_t count)
 /**
  * @brief Synchronous memory set implementation using device kernel
  *
- * Sets each element in the array to the specified value using a HIP kernel.
+ * Sets each element in the array to the specified value using a HIP kernel
  * Unlike standard memset which operates on bytes, this operates on typed elements.
  *
  * @tparam T Type of array elements
