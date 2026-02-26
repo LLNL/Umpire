@@ -77,7 +77,7 @@ include:
     inputs:
       github_project_name: $GITHUB_PROJECT_NAME
       github_project_org: $GITHUB_PROJECT_ORG
-      github_token: $GITHUB_TOKEN
+      github_token: $RSCI_GITHUB_STATUS_TOKEN
 
   # Local custom variables (used for component inputs and forwarded to child pipelines)
   - local: '.gitlab/custom-variables.yml'
