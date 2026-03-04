@@ -200,6 +200,26 @@ void umpire_resourcemanager_remove_alias_bufferify(
     umpire_resourcemanager * self, const char * name, int Lname,
     umpire_allocator allocator);
 
+void umpire_resourcemanager_destroy_allocator(
+    umpire_resourcemanager * self, const char * name);
+
+void umpire_resourcemanager_destroy_allocator_bufferify(
+    umpire_resourcemanager * self, const char * name, int Lname);
+
+void umpire_resourcemanager_destroy_allocator_with_free(
+    umpire_resourcemanager * self, const char * name,
+    bool free_allocations);
+
+void umpire_resourcemanager_destroy_allocator_with_free_bufferify(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    bool free_allocations);
+
+void umpire_resourcemanager_destroy_allocator(
+    umpire_resourcemanager * self, int id);
+
+void umpire_resourcemanager_destroy_allocator_with_free(
+    umpire_resourcemanager * self, int id, bool free_allocations);
+
 umpire_allocator * umpire_resourcemanager_get_allocator_for_ptr(
     umpire_resourcemanager * self, void * ptr,
     umpire_allocator * SHC_rv);

@@ -244,6 +244,10 @@ module umpire_mod
         procedure :: make_allocator_prefetcher => resourcemanager_make_allocator_prefetcher
         procedure :: add_alias => resourcemanager_add_alias
         procedure :: remove_alias => resourcemanager_remove_alias
+        procedure :: destroy_allocator => resourcemanager_destroy_allocator
+        procedure :: destroy_allocator_with_free => resourcemanager_destroy_allocator_with_free
+        procedure :: destroy_allocator => resourcemanager_destroy_allocator
+        procedure :: destroy_allocator_with_free => resourcemanager_destroy_allocator_with_free
         procedure :: get_allocator_for_ptr => resourcemanager_get_allocator_for_ptr
         procedure :: is_allocator_name => resourcemanager_is_allocator_name
         procedure :: is_allocator_id => resourcemanager_is_allocator_id
@@ -261,6 +265,9 @@ module umpire_mod
         procedure :: deregister_allocation => resourcemanager_deregister_allocation
         procedure :: associated => resourcemanager_associated
         generic :: copy => copy_all, copy_with_size
+        generic :: destroy_allocator => destroy_allocator,  &
+            destroy_allocator_with_free, destroy_allocator,  &
+            destroy_allocator_with_free
         generic :: get_allocator => get_allocator_by_name,  &
             get_allocator_by_id, get_allocator_for_ptr
         generic :: is_allocator => is_allocator_name, is_allocator_id
@@ -953,6 +960,69 @@ module umpire_mod
             integer(C_INT), value, intent(IN) :: Lname
             type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
         end subroutine c_resourcemanager_remove_alias_bufferify
+
+        subroutine c_resourcemanager_destroy_allocator(self, name) &
+                bind(C, name="umpire_resourcemanager_destroy_allocator")
+            use iso_c_binding, only : C_CHAR
+            import :: umpire_SHROUD_resourcemanager_capsule
+            implicit none
+            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            character(kind=C_CHAR), intent(IN) :: name(*)
+        end subroutine c_resourcemanager_destroy_allocator
+
+        subroutine c_resourcemanager_destroy_allocator_bufferify(self, &
+                name, Lname) &
+                bind(C, name="umpire_resourcemanager_destroy_allocator_bufferify")
+            use iso_c_binding, only : C_CHAR, C_INT
+            import :: umpire_SHROUD_resourcemanager_capsule
+            implicit none
+            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            character(kind=C_CHAR), intent(IN) :: name(*)
+            integer(C_INT), value, intent(IN) :: Lname
+        end subroutine c_resourcemanager_destroy_allocator_bufferify
+
+        subroutine c_resourcemanager_destroy_allocator_with_free(self, &
+                name, free_allocations) &
+                bind(C, name="umpire_resourcemanager_destroy_allocator_with_free")
+            use iso_c_binding, only : C_BOOL, C_CHAR
+            import :: umpire_SHROUD_resourcemanager_capsule
+            implicit none
+            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            character(kind=C_CHAR), intent(IN) :: name(*)
+            logical(C_BOOL), value, intent(IN) :: free_allocations
+        end subroutine c_resourcemanager_destroy_allocator_with_free
+
+        subroutine c_resourcemanager_destroy_allocator_with_free_bufferify( &
+                self, name, Lname, free_allocations) &
+                bind(C, name="umpire_resourcemanager_destroy_allocator_with_free_bufferify")
+            use iso_c_binding, only : C_BOOL, C_CHAR, C_INT
+            import :: umpire_SHROUD_resourcemanager_capsule
+            implicit none
+            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            character(kind=C_CHAR), intent(IN) :: name(*)
+            integer(C_INT), value, intent(IN) :: Lname
+            logical(C_BOOL), value, intent(IN) :: free_allocations
+        end subroutine c_resourcemanager_destroy_allocator_with_free_bufferify
+
+        subroutine c_resourcemanager_destroy_allocator(self, id) &
+                bind(C, name="umpire_resourcemanager_destroy_allocator")
+            use iso_c_binding, only : C_INT
+            import :: umpire_SHROUD_resourcemanager_capsule
+            implicit none
+            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            integer(C_INT), value, intent(IN) :: id
+        end subroutine c_resourcemanager_destroy_allocator
+
+        subroutine c_resourcemanager_destroy_allocator_with_free(self, &
+                id, free_allocations) &
+                bind(C, name="umpire_resourcemanager_destroy_allocator_with_free")
+            use iso_c_binding, only : C_BOOL, C_INT
+            import :: umpire_SHROUD_resourcemanager_capsule
+            implicit none
+            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            integer(C_INT), value, intent(IN) :: id
+            logical(C_BOOL), value, intent(IN) :: free_allocations
+        end subroutine c_resourcemanager_destroy_allocator_with_free
 
         function c_resourcemanager_get_allocator_for_ptr(self, ptr, &
                 SHT_crv) &
@@ -3114,6 +3184,69 @@ contains
             len_trim(name, kind=C_INT), allocator%cxxmem)
         ! splicer end class.ResourceManager.method.remove_alias
     end subroutine resourcemanager_remove_alias
+
+    !>
+    !! \brief Destroy an allocator by name
+    !!
+    !<
+    subroutine resourcemanager_destroy_allocator(obj, name)
+        use iso_c_binding, only : C_INT
+        class(UmpireResourceManager) :: obj
+        character(len=*), intent(IN) :: name
+        ! splicer begin class.ResourceManager.method.destroy_allocator
+        call c_resourcemanager_destroy_allocator_bufferify(obj%cxxmem, &
+            name, len_trim(name, kind=C_INT))
+        ! splicer end class.ResourceManager.method.destroy_allocator
+    end subroutine resourcemanager_destroy_allocator
+
+    !>
+    !! \brief Destroy an allocator by name
+    !!
+    !<
+    subroutine resourcemanager_destroy_allocator_with_free(obj, name, &
+            free_allocations)
+        use iso_c_binding, only : C_BOOL, C_INT
+        class(UmpireResourceManager) :: obj
+        character(len=*), intent(IN) :: name
+        logical, value, intent(IN) :: free_allocations
+        ! splicer begin class.ResourceManager.method.destroy_allocator_with_free
+        logical(C_BOOL) SH_free_allocations
+        SH_free_allocations = free_allocations  ! coerce to C_BOOL
+        call c_resourcemanager_destroy_allocator_with_free_bufferify(obj%cxxmem, &
+            name, len_trim(name, kind=C_INT), SH_free_allocations)
+        ! splicer end class.ResourceManager.method.destroy_allocator_with_free
+    end subroutine resourcemanager_destroy_allocator_with_free
+
+    !>
+    !! \brief Destroy an allocator by ID
+    !!
+    !<
+    subroutine resourcemanager_destroy_allocator(obj, id)
+        use iso_c_binding, only : C_INT
+        class(UmpireResourceManager) :: obj
+        integer(C_INT), value, intent(IN) :: id
+        ! splicer begin class.ResourceManager.method.destroy_allocator
+        call c_resourcemanager_destroy_allocator(obj%cxxmem, id)
+        ! splicer end class.ResourceManager.method.destroy_allocator
+    end subroutine resourcemanager_destroy_allocator
+
+    !>
+    !! \brief Destroy an allocator by ID
+    !!
+    !<
+    subroutine resourcemanager_destroy_allocator_with_free(obj, id, &
+            free_allocations)
+        use iso_c_binding, only : C_BOOL, C_INT
+        class(UmpireResourceManager) :: obj
+        integer(C_INT), value, intent(IN) :: id
+        logical, value, intent(IN) :: free_allocations
+        ! splicer begin class.ResourceManager.method.destroy_allocator_with_free
+        logical(C_BOOL) SH_free_allocations
+        SH_free_allocations = free_allocations  ! coerce to C_BOOL
+        call c_resourcemanager_destroy_allocator_with_free(obj%cxxmem, &
+            id, SH_free_allocations)
+        ! splicer end class.ResourceManager.method.destroy_allocator_with_free
+    end subroutine resourcemanager_destroy_allocator_with_free
 
     function resourcemanager_get_allocator_for_ptr(obj, ptr) &
             result(SHT_rv)

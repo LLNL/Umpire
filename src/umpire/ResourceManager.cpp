@@ -326,6 +326,157 @@ void ResourceManager::removeAlias(const std::string& name, Allocator allocator)
   m_allocators_by_name.erase(a);
 }
 
+bool ResourceManager::isCoreResource(strategy::AllocationStrategy* strategy)
+{
+  // Check if it's in the memory resources map (core resources)
+  for (const auto& entry : m_memory_resources) {
+    if (entry.second == strategy) {
+      return true;
+    }
+  }
+
+  // Check special internal allocators
+  std::string name = strategy->getName();
+  if (name == "__umpire_internal_null" || name == "__umpire_internal_0_byte_pool") {
+    return true;
+  }
+
+  return false;
+}
+
+void ResourceManager::destroyAllocator(const std::string& name, bool free_allocations)
+{
+  std::lock_guard<std::mutex> lock(m_mutex);
+
+  UMPIRE_LOG(Debug, "(name=\"" << name << "\", free_allocations=" << free_allocations << ")");
+
+  // Find strategy by name
+  auto it = m_allocators_by_name.find(name);
+  if (it == m_allocators_by_name.end()) {
+    UMPIRE_ERROR(runtime_error, fmt::format("Allocator \"{}\" not found", name));
+  }
+
+  strategy::AllocationStrategy* strategy = it->second;
+  int id = strategy->getId();
+
+  // Validate not core resource
+  if (isCoreResource(strategy)) {
+    UMPIRE_ERROR(runtime_error,
+                 fmt::format("Cannot destroy core resource allocator \"{}\"", name));
+  }
+
+  // Check for active allocations
+  auto records = umpire::get_allocator_records(Allocator(strategy));
+  if (!records.empty() && !free_allocations) {
+#ifdef UMPIRE_ENABLE_STRICT_DESTROY
+    UMPIRE_ERROR(runtime_error,
+                 fmt::format("Allocator \"{}\" has {} active allocations. "
+                            "Use free_allocations=true or deallocate them first.",
+                            name, records.size()));
+#else
+    UMPIRE_LOG(Warning, "Allocator \"" << name << "\" has " << records.size()
+                        << " active allocations. Destroying anyway (non-strict mode).");
+#endif
+  }
+
+  // Check for child allocators (allocators using this as parent)
+  std::vector<std::string> child_names;
+  for (const auto& alloc : m_allocators) {
+    if (alloc.get() != strategy && alloc->getParent() == strategy) {
+      child_names.push_back(alloc->getName());
+    }
+  }
+
+  if (!child_names.empty()) {
+    std::string children_str;
+    for (size_t i = 0; i < child_names.size(); ++i) {
+      if (i > 0) children_str += ", ";
+      children_str += child_names[i];
+    }
+
+#ifdef UMPIRE_ENABLE_STRICT_DESTROY
+    UMPIRE_ERROR(runtime_error,
+                 fmt::format("Allocator \"{}\" is a parent of other allocators: {}. "
+                            "Destroy children first.",
+                            name, children_str));
+#else
+    UMPIRE_LOG(Warning, "Allocator \"" << name << "\" is a parent of other allocators: "
+                        << children_str << ". Destroying anyway (non-strict mode).");
+#endif
+  }
+
+  // Free allocations if requested
+  if (free_allocations && !records.empty()) {
+    UMPIRE_LOG(Debug, "Freeing " << records.size() << " allocations");
+    for (const auto& record : records) {
+      strategy->deallocate_internal(record.ptr, record.size);
+    }
+  }
+
+  // Collect all names pointing to this strategy (handles aliases)
+  std::vector<std::string> names_to_remove;
+  for (const auto& entry : m_allocators_by_name) {
+    if (entry.second == strategy) {
+      names_to_remove.push_back(entry.first);
+    }
+  }
+
+  // Remove from all data structures
+  for (const auto& n : names_to_remove) {
+    m_allocators_by_name.erase(n);
+  }
+
+  m_allocators_by_id.erase(id);
+
+  // Remove from memory resources if present
+  for (auto it_mem = m_memory_resources.begin(); it_mem != m_memory_resources.end();) {
+    if (it_mem->second == strategy) {
+      it_mem = m_memory_resources.erase(it_mem);
+    } else {
+      ++it_mem;
+    }
+  }
+
+  // Remove from shared allocator names if present
+  auto shared_it = std::find(m_shared_allocator_names.begin(), m_shared_allocator_names.end(), name);
+  if (shared_it != m_shared_allocator_names.end()) {
+    m_shared_allocator_names.erase(shared_it);
+  }
+
+  // Remove from allocators list (destroys the unique_ptr)
+  for (auto it_alloc = m_allocators.begin(); it_alloc != m_allocators.end(); ++it_alloc) {
+    if (it_alloc->get() == strategy) {
+      m_allocators.erase(it_alloc);
+      break;
+    }
+  }
+
+  // Record event for replay
+  umpire::event::record([&](auto& event) {
+    event.name("destroy_allocator")
+        .category(event::category::operation)
+        .arg("allocator_name", name)
+        .arg("allocator_id", id)
+        .arg("freed_allocations", free_allocations)
+        .tag("replay", "true");
+  });
+
+  UMPIRE_LOG(Debug, "Allocator \"" << name << "\" destroyed successfully");
+}
+
+void ResourceManager::destroyAllocator(int id, bool free_allocations)
+{
+  UMPIRE_LOG(Debug, "(id=" << id << ", free_allocations=" << free_allocations << ")");
+
+  auto it = m_allocators_by_id.find(id);
+  if (it == m_allocators_by_id.end()) {
+    UMPIRE_ERROR(runtime_error, fmt::format("Allocator with id {} not found", id));
+  }
+
+  // Delegate to string version
+  destroyAllocator(it->second->getName(), free_allocations);
+}
+
 Allocator ResourceManager::getAllocator(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");

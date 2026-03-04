@@ -243,6 +243,20 @@ blt_add_test(
   NAME introspection_tests
   COMMAND introspection_tests)
 
+blt_add_executable(
+  NAME destroy_allocator_tests
+  SOURCES destroy_allocator_tests.cpp
+  DEPENDS_ON ${integration_tests_depends})
+
+target_include_directories(
+  destroy_allocator_tests
+  PRIVATE
+  ${PROJECT_BINARY_DIR}/include)
+
+blt_add_test(
+  NAME destroy_allocator_tests
+  COMMAND destroy_allocator_tests)
+
 if (UMPIRE_ENABLE_IPC_SHARED_MEMORY AND UMPIRE_ENABLE_MPI)
   blt_add_executable(
     NAME get_communicator_tests
