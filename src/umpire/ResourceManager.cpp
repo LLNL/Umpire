@@ -326,9 +326,9 @@ void ResourceManager::removeAlias(const std::string& name, Allocator allocator)
   m_allocators_by_name.erase(a);
 }
 
-bool ResourceManager::isCoreResource(strategy::AllocationStrategy* strategy)
+bool ResourceManager::isBuiltinAllocator(strategy::AllocationStrategy* strategy)
 {
-  // Check if it's in the memory resources map (core resources)
+  // Check if it's in the memory resources map (builtin resources)
   for (const auto& entry : m_memory_resources) {
     if (entry.second == strategy) {
       return true;
@@ -359,50 +359,53 @@ void ResourceManager::destroyAllocator(const std::string& name, bool free_alloca
   strategy::AllocationStrategy* strategy = it->second;
   int id = strategy->getId();
 
-  // Validate not core resource
-  if (isCoreResource(strategy)) {
+  // Validate not builtin allocator
+  if (isBuiltinAllocator(strategy)) {
     UMPIRE_ERROR(runtime_error,
-                 fmt::format("Cannot destroy core resource allocator \"{}\"", name));
+                 fmt::format("Cannot destroy builtin allocator \"{}\"", name));
   }
 
   // Check for active allocations
-  auto records = umpire::get_allocator_records(Allocator(strategy));
-  if (!records.empty() && !free_allocations) {
-#ifdef UMPIRE_ENABLE_STRICT_DESTROY
-    UMPIRE_ERROR(runtime_error,
-                 fmt::format("Allocator \"{}\" has {} active allocations. "
-                            "Use free_allocations=true or deallocate them first.",
-                            name, records.size()));
-#else
-    UMPIRE_LOG(Warning, "Allocator \"" << name << "\" has " << records.size()
-                        << " active allocations. Destroying anyway (non-strict mode).");
-#endif
+  if (isStrictDestructionMode()) {
+    auto records = umpire::get_allocator_records(Allocator(strategy));
+    if (!records.empty() && !free_allocations) {
+      UMPIRE_ERROR(runtime_error,
+                   fmt::format("Allocator \"{}\" has {} active allocations. "
+                              "Use free_allocations=true or deallocate them first.",
+                              name, records.size()));
+    }
+  } else if (!free_allocations) {
+    UMPIRE_LOG(Warning, "Allocator \"" << name << "\" may have active allocations. "
+                        << "Destroying anyway (non-strict mode).");
   }
+
+  // Get records for potential cleanup
+  auto records = umpire::get_allocator_records(Allocator(strategy));
 
   // Check for child allocators (allocators using this as parent)
-  std::vector<std::string> child_names;
-  for (const auto& alloc : m_allocators) {
-    if (alloc.get() != strategy && alloc->getParent() == strategy) {
-      child_names.push_back(alloc->getName());
-    }
-  }
-
-  if (!child_names.empty()) {
-    std::string children_str;
-    for (size_t i = 0; i < child_names.size(); ++i) {
-      if (i > 0) children_str += ", ";
-      children_str += child_names[i];
+  if (isStrictDestructionMode()) {
+    std::vector<std::string> child_names;
+    for (const auto& alloc : m_allocators) {
+      if (alloc.get() != strategy && alloc->getParent() == strategy) {
+        child_names.push_back(alloc->getName());
+      }
     }
 
-#ifdef UMPIRE_ENABLE_STRICT_DESTROY
-    UMPIRE_ERROR(runtime_error,
-                 fmt::format("Allocator \"{}\" is a parent of other allocators: {}. "
-                            "Destroy children first.",
-                            name, children_str));
-#else
-    UMPIRE_LOG(Warning, "Allocator \"" << name << "\" is a parent of other allocators: "
-                        << children_str << ". Destroying anyway (non-strict mode).");
-#endif
+    if (!child_names.empty()) {
+      std::string children_str;
+      for (size_t i = 0; i < child_names.size(); ++i) {
+        if (i > 0) children_str += ", ";
+        children_str += child_names[i];
+      }
+
+      UMPIRE_ERROR(runtime_error,
+                   fmt::format("Allocator \"{}\" is a parent of other allocators: {}. "
+                              "Destroy children first.",
+                              name, children_str));
+    }
+  } else {
+    UMPIRE_LOG(Warning, "Allocator \"" << name << "\" may be a parent of other allocators. "
+                        << "Destroying anyway (non-strict mode).");
   }
 
   // Free allocations if requested
@@ -1107,6 +1110,12 @@ std::shared_ptr<op::MemoryOperation> ResourceManager::getOperation(const std::st
   auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
   return op_registry.find(operation_name, src_allocator.getAllocationStrategy(), dst_allocator.getAllocationStrategy());
+}
+
+bool ResourceManager::isStrictDestructionMode() const noexcept
+{
+  static const char* env_value = std::getenv("UMPIRE_STRICT_DESTRUCTION");
+  return (env_value != nullptr);
 }
 
 int ResourceManager::getNumDevices() const
