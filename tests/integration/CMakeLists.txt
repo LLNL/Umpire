@@ -257,6 +257,23 @@ blt_add_test(
   NAME destroy_allocator_tests
   COMMAND destroy_allocator_tests)
 
+blt_add_executable(
+  NAME destroy_allocator_strict_mode_tests
+  SOURCES destroy_allocator_strict_mode_tests.cpp
+  DEPENDS_ON ${integration_tests_depends})
+
+target_include_directories(
+  destroy_allocator_strict_mode_tests
+  PRIVATE
+  ${PROJECT_BINARY_DIR}/include)
+
+blt_add_test(
+  NAME destroy_allocator_strict_mode_tests
+  COMMAND destroy_allocator_strict_mode_tests)
+
+set_property(TEST destroy_allocator_strict_mode_tests
+  PROPERTY ENVIRONMENT "UMPIRE_STRICT_DESTRUCTION=1")
+
 if (UMPIRE_ENABLE_IPC_SHARED_MEMORY AND UMPIRE_ENABLE_MPI)
   blt_add_executable(
     NAME get_communicator_tests

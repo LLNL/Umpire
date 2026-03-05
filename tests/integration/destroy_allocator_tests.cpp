@@ -10,7 +10,6 @@
 #include "umpire/Umpire.hpp"
 #include "umpire/config.hpp"
 #include "umpire/strategy/QuickPool.hpp"
-#include <cstdlib>  // for setenv/unsetenv
 
 TEST(DestroyAllocatorTest, DestroyBasicQuickPool)
 {
@@ -86,32 +85,8 @@ TEST(DestroyAllocatorTest, ErrorOnInternalAllocators)
   ASSERT_THROW(rm.destroyAllocator("__umpire_internal_0_byte_pool"), umpire::runtime_error);
 }
 
-TEST(DestroyAllocatorTest, ActiveAllocationsStrictMode)
-{
-  // Set strict mode
-  setenv("UMPIRE_STRICT_DESTRUCTION", "1", 1);
-
-  auto& rm = umpire::ResourceManager::getInstance();
-  auto pool = rm.makeAllocator<umpire::strategy::QuickPool>("test_pool_strict", rm.getAllocator("HOST"));
-  void* ptr = pool.allocate(100);
-  ASSERT_NE(nullptr, ptr);
-
-  // Try to destroy with active allocations - should throw error in strict mode
-  ASSERT_THROW(rm.destroyAllocator("test_pool_strict", false), umpire::runtime_error);
-
-  // Clean up
-  pool.deallocate(ptr);
-  rm.destroyAllocator("test_pool_strict");
-
-  // Unset for other tests
-  unsetenv("UMPIRE_STRICT_DESTRUCTION");
-}
-
 TEST(DestroyAllocatorTest, ActiveAllocationsNonStrictMode)
 {
-  // Ensure strict mode is off
-  unsetenv("UMPIRE_STRICT_DESTRUCTION");
-
   auto& rm = umpire::ResourceManager::getInstance();
   auto pool = rm.makeAllocator<umpire::strategy::QuickPool>("test_pool_nonstrict", rm.getAllocator("HOST"));
   void* ptr = pool.allocate(100);
@@ -171,31 +146,8 @@ TEST(DestroyAllocatorTest, DestroyAllocatorWithAliases)
   ASSERT_FALSE(rm.isAllocator("alias2"));
 }
 
-TEST(DestroyAllocatorTest, ParentChildWarningStrictMode)
-{
-  // Set strict mode
-  setenv("UMPIRE_STRICT_DESTRUCTION", "1", 1);
-
-  auto& rm = umpire::ResourceManager::getInstance();
-  auto parent = rm.makeAllocator<umpire::strategy::QuickPool>("test_parent_strict", rm.getAllocator("HOST"));
-  auto child = rm.makeAllocator<umpire::strategy::QuickPool>("test_child_strict", parent);
-
-  // Try to destroy parent - should throw error in strict mode
-  ASSERT_THROW(rm.destroyAllocator("test_parent_strict"), umpire::runtime_error);
-
-  // Clean up in correct order
-  rm.destroyAllocator("test_child_strict");
-  rm.destroyAllocator("test_parent_strict");
-
-  // Unset for other tests
-  unsetenv("UMPIRE_STRICT_DESTRUCTION");
-}
-
 TEST(DestroyAllocatorTest, ParentChildWarningNonStrictMode)
 {
-  // Ensure strict mode is off
-  unsetenv("UMPIRE_STRICT_DESTRUCTION");
-
   auto& rm = umpire::ResourceManager::getInstance();
   auto parent = rm.makeAllocator<umpire::strategy::QuickPool>("test_parent_nonstrict", rm.getAllocator("HOST"));
   rm.makeAllocator<umpire::strategy::QuickPool>("test_child_nonstrict", parent);
