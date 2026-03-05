@@ -49,7 +49,12 @@ if (UMPIRE_ENABLE_CUDA)
     CudaAdviseOperation.cpp
     CudaCopyOperation.cpp
     CudaMemsetOperation.cpp
-    CudaMemPrefetchOperation.cpp)
+    CudaMemPrefetchOperation.cpp
+    cuda.cu)
+
+  set_source_files_properties(
+    cuda.cu
+    PROPERTIES LANGUAGE CUDA)
 
   set (umpire_op_depends
     ${umpire_op_depends}
@@ -68,10 +73,10 @@ if (UMPIRE_ENABLE_HIP)
     HipAdviseOperation.cpp
     HipCopyOperation.cpp
     HipMemsetOperation.cpp
-    ${PROJECT_SOURCE_DIR}/include/umpire/op/hip.cpp)
+    hip.cpp)
 
   set_source_files_properties(
-    ${PROJECT_SOURCE_DIR}/include/umpire/op/hip.cpp
+    hip.cpp
     PROPERTIES LANGUAGE HIP)
 
   set (umpire_op_depends
@@ -94,7 +99,8 @@ if (UMPIRE_ENABLE_SYCL)
     SyclCopyFromOperation.cpp
     SyclCopyToOperation.cpp
     SyclMemsetOperation.cpp
-    SyclMemPrefetchOperation.cpp)
+    SyclMemPrefetchOperation.cpp
+    sycl_device_memset.cpp)
 endif ()
 
 if (UMPIRE_ENABLE_OPENMP_TARGET)

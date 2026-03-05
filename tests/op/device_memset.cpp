@@ -6,6 +6,8 @@
 //////////////////////////////////////////////////////////////////////////////
 #include <algorithm>
 #include <cstring>
+#include <exception>
+#include <optional>
 #include <random>
 
 #include "gtest/gtest.h"
@@ -13,17 +15,31 @@
 #include "umpire/ResourceManager.hpp"
 #include "umpire/op.hpp"
 
+namespace {
+std::optional<umpire::Allocator> try_get_allocator(umpire::ResourceManager& rm, const char* name)
+{
+  try {
+    return rm.getAllocator(name);
+  } catch (const std::exception&) {
+    return std::nullopt;
+  }
+}
+} // namespace
+
 TEST(DeviceMemset, TypedDeviceMemsetInt)
 {
   constexpr std::size_t num_elements = 256;
   constexpr int value = 34;
 
   auto& rm = umpire::ResourceManager::getInstance();
-  auto device_allocator = rm.getAllocator("DEVICE");
+  auto device_allocator = try_get_allocator(rm, "DEVICE");
+  if (!device_allocator) {
+    GTEST_SKIP() << "No DEVICE allocator available in this build";
+  }
   auto host_allocator = rm.getAllocator("HOST");
 
   // Allocate device buffer for integers
-  int* device_ptr = static_cast<int*>(device_allocator.allocate(num_elements * sizeof(int)));
+  int* device_ptr = static_cast<int*>(device_allocator->allocate(num_elements * sizeof(int)));
 
   // Allocate host buffer for initialization and verification
   int* host_ptr = static_cast<int*>(host_allocator.allocate(num_elements * sizeof(int)));
@@ -48,7 +64,7 @@ TEST(DeviceMemset, TypedDeviceMemsetInt)
   }
 
   // Cleanup
-  device_allocator.deallocate(device_ptr);
+  device_allocator->deallocate(device_ptr);
   host_allocator.deallocate(host_ptr);
 }
 
@@ -60,11 +76,14 @@ TEST(DeviceMemset, PartialDeviceMemset)
   constexpr int initial_value = -1;
 
   auto& rm = umpire::ResourceManager::getInstance();
-  auto device_allocator = rm.getAllocator("DEVICE");
+  auto device_allocator = try_get_allocator(rm, "DEVICE");
+  if (!device_allocator) {
+    GTEST_SKIP() << "No DEVICE allocator available in this build";
+  }
   auto host_allocator = rm.getAllocator("HOST");
 
   // Allocate device buffer for integers
-  int* device_ptr = static_cast<int*>(device_allocator.allocate(total_elements * sizeof(int)));
+  int* device_ptr = static_cast<int*>(device_allocator->allocate(total_elements * sizeof(int)));
 
   // Allocate host buffer for initialization and verification
   int* host_ptr = static_cast<int*>(host_allocator.allocate(total_elements * sizeof(int)));
@@ -94,7 +113,7 @@ TEST(DeviceMemset, PartialDeviceMemset)
   }
 
   // Cleanup
-  device_allocator.deallocate(device_ptr);
+  device_allocator->deallocate(device_ptr);
   host_allocator.deallocate(host_ptr);
 }
 
@@ -105,11 +124,14 @@ TEST(DeviceMemset, ZeroSize)
   constexpr int memset_value = 99;
 
   auto& rm = umpire::ResourceManager::getInstance();
-  auto device_allocator = rm.getAllocator("DEVICE");
+  auto device_allocator = try_get_allocator(rm, "DEVICE");
+  if (!device_allocator) {
+    GTEST_SKIP() << "No DEVICE allocator available in this build";
+  }
   auto host_allocator = rm.getAllocator("HOST");
 
   // Allocate device buffer for integers
-  int* device_ptr = static_cast<int*>(device_allocator.allocate(num_elements * sizeof(int)));
+  int* device_ptr = static_cast<int*>(device_allocator->allocate(num_elements * sizeof(int)));
 
   // Allocate host buffer for initialization and verification
   int* host_ptr = static_cast<int*>(host_allocator.allocate(num_elements * sizeof(int)));
@@ -134,7 +156,7 @@ TEST(DeviceMemset, ZeroSize)
   }
 
   // Cleanup
-  device_allocator.deallocate(device_ptr);
+  device_allocator->deallocate(device_ptr);
   host_allocator.deallocate(host_ptr);
 }
 
@@ -144,11 +166,14 @@ TEST(DeviceMemset, DifferentValues)
   constexpr int test_values[] = {0, 1, -1, 42, 100, -100, 1000, -1000};
 
   auto& rm = umpire::ResourceManager::getInstance();
-  auto device_allocator = rm.getAllocator("DEVICE");
+  auto device_allocator = try_get_allocator(rm, "DEVICE");
+  if (!device_allocator) {
+    GTEST_SKIP() << "No DEVICE allocator available in this build";
+  }
   auto host_allocator = rm.getAllocator("HOST");
 
   // Allocate device buffer for integers
-  int* device_ptr = static_cast<int*>(device_allocator.allocate(num_elements * sizeof(int)));
+  int* device_ptr = static_cast<int*>(device_allocator->allocate(num_elements * sizeof(int)));
 
   // Allocate host buffer for verification
   int* host_ptr = static_cast<int*>(host_allocator.allocate(num_elements * sizeof(int)));
@@ -169,7 +194,7 @@ TEST(DeviceMemset, DifferentValues)
   }
 
   // Cleanup
-  device_allocator.deallocate(device_ptr);
+  device_allocator->deallocate(device_ptr);
   host_allocator.deallocate(host_ptr);
 }
 
@@ -180,11 +205,14 @@ TEST(DeviceMemset, CudaDeviceMemset)
   constexpr int value = 42;
 
   auto& rm = umpire::ResourceManager::getInstance();
-  auto cuda_allocator = rm.getAllocator("DEVICE");
+  auto cuda_allocator = try_get_allocator(rm, "DEVICE");
+  if (!cuda_allocator) {
+    GTEST_SKIP() << "No DEVICE allocator available in this build";
+  }
   auto host_allocator = rm.getAllocator("HOST");
 
   // Allocate device buffer for integers
-  int* device_ptr = static_cast<int*>(cuda_allocator.allocate(num_elements * sizeof(int)));
+  int* device_ptr = static_cast<int*>(cuda_allocator->allocate(num_elements * sizeof(int)));
 
   // Allocate host buffer for verification
   int* host_ptr = static_cast<int*>(host_allocator.allocate(num_elements * sizeof(int)));
@@ -201,7 +229,7 @@ TEST(DeviceMemset, CudaDeviceMemset)
   }
 
   // Cleanup
-  cuda_allocator.deallocate(device_ptr);
+  cuda_allocator->deallocate(device_ptr);
   host_allocator.deallocate(host_ptr);
 }
 
@@ -211,11 +239,14 @@ TEST(DeviceMemset, ExplicitCudaDeviceMemset)
   constexpr double value = 3.14;
 
   auto& rm = umpire::ResourceManager::getInstance();
-  auto cuda_allocator = rm.getAllocator("DEVICE");
+  auto cuda_allocator = try_get_allocator(rm, "DEVICE");
+  if (!cuda_allocator) {
+    GTEST_SKIP() << "No DEVICE allocator available in this build";
+  }
   auto host_allocator = rm.getAllocator("HOST");
 
   // Allocate device buffer for doubles
-  double* device_ptr = static_cast<double*>(cuda_allocator.allocate(num_elements * sizeof(double)));
+  double* device_ptr = static_cast<double*>(cuda_allocator->allocate(num_elements * sizeof(double)));
 
   // Allocate host buffer for verification
   double* host_ptr = static_cast<double*>(host_allocator.allocate(num_elements * sizeof(double)));
@@ -232,7 +263,7 @@ TEST(DeviceMemset, ExplicitCudaDeviceMemset)
   }
 
   // Cleanup
-  cuda_allocator.deallocate(device_ptr);
+  cuda_allocator->deallocate(device_ptr);
   host_allocator.deallocate(host_ptr);
 }
 #endif // UMPIRE_ENABLE_CUDA
@@ -244,11 +275,14 @@ TEST(DeviceMemset, HipDeviceMemset)
   constexpr int value = 77;
 
   auto& rm = umpire::ResourceManager::getInstance();
-  auto hip_allocator = rm.getAllocator("DEVICE");
+  auto hip_allocator = try_get_allocator(rm, "DEVICE");
+  if (!hip_allocator) {
+    GTEST_SKIP() << "No DEVICE allocator available in this build";
+  }
   auto host_allocator = rm.getAllocator("HOST");
 
   // Allocate device buffer for integers
-  int* device_ptr = static_cast<int*>(hip_allocator.allocate(num_elements * sizeof(int)));
+  int* device_ptr = static_cast<int*>(hip_allocator->allocate(num_elements * sizeof(int)));
 
   // Allocate host buffer for verification
   int* host_ptr = static_cast<int*>(host_allocator.allocate(num_elements * sizeof(int)));
@@ -265,7 +299,7 @@ TEST(DeviceMemset, HipDeviceMemset)
   }
 
   // Cleanup
-  hip_allocator.deallocate(device_ptr);
+  hip_allocator->deallocate(device_ptr);
   host_allocator.deallocate(host_ptr);
 }
 
@@ -275,11 +309,14 @@ TEST(DeviceMemset, ExplicitHipDeviceMemset)
   constexpr float value = 2.718f;
 
   auto& rm = umpire::ResourceManager::getInstance();
-  auto hip_allocator = rm.getAllocator("DEVICE");
+  auto hip_allocator = try_get_allocator(rm, "DEVICE");
+  if (!hip_allocator) {
+    GTEST_SKIP() << "No DEVICE allocator available in this build";
+  }
   auto host_allocator = rm.getAllocator("HOST");
 
   // Allocate device buffer for floats
-  float* device_ptr = static_cast<float*>(hip_allocator.allocate(num_elements * sizeof(float)));
+  float* device_ptr = static_cast<float*>(hip_allocator->allocate(num_elements * sizeof(float)));
 
   // Allocate host buffer for verification
   float* host_ptr = static_cast<float*>(host_allocator.allocate(num_elements * sizeof(float)));
@@ -290,15 +327,13 @@ TEST(DeviceMemset, ExplicitHipDeviceMemset)
   // Copy back to host for verification
   umpire::copy(device_ptr, host_ptr, num_elements);
 
-std::cout<<"host_ptr[0] is: "<<host_ptr[0]<<" device_ptr[0] is "<<device_ptr[0]<<" and value is "<<value<<std::endl;
-
   // Verify the memset was successful
   for (std::size_t i = 0; i < num_elements; ++i) {
     ASSERT_FLOAT_EQ(host_ptr[i], value) << "Explicit HIP device memset failed at element " << i;
   }
 
   // Cleanup
-  hip_allocator.deallocate(device_ptr);
+  hip_allocator->deallocate(device_ptr);
   host_allocator.deallocate(host_ptr);
 }
 #endif // UMPIRE_ENABLE_HIP

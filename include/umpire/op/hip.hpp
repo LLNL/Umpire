@@ -234,11 +234,11 @@ inline void prefetch(T* ptr, int device, std::size_t count)
 {
   // Use current device for properties if device is CPU
   int current_device;
-  hipError_t error = hipGetDevice(&current_device);
+  hipError_t get_dev_err = hipGetDevice(&current_device);
 
-  if (error != hipSuccess) {
+  if (get_dev_err != hipSuccess) {
     UMPIRE_ERROR(runtime_error,
-                 fmt::format("hipGetDevice failed with error: {}", hipGetErrorString(error)));
+                 fmt::format("hipGetDevice failed with error: {}", hipGetErrorString(get_dev_err)));
   }
 
   int gpu = (device != hipCpuDeviceId) ? device : current_device;
@@ -272,11 +272,11 @@ inline camp::resources::EventProxy<camp::resources::Resource> prefetch_async(T* 
 
   // Use current device for properties if device is CPU
   int current_device;
-  hipError_t error = hipGetDevice(&current_device);
+  hipError_t get_dev_err = hipGetDevice(&current_device);
 
-  if (error != hipSuccess) {
+  if (get_dev_err != hipSuccess) {
     UMPIRE_ERROR(runtime_error,
-                 fmt::format("hipGetDevice failed with error: {}", hipGetErrorString(error)));
+                 fmt::format("hipGetDevice failed with error: {}", hipGetErrorString(get_dev_err)));
   }
 
   int gpu = (device != hipCpuDeviceId) ? device : current_device;
@@ -313,7 +313,7 @@ struct copy<resource::hip_platform, resource::hip_platform> {
    * @param len Number of elements to copy
    */
   template <typename T>
-  static void exec(T* src, T* dst, std::size_t len) noexcept
+  static void exec(T* src, T* dst, std::size_t len)
   {
     detail::copy(src, dst, len, detail::copy_kind<resource::hip_platform, resource::hip_platform>::value);
   }
@@ -349,7 +349,7 @@ struct copy<resource::hip_platform, resource::host_platform> {
    * @param len Number of elements to copy
    */
   template <typename T>
-  static void exec(T* src, T* dst, std::size_t len) noexcept
+  static void exec(T* src, T* dst, std::size_t len)
   {
     detail::copy(src, dst, len, detail::copy_kind<resource::hip_platform, resource::host_platform>::value);
   }
@@ -385,7 +385,7 @@ struct copy<resource::host_platform, resource::hip_platform> {
    * @param len Number of elements to copy
    */
   template <typename T>
-  static void exec(T* src, T* dst, std::size_t len) noexcept
+  static void exec(T* src, T* dst, std::size_t len)
   {
     detail::copy(src, dst, len, detail::copy_kind<resource::host_platform, resource::hip_platform>::value);
   }
@@ -421,7 +421,7 @@ struct memset<resource::hip_platform> {
    * @param len Number of elements to set
    */
   template <typename T>
-  static void exec(T* ptr, int val, std::size_t len) noexcept
+  static void exec(T* ptr, int val, std::size_t len)
   {
     detail::memset(ptr, val, len);
   }
@@ -456,7 +456,7 @@ struct device_memset<resource::hip_platform> {
    * @param len Number of elements to set
    */
   template <typename T>
-  static void exec(T* ptr, T val, std::size_t len) noexcept
+  static void exec(T* ptr, T val, std::size_t len)
   {
     detail::device_memset(ptr, val, len);
   }
@@ -477,7 +477,7 @@ struct prefetch<resource::hip_platform> {
    * @param len Number of elements to prefetch
    */
   template <typename T>
-  static void exec(T* ptr, int device, std::size_t len) noexcept
+  static void exec(T* ptr, int device, std::size_t len)
   {
     detail::prefetch(ptr, device, len);
   }
@@ -513,7 +513,7 @@ struct prefetch<resource::hip_platform> {
      * @param len Number of elements                                      \
      */                                                                   \
     template <typename T>                                                 \
-    static inline void exec(T* ptr, int device, std::size_t len) noexcept \
+    static inline void exec(T* ptr, int device, std::size_t len)          \
     {                                                                     \
       detail::advise(ptr, len, device, advice_flag);                      \
     }                                                                     \

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cuda_runtime.h>
 #include <type_traits>
 
 #include "umpire/op/detail/utils.hpp"
@@ -13,6 +14,14 @@ namespace op {
 
 // CUDA implementation helpers
 namespace detail {
+
+template <typename T>
+#if defined(__CUDACC__)
+__global__ void umpire_device_memset_kernel(T* data, T value, std::size_t count);
+#endif
+
+template <typename T>
+void device_memset(T* ptr, T value, std::size_t count);
 
 /**
  * @brief Get the CUDA memory copy direction kind
@@ -213,7 +222,11 @@ inline void prefetch(T* ptr, int device, std::size_t count)
 {
   // Use current device for properties if device is CPU
   int current_device;
-  cudaGetDevice(&current_device);
+  cudaError_t get_dev_err = cudaGetDevice(&current_device);
+  if (get_dev_err != cudaSuccess) {
+    UMPIRE_ERROR(runtime_error,
+                 fmt::format("cudaGetDevice failed: {} ({})", cudaGetErrorString(get_dev_err), get_dev_err));
+  }
   int gpu = (device != cudaCpuDeviceId) ? device : current_device;
 
   if (supports_managed_memory(gpu)) {
@@ -245,7 +258,11 @@ inline camp::resources::EventProxy<camp::resources::Resource> prefetch_async(T* 
 
   // Use current device for properties if device is CPU
   int current_device;
-  cudaGetDevice(&current_device);
+  cudaError_t get_dev_err = cudaGetDevice(&current_device);
+  if (get_dev_err != cudaSuccess) {
+    UMPIRE_ERROR(runtime_error,
+                 fmt::format("cudaGetDevice failed: {} ({})", cudaGetErrorString(get_dev_err), get_dev_err));
+  }
   int gpu = (device != cudaCpuDeviceId) ? device : current_device;
 
   if (supports_managed_memory(gpu)) {
@@ -280,7 +297,7 @@ struct copy<resource::cuda_platform, resource::cuda_platform> {
    * @param len Number of elements to copy
    */
   template <typename T>
-  static void exec(T* src, T* dst, std::size_t len) noexcept
+  static void exec(T* src, T* dst, std::size_t len)
   {
     detail::copy(src, dst, len, detail::copy_kind<resource::cuda_platform, resource::cuda_platform>::value);
   }
@@ -316,7 +333,7 @@ struct copy<resource::cuda_platform, resource::host_platform> {
    * @param len Number of elements to copy
    */
   template <typename T>
-  static void exec(T* src, T* dst, std::size_t len) noexcept
+  static void exec(T* src, T* dst, std::size_t len)
   {
     detail::copy(src, dst, len, detail::copy_kind<resource::cuda_platform, resource::host_platform>::value);
   }
@@ -352,7 +369,7 @@ struct copy<resource::host_platform, resource::cuda_platform> {
    * @param len Number of elements to copy
    */
   template <typename T>
-  static void exec(T* src, T* dst, std::size_t len) noexcept
+  static void exec(T* src, T* dst, std::size_t len)
   {
     detail::copy(src, dst, len, detail::copy_kind<resource::host_platform, resource::cuda_platform>::value);
   }
@@ -388,7 +405,7 @@ struct memset<resource::cuda_platform> {
    * @param len Number of elements to set
    */
   template <typename T>
-  static void exec(T* ptr, int val, std::size_t len) noexcept
+  static void exec(T* ptr, int val, std::size_t len)
   {
     detail::memset(ptr, val, len);
   }
@@ -423,7 +440,7 @@ struct prefetch<resource::cuda_platform> {
    * @param len Number of elements to prefetch
    */
   template <typename T>
-  static void exec(T* ptr, int device, std::size_t len) noexcept
+  static void exec(T* ptr, int device, std::size_t len)
   {
     detail::prefetch(ptr, device, len);
   }
@@ -446,6 +463,16 @@ struct prefetch<resource::cuda_platform> {
   }
 };
 
+// CUDA device_memset operation
+template <>
+struct device_memset<resource::cuda_platform> {
+  template <typename T>
+  static void exec(T* ptr, T val, std::size_t len)
+  {
+    detail::device_memset(ptr, val, len);
+  }
+};
+
 // Memory advice operations define macro to reduce duplication
 #define DEFINE_CUDA_ADVICE_OP(op_name, advice_flag)                       \
   template <>                                                             \
@@ -459,7 +486,7 @@ struct prefetch<resource::cuda_platform> {
      * @param len Number of elements                                      \
      */                                                                   \
     template <typename T>                                                 \
-    static inline void exec(T* ptr, int device, std::size_t len) noexcept \
+    static inline void exec(T* ptr, int device, std::size_t len)          \
     {                                                                     \
       detail::advise(ptr, len, device, advice_flag);                      \
     }                                                                     \

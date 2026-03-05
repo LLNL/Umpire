@@ -1,5 +1,6 @@
 #pragma once
 
+#include <limits>
 #include <type_traits>
 
 #include "umpire/ResourceManager.hpp"
@@ -40,7 +41,7 @@ inline auto dispatch(camp::resources::Platform platform, Args&&... args)
 #endif
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
     case camp::resources::Platform::omp_target:
-      return Op<resource::openmp_target_platform>::exec(std::forward<Args>(args)...);
+      return Op<resource::omp_target_platform>::exec(std::forward<Args>(args)...);
 #endif
     default:
       UMPIRE_ERROR(runtime_error, "Unknown platform for operation");
@@ -79,7 +80,7 @@ inline auto dispatch(camp::resources::Platform src_platform, camp::resources::Pl
 #endif
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
       case camp::resources::Platform::omp_target:
-        return Op<resource::openmp_target_platform, resource::openmp_target_platform>::exec(
+        return Op<resource::omp_target_platform, resource::omp_target_platform>::exec(
             std::forward<Args>(args)...);
 #endif
       default:
@@ -117,18 +118,31 @@ inline auto dispatch(camp::resources::Platform src_platform, camp::resources::Pl
 
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
   if (src_platform == camp::resources::Platform::host && dst_platform == camp::resources::Platform::omp_target) {
-    return Op<resource::host_platform, resource::openmp_target_platform>::exec(std::forward<Args>(args)...);
+    return Op<resource::host_platform, resource::omp_target_platform>::exec(std::forward<Args>(args)...);
   }
   if (src_platform == camp::resources::Platform::omp_target && dst_platform == camp::resources::Platform::host) {
-    return Op<resource::openmp_target_platform, resource::host_platform>::exec(std::forward<Args>(args)...);
+    return Op<resource::omp_target_platform, resource::host_platform>::exec(std::forward<Args>(args)...);
   }
 #endif
 
   UMPIRE_ERROR(runtime_error, "Unsupported platform combination");
 }
 
+/**
+ * @brief Get the base pointer for allocation map lookup
+ *
+ * When given a pointer-to-pointer (T**), unwraps it to get the base pointer (T*)
+ * that was originally allocated. This is necessary for looking up allocations
+ * in the ResourceManager's allocation map, which tracks base pointers.
+ *
+ * For non-pointer types (T*), returns the pointer unchanged.
+ *
+ * @tparam T The type pointed to (may be a pointer type itself)
+ * @param ptr The pointer to unwrap
+ * @return For T**, returns *ptr (the T*). For T*, returns ptr unchanged.
+ */
 template <typename T>
-constexpr auto decay_ptr(T* ptr)
+constexpr auto get_base_ptr(T* ptr)
 {
   if constexpr (std::is_pointer_v<T>) {
     return *ptr;
@@ -136,6 +150,27 @@ constexpr auto decay_ptr(T* ptr)
     return ptr;
   }
 }
+
+// Simple RAII scope guard for cleanup on success
+template<typename F>
+struct scope_exit {
+  F func;
+  bool active = true;
+
+  explicit scope_exit(F f) : func(std::move(f)) {}
+
+  ~scope_exit() {
+    if (active) func();
+  }
+
+  void dismiss() { active = false; }
+};
+
+template<typename F>
+scope_exit<F> make_scope_exit(F f) {
+  return scope_exit<F>(std::move(f));
+}
+
 } // namespace detail
 
 // Base template for op_caller with helper functions for argument handling
@@ -161,10 +196,23 @@ struct op_caller {
   static void check_memset_bounds(T* src, const util::AllocationRecord* record, std::size_t length)
   {
     std::ptrdiff_t offset = reinterpret_cast<const char*>(src) - reinterpret_cast<const char*>(record->ptr);
-    std::size_t size = record->size - offset;
+    if (offset < 0) {
+      UMPIRE_ERROR(runtime_error, "Invalid pointer for memset bounds check");
+    }
 
-    if (length > 0 && length > size) {
-      UMPIRE_ERROR(runtime_error, fmt::format("Cannot memset over the end of allocation: {} -> {}", length, size));
+    std::size_t available_bytes = record->size - static_cast<std::size_t>(offset);
+
+    std::size_t requested_bytes = length;
+    if constexpr (!std::is_same_v<T, void>) {
+      if (length > (std::numeric_limits<std::size_t>::max() / sizeof(T))) {
+        UMPIRE_ERROR(runtime_error, "Requested memset size overflow");
+      }
+      requested_bytes = length * sizeof(T);
+    }
+
+    if (requested_bytes > 0 && requested_bytes > available_bytes) {
+      UMPIRE_ERROR(runtime_error,
+                   fmt::format("Cannot memset over the end of allocation: {} -> {}", requested_bytes, available_bytes));
     }
   }
 
@@ -175,20 +223,41 @@ struct op_caller {
   {
     // Calculate source and destination details
     std::ptrdiff_t src_offset = reinterpret_cast<const char*>(src) - reinterpret_cast<const char*>(src_record->ptr);
-    std::size_t src_size = src_record->size - src_offset;
+    if (src_offset < 0) {
+      UMPIRE_ERROR(runtime_error, "Invalid source pointer for copy bounds check");
+    }
+    std::size_t src_available_bytes = src_record->size - static_cast<std::size_t>(src_offset);
 
     std::ptrdiff_t dst_offset = reinterpret_cast<const char*>(dst) - reinterpret_cast<const char*>(dst_record->ptr);
-    std::size_t dst_size = dst_record->size - dst_offset;
+    if (dst_offset < 0) {
+      UMPIRE_ERROR(runtime_error, "Invalid destination pointer for copy bounds check");
+    }
+    std::size_t dst_available_bytes = dst_record->size - static_cast<std::size_t>(dst_offset);
 
-    // If size is 0, use the source size
-    if (size == 0) {
-      size = src_size;
+    std::size_t requested_bytes = size;
+    if constexpr (!std::is_same_v<T, void>) {
+      if (size > (std::numeric_limits<std::size_t>::max() / sizeof(T))) {
+        UMPIRE_ERROR(runtime_error, "Requested copy size overflow");
+      }
+      requested_bytes = size * sizeof(T);
+    }
+
+    if (requested_bytes == 0) {
+      return;
+    }
+
+    // Check if source has enough data and destination has enough space
+    if (requested_bytes > src_available_bytes) {
+      UMPIRE_ERROR(runtime_error,
+                   fmt::format("Not enough data in source to copy {} bytes from {} bytes", requested_bytes,
+                               src_available_bytes));
     }
 
     // Check if destination has enough space
-    if (size > dst_size) {
+    if (requested_bytes > dst_available_bytes) {
       UMPIRE_ERROR(runtime_error,
-                   fmt::format("Not enough space in destination to copy {} bytes into {} bytes", size, dst_size));
+                   fmt::format("Not enough space in destination to copy {} bytes into {} bytes", requested_bytes,
+                               dst_available_bytes));
     }
   }
 #endif // UMPIRE_ENABLE_BOUNDS_CHECKS
@@ -199,7 +268,7 @@ struct op_caller {
   {
     auto& rm = ResourceManager::getInstance();
     auto& allocation_map = rm.m_allocations;
-    auto src_record = allocation_map.find(detail::decay_ptr(src));
+    auto src_record = allocation_map.find(detail::get_base_ptr(src));
     auto p = src_record->strategy->getPlatform();
 
     // Operation-specific handling
@@ -221,7 +290,7 @@ struct op_caller {
   {
     auto& rm = ResourceManager::getInstance();
     auto& allocation_map = rm.m_allocations;
-    auto src_record = allocation_map.find(detail::decay_ptr(src));
+    auto src_record = allocation_map.find(detail::get_base_ptr(src));
     auto p = src_record->strategy->getPlatform();
 
     // Operation-specific handling
@@ -242,7 +311,7 @@ struct op_caller {
   {
     auto& rm = ResourceManager::getInstance();
     auto& allocation_map = rm.m_allocations;
-    auto src_record = allocation_map.find(detail::decay_ptr(src));
+    auto src_record = allocation_map.find(detail::get_base_ptr(src));
     auto dst_record = allocation_map.find(dst);
 
     auto p1 = src_record->strategy->getPlatform();
@@ -268,7 +337,7 @@ struct op_caller {
   {
     auto& rm = ResourceManager::getInstance();
     auto& allocation_map = rm.m_allocations;
-    auto src_record = allocation_map.find(detail::decay_ptr(src));
+    auto src_record = allocation_map.find(detail::get_base_ptr(src));
     auto dst_record = allocation_map.find(dst);
 
     auto p1 = src_record->strategy->getPlatform();
@@ -491,14 +560,21 @@ T* op::reallocate<Src>::exec(T** ptr, std::size_t new_size)
   // Calculate copy size in bytes (minimum of old and new size)
   std::size_t copy_bytes = (old_bytes > new_bytes) ? new_bytes : old_bytes;
 
+  // Ensure new memory is freed if any operation throws
+  auto new_cleanup = detail::make_scope_exit([&]() {
+    allocator.deallocate(new_ptr);
+  });
+
   // Copy data using void* to pass bytes directly (avoids sizeof(T) multiplication in copy)
   // Note: We cast to void* so that detail::get_size<void>(len) returns len as-is (bytes)
   umpire::copy(static_cast<void*>(current_ptr), static_cast<void*>(new_ptr), copy_bytes);
 
-  // Deallocate old memory
+  // Copy succeeded, deallocate old memory
+  // Note: If this throws, new_cleanup will still free new_ptr (strong exception safety)
   allocator.deallocate(current_ptr);
 
-  // Update the pointer
+  // All cleanup succeeded, dismiss guard and update pointer
+  new_cleanup.dismiss();
   *ptr = new_ptr;
 
   return new_ptr;
@@ -559,16 +635,15 @@ camp::resources::EventProxy<camp::resources::Resource> op::reallocate<Src>::exec
   // Note: We cast to void* so that detail::get_size<void>(len) returns len as-is (bytes)
   auto event = umpire::copy(static_cast<void*>(current_ptr), static_cast<void*>(new_ptr), copy_bytes, ctx);
 
-  // IMPORTANT: In a fully async implementation, we would need to chain the deallocation
-  // to happen after the copy completes. However, since we don't have that mechanism yet,
-  // and ResourceManager's reallocate operation doesn't wait on the event, we need to
-  // deallocate here as we did in the synchronous case.
-  //
-  // This has the potential to cause race conditions if the memory is deallocated before
-  // the copy completes, but for most allocators, the memory won't be immediately reused.
-  // A better solution would be to have the ResourceManager wait on the event before returning
-  // or implement a chained operation system.
-  allocator.deallocate(current_ptr);
+  // Ensure old memory is freed even if wait() throws
+  // Note: This is the correct cleanup order - old memory must be freed after copy completes
+  auto cleanup = detail::make_scope_exit([&]() {
+    allocator.deallocate(current_ptr);
+  });
+
+  // Wait for async copy to complete before deallocating to avoid race condition
+  static_cast<camp::resources::Event>(event).wait();
+  // cleanup happens automatically via RAII
 
   // Update the pointer
   *ptr_ptr = new_ptr;
@@ -620,13 +695,20 @@ void* op::reallocate<Src>::exec(void** ptr_ptr, std::size_t new_size)
   // Calculate copy size in bytes (minimum of old and new size)
   std::size_t copy_bytes = (old_size > new_size) ? new_size : old_size;
 
+  // Ensure new memory is freed if any operation throws
+  auto new_cleanup = detail::make_scope_exit([&]() {
+    allocator.deallocate(new_ptr);
+  });
+
   // Copy data from old to new location (void* naturally uses bytes)
   umpire::copy(static_cast<void*>(current_ptr), static_cast<void*>(new_ptr), copy_bytes);
 
-  // Deallocate old memory
+  // Copy succeeded, deallocate old memory
+  // Note: If this throws, new_cleanup will still free new_ptr (strong exception safety)
   allocator.deallocate(current_ptr);
 
-  // Update the pointer
+  // All cleanup succeeded, dismiss guard and update pointer
+  new_cleanup.dismiss();
   *ptr_ptr = new_ptr;
 
   return new_ptr;
@@ -681,8 +763,15 @@ camp::resources::EventProxy<camp::resources::Resource> op::reallocate<Src>::exec
   // Copy data from old to new location asynchronously (void* naturally uses bytes)
   auto event = umpire::copy(static_cast<void*>(current_ptr), static_cast<void*>(new_ptr), copy_bytes, ctx);
 
-  // Deallocate old memory
-  allocator.deallocate(current_ptr);
+  // Ensure old memory is freed even if wait() throws
+  // Note: This is the correct cleanup order - old memory must be freed after copy completes
+  auto cleanup = detail::make_scope_exit([&]() {
+    allocator.deallocate(current_ptr);
+  });
+
+  // Wait for async copy to complete before deallocating to avoid race condition
+  static_cast<camp::resources::Event>(event).wait();
+  // cleanup happens automatically via RAII
 
   // Update the pointer
   *ptr_ptr = new_ptr;

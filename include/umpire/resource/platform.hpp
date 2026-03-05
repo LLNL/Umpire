@@ -20,6 +20,9 @@ struct hip_platform {};
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
 struct omp_target_platform {};
 #endif
+#if defined(UMPIRE_ENABLE_SYCL)
+struct sycl_platform {};
+#endif
 
 template <>
 struct platform_for<undefined_platform> {
@@ -49,6 +52,12 @@ struct platform_for<omp_target_platform> {
   static constexpr camp::resources::Platform value = camp::resources::Platform::omp_target;
 };
 #endif
+#if defined(UMPIRE_ENABLE_SYCL)
+template <>
+struct platform_for<sycl_platform> {
+  static constexpr camp::resources::Platform value = camp::resources::Platform::sycl;
+};
+#endif
 
 } // namespace resource
 
@@ -61,6 +70,9 @@ using hip = resource::hip_platform;
 #endif
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
 using omp_target = resource::omp_target_platform;
+#endif
+#if defined(UMPIRE_ENABLE_SYCL)
+using sycl = resource::sycl_platform;
 #endif
 
 } // namespace umpire

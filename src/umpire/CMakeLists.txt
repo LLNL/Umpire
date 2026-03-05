@@ -221,4 +221,12 @@ install(FILES
   ${CMAKE_BINARY_DIR}/include/umpire/config.hpp
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/umpire)
 
+install(DIRECTORY
+  ${PROJECT_SOURCE_DIR}/include/umpire/
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/umpire
+  FILES_MATCHING
+  PATTERN "*.hpp"
+  PATTERN "*.h"
+  PATTERN "*.inl")
+
 umpire_add_code_checks(PREFIX umpire)

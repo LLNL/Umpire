@@ -3,6 +3,7 @@
 #include <type_traits>
 
 #include "umpire/config.hpp"
+#include "umpire/resource/platform.hpp"
 
 namespace umpire {
 namespace op {
@@ -19,16 +20,6 @@ struct supports_memory_advice<resource::cuda_platform> : std::true_type {};
 #if defined(UMPIRE_ENABLE_HIP)
 template <>
 struct supports_memory_advice<resource::hip_platform> : std::true_type {};
-#endif
-
-#if defined(UMPIRE_ENABLE_SYCL)
-template <>
-struct supports_memory_advice<resource::sycl_platform> : std::true_type {};
-#endif
-
-#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
-template <>
-struct supports_memory_advice<resource::openmp_target_platform> : std::true_type {};
 #endif
 
 } // namespace detail
