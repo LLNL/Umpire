@@ -33,12 +33,12 @@ cce_21_0_0:
 # This job intentionally tests our umpire package.py because although this job does not
 # explicitly have the ~tools, the package.py should still prevent tools from being built.
 ###
-rocmcc_7_2_0_hip_openmp_device_alloc:
+rocmcc_6_4_3_hip_openmp_device_alloc:
   variables:
-    SPEC: "~shared +fortran +openmp +rocm +device_alloc tests=basic amdgpu_target=gfx942 %llvm-amdgpu@=7.2.0 ^hip@7.2.0"
+    SPEC: "~shared +fortran +openmp +rocm +device_alloc tests=basic amdgpu_target=gfx942 %llvm-amdgpu@=6.4.3 ^hip@6.4.3"
   extends: .job_on_tuolumne
 
-rocmcc_7_2_0_hip_deviceconst:
+rocmcc_6_4_3_hip_deviceconst:
   variables:
-    SPEC: "~shared +fortran +deviceconst +rocm tests=basic amdgpu_target=gfx942 %llvm-amdgpu@=7.2.0 ^hip@7.2.0"
+    SPEC: "~shared +fortran +deviceconst +rocm tests=basic amdgpu_target=gfx942 %llvm-amdgpu@=6.4.3 ^hip@6.4.3"
   extends: .job_on_tuolumne
