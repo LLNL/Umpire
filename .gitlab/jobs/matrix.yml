@@ -22,11 +22,6 @@ clang_18_1_8_gcc_13_cuda_12_6_0:
     SPEC: "${PROJECT_MATRIX_VARIANTS} +deviceconst %clang-18-gcc-13 ^cmake@3.25.2 ^cuda@12.6.0+allow-unsupported-compilers ${PROJECT_MATRIX_DEPS}"
   extends: .job_on_matrix
 
-clang_19_1_3_gcc_13_cuda_13_1_1:
-  variables:
-    SPEC: "${PROJECT_MATRIX_VARIANTS} +deviceconst %clang-19-gcc-13 ^cmake@3.25.2 ^cuda@13.1.1+allow-unsupported-compilers ${PROJECT_MATRIX_DEPS}"
-  extends: .job_on_matrix
-
 ############
 # Extra jobs
 ############
