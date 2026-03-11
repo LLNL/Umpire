@@ -1004,25 +1004,25 @@ module umpire_mod
             logical(C_BOOL), value, intent(IN) :: free_allocations
         end subroutine c_resourcemanager_destroy_allocator_with_free_bufferify
 
-        subroutine c_resourcemanager_destroy_allocator(self, id) &
-                bind(C, name="umpire_resourcemanager_destroy_allocator")
+        subroutine c_resourcemanager_destroy_allocator_by_id(self, id) &
+                bind(C, name="umpire_resourcemanager_destroy_allocator_by_id")
             use iso_c_binding, only : C_INT
             import :: umpire_SHROUD_resourcemanager_capsule
             implicit none
             type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
             integer(C_INT), value, intent(IN) :: id
-        end subroutine c_resourcemanager_destroy_allocator
+        end subroutine c_resourcemanager_destroy_allocator_by_id
 
-        subroutine c_resourcemanager_destroy_allocator_with_free(self, &
+        subroutine c_resourcemanager_destroy_allocator_by_id_with_free(self, &
                 id, free_allocations) &
-                bind(C, name="umpire_resourcemanager_destroy_allocator_with_free")
+                bind(C, name="umpire_resourcemanager_destroy_allocator_by_id_with_free")
             use iso_c_binding, only : C_BOOL, C_INT
             import :: umpire_SHROUD_resourcemanager_capsule
             implicit none
             type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
             integer(C_INT), value, intent(IN) :: id
             logical(C_BOOL), value, intent(IN) :: free_allocations
-        end subroutine c_resourcemanager_destroy_allocator_with_free
+        end subroutine c_resourcemanager_destroy_allocator_by_id_with_free
 
         function c_resourcemanager_get_allocator_for_ptr(self, ptr, &
                 SHT_crv) &
@@ -3226,7 +3226,7 @@ contains
         class(UmpireResourceManager) :: obj
         integer(C_INT), value, intent(IN) :: id
         ! splicer begin class.ResourceManager.method.destroy_allocator
-        call c_resourcemanager_destroy_allocator(obj%cxxmem, id)
+        call c_resourcemanager_destroy_allocator_by_id(obj%cxxmem, id)
         ! splicer end class.ResourceManager.method.destroy_allocator
     end subroutine resourcemanager_destroy_allocator
 
@@ -3243,7 +3243,7 @@ contains
         ! splicer begin class.ResourceManager.method.destroy_allocator_with_free
         logical(C_BOOL) SH_free_allocations
         SH_free_allocations = free_allocations  ! coerce to C_BOOL
-        call c_resourcemanager_destroy_allocator_with_free(obj%cxxmem, &
+        call c_resourcemanager_destroy_allocator_by_id_with_free(obj%cxxmem, &
             id, SH_free_allocations)
         ! splicer end class.ResourceManager.method.destroy_allocator_with_free
     end subroutine resourcemanager_destroy_allocator_with_free

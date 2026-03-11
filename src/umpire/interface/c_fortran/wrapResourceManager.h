@@ -214,10 +214,10 @@ void umpire_resourcemanager_destroy_allocator_with_free_bufferify(
     umpire_resourcemanager * self, const char * name, int Lname,
     bool free_allocations);
 
-void umpire_resourcemanager_destroy_allocator(
+void umpire_resourcemanager_destroy_allocator_by_id(
     umpire_resourcemanager * self, int id);
 
-void umpire_resourcemanager_destroy_allocator_with_free(
+void umpire_resourcemanager_destroy_allocator_by_id_with_free(
     umpire_resourcemanager * self, int id, bool free_allocations);
 
 umpire_allocator * umpire_resourcemanager_get_allocator_for_ptr(
