@@ -795,7 +795,7 @@ void umpire_resourcemanager_destroy_allocator_with_free_bufferify(
  * \brief Destroy an allocator by ID
  *
  */
-void umpire_resourcemanager_destroy_allocator_by_id(
+void umpire_resourcemanager_destroy_allocator(
     umpire_resourcemanager * self, int id)
 {
     umpire::ResourceManager *SH_this =
@@ -809,7 +809,7 @@ void umpire_resourcemanager_destroy_allocator_by_id(
  * \brief Destroy an allocator by ID
  *
  */
-void umpire_resourcemanager_destroy_allocator_by_id_with_free(
+void umpire_resourcemanager_destroy_allocator_with_free(
     umpire_resourcemanager * self, int id, bool free_allocations)
 {
     umpire::ResourceManager *SH_this =
