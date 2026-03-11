@@ -733,7 +733,7 @@ void umpire_resourcemanager_remove_alias_bufferify(
  * \brief Destroy an allocator by name
  *
  */
-void umpire_resourcemanager_destroy_allocator(
+void umpire_resourcemanager_destroy_allocator_by_name(
     umpire_resourcemanager * self, const char * name)
 {
     umpire::ResourceManager *SH_this =
@@ -748,7 +748,7 @@ void umpire_resourcemanager_destroy_allocator(
  * \brief Destroy an allocator by name
  *
  */
-void umpire_resourcemanager_destroy_allocator_bufferify(
+void umpire_resourcemanager_destroy_allocator_by_name_bufferify(
     umpire_resourcemanager * self, const char * name, int Lname)
 {
     umpire::ResourceManager *SH_this =
@@ -763,7 +763,7 @@ void umpire_resourcemanager_destroy_allocator_bufferify(
  * \brief Destroy an allocator by name
  *
  */
-void umpire_resourcemanager_destroy_allocator_with_free(
+void umpire_resourcemanager_destroy_allocator_by_name_with_free(
     umpire_resourcemanager * self, const char * name,
     bool free_allocations)
 {
@@ -779,7 +779,7 @@ void umpire_resourcemanager_destroy_allocator_with_free(
  * \brief Destroy an allocator by name
  *
  */
-void umpire_resourcemanager_destroy_allocator_with_free_bufferify(
+void umpire_resourcemanager_destroy_allocator_by_name_with_free_bufferify(
     umpire_resourcemanager * self, const char * name, int Lname,
     bool free_allocations)
 {
@@ -795,7 +795,7 @@ void umpire_resourcemanager_destroy_allocator_with_free_bufferify(
  * \brief Destroy an allocator by ID
  *
  */
-void umpire_resourcemanager_destroy_allocator(
+void umpire_resourcemanager_destroy_allocator_by_id(
     umpire_resourcemanager * self, int id)
 {
     umpire::ResourceManager *SH_this =
@@ -809,7 +809,7 @@ void umpire_resourcemanager_destroy_allocator(
  * \brief Destroy an allocator by ID
  *
  */
-void umpire_resourcemanager_destroy_allocator_with_free(
+void umpire_resourcemanager_destroy_allocator_by_id_with_free(
     umpire_resourcemanager * self, int id, bool free_allocations)
 {
     umpire::ResourceManager *SH_this =

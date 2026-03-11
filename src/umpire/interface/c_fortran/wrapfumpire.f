@@ -962,7 +962,7 @@ module umpire_mod
         end subroutine c_resourcemanager_remove_alias_bufferify
 
         subroutine c_resourcemanager_destroy_allocator(self, name) &
-                bind(C, name="umpire_resourcemanager_destroy_allocator")
+                bind(C, name="umpire_resourcemanager_destroy_allocator_by_name")
             use iso_c_binding, only : C_CHAR
             import :: umpire_SHROUD_resourcemanager_capsule
             implicit none
@@ -972,7 +972,7 @@ module umpire_mod
 
         subroutine c_resourcemanager_destroy_allocator_bufferify(self, &
                 name, Lname) &
-                bind(C, name="umpire_resourcemanager_destroy_allocator_bufferify")
+                bind(C, name="umpire_resourcemanager_destroy_allocator_by_name_bufferify")
             use iso_c_binding, only : C_CHAR, C_INT
             import :: umpire_SHROUD_resourcemanager_capsule
             implicit none
@@ -983,7 +983,7 @@ module umpire_mod
 
         subroutine c_resourcemanager_destroy_allocator_with_free(self, &
                 name, free_allocations) &
-                bind(C, name="umpire_resourcemanager_destroy_allocator_with_free")
+                bind(C, name="umpire_resourcemanager_destroy_allocator_by_name_with_free")
             use iso_c_binding, only : C_BOOL, C_CHAR
             import :: umpire_SHROUD_resourcemanager_capsule
             implicit none
@@ -994,7 +994,7 @@ module umpire_mod
 
         subroutine c_resourcemanager_destroy_allocator_with_free_bufferify( &
                 self, name, Lname, free_allocations) &
-                bind(C, name="umpire_resourcemanager_destroy_allocator_with_free_bufferify")
+                bind(C, name="umpire_resourcemanager_destroy_allocator_by_name_with_free_bufferify")
             use iso_c_binding, only : C_BOOL, C_CHAR, C_INT
             import :: umpire_SHROUD_resourcemanager_capsule
             implicit none
@@ -1005,7 +1005,7 @@ module umpire_mod
         end subroutine c_resourcemanager_destroy_allocator_with_free_bufferify
 
         subroutine c_resourcemanager_destroy_allocator(self, id) &
-                bind(C, name="umpire_resourcemanager_destroy_allocator")
+                bind(C, name="umpire_resourcemanager_destroy_allocator_by_id")
             use iso_c_binding, only : C_INT
             import :: umpire_SHROUD_resourcemanager_capsule
             implicit none
@@ -1015,7 +1015,7 @@ module umpire_mod
 
         subroutine c_resourcemanager_destroy_allocator_with_free(self, &
                 id, free_allocations) &
-                bind(C, name="umpire_resourcemanager_destroy_allocator_with_free")
+                bind(C, name="umpire_resourcemanager_destroy_allocator_by_id_with_free")
             use iso_c_binding, only : C_BOOL, C_INT
             import :: umpire_SHROUD_resourcemanager_capsule
             implicit none

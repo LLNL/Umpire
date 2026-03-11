@@ -267,20 +267,16 @@ declarations:
       - decl: void destroyAllocator(const std::string& name, bool free_allocations=false)
         doxygen:
           brief: Destroy an allocator by name
-        format:
-          function_suffix: _by_name
         default_arg_suffix:
-          - ""
-          - _with_free
+          - _by_name
+          - _by_name_with_free
 
       - decl: void destroyAllocator(int id, bool free_allocations=false)
         doxygen:
           brief: Destroy an allocator by ID
-        format:
-          function_suffix: _by_id
         default_arg_suffix:
-          - ""
-          - _with_free
+          - _by_id
+          - _by_id_with_free
 
       - decl: Allocator getAllocator(void* ptr)
         format:
