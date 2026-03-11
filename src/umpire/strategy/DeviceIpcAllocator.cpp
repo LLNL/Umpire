@@ -59,7 +59,8 @@ DeviceIpcAllocator::DeviceIpcAllocator(const std::string& name, int id, Allocato
       m_device_allocator(device_allocator.getAllocationStrategy()),
       m_scope_rank(0),
       m_is_scope_leader(false),
-      m_scope_color(MPI_COMM_TYPE_SHARED)
+      m_scope_color(MPI_COMM_TYPE_SHARED),
+      m_scope(scope)
 {
   setup_shared_scope(scope);
 
@@ -311,7 +312,10 @@ Platform DeviceIpcAllocator::getPlatform() noexcept
 
 MemoryResourceTraits DeviceIpcAllocator::getTraits() const noexcept
 {
-  return m_device_allocator->getTraits();
+  auto traits = m_device_allocator->getTraits();
+  traits.scope = m_scope;
+  traits.ipc = true;
+  return traits;
 }
 
 } // end of namespace strategy
