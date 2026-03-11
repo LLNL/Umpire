@@ -36,6 +36,8 @@ TEST(DestroyAllocatorStrictModeTest, ParentChildWarning)
   auto parent = rm.makeAllocator<umpire::strategy::QuickPool>("test_parent_strict", rm.getAllocator("HOST"));
   auto child = rm.makeAllocator<umpire::strategy::QuickPool>("test_child_strict", parent);
 
+  UMPIRE_USE_VAR(child);
+
   // Try to destroy parent - should throw error in strict mode
   ASSERT_THROW(rm.destroyAllocator("test_parent_strict"), umpire::runtime_error);
 
