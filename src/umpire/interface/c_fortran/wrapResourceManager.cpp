@@ -738,10 +738,10 @@ void umpire_resourcemanager_destroy_allocator_by_name(
 {
     umpire::ResourceManager *SH_this =
         static_cast<umpire::ResourceManager *>(self->addr);
-    // splicer begin class.ResourceManager.method.destroy_allocator
+    // splicer begin class.ResourceManager.method.destroy_allocator_by_name
     const std::string SHCXX_name(name);
     SH_this->destroyAllocator(SHCXX_name);
-    // splicer end class.ResourceManager.method.destroy_allocator
+    // splicer end class.ResourceManager.method.destroy_allocator_by_name
 }
 
 /**
@@ -753,10 +753,10 @@ void umpire_resourcemanager_destroy_allocator_by_name_bufferify(
 {
     umpire::ResourceManager *SH_this =
         static_cast<umpire::ResourceManager *>(self->addr);
-    // splicer begin class.ResourceManager.method.destroy_allocator_bufferify
+    // splicer begin class.ResourceManager.method.destroy_allocator_by_name_bufferify
     const std::string SHCXX_name(name, Lname);
     SH_this->destroyAllocator(SHCXX_name);
-    // splicer end class.ResourceManager.method.destroy_allocator_bufferify
+    // splicer end class.ResourceManager.method.destroy_allocator_by_name_bufferify
 }
 
 /**
@@ -769,10 +769,10 @@ void umpire_resourcemanager_destroy_allocator_by_name_with_free(
 {
     umpire::ResourceManager *SH_this =
         static_cast<umpire::ResourceManager *>(self->addr);
-    // splicer begin class.ResourceManager.method.destroy_allocator_with_free
+    // splicer begin class.ResourceManager.method.destroy_allocator_by_name_with_free
     const std::string SHCXX_name(name);
     SH_this->destroyAllocator(SHCXX_name, free_allocations);
-    // splicer end class.ResourceManager.method.destroy_allocator_with_free
+    // splicer end class.ResourceManager.method.destroy_allocator_by_name_with_free
 }
 
 /**
@@ -785,10 +785,10 @@ void umpire_resourcemanager_destroy_allocator_by_name_with_free_bufferify(
 {
     umpire::ResourceManager *SH_this =
         static_cast<umpire::ResourceManager *>(self->addr);
-    // splicer begin class.ResourceManager.method.destroy_allocator_with_free_bufferify
+    // splicer begin class.ResourceManager.method.destroy_allocator_by_name_with_free_bufferify
     const std::string SHCXX_name(name, Lname);
     SH_this->destroyAllocator(SHCXX_name, free_allocations);
-    // splicer end class.ResourceManager.method.destroy_allocator_with_free_bufferify
+    // splicer end class.ResourceManager.method.destroy_allocator_by_name_with_free_bufferify
 }
 
 /**
@@ -800,9 +800,9 @@ void umpire_resourcemanager_destroy_allocator_by_id(
 {
     umpire::ResourceManager *SH_this =
         static_cast<umpire::ResourceManager *>(self->addr);
-    // splicer begin class.ResourceManager.method.destroy_allocator
+    // splicer begin class.ResourceManager.method.destroy_allocator_by_id
     SH_this->destroyAllocator(id);
-    // splicer end class.ResourceManager.method.destroy_allocator
+    // splicer end class.ResourceManager.method.destroy_allocator_by_id
 }
 
 /**
@@ -814,9 +814,9 @@ void umpire_resourcemanager_destroy_allocator_by_id_with_free(
 {
     umpire::ResourceManager *SH_this =
         static_cast<umpire::ResourceManager *>(self->addr);
-    // splicer begin class.ResourceManager.method.destroy_allocator_with_free
+    // splicer begin class.ResourceManager.method.destroy_allocator_by_id_with_free
     SH_this->destroyAllocator(id, free_allocations);
-    // splicer end class.ResourceManager.method.destroy_allocator_with_free
+    // splicer end class.ResourceManager.method.destroy_allocator_by_id_with_free
 }
 
 umpire_allocator * umpire_resourcemanager_get_allocator_for_ptr(
