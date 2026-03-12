@@ -45,7 +45,10 @@ void sanitizer_test(const std::string test_type)
   if (test_type.find("read") != std::string::npos) {
 #if defined(UMPIRE_ENABLE_HIP)
     hipLaunchKernelGGL(test_read_for_hip, dim3(1), dim3(16), 0, 0, data, INDEX);
-    hipDeviceSynchronize();
+    hipError_t err = hipDeviceSynchronize();
+    if (err != hipSuccess) {
+      UMPIRE_ERROR(umpire::runtime_error, fmt::format("hipDeviceSynchronize failed with error: {}", hipGetErrorString(err)));
+    }
 #endif
     std::cout << "data[256] = " << data[256] << std::endl;
   } else {
@@ -54,7 +57,10 @@ void sanitizer_test(const std::string test_type)
     }
 #if defined(UMPIRE_ENABLE_HIP)
     hipLaunchKernelGGL(test_write_for_hip, dim3(1), dim3(16), 0, 0, data, INDEX);
-    hipDeviceSynchronize();
+    hipError_t err = hipDeviceSynchronize();
+    if (err != hipSuccess) {
+      UMPIRE_ERROR(umpire::runtime_error, fmt::format("hipDeviceSynchronize failed with error: {}", hipGetErrorString(err)));
+    }
 #endif
     data[INDEX] = -1;
     std::cout << "data[INDEX] = " << data[INDEX] << std::endl;
