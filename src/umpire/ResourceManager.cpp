@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -877,6 +877,11 @@ std::size_t ResourceManager::getSize(void* ptr) const
   auto record = m_allocations.find(ptr);
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ") returning " << record->size);
   return record->size;
+}
+
+std::size_t ResourceManager::getInternalMemoryUsage() const
+{
+  return m_allocations.internalMemoryUsage();
 }
 
 strategy::AllocationStrategy* ResourceManager::findAllocatorForId(int id)

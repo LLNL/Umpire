@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -126,6 +126,11 @@ void FixedMallocPool::deallocate(void* ptr)
 std::size_t FixedMallocPool::numPools() const noexcept
 {
   return m_pool.size();
+}
+
+std::size_t FixedMallocPool::totalBytes() const noexcept
+{
+  return numPools() * m_data_bytes;
 }
 
 } // namespace util

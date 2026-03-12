@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -34,6 +34,10 @@ class MPI {
   static void logMpiInfo();
 
   static bool isInitialized();
+
+#if defined(UMPIRE_ENABLE_MPI)
+  static MPI_Comm getCommunicator();
+#endif
 
  private:
   static int s_rank;

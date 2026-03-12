@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -170,6 +170,9 @@ class MemoryMap {
    * \brief Return number of entries in the map
    */
   std::size_t size() const noexcept;
+
+  std::size_t judyMemoryUsage() const noexcept;
+  std::size_t poolMemoryUsage() const noexcept;
 
  private:
   // Helper method for public findOrBefore()

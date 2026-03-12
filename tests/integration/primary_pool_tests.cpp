@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -102,7 +102,7 @@ TYPED_TEST(PrimaryPoolTest, NamedAllocation)
   ASSERT_NO_THROW(ptr = this->m_allocator->allocate(myname, 100));
 
   auto& rm = umpire::ResourceManager::getInstance();
-  const umpire::util::AllocationRecord* record;
+  const umpire::util::AllocationRecord* record = nullptr;
 
   ASSERT_NO_THROW(record = rm.findAllocationRecord(ptr));
   ASSERT_NE(record, nullptr);

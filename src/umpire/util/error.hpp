@@ -115,16 +115,16 @@ class resource_error : public umpire::runtime_error {
 } // end of namespace umpire
 
 #if defined(__CUDA_ARCH__)
-#define UMPIRE_ERROR(type, msg, ...) asm("trap;");
+#define UMPIRE_ERROR(type, msg) asm("trap;");
 #elif defined(__HIP_DEVICE_COMPILE__)
 #define UMPIRE_ERROR(type, msg) abort();
 #else
-#define UMPIRE_ERROR(type, msg, ...)                             \
-  {                                                              \
-    type e{msg, std::string{__FILE__}, __LINE__, ##__VA_ARGS__}; \
-    UMPIRE_LOG(Error, e.what());                                 \
-    umpire::util::flush_files();                                 \
-    throw e;                                                     \
+#define UMPIRE_ERROR(type, msg)                                           \
+  {                                                                       \
+    type e{msg, std::string{__FILE__}, __LINE__};                         \
+    UMPIRE_LOG(Error, e.what());                                          \
+    umpire::util::flush_files();                                          \
+    throw e;                                                              \
   }
 #endif
 

@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -127,6 +127,10 @@ elseif(UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
   set(UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE "MPI3" CACHE STRING "Default implementation for SHARED memory resource (MPI3)")
 else()
   set (UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE "" CACHE STRING "")
+endif()
+
+if(UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE)
+  message(STATUS "Default Shared Memory Resource is ${UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE}")
 endif()
 
 ########

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -196,6 +196,22 @@ template <typename V>
 std::size_t MemoryMap<V>::size() const noexcept
 {
   return m_size;
+}
+
+template <typename V>
+std::size_t MemoryMap<V>::judyMemoryUsage() const noexcept
+{
+  std::size_t total = 0;
+  for (JudySeg* seg = m_array->seg; seg; seg = static_cast<JudySeg*>(seg->seg)) {
+    total += JUDY_seg;
+  }
+  return total;
+}
+
+template <typename V>
+std::size_t MemoryMap<V>::poolMemoryUsage() const noexcept
+{
+  return m_pool.totalBytes();
 }
 
 template <typename V>

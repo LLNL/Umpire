@@ -22,6 +22,8 @@ struct deallocate_resource;
 
 class event_store {
  public:
+  virtual ~event_store() = default;
+
   virtual void insert(const event& e) = 0;
   virtual void insert(const allocate& e) = 0;
   virtual void insert(const named_allocate& e) = 0;

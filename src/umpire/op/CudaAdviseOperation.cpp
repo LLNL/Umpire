@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -21,7 +21,14 @@ void CudaAdviseOperation::apply(void* src_ptr, util::AllocationRecord* UMPIRE_UN
                                 std::size_t length)
 {
   int device = val;
-  cudaError_t error = ::cudaMemAdvise(src_ptr, length, m_advice, device);
+  cudaError_t error;
+
+#if CUDART_VERSION >= 13000
+  cudaMemLocation loc = {(device == cudaCpuDeviceId) ? cudaMemLocationTypeHost : cudaMemLocationTypeDevice, device};
+  error = ::cudaMemAdvise(src_ptr, length, m_advice, loc);
+#else
+  error = ::cudaMemAdvise(src_ptr, length, m_advice, device);
+#endif
 
   if (error != cudaSuccess) {
     UMPIRE_ERROR(runtime_error,
