@@ -48,8 +48,8 @@ if ("${CMAKE_CUDA_STANDARD}" STREQUAL "98" OR
   message(FATAL_ERROR "Umpire requires a minimum CUDA standard of 20. Please set BLT_CXX_STD and/or CMAKE_CUDA_STANDARD accordingly.")
 endif()
 
-# If CMAKE_HIP_STANDARD is set by the user, check that it is at least 20.
-# If it is not set, it will be set later by BLT to match BLT_CXX_STD.
+# If CMAKE_HIP_STANDARD is set by the user, check that it is at least 20
+# If it is not set, it will be set later by BLT to match BLT_CXX_STD
 if ("${CMAKE_HIP_STANDARD}" STREQUAL "98" OR
     "${CMAKE_HIP_STANDARD}" STREQUAL "03" OR
     "${CMAKE_HIP_STANDARD}" STREQUAL "11" OR
