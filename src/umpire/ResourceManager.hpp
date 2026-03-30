@@ -7,6 +7,7 @@
 #ifndef UMPIRE_ResourceManager_HPP
 #define UMPIRE_ResourceManager_HPP
 
+#include <atomic>
 #include <list>
 #include <memory>
 #include <mutex>
@@ -16,6 +17,7 @@
 
 #include "camp/resource.hpp"
 #include "umpire/Allocator.hpp"
+#include "umpire/Introspection.hpp"
 #include "umpire/Tracking.hpp"
 #include "umpire/resource/MemoryResourceTypes.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
@@ -51,6 +53,16 @@ class ResourceManager {
    * This will create all registered MemoryResource objects
    */
   void initialize();
+
+  /*!
+   * \brief Set the global introspection level for tracked allocations.
+   */
+  void setIntrospectionLevel(IntrospectionLevel level) noexcept;
+
+  /*!
+   * \brief Get the global introspection level for tracked allocations.
+   */
+  IntrospectionLevel getIntrospectionLevel() const noexcept;
 
   /*!
    * \brief Get the names of all available Allocator objects.
@@ -351,6 +363,8 @@ class ResourceManager {
   strategy::AllocationStrategy* m_default_allocator{nullptr};
   strategy::AllocationStrategy* m_null_allocator{nullptr};
   strategy::AllocationStrategy* m_zero_byte_pool{nullptr};
+
+  std::atomic<IntrospectionLevel> m_introspection_level{IntrospectionLevel::High};
 
   int m_id;
 

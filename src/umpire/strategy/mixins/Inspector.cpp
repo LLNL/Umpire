@@ -35,7 +35,12 @@ void Inspector::registerAllocation(void* ptr, std::size_t size, strategy::Alloca
     s->m_high_watermark = s->m_current_size;
   }
 
-  ResourceManager::getInstance().registerAllocation(ptr, {ptr, size, s, name});
+  auto& rm = ResourceManager::getInstance();
+  if (rm.getIntrospectionLevel() == IntrospectionLevel::Low) {
+    rm.registerAllocation(ptr, {ptr, size, s});
+  } else {
+    rm.registerAllocation(ptr, {ptr, size, s, name});
+  }
 }
 
 util::AllocationRecord

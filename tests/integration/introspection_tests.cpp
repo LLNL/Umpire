@@ -8,6 +8,21 @@
 #include "umpire/Umpire.hpp"
 #include "umpire/config.hpp"
 
+namespace {
+class IntrospectionLevelGuard {
+ public:
+  explicit IntrospectionLevelGuard(umpire::ResourceManager& rm) : m_rm(rm), m_prev(rm.getIntrospectionLevel()) {}
+  ~IntrospectionLevelGuard() { m_rm.setIntrospectionLevel(m_prev); }
+
+  IntrospectionLevelGuard(const IntrospectionLevelGuard&) = delete;
+  IntrospectionLevelGuard& operator=(const IntrospectionLevelGuard&) = delete;
+
+ private:
+  umpire::ResourceManager& m_rm;
+  umpire::IntrospectionLevel m_prev;
+};
+} // namespace
+
 TEST(IntrospectionTest, Overlaps)
 {
   auto& rm = umpire::ResourceManager::getInstance();
@@ -97,4 +112,39 @@ TEST(IntrospectionTest, RegisterNull)
   auto record = umpire::util::AllocationRecord{nullptr, 0, strategy};
 
   EXPECT_THROW(rm.registerAllocation(nullptr, record), umpire::runtime_error);
+}
+
+TEST(IntrospectionLevelTest, NamedAllocationRecordedByLevel)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  IntrospectionLevelGuard guard{rm};
+
+  umpire::Allocator allocator{rm.getAllocator("HOST")};
+
+  const std::string alloc_name{"my_named_alloc"};
+  constexpr std::size_t size{64};
+
+  rm.setIntrospectionLevel(umpire::IntrospectionLevel::Low);
+  {
+    void* p = allocator.allocate(alloc_name, size);
+    ASSERT_TRUE(rm.hasAllocator(p));
+    EXPECT_TRUE(rm.findAllocationRecord(p)->name.empty());
+    allocator.deallocate(p);
+  }
+
+  rm.setIntrospectionLevel(umpire::IntrospectionLevel::Medium);
+  {
+    void* p = allocator.allocate(alloc_name, size);
+    ASSERT_TRUE(rm.hasAllocator(p));
+    EXPECT_EQ(rm.findAllocationRecord(p)->name, alloc_name);
+    allocator.deallocate(p);
+  }
+
+  rm.setIntrospectionLevel(umpire::IntrospectionLevel::High);
+  {
+    void* p = allocator.allocate(alloc_name, size);
+    ASSERT_TRUE(rm.hasAllocator(p));
+    EXPECT_EQ(rm.findAllocationRecord(p)->name, alloc_name);
+    allocator.deallocate(p);
+  }
 }

@@ -6,6 +6,8 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/ResourceManager.hpp"
 
+#include <algorithm>
+#include <cctype>
 #include <iterator>
 #include <memory>
 #include <sstream>
@@ -42,8 +44,36 @@
 
 static const char* s_null_resource_name{"__umpire_internal_null"};
 static const char* s_zero_byte_pool_name{"__umpire_internal_0_byte_pool"};
+static const char* s_introspection_level_env_name{"UMPIRE_INTROSPECTION_LEVEL"};
 
 namespace umpire {
+
+namespace {
+bool case_insensitive_match(const std::string& s1, const std::string& s2)
+{
+  return (s1.size() == s2.size()) && std::equal(s1.begin(), s1.end(), s2.begin(), [](char c1, char c2) {
+           return (std::toupper(c1) == std::toupper(c2));
+         });
+}
+
+IntrospectionLevel parse_introspection_level(const char* enval) noexcept
+{
+  if (!enval) {
+    return IntrospectionLevel::High;
+  }
+
+  const std::string val{enval};
+  if (case_insensitive_match(val, "LOW")) {
+    return IntrospectionLevel::Low;
+  } else if (case_insensitive_match(val, "MEDIUM")) {
+    return IntrospectionLevel::Medium;
+  } else if (case_insensitive_match(val, "HIGH")) {
+    return IntrospectionLevel::High;
+  }
+
+  return IntrospectionLevel::High;
+}
+} // namespace
 
 ResourceManager& ResourceManager::getInstance()
 {
@@ -56,9 +86,14 @@ ResourceManager& ResourceManager::getInstance()
 ResourceManager::ResourceManager()
     : m_allocations(),
       m_allocators(),
+      m_shared_allocator_names(),
       m_allocators_by_id(),
       m_allocators_by_name(),
       m_memory_resources(),
+      m_default_allocator(nullptr),
+      m_null_allocator(nullptr),
+      m_zero_byte_pool(nullptr),
+      m_introspection_level{parse_introspection_level(std::getenv(s_introspection_level_env_name))},
       m_id(0),
       m_mutex()
 {
@@ -129,6 +164,16 @@ void ResourceManager::initialize()
   UMPIRE_LOG(Debug, "() leaving");
 }
 
+void ResourceManager::setIntrospectionLevel(IntrospectionLevel level) noexcept
+{
+  m_introspection_level.store(level, std::memory_order_relaxed);
+}
+
+IntrospectionLevel ResourceManager::getIntrospectionLevel() const noexcept
+{
+  return m_introspection_level.load(std::memory_order_relaxed);
+}
+
 Allocator ResourceManager::makeResource(const std::string& name)
 {
   resource::MemoryResourceRegistry& registry{resource::MemoryResourceRegistry::getInstance()};
@@ -167,6 +212,7 @@ Allocator ResourceManager::makeResource(const std::string& name, MemoryResourceT
         .category(event::category::operation)
         .arg("allocator_ref", (void*)allocator.get())
         .arg("introspection", traits.tracking)
+        .arg("introspection_level", to_string(getIntrospectionLevel()))
         .tag("allocator_name", name)
         .tag("replay", "true");
   });
@@ -362,7 +408,12 @@ void ResourceManager::registerAllocation(void* ptr, util::AllocationRecord recor
   UMPIRE_LOG(Debug,
              "(ptr=" << ptr << ", size=" << record.size << ", strategy=" << record.strategy << ") with " << this);
 
-  UMPIRE_RECORD_BACKTRACE(record);
+  const auto level = getIntrospectionLevel();
+  if (level == IntrospectionLevel::High) {
+    UMPIRE_RECORD_BACKTRACE(record);
+  } else if (level == IntrospectionLevel::Low) {
+    record.name.clear();
+  }
 
   m_allocations.insert(ptr, record);
 }

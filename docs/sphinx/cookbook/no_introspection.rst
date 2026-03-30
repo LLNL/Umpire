@@ -9,6 +9,12 @@ for allocations that come from a particular :class:`umpire::Allocator`, you can
 turn off the introspection and avoid the overhead of tracking the associated
 metadata.
 
+.. note::
+    Disabling introspection turns off *all* allocation metadata tracking for
+    that Allocator. If you still need pointer->(allocator,size) tracking but want
+    to reduce overhead, consider using a lower global introspection level via
+    ``UMPIRE_INTROSPECTION_LEVEL``.
+
 .. warning::
     Disabling introspection means that allocations from this Allocator cannot
     be used for operations, or size and location queries.

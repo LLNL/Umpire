@@ -9,6 +9,17 @@ the most difficult things can be keeping track of where each pointer has been
 allocated. Umpire's instrospection capability keeps track of this information,
 as well as other useful bits and pieces you might want to know.
 
+Umpire supports multiple *introspection levels* to control the overhead of
+recording allocation metadata:
+
+- ``low``: track only allocator + size for each pointer
+- ``medium``: ``low`` + named-allocation labels
+- ``high``: ``medium`` + allocation backtraces (if enabled via ``UMPIRE_BACKTRACE``)
+
+The level can be set via the ``UMPIRE_INTROSPECTION_LEVEL`` environment
+variable, or programmatically with
+``umpire::ResourceManager::setIntrospectionLevel``.
+
 The :class:`umpire::ResourceManager` can be used to find the allocator
 associated with an address: 
 
