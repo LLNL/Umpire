@@ -356,7 +356,11 @@ void ResourceManager::destroyAllocator(const std::string& name, bool free_alloca
   strategy::AllocationStrategy* strategy = it->second;
   int id = strategy->getId();
 
-  if (isBuiltinAllocator(strategy)) {
+  const std::string& strategy_name = strategy->getName();
+  const bool is_shared_resource =
+      (strategy_name == "SHARED") || (strategy_name.rfind("SHARED::", 0) == 0);
+
+  if (isBuiltinAllocator(strategy) && !is_shared_resource) {
     UMPIRE_ERROR(runtime_error,
                  fmt::format("Cannot destroy builtin allocator \"{}\"", name));
   }
