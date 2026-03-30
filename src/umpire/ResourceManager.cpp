@@ -361,15 +361,16 @@ void ResourceManager::destroyAllocator(const std::string& name, bool free_alloca
                  fmt::format("Cannot destroy builtin allocator \"{}\"", name));
   }
 
+  auto records = umpire::get_allocator_records(Allocator(strategy));
+
   if (isStrictDestructionMode()) {
-    auto records = umpire::get_allocator_records(Allocator(strategy));
     if (!records.empty() && !free_allocations) {
       UMPIRE_ERROR(runtime_error,
                    fmt::format("Allocator \"{}\" has {} active allocations. "
                               "Use free_allocations=true or deallocate them first.",
                               name, records.size()));
     }
-  } else if (!free_allocations) {
+  } else if (!free_allocations && !records.empty()) {
     UMPIRE_LOG(Warning, "Allocator \"" << name << "\" may have active allocations. "
                         << "Destroying anyway (non-strict mode).");
   }
@@ -401,10 +402,22 @@ void ResourceManager::destroyAllocator(const std::string& name, bool free_alloca
   }
 
   if (free_allocations) {
-    auto records = umpire::get_allocator_records(Allocator(strategy));
     UMPIRE_LOG(Debug, "Freeing " << records.size() << " allocations");
+    Allocator allocator{strategy};
     for (const auto& record : records) {
-      strategy->deallocate_internal(record.ptr, record.size);
+      allocator.deallocate(record.ptr);
+    }
+  } else if (!records.empty()) {
+    //
+    // In non-strict mode, destroying an allocator with active allocations
+    // intentionally "leaks" those allocations. Ensure we remove their records
+    // so we don't retain dangling strategy pointers that could later collide
+    // with a new allocator at the same address.
+    //
+    UMPIRE_LOG(Warning, "Untracking " << records.size() << " active allocations for allocator \"" << name
+                                     << "\" (allocator destroyed without freeing allocations).");
+    for (const auto& record : records) {
+      deregisterAllocation(record.ptr);
     }
   }
 
