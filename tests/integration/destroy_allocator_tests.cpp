@@ -125,7 +125,7 @@ TEST(DestroyAllocatorTest, FreeAllocationsOnDestroy)
   rm.destroyAllocator("test_pool_free", true);
 
   // Verify allocator is destroyed
-  //ASSERT_FALSE(rm.isAllocator("test_pool_free"));
+  ASSERT_FALSE(rm.isAllocator("test_pool_free"));
 
   // Allocation records are removed when allocations are freed
   ASSERT_FALSE(rm.hasAllocator(ptr1));
