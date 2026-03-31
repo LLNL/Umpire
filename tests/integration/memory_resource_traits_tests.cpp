@@ -77,9 +77,9 @@ std::vector<std::string> memory_resource_strings()
 #if defined(UMPIRE_ENABLE_DEVICE)
   resources.push_back("DEVICE");
   auto& rm = umpire::ResourceManager::getInstance();
-  //for (int id = 1; id == rm.getNumDevices(); id++) {
-  //  resources.push_back(std::string{"DEVICE::" + std::to_string(id)});
-  //}
+  for (int id = 1; id == rm.getNumDevices(); id++) {
+    resources.push_back(std::string{"DEVICE::" + std::to_string(id)});
+  }
 #endif
 #if defined(UMPIRE_ENABLE_UM)
   resources.push_back("UM");
