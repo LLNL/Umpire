@@ -253,9 +253,16 @@ target_include_directories(
   PRIVATE
   ${PROJECT_BINARY_DIR}/include)
 
-blt_add_test(
-  NAME destroy_allocator_tests
-  COMMAND destroy_allocator_tests)
+if (UMPIRE_ENABLE_MPI AND (UMPIRE_ENABLE_IPC_SHARED_MEMORY OR UMPIRE_ENABLE_MPI3_SHARED_MEMORY))
+  umpire_add_test_with_mpi(
+    NAME destroy_allocator_tests
+    COMMAND destroy_allocator_tests
+    NUM_MPI_TASKS 1)
+else ()
+  blt_add_test(
+    NAME destroy_allocator_tests
+    COMMAND destroy_allocator_tests)
+endif ()
 
 blt_add_executable(
   NAME destroy_allocator_strict_mode_tests

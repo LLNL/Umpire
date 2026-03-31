@@ -11,6 +11,10 @@
 #include "umpire/config.hpp"
 #include "umpire/strategy/QuickPool.hpp"
 
+#if defined(UMPIRE_ENABLE_MPI)
+  #include <mpi.h>
+#endif
+
 TEST(DestroyAllocatorTest, DestroyBasicQuickPool)
 {
   auto& rm = umpire::ResourceManager::getInstance();
@@ -237,4 +241,23 @@ TEST(DestroyAllocatorTest, DestroyAndRecreate)
 
   // Clean up
   rm.destroyAllocator("test_pool_recreate");
+}
+
+int main(int argc, char* argv[])
+{
+  int result = 0;
+
+  ::testing::InitGoogleTest(&argc, argv);
+
+#if defined(UMPIRE_ENABLE_MPI)
+  MPI_Init(&argc, &argv);
+#endif
+
+  result = RUN_ALL_TESTS();
+
+#if defined(UMPIRE_ENABLE_MPI)
+  MPI_Finalize();
+#endif
+
+  return result;
 }
