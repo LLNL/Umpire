@@ -265,99 +265,99 @@ declarations:
       # Note: Keep generated Fortran identifiers <= 63 chars (gfortran default limit).
       # The ResourceAwarePool untracked + bufferify wrapper is particularly close to
       # the limit due to the extra `_bufferify` suffix.
-	      - decl: Allocator makeAllocator_list_pool_untracked(const std::string& name, Allocator allocator, size_t initial_size, size_t block)
-	        splicer:
-	          c: |
-	            const std::string SHC_name_cxx(name);
-	            umpire::Allocator *SHC_allocator_cxx =
-	                static_cast<umpire::Allocator *>(allocator.addr);
-	            umpire::Allocator *SHC_rv_cxx = new umpire::Allocator;
-	            *SHC_rv_cxx = SH_this->makeAllocator<umpire::strategy::DynamicPoolList, false>(
-	                SHC_name_cxx, *SHC_allocator_cxx, initial_size, block);
-	            SHC_rv->addr  = SHC_rv_cxx;
-	            SHC_rv->idtor = 1;
-	            return SHC_rv;
+      - decl: Allocator makeAllocator_list_pool_untracked(const std::string& name, Allocator allocator, size_t initial_size, size_t block)
+        splicer:
+          c: |
+            const std::string SHC_name_cxx(name);
+            umpire::Allocator *SHC_allocator_cxx =
+                static_cast<umpire::Allocator *>(allocator.addr);
+            umpire::Allocator *SHC_rv_cxx = new umpire::Allocator;
+            *SHC_rv_cxx = SH_this->makeAllocator<umpire::strategy::DynamicPoolList, false>(
+                SHC_name_cxx, *SHC_allocator_cxx, initial_size, block);
+            SHC_rv->addr  = SHC_rv_cxx;
+            SHC_rv->idtor = 1;
+            return SHC_rv;
 
-	      - decl: Allocator makeAllocator_quick_pool_untracked(const std::string& name, Allocator allocator, size_t initial_size, size_t block)
-	        splicer:
-	          c: |
-	            const std::string SHC_name_cxx(name);
-	            umpire::Allocator *SHC_allocator_cxx =
-	                static_cast<umpire::Allocator *>(allocator.addr);
-	            umpire::Allocator *SHC_rv_cxx = new umpire::Allocator;
-	            *SHC_rv_cxx = SH_this->makeAllocator<umpire::strategy::QuickPool, false>(
-	                SHC_name_cxx, *SHC_allocator_cxx, initial_size, block);
-	            SHC_rv->addr  = SHC_rv_cxx;
-	            SHC_rv->idtor = 1;
-	            return SHC_rv;
+      - decl: Allocator makeAllocator_quick_pool_untracked(const std::string& name, Allocator allocator, size_t initial_size, size_t block)
+        splicer:
+          c: |
+            const std::string SHC_name_cxx(name);
+            umpire::Allocator *SHC_allocator_cxx =
+                static_cast<umpire::Allocator *>(allocator.addr);
+            umpire::Allocator *SHC_rv_cxx = new umpire::Allocator;
+            *SHC_rv_cxx = SH_this->makeAllocator<umpire::strategy::QuickPool, false>(
+                SHC_name_cxx, *SHC_allocator_cxx, initial_size, block);
+            SHC_rv->addr  = SHC_rv_cxx;
+            SHC_rv->idtor = 1;
+            return SHC_rv;
 
-	      - decl: Allocator makeAllocator_resource_aware_pool_untracked(const std::string& name, Allocator allocator, size_t initial_size, size_t block)
-	        splicer:
-	          c: |
-	            const std::string SHC_name_cxx(name);
-	            umpire::Allocator *SHC_allocator_cxx =
-	                static_cast<umpire::Allocator *>(allocator.addr);
-	            umpire::Allocator *SHC_rv_cxx = new umpire::Allocator;
-	            *SHC_rv_cxx = SH_this->makeAllocator<umpire::strategy::ResourceAwarePool, false>(
-	                SHC_name_cxx, *SHC_allocator_cxx, initial_size, block);
-	            SHC_rv->addr  = SHC_rv_cxx;
-	            SHC_rv->idtor = 1;
-	            return SHC_rv;
+      - decl: Allocator makeAllocator_resource_aware_pool_untracked(const std::string& name, Allocator allocator, size_t initial_size, size_t block)
+        splicer:
+          c: |
+            const std::string SHC_name_cxx(name);
+            umpire::Allocator *SHC_allocator_cxx =
+                static_cast<umpire::Allocator *>(allocator.addr);
+            umpire::Allocator *SHC_rv_cxx = new umpire::Allocator;
+            *SHC_rv_cxx = SH_this->makeAllocator<umpire::strategy::ResourceAwarePool, false>(
+                SHC_name_cxx, *SHC_allocator_cxx, initial_size, block);
+            SHC_rv->addr  = SHC_rv_cxx;
+            SHC_rv->idtor = 1;
+            return SHC_rv;
 
-	      - decl: Allocator makeAllocator_fixed_pool_untracked(const std::string& name, Allocator allocator, size_t object_size)
-	        splicer:
-	          c: |
-	            const std::string SHC_name_cxx(name);
-	            umpire::Allocator *SHC_allocator_cxx =
-	                static_cast<umpire::Allocator *>(allocator.addr);
-	            umpire::Allocator *SHC_rv_cxx = new umpire::Allocator;
-	            *SHC_rv_cxx = SH_this->makeAllocator<umpire::strategy::FixedPool, false>(
-	                SHC_name_cxx, *SHC_allocator_cxx, object_size);
-	            SHC_rv->addr  = SHC_rv_cxx;
-	            SHC_rv->idtor = 1;
-	            return SHC_rv;
+      - decl: Allocator makeAllocator_fixed_pool_untracked(const std::string& name, Allocator allocator, size_t object_size)
+        splicer:
+          c: |
+            const std::string SHC_name_cxx(name);
+            umpire::Allocator *SHC_allocator_cxx =
+                static_cast<umpire::Allocator *>(allocator.addr);
+            umpire::Allocator *SHC_rv_cxx = new umpire::Allocator;
+            *SHC_rv_cxx = SH_this->makeAllocator<umpire::strategy::FixedPool, false>(
+                SHC_name_cxx, *SHC_allocator_cxx, object_size);
+            SHC_rv->addr  = SHC_rv_cxx;
+            SHC_rv->idtor = 1;
+            return SHC_rv;
 
-	      - decl: Allocator makeAllocator_monotonic_untracked(const std::string& name, Allocator allocator, size_t object_size)
-	        splicer:
-	          c: |
-	            const std::string SHC_name_cxx(name);
-	            umpire::Allocator *SHC_allocator_cxx =
-	                static_cast<umpire::Allocator *>(allocator.addr);
-	            umpire::Allocator *SHC_rv_cxx = new umpire::Allocator;
-	            *SHC_rv_cxx = SH_this->makeAllocator<umpire::strategy::MonotonicAllocationStrategy, false>(
-	                SHC_name_cxx, *SHC_allocator_cxx, object_size);
-	            SHC_rv->addr  = SHC_rv_cxx;
-	            SHC_rv->idtor = 1;
-	            return SHC_rv;
+      - decl: Allocator makeAllocator_monotonic_untracked(const std::string& name, Allocator allocator, size_t object_size)
+        splicer:
+          c: |
+            const std::string SHC_name_cxx(name);
+            umpire::Allocator *SHC_allocator_cxx =
+                static_cast<umpire::Allocator *>(allocator.addr);
+            umpire::Allocator *SHC_rv_cxx = new umpire::Allocator;
+            *SHC_rv_cxx = SH_this->makeAllocator<umpire::strategy::MonotonicAllocationStrategy, false>(
+                SHC_name_cxx, *SHC_allocator_cxx, object_size);
+            SHC_rv->addr  = SHC_rv_cxx;
+            SHC_rv->idtor = 1;
+            return SHC_rv;
 
-	      - decl: Allocator makeAllocator_slot_pool_untracked(const std::string& name, Allocator allocator, size_t object_size)
-	        splicer:
-	          c: |
-	            const std::string SHC_name_cxx(name);
-	            umpire::Allocator *SHC_allocator_cxx =
-	                static_cast<umpire::Allocator *>(allocator.addr);
-	            umpire::Allocator *SHC_rv_cxx = new umpire::Allocator;
-	            *SHC_rv_cxx = SH_this->makeAllocator<umpire::strategy::SlotPool, false>(
-	                SHC_name_cxx, *SHC_allocator_cxx, object_size);
-	            SHC_rv->addr  = SHC_rv_cxx;
-	            SHC_rv->idtor = 1;
-	            return SHC_rv;
+      - decl: Allocator makeAllocator_slot_pool_untracked(const std::string& name, Allocator allocator, size_t object_size)
+        splicer:
+          c: |
+            const std::string SHC_name_cxx(name);
+            umpire::Allocator *SHC_allocator_cxx =
+                static_cast<umpire::Allocator *>(allocator.addr);
+            umpire::Allocator *SHC_rv_cxx = new umpire::Allocator;
+            *SHC_rv_cxx = SH_this->makeAllocator<umpire::strategy::SlotPool, false>(
+                SHC_name_cxx, *SHC_allocator_cxx, object_size);
+            SHC_rv->addr  = SHC_rv_cxx;
+            SHC_rv->idtor = 1;
+            return SHC_rv;
 
-	      - decl: Allocator makeAllocator_mixed_pool_untracked(const std::string& name, Allocator allocator, size_t smallest_fixed_obj_size, size_t largest_fixed_obj_size, size_t max_initial_fixed_pool_size, size_t fixed_size_multiplier, size_t quick_pool_initial_alloc_size, size_t quick_pool_min_alloc_size, size_t quick_pool_align_bytes)
-	        splicer:
-	          c: |
-	            const std::string SHC_name_cxx(name);
-	            umpire::Allocator *SHC_allocator_cxx =
-	                static_cast<umpire::Allocator *>(allocator.addr);
-	            umpire::Allocator *SHC_rv_cxx = new umpire::Allocator;
-	            *SHC_rv_cxx = SH_this->makeAllocator<umpire::strategy::MixedPool, false>(
-	                SHC_name_cxx, *SHC_allocator_cxx, smallest_fixed_obj_size,
-	                largest_fixed_obj_size, max_initial_fixed_pool_size,
-	                fixed_size_multiplier, quick_pool_initial_alloc_size,
-	                quick_pool_min_alloc_size, quick_pool_align_bytes);
-	            SHC_rv->addr  = SHC_rv_cxx;
-	            SHC_rv->idtor = 1;
-	            return SHC_rv;
+      - decl: Allocator makeAllocator_mixed_pool_untracked(const std::string& name, Allocator allocator, size_t smallest_fixed_obj_size, size_t largest_fixed_obj_size, size_t max_initial_fixed_pool_size, size_t fixed_size_multiplier, size_t quick_pool_initial_alloc_size, size_t quick_pool_min_alloc_size, size_t quick_pool_align_bytes)
+        splicer:
+          c: |
+            const std::string SHC_name_cxx(name);
+            umpire::Allocator *SHC_allocator_cxx =
+                static_cast<umpire::Allocator *>(allocator.addr);
+            umpire::Allocator *SHC_rv_cxx = new umpire::Allocator;
+            *SHC_rv_cxx = SH_this->makeAllocator<umpire::strategy::MixedPool, false>(
+                SHC_name_cxx, *SHC_allocator_cxx, smallest_fixed_obj_size,
+                largest_fixed_obj_size, max_initial_fixed_pool_size,
+                fixed_size_multiplier, quick_pool_initial_alloc_size,
+                quick_pool_min_alloc_size, quick_pool_align_bytes);
+            SHC_rv->addr  = SHC_rv_cxx;
+            SHC_rv->idtor = 1;
+            return SHC_rv;
 
       - decl: void addAlias(const std::string& name, Allocator allocator)
       - decl: void removeAlias(const std::string& name, Allocator allocator)
