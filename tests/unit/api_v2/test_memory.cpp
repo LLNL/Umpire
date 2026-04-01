@@ -6,10 +6,12 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "umpire/detail/registry.hpp"
+#include "umpire/error.hpp"
 #include "umpire/memory.hpp"
 
 #include <cstdlib>
 #include <gtest/gtest.h>
+#include <string>
 
 namespace {
 
@@ -72,6 +74,14 @@ TEST(memory, unknown_allocation_throws)
 {
   test_memory mem;
   int i = 7;
-  EXPECT_THROW(mem.deallocate(&i), std::runtime_error);
-}
 
+  try {
+    mem.deallocate(&i);
+    FAIL() << "Expected unknown_allocation";
+  } catch (const umpire::unknown_allocation& e) {
+    EXPECT_NE(std::string{e.what()}.find("Attempted to deallocate unknown pointer"), std::string::npos);
+    EXPECT_NE(std::string{e.what()}.find("0x"), std::string::npos);
+  } catch (...) {
+    FAIL() << "Expected umpire::unknown_allocation";
+  }
+}

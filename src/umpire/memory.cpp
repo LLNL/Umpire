@@ -8,8 +8,9 @@
 
 #include "umpire/allocation_record.hpp"
 #include "umpire/detail/registry.hpp"
+#include "umpire/error.hpp"
 
-#include <stdexcept>
+#include "fmt/format.h"
 
 namespace umpire {
 
@@ -36,7 +37,7 @@ void memory::untrack_allocation(void* ptr)
 {
   auto* record = detail::registry::get().find_allocation(ptr);
   if (!record) {
-    throw std::runtime_error("Attempted to deallocate unknown pointer");
+    throw unknown_allocation(fmt::format("Attempted to deallocate unknown pointer {:p}", ptr));
   }
 
   std::size_t size = record->size;

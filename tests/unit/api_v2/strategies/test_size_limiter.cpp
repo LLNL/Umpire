@@ -5,6 +5,7 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 
+#include "umpire/error.hpp"
 #include "umpire/strategy/size_limiter.hpp"
 #include "umpire/resource/host_memory.hpp"
 #include "umpire/memory.hpp"
@@ -168,7 +169,7 @@ TEST(size_limiter, limit_exceeded_throws_logic_error)
   void* ptr = limiter.allocate(64);
   ASSERT_NE(ptr, nullptr);
 
-  EXPECT_THROW(limiter.allocate(80), std::logic_error);
+  EXPECT_THROW(limiter.allocate(80), umpire::logic_error);
   EXPECT_EQ(limiter.get_current_usage(), 64);
   EXPECT_EQ(parent.get_current_size(), 64);
 
@@ -204,14 +205,22 @@ TEST(size_limiter, nullptr_deallocation_is_safe)
   EXPECT_EQ(limiter.get_current_usage(), 0);
 }
 
-TEST(size_limiter, unknown_pointer_throws_runtime_error)
+TEST(size_limiter, unknown_pointer_throws_unknown_allocation)
 {
   test_memory parent;
   umpire::strategy::size_limiter<test_memory> limiter("limiter", &parent, 128);
 
   int stack_value = 42;
-  EXPECT_THROW(limiter.deallocate(&stack_value), std::runtime_error);
-  EXPECT_EQ(limiter.get_current_usage(), 0);
+  try {
+    limiter.deallocate(&stack_value);
+    FAIL() << "Expected unknown_allocation";
+  } catch (const umpire::unknown_allocation& e) {
+    EXPECT_NE(std::string{e.what()}.find("cannot determine allocation size for pointer"), std::string::npos);
+    EXPECT_NE(std::string{e.what()}.find("0x"), std::string::npos);
+    EXPECT_EQ(limiter.get_current_usage(), 0);
+  } catch (...) {
+    FAIL() << "Expected umpire::unknown_allocation";
+  }
 }
 
 TEST(size_limiter, current_usage_not_reduced_when_parent_deallocate_throws)

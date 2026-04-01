@@ -8,6 +8,7 @@
 #define UMPIRE_strategy_size_limiter_HPP
 
 #include "umpire/detail/registry.hpp"
+#include "umpire/error.hpp"
 #include "umpire/strategy/allocation_strategy.hpp"
 
 #include "fmt/format.h"
@@ -15,7 +16,6 @@
 #include <atomic>
 #include <cstddef>
 #include <limits>
-#include <stdexcept>
 #include <string>
 
 namespace umpire {
@@ -66,7 +66,7 @@ public:
   //!
   //! @param size Number of bytes to allocate
   //! @return Pointer returned by the parent memory source
-  //! @throws std::logic_error if the allocation would exceed the limit
+  //! @throws umpire::logic_error if the allocation would exceed the limit
   //! @throws Any exception thrown by the parent allocate(), after rolling back
   //!         the reserved usage accounting
   void* allocate(std::size_t size) override
@@ -78,7 +78,7 @@ public:
     std::size_t observed = current_.load(std::memory_order_relaxed);
     while (true) {
       if (observed > limit_ || size > limit_ - observed) {
-        throw std::logic_error(
+        throw umpire::logic_error(
           fmt::format("size_limiter: allocation of {} bytes exceeds limit {} with {} bytes in use",
                       size, limit_, observed));
       }
@@ -102,7 +102,7 @@ public:
   //! @brief Deallocate memory and return its size to the available quota
   //!
   //! @param ptr Pointer to memory to deallocate (nullptr is safe)
-  //! @throws std::runtime_error if ptr is not tracked in the registry
+  //! @throws umpire::unknown_allocation if ptr is not tracked in the registry
   //! @throws Any exception thrown by the parent deallocate()
   void deallocate(void* ptr) override
   {
@@ -112,7 +112,7 @@ public:
 
     auto* record = detail::registry::get().find_allocation(ptr);
     if (!record) {
-      throw std::runtime_error(
+      throw umpire::unknown_allocation(
         fmt::format("size_limiter: cannot determine allocation size for pointer {:p}", ptr));
     }
 
