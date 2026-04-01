@@ -82,6 +82,17 @@ blt_add_test(
   NAME api_v2_host_memory_tests
   COMMAND api_v2_host_memory_tests)
 
+if (UMPIRE_ENABLE_CUDA)
+  blt_add_executable(
+    NAME api_v2_cuda_device_memory_tests
+    SOURCES api_v2/resources/test_cuda_device_memory.cpp
+    DEPENDS_ON ${unit_depends} cuda_runtime)
+
+  blt_add_test(
+    NAME api_v2_cuda_device_memory_tests
+    COMMAND api_v2_cuda_device_memory_tests)
+endif()
+
 add_subdirectory(alloc)
 add_subdirectory(op)
 add_subdirectory(resource)
