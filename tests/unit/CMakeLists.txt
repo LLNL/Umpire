@@ -65,6 +65,20 @@ blt_add_test(
   COMMAND api_v2_memory_resource_tests)
 
 blt_add_executable(
+  NAME api_v2_allocator_tests
+  SOURCES api_v2/test_allocator.cpp
+  DEPENDS_ON ${unit_depends})
+
+target_include_directories(
+  api_v2_allocator_tests
+  BEFORE PRIVATE
+  ${PROJECT_SOURCE_DIR}/include)
+
+blt_add_test(
+  NAME api_v2_allocator_tests
+  COMMAND api_v2_allocator_tests)
+
+blt_add_executable(
   NAME api_v2_allocation_strategy_tests
   SOURCES api_v2/test_allocation_strategy.cpp
   DEPENDS_ON ${unit_depends})
