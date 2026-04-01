@@ -125,9 +125,6 @@ bool operator!=(const allocator<T, Memory>& lhs, const allocator<U, Memory>& rhs
   return !(lhs == rhs);
 }
 
-template<typename Memory>
-using Allocator = allocator<char, Memory>;
-
 } // namespace umpire
 
 #endif // UMPIRE_allocator_HPP

@@ -10,6 +10,7 @@
 #include "umpire/resource/host_memory.hpp"
 
 #include <cstdlib>
+#include <limits>
 #include <map>
 #include <memory>
 #include <string>
@@ -148,6 +149,17 @@ TEST(allocator, comparison_operators_use_underlying_memory_identity)
   EXPECT_TRUE(first != different);
 }
 
+TEST(allocator, cross_type_assignment_preserves_memory)
+{
+  instrumented_memory memory;
+  umpire::allocator<int, instrumented_memory> ints(&memory);
+  umpire::allocator<double, instrumented_memory> doubles(&memory);
+
+  doubles = ints;
+
+  EXPECT_EQ(doubles.get_memory(), &memory);
+}
+
 TEST(allocator, vector_integration)
 {
   auto& host = umpire::resource::host_memory<>::get();
@@ -203,4 +215,12 @@ TEST(allocator, allocate_shared_uses_rebind)
   auto value = std::allocate_shared<int>(alloc_type{&host}, 42);
   ASSERT_NE(value, nullptr);
   EXPECT_EQ(*value, 42);
+}
+
+TEST(allocator, max_size_scales_by_element_size)
+{
+  instrumented_memory memory;
+  umpire::allocator<long long, instrumented_memory> alloc(&memory);
+
+  EXPECT_EQ(alloc.max_size(), std::numeric_limits<std::size_t>::max() / sizeof(long long));
 }
