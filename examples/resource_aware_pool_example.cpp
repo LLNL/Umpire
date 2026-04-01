@@ -53,7 +53,7 @@ __device__ void sleep(clock_value_t sleep_cycles)
 __global__ void do_sleep()
 {
   // sleep - works still at 1000, so keeping it at 100k
-  sleep(10000000);
+  sleep((clock_value_t)10000000);
 }
 #endif
 

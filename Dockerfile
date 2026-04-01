@@ -43,7 +43,7 @@ RUN cmake -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DCMAKE_CXX_COMPILER=clang++ -DC
     make -j 2 && \
     ctest -T test -E operation_tests --output-on-failure
 
-FROM ghcr.io/llnl/radiuss:ubuntu-22.04-cuda-12-3 AS cuda
+FROM ghcr.io/llnl/radiuss:cuda-12-9-ubuntu-24.04 AS cuda
 ENV GTEST_COLOR=1
 COPY . /home/umpire/workspace
 WORKDIR /home/umpire/workspace/build
