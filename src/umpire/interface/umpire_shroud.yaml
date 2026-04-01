@@ -262,6 +262,9 @@ declarations:
               function_suffix: ""
 
       # Untracked pool allocators - using splicer to handle bool template parameter
+      # Note: Keep generated Fortran identifiers <= 63 chars (gfortran default limit).
+      # The ResourceAwarePool untracked + bufferify wrapper is particularly close to
+      # the limit due to the extra `_bufferify` suffix.
       - decl: Allocator makeAllocator_list_pool_untracked(const std::string& name, Allocator allocator, size_t initial_size, size_t block)
         splicer:
           c: |
