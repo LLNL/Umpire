@@ -82,6 +82,15 @@ blt_add_test(
   NAME api_v2_host_memory_tests
   COMMAND api_v2_host_memory_tests)
 
+blt_add_executable(
+  NAME api_v2_null_resource_tests
+  SOURCES api_v2/resources/test_null_resource.cpp
+  DEPENDS_ON ${unit_depends})
+
+blt_add_test(
+  NAME api_v2_null_resource_tests
+  COMMAND api_v2_null_resource_tests)
+
 if (UMPIRE_ENABLE_CUDA)
   blt_add_executable(
     NAME api_v2_cuda_device_memory_tests
@@ -139,6 +148,33 @@ blt_add_executable(
 blt_add_test(
   NAME api_v2_quick_pool_tests
   COMMAND api_v2_quick_pool_tests)
+
+blt_add_executable(
+  NAME api_v2_size_limiter_tests
+  SOURCES api_v2/strategies/test_size_limiter.cpp
+  DEPENDS_ON ${unit_depends})
+
+blt_add_test(
+  NAME api_v2_size_limiter_tests
+  COMMAND api_v2_size_limiter_tests)
+
+blt_add_executable(
+  NAME api_v2_monotonic_buffer_tests
+  SOURCES api_v2/strategies/test_monotonic_buffer.cpp
+  DEPENDS_ON ${unit_depends})
+
+blt_add_test(
+  NAME api_v2_monotonic_buffer_tests
+  COMMAND api_v2_monotonic_buffer_tests)
+
+blt_add_executable(
+  NAME api_v2_named_tests
+  SOURCES api_v2/strategies/test_named.cpp
+  DEPENDS_ON ${unit_depends})
+
+blt_add_test(
+  NAME api_v2_named_tests
+  COMMAND api_v2_named_tests)
 
 add_subdirectory(alloc)
 add_subdirectory(op)

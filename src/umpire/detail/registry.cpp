@@ -5,6 +5,7 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/detail/registry.hpp"
+#include "umpire/memory.hpp"
 
 #include <algorithm>
 
@@ -29,6 +30,8 @@ void registry::register_allocator(memory* alloc)
 {
   std::lock_guard<std::mutex> lock{allocator_mutex_};
   allocator_list_.push_back(alloc);
+  allocator_by_name_[alloc->get_name()] = alloc;
+  allocator_by_id_[alloc->get_id()] = alloc;
 }
 
 void registry::deregister_allocator(memory* alloc)
