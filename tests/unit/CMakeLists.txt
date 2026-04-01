@@ -122,6 +122,15 @@ blt_add_test(
   NAME api_v2_fixed_pool_tests
   COMMAND api_v2_fixed_pool_tests)
 
+blt_add_executable(
+  NAME api_v2_dynamic_pool_list_tests
+  SOURCES api_v2/strategies/test_dynamic_pool_list.cpp
+  DEPENDS_ON ${unit_depends})
+
+blt_add_test(
+  NAME api_v2_dynamic_pool_list_tests
+  COMMAND api_v2_dynamic_pool_list_tests)
+
 add_subdirectory(alloc)
 add_subdirectory(op)
 add_subdirectory(resource)
