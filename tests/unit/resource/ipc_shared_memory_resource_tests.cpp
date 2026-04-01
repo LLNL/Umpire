@@ -222,6 +222,18 @@ TEST_F(SharedMemoryTest, UnitTests)
     ASSERT_EQ(shmem_resource->getActualSize(), shmem_state->initial_size);
 
     MPI_Barrier(MPI_COMM_WORLD);
+    ASSERT_NO_THROW(allocator.release(););
+    MPI_Barrier(MPI_COMM_WORLD);
+    ASSERT_EQ(shmem_resource->getActualSize(), shmem_state->initial_size);
+
+    MPI_Barrier(MPI_COMM_WORLD);
+    if (m_rank == 0) {
+      void* ptr = allocator.allocate("PostReleaseAlloc", shmem_state->largest_allocation_size);
+      allocator.deallocate(ptr);
+    }
+    MPI_Barrier(MPI_COMM_WORLD);
+
+    MPI_Barrier(MPI_COMM_WORLD);
   }
 }
 } // namespace
