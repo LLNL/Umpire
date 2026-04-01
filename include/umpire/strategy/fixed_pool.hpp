@@ -118,13 +118,11 @@ public:
     , free_objects_(0)
   {
     if (object_size_ == 0) {
-      UMPIRE_ERROR(std::invalid_argument,
-                   "fixed_pool: object_size must be greater than 0");
+      throw std::invalid_argument("fixed_pool: object_size must be greater than 0");
     }
 
     if (objects_per_pool_ == 0) {
-      UMPIRE_ERROR(std::invalid_argument,
-                   "fixed_pool: objects_per_pool must be greater than 0");
+      throw std::invalid_argument("fixed_pool: objects_per_pool must be greater than 0");
     }
 
     // Pre-allocate first pool for fast initial allocations
@@ -150,9 +148,9 @@ public:
   //! @throws out_of_memory_error if pool allocation fails
   void* allocate(std::size_t size) override {
     if (size != object_size_) {
-      UMPIRE_ERROR(std::invalid_argument,
-                   fmt::format("fixed_pool: requested size {} does not match object_size {}",
-                              size, object_size_));
+      throw std::invalid_argument(
+        fmt::format("fixed_pool: requested size {} does not match object_size {}",
+                    size, object_size_));
     }
 
     // Grow pool if needed

@@ -202,18 +202,15 @@ public:
     , next_pool_size_(initial_pool_size)
   {
     if (initial_pool_size_ == 0) {
-      UMPIRE_ERROR(std::invalid_argument,
-                   "dynamic_pool_list: initial_pool_size must be greater than 0");
+      throw std::invalid_argument("dynamic_pool_list: initial_pool_size must be greater than 0");
     }
 
     if (min_alloc_size_ == 0) {
-      UMPIRE_ERROR(std::invalid_argument,
-                   "dynamic_pool_list: min_alloc_size must be greater than 0");
+      throw std::invalid_argument("dynamic_pool_list: min_alloc_size must be greater than 0");
     }
 
     if (growth_factor_ <= 1.0) {
-      UMPIRE_ERROR(std::invalid_argument,
-                   "dynamic_pool_list: growth_factor must be greater than 1.0");
+      throw std::invalid_argument("dynamic_pool_list: growth_factor must be greater than 1.0");
     }
 
     // Allocate initial pool
