@@ -68,6 +68,16 @@ TEST(STLCompatibility, MapStoresOrderedKeyValuePairs)
   EXPECT_EQ(values.at(3), "three");
 }
 
+TEST(STLCompatibility, AllocatorExtendedConstructorsInitializeContainers)
+{
+  std::vector<int, host_allocator<int>> values(3, 7, host_allocator<int>{&host()});
+
+  ASSERT_EQ(values.size(), 3u);
+  EXPECT_EQ(values[0], 7);
+  EXPECT_EQ(values[2], 7);
+  EXPECT_EQ(values.get_allocator().get_memory(), &host());
+}
+
 TEST(STLCompatibility, UnorderedMapStoresAndFindsValues)
 {
   using value_type = std::pair<const int, std::string>;
@@ -131,6 +141,25 @@ TEST(STLCompatibility, MoveConstructionPreservesAllocatorAndContents)
   EXPECT_EQ(moved[0], 5);
   EXPECT_EQ(moved[1], 8);
   EXPECT_EQ(moved.get_allocator().get_memory(), &host());
+}
+
+TEST(STLCompatibility, MoveAssignmentPreservesContentsWithSharedAllocator)
+{
+  using vector_type = std::vector<int, host_allocator<int>>;
+
+  vector_type source{host_allocator<int>{&host()}};
+  vector_type destination{host_allocator<int>{&host()}};
+
+  source.push_back(4);
+  source.push_back(6);
+  destination.push_back(1);
+
+  destination = std::move(source);
+
+  ASSERT_EQ(destination.size(), 2u);
+  EXPECT_EQ(destination[0], 4);
+  EXPECT_EQ(destination[1], 6);
+  EXPECT_EQ(destination.get_allocator().get_memory(), &host());
 }
 
 TEST(STLCompatibility, SwapExchangesContentsWithSharedAllocator)

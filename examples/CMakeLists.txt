@@ -171,6 +171,8 @@ endif()
 
 install(TARGETS ${umpire_examples} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
+add_subdirectory(api_v2)
+
 add_subdirectory(tutorial)
 
 add_subdirectory(cookbook)

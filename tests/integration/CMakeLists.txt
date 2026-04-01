@@ -209,6 +209,8 @@ blt_add_test(
   NAME api_v2_thread_safe_stress_tests
   COMMAND api_v2_thread_safe_stress_tests)
 
+add_subdirectory(api_v2)
+
 blt_add_executable(
   NAME free_functions_integration_tests
   SOURCES free_functions_integration_tests.cpp
