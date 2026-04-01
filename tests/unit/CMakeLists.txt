@@ -104,6 +104,15 @@ if (UMPIRE_ENABLE_HIP)
     COMMAND api_v2_hip_device_memory_tests)
 endif()
 
+blt_add_executable(
+  NAME api_v2_thread_safe_tests
+  SOURCES api_v2/strategies/test_thread_safe.cpp
+  DEPENDS_ON ${unit_depends})
+
+blt_add_test(
+  NAME api_v2_thread_safe_tests
+  COMMAND api_v2_thread_safe_tests)
+
 add_subdirectory(alloc)
 add_subdirectory(op)
 add_subdirectory(resource)
