@@ -707,8 +707,8 @@ umpire_allocator * umpire_resourcemanager_make_allocator_list_pool_untracked_buf
     umpire::Allocator * SHCXX_allocator =
         static_cast<umpire::Allocator *>(allocator.addr);
     umpire::Allocator * SHCXX_rv = new umpire::Allocator;
-    *SHCXX_rv = SH_this->makeAllocator<umpire::strategy::DynamicPoolList, false>(
-        SHCXX_name, *SHCXX_allocator, initial_size, block);
+    *SHCXX_rv = SH_this->makeAllocator<umpire::strategy::DynamicPoolList, false>(SHCXX_name,
+        *SHCXX_allocator, initial_size, block);
     SHC_rv->addr = SHCXX_rv;
     SHC_rv->idtor = 1;
     return SHC_rv;
@@ -747,8 +747,8 @@ umpire_allocator * umpire_resourcemanager_make_allocator_quick_pool_untracked_bu
     umpire::Allocator * SHCXX_allocator =
         static_cast<umpire::Allocator *>(allocator.addr);
     umpire::Allocator * SHCXX_rv = new umpire::Allocator;
-    *SHCXX_rv = SH_this->makeAllocator<umpire::strategy::QuickPool, false>(
-        SHCXX_name, *SHCXX_allocator, initial_size, block);
+    *SHCXX_rv = SH_this->makeAllocator<umpire::strategy::QuickPool, false>(SHCXX_name,
+        *SHCXX_allocator, initial_size, block);
     SHC_rv->addr = SHCXX_rv;
     SHC_rv->idtor = 1;
     return SHC_rv;
@@ -827,8 +827,8 @@ umpire_allocator * umpire_resourcemanager_make_allocator_fixed_pool_untracked_bu
     umpire::Allocator * SHCXX_allocator =
         static_cast<umpire::Allocator *>(allocator.addr);
     umpire::Allocator * SHCXX_rv = new umpire::Allocator;
-    *SHCXX_rv = SH_this->makeAllocator<umpire::strategy::FixedPool, false>(
-        SHCXX_name, *SHCXX_allocator, object_size);
+    *SHCXX_rv = SH_this->makeAllocator<umpire::strategy::FixedPool, false>(SHCXX_name,
+        *SHCXX_allocator, object_size);
     SHC_rv->addr = SHCXX_rv;
     SHC_rv->idtor = 1;
     return SHC_rv;
@@ -867,8 +867,8 @@ umpire_allocator * umpire_resourcemanager_make_allocator_monotonic_untracked_buf
     umpire::Allocator * SHCXX_allocator =
         static_cast<umpire::Allocator *>(allocator.addr);
     umpire::Allocator * SHCXX_rv = new umpire::Allocator;
-    *SHCXX_rv = SH_this->makeAllocator<umpire::strategy::MonotonicAllocationStrategy, false>(
-        SHCXX_name, *SHCXX_allocator, object_size);
+    *SHCXX_rv = SH_this->makeAllocator<umpire::strategy::MonotonicAllocationStrategy, false>(SHCXX_name,
+        *SHCXX_allocator, object_size);
     SHC_rv->addr = SHCXX_rv;
     SHC_rv->idtor = 1;
     return SHC_rv;
@@ -907,8 +907,8 @@ umpire_allocator * umpire_resourcemanager_make_allocator_slot_pool_untracked_buf
     umpire::Allocator * SHCXX_allocator =
         static_cast<umpire::Allocator *>(allocator.addr);
     umpire::Allocator * SHCXX_rv = new umpire::Allocator;
-    *SHCXX_rv = SH_this->makeAllocator<umpire::strategy::SlotPool, false>(
-        SHCXX_name, *SHCXX_allocator, object_size);
+    *SHCXX_rv = SH_this->makeAllocator<umpire::strategy::SlotPool, false>(SHCXX_name,
+        *SHCXX_allocator, object_size);
     SHC_rv->addr = SHCXX_rv;
     SHC_rv->idtor = 1;
     return SHC_rv;
@@ -956,8 +956,8 @@ umpire_allocator * umpire_resourcemanager_make_allocator_mixed_pool_untracked_bu
     umpire::Allocator * SHCXX_allocator =
         static_cast<umpire::Allocator *>(allocator.addr);
     umpire::Allocator * SHCXX_rv = new umpire::Allocator;
-    *SHCXX_rv = SH_this->makeAllocator<umpire::strategy::MixedPool, false>(
-        SHCXX_name, *SHCXX_allocator, smallest_fixed_obj_size,
+    *SHCXX_rv = SH_this->makeAllocator<umpire::strategy::MixedPool, false>(SHCXX_name,
+        *SHCXX_allocator, smallest_fixed_obj_size,
         largest_fixed_obj_size, max_initial_fixed_pool_size,
         fixed_size_multiplier, quick_pool_initial_alloc_size,
         quick_pool_min_alloc_size, quick_pool_align_bytes);
