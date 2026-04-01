@@ -93,6 +93,17 @@ if (UMPIRE_ENABLE_CUDA)
     COMMAND api_v2_cuda_device_memory_tests)
 endif()
 
+if (UMPIRE_ENABLE_HIP)
+  blt_add_executable(
+    NAME api_v2_hip_device_memory_tests
+    SOURCES api_v2/resources/test_hip_device_memory.cpp
+    DEPENDS_ON ${unit_depends} hip)
+
+  blt_add_test(
+    NAME api_v2_hip_device_memory_tests
+    COMMAND api_v2_hip_device_memory_tests)
+endif()
+
 add_subdirectory(alloc)
 add_subdirectory(op)
 add_subdirectory(resource)
