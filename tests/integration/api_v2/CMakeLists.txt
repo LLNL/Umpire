@@ -31,3 +31,12 @@ blt_add_executable(
 blt_add_test(
   NAME api_v2_operations_headers_tests
   COMMAND api_v2_operations_headers_tests)
+
+blt_add_executable(
+  NAME api_v2_operations_tests
+  SOURCES test_operations.cpp
+  DEPENDS_ON ${integration_tests_depends})
+
+blt_add_test(
+  NAME api_v2_operations_tests
+  COMMAND api_v2_operations_tests)
