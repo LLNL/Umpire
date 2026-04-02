@@ -21,6 +21,9 @@ namespace {
 // Test memory implementation for unit testing
 class test_memory : public umpire::memory {
 public:
+  // Match the platform alias expected by strategy::fixed_pool and other templates
+  using platform = umpire::host_platform;
+
   test_memory() : umpire::memory{"test_parent"} { }
 
   void* allocate(std::size_t size) override
