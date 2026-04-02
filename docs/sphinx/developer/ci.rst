@@ -15,6 +15,44 @@ configurations that run on different LC machines.
 Umpire shares its Gitlab CI workflow with other projects. The documentation is
 therefore `shared <https://radiuss-shared-ci.readthedocs.io/en/latest/>`_.
 
+HIP validation hosts
+~~~~~~~~~~~~~~~~~~~~
+
+The RADIUSS configuration in this repository also includes ROCm/HIP-capable
+machine pipelines under ``scripts/radiuss-spack-configs/gitlab/radiuss-jobs/``.
+For example, ``scripts/radiuss-spack-configs/gitlab/radiuss-jobs/corona.yml``
+defines a ``rocmcc_5_7_1_hip`` job that builds a +rocm Umpire spec on the
+``corona`` LC system. The associated Spack package for Umpire in
+``scripts/radiuss-spack-configs/spack_repo/llnl_radiuss/packages/umpire/package.py``
+enables HIP via the ``+rocm`` variant and writes CMake cache entries such as
+``ENABLE_HIP`` and the appropriate ROCm paths.
+
+In practice, a HIP-capable LC machine wired into this shared CI (for example,
+corona via the ``rocmcc_5_7_1_hip`` job) is the natural place to run API v2 HIP
+validation. A representative manual validation flow on such a host looks like:
+
+.. code-block:: bash
+
+  # On an LC system with ROCm/HIP (for example, corona with rocmcc HIP modules)
+  cmake -S . -B build-hip -G Ninja \
+    -DCMAKE_CXX_COMPILER=/opt/rocm-6.4.3/bin/amdclang++ \
+    -DROCM_PATH=/opt/rocm-6.4.3 \
+    -DENABLE_HIP=On \
+    -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On \
+    -DUMPIRE_ENABLE_TESTS=On
+
+  cmake --build build-hip --parallel \
+    --target api_v2_hip_device_memory_tests api_v2_operations_tests
+
+  ctest --test-dir build-hip \
+    -R '^(api_v2_hip_device_memory_tests|api_v2_operations_tests)$' \
+    --output-on-failure
+
+As with the OpenMP target path, this configuration does not rely on the local
+macOS development machine. It records a concrete host path and
+configure/test invocation that downstream beads (for example ``umpire-4og``)
+can use when exercising API v2 HIP device coverage on a HIP-capable system.
+
 OpenMP target validation hosts
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

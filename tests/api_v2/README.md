@@ -123,6 +123,41 @@ GPU-backed CUDA, HIP, SYCL, and OpenMP target test execution requires the
 appropriate hardware and should be validated in dedicated follow-up tasks on
 capable machines.
 
+### HIP Validation
+
+The API v2 HIP resource and operation paths should be validated on ROCm/HIP
+systems rather than on the local macOS development machine. This repository
+already carries the RADIUSS shared CI configuration under
+``scripts/radiuss-spack-configs/``, including a HIP-focused job in
+``scripts/radiuss-spack-configs/gitlab/radiuss-jobs/corona.yml`` named
+``rocmcc_5_7_1_hip`` that builds a +rocm Umpire spec on the ``corona`` LC
+system.
+
+A representative manual validation recipe on a HIP-capable LC host for API v2
+HIP device coverage is:
+
+```bash
+# On an LC system with ROCm/HIP (for example, corona with rocmcc HIP modules)
+cmake -S . -B build-hip -G Ninja \
+  -DCMAKE_CXX_COMPILER=/opt/rocm-6.4.3/bin/amdclang++ \
+  -DROCM_PATH=/opt/rocm-6.4.3 \
+  -DENABLE_HIP=On \
+  -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On \
+  -DUMPIRE_ENABLE_TESTS=On
+
+cmake --build build-hip --parallel \
+  --target api_v2_hip_device_memory_tests api_v2_operations_tests
+
+ctest --test-dir build-hip \
+  -R '^(api_v2_hip_device_memory_tests|api_v2_operations_tests)$' \
+  --output-on-failure
+```
+
+This flow does not run on the current macOS development host but documents a
+concrete HIP-capable environment and configure/test invocation that follow-up
+beads such as ``umpire-4og`` can use when exercising API v2 HIP device
+coverage on ROCm-capable hardware.
+
 ### OpenMP Target Validation
 
 The API v2 OpenMP target resource and copy paths are intended to be validated
