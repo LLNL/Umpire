@@ -337,3 +337,101 @@ TEST(DeviceMemset, ExplicitHipDeviceMemset)
   host_allocator.deallocate(host_ptr);
 }
 #endif // UMPIRE_ENABLE_HIP
+
+//------------------------------------------------------------------------------
+// Platform-by-value overload tests
+//------------------------------------------------------------------------------
+
+#if defined(UMPIRE_ENABLE_CUDA)
+TEST(DeviceMemset, ExplicitPlatformCuda)
+{
+  constexpr std::size_t num_elements = 512;
+  constexpr int value = 123;
+
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto cuda_allocator = try_get_allocator(rm, "DEVICE");
+  if (!cuda_allocator) {
+    GTEST_SKIP() << "No DEVICE allocator available in this build";
+  }
+  auto host_allocator = rm.getAllocator("HOST");
+
+  int* device_ptr = static_cast<int*>(cuda_allocator->allocate(num_elements * sizeof(int)));
+  int* host_ptr = static_cast<int*>(host_allocator.allocate(num_elements * sizeof(int)));
+
+  // Use explicit platform device_memset
+  umpire::device_memset(camp::resources::Platform::cuda, device_ptr, value, num_elements);
+
+  // Copy back to verify
+  umpire::copy(device_ptr, host_ptr, num_elements);
+
+  // Verify
+  for (std::size_t i = 0; i < num_elements; ++i) {
+    ASSERT_EQ(host_ptr[i], value) << "Device memset failed at element " << i;
+  }
+
+  cuda_allocator->deallocate(device_ptr);
+  host_allocator.deallocate(host_ptr);
+}
+
+TEST(DeviceMemset, ExplicitPlatformCudaDouble)
+{
+  constexpr std::size_t num_elements = 512;
+  constexpr double value = 9.876;
+
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto cuda_allocator = try_get_allocator(rm, "DEVICE");
+  if (!cuda_allocator) {
+    GTEST_SKIP() << "No DEVICE allocator available in this build";
+  }
+  auto host_allocator = rm.getAllocator("HOST");
+
+  double* device_ptr = static_cast<double*>(cuda_allocator->allocate(num_elements * sizeof(double)));
+  double* host_ptr = static_cast<double*>(host_allocator.allocate(num_elements * sizeof(double)));
+
+  // Use explicit platform device_memset with double value
+  umpire::device_memset(camp::resources::Platform::cuda, device_ptr, value, num_elements);
+
+  // Copy back to verify
+  umpire::copy(device_ptr, host_ptr, num_elements);
+
+  // Verify
+  for (std::size_t i = 0; i < num_elements; ++i) {
+    ASSERT_DOUBLE_EQ(host_ptr[i], value) << "Device memset failed at element " << i;
+  }
+
+  cuda_allocator->deallocate(device_ptr);
+  host_allocator.deallocate(host_ptr);
+}
+#endif // UMPIRE_ENABLE_CUDA
+
+#if defined(UMPIRE_ENABLE_HIP)
+TEST(DeviceMemset, ExplicitPlatformHip)
+{
+  constexpr std::size_t num_elements = 512;
+  constexpr int value = 456;
+
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto hip_allocator = try_get_allocator(rm, "DEVICE");
+  if (!hip_allocator) {
+    GTEST_SKIP() << "No DEVICE allocator available in this build";
+  }
+  auto host_allocator = rm.getAllocator("HOST");
+
+  int* device_ptr = static_cast<int*>(hip_allocator->allocate(num_elements * sizeof(int)));
+  int* host_ptr = static_cast<int*>(host_allocator.allocate(num_elements * sizeof(int)));
+
+  // Use explicit platform device_memset
+  umpire::device_memset(camp::resources::Platform::hip, device_ptr, value, num_elements);
+
+  // Copy back to verify
+  umpire::copy(device_ptr, host_ptr, num_elements);
+
+  // Verify
+  for (std::size_t i = 0; i < num_elements; ++i) {
+    ASSERT_EQ(host_ptr[i], value) << "Device memset failed at element " << i;
+  }
+
+  hip_allocator->deallocate(device_ptr);
+  host_allocator.deallocate(host_ptr);
+}
+#endif // UMPIRE_ENABLE_HIP

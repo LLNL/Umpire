@@ -486,3 +486,143 @@ TEST(Advise, HipCoarseGrain)
 }
 #endif // HIP_VERSION_MAJOR >= 5
 #endif // UMPIRE_ENABLE_HIP
+
+//------------------------------------------------------------------------------
+// Platform-by-value overload tests
+//------------------------------------------------------------------------------
+
+TEST(Advise, ExplicitPlatformHostThrows)
+{
+  constexpr std::size_t size = 512;
+
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto allocator = rm.getAllocator("HOST");
+
+  void* ptr = allocator.allocate(size);
+
+  // Fill with test data
+  std::memset(ptr, 0x22, size);
+
+  // Advise operations should throw for host platform
+  EXPECT_THROW(umpire::set_accessed_by(camp::resources::Platform::host, ptr, 0, size), std::runtime_error);
+  EXPECT_THROW(umpire::set_preferred_location(camp::resources::Platform::host, ptr, 0, size), std::runtime_error);
+  EXPECT_THROW(umpire::set_read_mostly(camp::resources::Platform::host, ptr, 0, size), std::runtime_error);
+  EXPECT_THROW(umpire::unset_accessed_by(camp::resources::Platform::host, ptr, 0, size), std::runtime_error);
+  EXPECT_THROW(umpire::unset_preferred_location(camp::resources::Platform::host, ptr, 0, size), std::runtime_error);
+  EXPECT_THROW(umpire::unset_read_mostly(camp::resources::Platform::host, ptr, 0, size), std::runtime_error);
+
+  allocator.deallocate(ptr);
+}
+
+#if defined(UMPIRE_ENABLE_CUDA)
+TEST(Advise, ExplicitPlatformCudaSetAccessedBy)
+{
+  constexpr std::size_t size = 512;
+
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  try {
+    auto um_allocator = rm.getAllocator("UM");
+    auto host_allocator = rm.getAllocator("HOST");
+
+    void* um_ptr = um_allocator.allocate(size);
+    unsigned char* host_ptr = static_cast<unsigned char*>(host_allocator.allocate(size));
+
+    // Fill with test data
+    std::memset(um_ptr, 0x33, size);
+
+    // Set accessed by with explicit platform
+    EXPECT_NO_THROW(umpire::set_accessed_by(camp::resources::Platform::cuda, um_ptr, 0, size));
+
+    // Copy to verify
+    std::memcpy(host_ptr, um_ptr, size);
+
+    // Verify data is intact
+    for (std::size_t i = 0; i < size; ++i) {
+      ASSERT_EQ(host_ptr[i], 0x33) << "Data corrupted at byte " << i;
+    }
+
+    // Unset with explicit platform
+    EXPECT_NO_THROW(umpire::unset_accessed_by(camp::resources::Platform::cuda, um_ptr, 0, size));
+
+    um_allocator.deallocate(um_ptr);
+    host_allocator.deallocate(host_ptr);
+  } catch (const std::runtime_error& e) {
+    GTEST_SKIP() << "Unified Memory not available: " << e.what();
+  }
+}
+
+TEST(Advise, ExplicitPlatformCudaSetPreferredLocation)
+{
+  constexpr std::size_t size = 512;
+
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  try {
+    auto um_allocator = rm.getAllocator("UM");
+    auto host_allocator = rm.getAllocator("HOST");
+
+    void* um_ptr = um_allocator.allocate(size);
+    unsigned char* host_ptr = static_cast<unsigned char*>(host_allocator.allocate(size));
+
+    // Fill with test data
+    std::memset(um_ptr, 0x44, size);
+
+    // Set preferred location with explicit platform
+    EXPECT_NO_THROW(umpire::set_preferred_location(camp::resources::Platform::cuda, um_ptr, 0, size));
+
+    // Copy to verify
+    std::memcpy(host_ptr, um_ptr, size);
+
+    // Verify data is intact
+    for (std::size_t i = 0; i < size; ++i) {
+      ASSERT_EQ(host_ptr[i], 0x44) << "Data corrupted at byte " << i;
+    }
+
+    // Unset with explicit platform
+    EXPECT_NO_THROW(umpire::unset_preferred_location(camp::resources::Platform::cuda, um_ptr, 0, size));
+
+    um_allocator.deallocate(um_ptr);
+    host_allocator.deallocate(host_ptr);
+  } catch (const std::runtime_error& e) {
+    GTEST_SKIP() << "Unified Memory not available: " << e.what();
+  }
+}
+
+TEST(Advise, ExplicitPlatformCudaSetReadMostly)
+{
+  constexpr std::size_t size = 512;
+
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  try {
+    auto um_allocator = rm.getAllocator("UM");
+    auto host_allocator = rm.getAllocator("HOST");
+
+    void* um_ptr = um_allocator.allocate(size);
+    unsigned char* host_ptr = static_cast<unsigned char*>(host_allocator.allocate(size));
+
+    // Fill with test data
+    std::memset(um_ptr, 0x55, size);
+
+    // Set read mostly with explicit platform
+    EXPECT_NO_THROW(umpire::set_read_mostly(camp::resources::Platform::cuda, um_ptr, 0, size));
+
+    // Copy to verify
+    std::memcpy(host_ptr, um_ptr, size);
+
+    // Verify data is intact
+    for (std::size_t i = 0; i < size; ++i) {
+      ASSERT_EQ(host_ptr[i], 0x55) << "Data corrupted at byte " << i;
+    }
+
+    // Unset with explicit platform
+    EXPECT_NO_THROW(umpire::unset_read_mostly(camp::resources::Platform::cuda, um_ptr, 0, size));
+
+    um_allocator.deallocate(um_ptr);
+    host_allocator.deallocate(host_ptr);
+  } catch (const std::runtime_error& e) {
+    GTEST_SKIP() << "Unified Memory not available: " << e.what();
+  }
+}
+#endif // UMPIRE_ENABLE_CUDA

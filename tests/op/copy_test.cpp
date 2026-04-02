@@ -209,4 +209,313 @@ TEST(Copy, VoidVsTypedSemantics)
   allocator.deallocate(void_dst);
 }
 
-// Additional tests for async copy operations could be added here
+TEST(Copy, HostToHostAsync)
+{
+  constexpr std::size_t size = 1024;
+  constexpr int num_elements = size / sizeof(int);
+
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto allocator = rm.getAllocator("HOST");
+
+  // Allocate source and destination buffers
+  int* source_ptr = static_cast<int*>(allocator.allocate(size));
+  int* dest_ptr = static_cast<int*>(allocator.allocate(size));
+
+  // Fill source with test data
+  for (int i = 0; i < num_elements; ++i) {
+    source_ptr[i] = i + 500;
+  }
+
+  // Set destination to zero
+  std::memset(dest_ptr, 0, size);
+
+  // Create host resource for async operation
+  camp::resources::Resource host_ctx{camp::resources::Host{}};
+
+  // Copy data using async variant
+  auto event = umpire::copy(source_ptr, dest_ptr, num_elements, host_ctx);
+
+  // Wait for async operation to complete
+  static_cast<camp::resources::Event>(event).wait();
+
+  // Verify the copy was successful
+  for (int i = 0; i < num_elements; ++i) {
+    ASSERT_EQ(source_ptr[i], dest_ptr[i]) << "Async copy failed at index " << i;
+  }
+
+  // Cleanup
+  allocator.deallocate(source_ptr);
+  allocator.deallocate(dest_ptr);
+}
+
+#if defined(UMPIRE_ENABLE_CUDA)
+TEST(Copy, CudaToHostAsync)
+{
+  constexpr std::size_t size = 1024;
+  constexpr int num_elements = size / sizeof(int);
+
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto cuda_allocator = rm.getAllocator("DEVICE");
+  auto host_allocator = rm.getAllocator("HOST");
+
+  // Allocate device and host buffers
+  int* device_ptr = static_cast<int*>(cuda_allocator.allocate(size));
+  int* host_ptr = static_cast<int*>(host_allocator.allocate(size));
+  int* temp_host = static_cast<int*>(host_allocator.allocate(size));
+
+  // Fill temp host buffer with test data
+  for (int i = 0; i < num_elements; ++i) {
+    temp_host[i] = i + 600;
+  }
+
+  // Copy data to device synchronously
+  umpire::copy(temp_host, device_ptr, num_elements);
+
+  // Zero out destination
+  std::memset(host_ptr, 0, size);
+
+  // Create CUDA resource for async operation
+  camp::resources::Resource cuda_ctx{camp::resources::Cuda{}};
+
+  // Async copy from device to host
+  auto event = umpire::copy(device_ptr, host_ptr, num_elements, cuda_ctx);
+
+  // Wait for async operation to complete
+  static_cast<camp::resources::Event>(event).wait();
+
+  // Verify the copy was successful
+  for (int i = 0; i < num_elements; ++i) {
+    ASSERT_EQ(host_ptr[i], i + 600) << "Async CUDA->Host copy failed at index " << i;
+  }
+
+  // Cleanup
+  cuda_allocator.deallocate(device_ptr);
+  host_allocator.deallocate(host_ptr);
+  host_allocator.deallocate(temp_host);
+}
+
+TEST(Copy, HostToCudaAsync)
+{
+  constexpr std::size_t size = 1024;
+  constexpr int num_elements = size / sizeof(int);
+
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto cuda_allocator = rm.getAllocator("DEVICE");
+  auto host_allocator = rm.getAllocator("HOST");
+
+  // Allocate device and host buffers
+  int* device_ptr = static_cast<int*>(cuda_allocator.allocate(size));
+  int* host_src = static_cast<int*>(host_allocator.allocate(size));
+  int* host_verify = static_cast<int*>(host_allocator.allocate(size));
+
+  // Fill source with test data
+  for (int i = 0; i < num_elements; ++i) {
+    host_src[i] = i + 700;
+  }
+
+  // Create CUDA resource for async operation
+  camp::resources::Resource cuda_ctx{camp::resources::Cuda{}};
+
+  // Async copy from host to device
+  auto event = umpire::copy(host_src, device_ptr, num_elements, cuda_ctx);
+
+  // Wait for async operation to complete
+  static_cast<camp::resources::Event>(event).wait();
+
+  // Copy back to verify
+  umpire::copy(device_ptr, host_verify, num_elements);
+
+  // Verify the copy was successful
+  for (int i = 0; i < num_elements; ++i) {
+    ASSERT_EQ(host_verify[i], i + 700) << "Async Host->CUDA copy failed at index " << i;
+  }
+
+  // Cleanup
+  cuda_allocator.deallocate(device_ptr);
+  host_allocator.deallocate(host_src);
+  host_allocator.deallocate(host_verify);
+}
+#endif
+
+//------------------------------------------------------------------------------
+// Platform-by-value overload tests
+//------------------------------------------------------------------------------
+
+TEST(Copy, ExplicitPlatformHostToHost)
+{
+  constexpr std::size_t num_elements = 256;
+
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto allocator = rm.getAllocator("HOST");
+
+  int* source_ptr = static_cast<int*>(allocator.allocate(num_elements * sizeof(int)));
+  int* dest_ptr = static_cast<int*>(allocator.allocate(num_elements * sizeof(int)));
+
+  // Initialize source data
+  for (std::size_t i = 0; i < num_elements; ++i) {
+    source_ptr[i] = static_cast<int>(i * 3 + 42);
+  }
+
+  // Zero destination
+  std::memset(dest_ptr, 0, num_elements * sizeof(int));
+
+  // Copy using explicit platform parameters
+  umpire::copy(camp::resources::Platform::host, camp::resources::Platform::host, source_ptr, dest_ptr, num_elements);
+
+  // Verify
+  for (std::size_t i = 0; i < num_elements; ++i) {
+    ASSERT_EQ(source_ptr[i], dest_ptr[i]) << "Data mismatch at index " << i;
+  }
+
+  allocator.deallocate(source_ptr);
+  allocator.deallocate(dest_ptr);
+}
+
+TEST(Copy, ExplicitPlatformHostToHostAsync)
+{
+  constexpr std::size_t num_elements = 256;
+
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto allocator = rm.getAllocator("HOST");
+
+  int* source_ptr = static_cast<int*>(allocator.allocate(num_elements * sizeof(int)));
+  int* dest_ptr = static_cast<int*>(allocator.allocate(num_elements * sizeof(int)));
+
+  // Initialize source data
+  for (std::size_t i = 0; i < num_elements; ++i) {
+    source_ptr[i] = static_cast<int>(i * 5 + 17);
+  }
+
+  // Zero destination
+  std::memset(dest_ptr, 0, num_elements * sizeof(int));
+
+  // Create host resource
+  camp::resources::Resource host_ctx{camp::resources::Host{}};
+
+  // Async copy using explicit platform parameters
+  auto event = umpire::copy(camp::resources::Platform::host, camp::resources::Platform::host, source_ptr, dest_ptr,
+                            num_elements, host_ctx);
+
+  // Wait for completion
+  static_cast<camp::resources::Event>(event).wait();
+
+  // Verify
+  for (std::size_t i = 0; i < num_elements; ++i) {
+    ASSERT_EQ(source_ptr[i], dest_ptr[i]) << "Data mismatch at index " << i;
+  }
+
+  allocator.deallocate(source_ptr);
+  allocator.deallocate(dest_ptr);
+}
+
+#if defined(UMPIRE_ENABLE_CUDA)
+TEST(Copy, ExplicitPlatformCudaToHost)
+{
+  constexpr std::size_t num_elements = 256;
+
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto cuda_allocator = rm.getAllocator("DEVICE");
+  auto host_allocator = rm.getAllocator("HOST");
+
+  int* device_ptr = static_cast<int*>(cuda_allocator.allocate(num_elements * sizeof(int)));
+  int* host_src = static_cast<int*>(host_allocator.allocate(num_elements * sizeof(int)));
+  int* host_dst = static_cast<int*>(host_allocator.allocate(num_elements * sizeof(int)));
+
+  // Initialize host source
+  for (std::size_t i = 0; i < num_elements; ++i) {
+    host_src[i] = static_cast<int>(i * 7 + 99);
+  }
+
+  // Copy to device first
+  umpire::copy(host_src, device_ptr, num_elements);
+
+  // Zero destination
+  std::memset(host_dst, 0, num_elements * sizeof(int));
+
+  // Copy from device to host using explicit platforms
+  umpire::copy(camp::resources::Platform::cuda, camp::resources::Platform::host, device_ptr, host_dst, num_elements);
+
+  // Verify
+  for (std::size_t i = 0; i < num_elements; ++i) {
+    ASSERT_EQ(host_dst[i], static_cast<int>(i * 7 + 99)) << "Data mismatch at index " << i;
+  }
+
+  cuda_allocator.deallocate(device_ptr);
+  host_allocator.deallocate(host_src);
+  host_allocator.deallocate(host_dst);
+}
+
+TEST(Copy, ExplicitPlatformHostToCuda)
+{
+  constexpr std::size_t num_elements = 256;
+
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto cuda_allocator = rm.getAllocator("DEVICE");
+  auto host_allocator = rm.getAllocator("HOST");
+
+  int* device_ptr = static_cast<int*>(cuda_allocator.allocate(num_elements * sizeof(int)));
+  int* host_src = static_cast<int*>(host_allocator.allocate(num_elements * sizeof(int)));
+  int* host_verify = static_cast<int*>(host_allocator.allocate(num_elements * sizeof(int)));
+
+  // Initialize host source
+  for (std::size_t i = 0; i < num_elements; ++i) {
+    host_src[i] = static_cast<int>(i * 11 + 13);
+  }
+
+  // Copy from host to device using explicit platforms
+  umpire::copy(camp::resources::Platform::host, camp::resources::Platform::cuda, host_src, device_ptr, num_elements);
+
+  // Copy back to verify
+  umpire::copy(device_ptr, host_verify, num_elements);
+
+  // Verify
+  for (std::size_t i = 0; i < num_elements; ++i) {
+    ASSERT_EQ(host_verify[i], static_cast<int>(i * 11 + 13)) << "Data mismatch at index " << i;
+  }
+
+  cuda_allocator.deallocate(device_ptr);
+  host_allocator.deallocate(host_src);
+  host_allocator.deallocate(host_verify);
+}
+
+TEST(Copy, ExplicitPlatformCudaToHostAsync)
+{
+  constexpr std::size_t num_elements = 256;
+
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto cuda_allocator = rm.getAllocator("DEVICE");
+  auto host_allocator = rm.getAllocator("HOST");
+
+  int* device_ptr = static_cast<int*>(cuda_allocator.allocate(num_elements * sizeof(int)));
+  int* host_src = static_cast<int*>(host_allocator.allocate(num_elements * sizeof(int)));
+  int* host_dst = static_cast<int*>(host_allocator.allocate(num_elements * sizeof(int)));
+
+  // Initialize and copy to device
+  for (std::size_t i = 0; i < num_elements; ++i) {
+    host_src[i] = static_cast<int>(i * 13 + 79);
+  }
+  umpire::copy(host_src, device_ptr, num_elements);
+
+  // Zero destination
+  std::memset(host_dst, 0, num_elements * sizeof(int));
+
+  // Create CUDA resource
+  camp::resources::Resource cuda_ctx{camp::resources::Cuda{}};
+
+  // Async copy using explicit platforms
+  auto event = umpire::copy(camp::resources::Platform::cuda, camp::resources::Platform::host, device_ptr, host_dst,
+                            num_elements, cuda_ctx);
+
+  // Wait for completion
+  static_cast<camp::resources::Event>(event).wait();
+
+  // Verify
+  for (std::size_t i = 0; i < num_elements; ++i) {
+    ASSERT_EQ(host_dst[i], static_cast<int>(i * 13 + 79)) << "Data mismatch at index " << i;
+  }
+
+  cuda_allocator.deallocate(device_ptr);
+  host_allocator.deallocate(host_src);
+  host_allocator.deallocate(host_dst);
+}
+#endif

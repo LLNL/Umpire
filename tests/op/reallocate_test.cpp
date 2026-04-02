@@ -341,3 +341,263 @@ TEST(Reallocate, TypedReallocateOddElements)
   // Cleanup
   allocator.deallocate(ptr);
 }
+
+TEST(Reallocate, HostReallocateAsync)
+{
+  constexpr std::size_t initial_size = 512;
+  constexpr std::size_t final_size = 1024;
+  constexpr int num_initial_elements = initial_size / sizeof(int);
+  constexpr int num_final_elements = final_size / sizeof(int);
+
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto allocator = rm.getAllocator("HOST");
+
+  // Allocate initial buffer
+  int* ptr = static_cast<int*>(allocator.allocate(initial_size));
+
+  // Fill with test data
+  for (int i = 0; i < num_initial_elements; ++i) {
+    ptr[i] = i + 800;
+  }
+
+  // Create host resource for async operation
+  camp::resources::Resource host_ctx{camp::resources::Host{}};
+
+  // Reallocate to larger size asynchronously
+  auto event = umpire::reallocate(&ptr, num_final_elements, host_ctx);
+
+  // Wait for async operation to complete
+  static_cast<camp::resources::Event>(event).wait();
+
+  // Verify original data is preserved
+  for (int i = 0; i < num_initial_elements; ++i) {
+    ASSERT_EQ(ptr[i], i + 800) << "Async reallocate lost data at index " << i;
+  }
+
+  // Fill new portion
+  for (int i = num_initial_elements; i < num_final_elements; ++i) {
+    ptr[i] = i + 900;
+  }
+
+  // Verify new data can be written
+  for (int i = num_initial_elements; i < num_final_elements; ++i) {
+    ASSERT_EQ(ptr[i], i + 900) << "New data write failed at index " << i;
+  }
+
+  // Cleanup
+  allocator.deallocate(ptr);
+}
+
+#if defined(UMPIRE_ENABLE_CUDA)
+TEST(Reallocate, CudaReallocateAsync)
+{
+  constexpr std::size_t initial_size = 512;
+  constexpr std::size_t final_size = 1024;
+  constexpr int num_initial_elements = initial_size / sizeof(int);
+  constexpr int num_final_elements = final_size / sizeof(int);
+
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto cuda_allocator = rm.getAllocator("DEVICE");
+  auto host_allocator = rm.getAllocator("HOST");
+
+  // Allocate device buffer
+  int* device_ptr = static_cast<int*>(cuda_allocator.allocate(initial_size));
+
+  // Allocate host buffer for data setup
+  int* host_ptr = static_cast<int*>(host_allocator.allocate(final_size));
+
+  // Fill host buffer with test data
+  for (int i = 0; i < num_initial_elements; ++i) {
+    host_ptr[i] = i + 1000;
+  }
+
+  // Copy initial data to device
+  umpire::copy(host_ptr, device_ptr, num_initial_elements);
+
+  // Create CUDA resource for async operation
+  camp::resources::Resource cuda_ctx{camp::resources::Cuda{}};
+
+  // Reallocate device memory asynchronously
+  auto event = umpire::reallocate(&device_ptr, num_final_elements, cuda_ctx);
+
+  // Wait for async operation to complete
+  static_cast<camp::resources::Event>(event).wait();
+
+  // Copy back to host for verification
+  umpire::copy(device_ptr, host_ptr, num_final_elements);
+
+  // Verify original data is preserved
+  for (int i = 0; i < num_initial_elements; ++i) {
+    ASSERT_EQ(host_ptr[i], i + 1000) << "Async CUDA reallocate lost data at index " << i;
+  }
+
+  // Cleanup
+  cuda_allocator.deallocate(device_ptr);
+  host_allocator.deallocate(host_ptr);
+}
+#endif
+
+//------------------------------------------------------------------------------
+// Platform-by-value overload tests
+//------------------------------------------------------------------------------
+
+TEST(Reallocate, ExplicitPlatformHost)
+{
+  constexpr std::size_t initial_elements = 128;
+  constexpr std::size_t final_elements = 256;
+
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto allocator = rm.getAllocator("HOST");
+
+  int* ptr = static_cast<int*>(allocator.allocate(initial_elements * sizeof(int)));
+
+  // Fill with test data
+  for (std::size_t i = 0; i < initial_elements; ++i) {
+    ptr[i] = static_cast<int>(i + 777);
+  }
+
+  // Reallocate using explicit platform
+  ptr = umpire::reallocate(camp::resources::Platform::host, &ptr, final_elements);
+
+  // Verify original data is preserved
+  for (std::size_t i = 0; i < initial_elements; ++i) {
+    ASSERT_EQ(ptr[i], static_cast<int>(i + 777)) << "Data lost at index " << i;
+  }
+
+  allocator.deallocate(ptr);
+}
+
+TEST(Reallocate, ExplicitPlatformHostAsync)
+{
+  constexpr std::size_t initial_elements = 128;
+  constexpr std::size_t final_elements = 256;
+
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto allocator = rm.getAllocator("HOST");
+
+  int* ptr = static_cast<int*>(allocator.allocate(initial_elements * sizeof(int)));
+
+  // Fill with test data
+  for (std::size_t i = 0; i < initial_elements; ++i) {
+    ptr[i] = static_cast<int>(i + 888);
+  }
+
+  // Create host resource
+  camp::resources::Resource host_ctx{camp::resources::Host{}};
+
+  // Async reallocate using explicit platform
+  auto event = umpire::reallocate(camp::resources::Platform::host, &ptr, final_elements, host_ctx);
+
+  // Wait for completion
+  static_cast<camp::resources::Event>(event).wait();
+
+  // Verify original data is preserved
+  for (std::size_t i = 0; i < initial_elements; ++i) {
+    ASSERT_EQ(ptr[i], static_cast<int>(i + 888)) << "Data lost at index " << i;
+  }
+
+  allocator.deallocate(ptr);
+}
+
+TEST(Reallocate, ExplicitPlatformHostVoidPtr)
+{
+  constexpr std::size_t initial_size = 256;
+  constexpr std::size_t final_size = 512;
+
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto allocator = rm.getAllocator("HOST");
+
+  void* ptr = allocator.allocate(initial_size);
+
+  // Fill with pattern
+  std::memset(ptr, 0xCD, initial_size);
+
+  // Reallocate using explicit platform and void*
+  ptr = umpire::reallocate(camp::resources::Platform::host, &ptr, final_size);
+
+  // Verify pattern is preserved
+  unsigned char* byte_ptr = static_cast<unsigned char*>(ptr);
+  for (std::size_t i = 0; i < initial_size; ++i) {
+    ASSERT_EQ(byte_ptr[i], 0xCD) << "Pattern lost at byte " << i;
+  }
+
+  allocator.deallocate(ptr);
+}
+
+#if defined(UMPIRE_ENABLE_CUDA)
+TEST(Reallocate, ExplicitPlatformCuda)
+{
+  constexpr std::size_t initial_elements = 128;
+  constexpr std::size_t final_elements = 256;
+
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto cuda_allocator = rm.getAllocator("DEVICE");
+  auto host_allocator = rm.getAllocator("HOST");
+
+  int* device_ptr = static_cast<int*>(cuda_allocator.allocate(initial_elements * sizeof(int)));
+  int* host_ptr = static_cast<int*>(host_allocator.allocate(final_elements * sizeof(int)));
+
+  // Fill host buffer with test data
+  for (std::size_t i = 0; i < initial_elements; ++i) {
+    host_ptr[i] = static_cast<int>(i + 555);
+  }
+
+  // Copy to device
+  umpire::copy(host_ptr, device_ptr, initial_elements);
+
+  // Reallocate using explicit platform
+  device_ptr = umpire::reallocate(camp::resources::Platform::cuda, &device_ptr, final_elements);
+
+  // Copy back to verify
+  umpire::copy(device_ptr, host_ptr, final_elements);
+
+  // Verify original data is preserved
+  for (std::size_t i = 0; i < initial_elements; ++i) {
+    ASSERT_EQ(host_ptr[i], static_cast<int>(i + 555)) << "Data lost at index " << i;
+  }
+
+  cuda_allocator.deallocate(device_ptr);
+  host_allocator.deallocate(host_ptr);
+}
+
+TEST(Reallocate, ExplicitPlatformCudaAsync)
+{
+  constexpr std::size_t initial_elements = 128;
+  constexpr std::size_t final_elements = 256;
+
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto cuda_allocator = rm.getAllocator("DEVICE");
+  auto host_allocator = rm.getAllocator("HOST");
+
+  int* device_ptr = static_cast<int*>(cuda_allocator.allocate(initial_elements * sizeof(int)));
+  int* host_ptr = static_cast<int*>(host_allocator.allocate(final_elements * sizeof(int)));
+
+  // Fill host buffer with test data
+  for (std::size_t i = 0; i < initial_elements; ++i) {
+    host_ptr[i] = static_cast<int>(i + 666);
+  }
+
+  // Copy to device
+  umpire::copy(host_ptr, device_ptr, initial_elements);
+
+  // Create CUDA resource
+  camp::resources::Resource cuda_ctx{camp::resources::Cuda{}};
+
+  // Async reallocate using explicit platform
+  auto event = umpire::reallocate(camp::resources::Platform::cuda, &device_ptr, final_elements, cuda_ctx);
+
+  // Wait for completion
+  static_cast<camp::resources::Event>(event).wait();
+
+  // Copy back to verify
+  umpire::copy(device_ptr, host_ptr, final_elements);
+
+  // Verify original data is preserved
+  for (std::size_t i = 0; i < initial_elements; ++i) {
+    ASSERT_EQ(host_ptr[i], static_cast<int>(i + 666)) << "Data lost at index " << i;
+  }
+
+  cuda_allocator.deallocate(device_ptr);
+  host_allocator.deallocate(host_ptr);
+}
+#endif

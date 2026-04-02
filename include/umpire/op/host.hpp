@@ -22,7 +22,7 @@ struct copy<resource::host_platform, resource::host_platform> {
    * @param len Number of elements to copy
    */
   template <typename T>
-  static void exec(T* src, T* dst, std::size_t len) noexcept
+  static void exec(T* src, T* dst, std::size_t len)
   {
     std::memcpy(dst, src, detail::get_size<T>(len));
   }
@@ -35,7 +35,7 @@ struct copy<resource::host_platform, resource::host_platform> {
    */
   template <typename T>
   static camp::resources::EventProxy<camp::resources::Resource> exec(T* src, T* dst, std::size_t len,
-                                                                     camp::resources::Resource& resource) noexcept
+                                                                     camp::resources::Resource& resource)
   {
     exec(src, dst, len);
     return detail::make_completed_event(resource);
@@ -53,7 +53,7 @@ struct memset<resource::host_platform> {
    * @param len Number of elements to set
    */
   template <typename T>
-  static void exec(T* ptr, int val, std::size_t len) noexcept
+  static void exec(T* ptr, int val, std::size_t len)
   {
     std::memset(ptr, val, detail::get_size<T>(len));
   }
@@ -66,7 +66,7 @@ struct memset<resource::host_platform> {
    */
   template <typename T>
   static camp::resources::EventProxy<camp::resources::Resource> exec(T* ptr, int val, std::size_t len,
-                                                                     camp::resources::Resource& resource) noexcept
+                                                                     camp::resources::Resource& resource)
   {
     exec(ptr, val, len);
     return detail::make_completed_event(resource);
@@ -106,7 +106,7 @@ struct prefetch<resource::host_platform> {
    * @param len Number of bytes to prefetch (unused)
    */
   template <typename T>
-  static void exec(T* /*ptr*/, int /*device*/, std::size_t /*len*/) noexcept
+  static void exec(T* /*ptr*/, int /*device*/, std::size_t /*len*/)
   {
     // No-op: CPU already has direct access to host memory
   }
@@ -118,7 +118,7 @@ struct prefetch<resource::host_platform> {
    */
   template <typename T>
   static camp::resources::EventProxy<camp::resources::Resource> exec(T* /*ptr*/, int /*device*/, std::size_t /*len*/,
-                                                                     camp::resources::Resource& resource) noexcept
+                                                                     camp::resources::Resource& resource)
   {
     // No-op: CPU already has direct access to host memory
     return detail::make_completed_event(resource);

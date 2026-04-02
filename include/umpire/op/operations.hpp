@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cstdlib>
+#include <functional>
+#include <optional>
 #include <stdexcept>
 
 #include "camp/resource.hpp"
@@ -34,7 +36,7 @@ struct device_memset : public operation {
   static constexpr const char* name = "DEVICE_MEMSET";
 };
 
-template <typename Src>
+template <typename Platform>
 struct reallocate : public operation {
   static constexpr int arity = 1;
   static constexpr const char* name = "REALLOCATE";
@@ -50,6 +52,15 @@ struct reallocate : public operation {
 
   static camp::resources::EventProxy<camp::resources::Resource> exec(void** ptr_ptr, std::size_t new_size,
                                                                      camp::resources::Resource& ctx);
+
+private:
+  // Private implementation helpers containing common reallocate logic
+  template <typename PtrType>
+  static PtrType* reallocate_impl_sync(PtrType** ptr_ptr, std::size_t new_size);
+
+  template <typename PtrType>
+  static camp::resources::EventProxy<camp::resources::Resource> reallocate_impl_async(
+      PtrType** ptr_ptr, std::size_t new_size, camp::resources::Resource& ctx);
 };
 
 #define DEFINE_ADVICE_OP(op_name, name_str)                                                        \

@@ -282,3 +282,194 @@ TEST(Memset, ExplicitHipMemset)
   host_allocator.deallocate(host_ptr);
 }
 #endif // UMPIRE_ENABLE_HIP
+
+TEST(Memset, HostMemsetAsync)
+{
+  constexpr std::size_t size = 1024;
+  constexpr int value = 0x77;
+
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto allocator = rm.getAllocator("HOST");
+
+  // Allocate buffer
+  unsigned char* ptr = static_cast<unsigned char*>(allocator.allocate(size));
+
+  // Fill with different pattern first
+  std::memset(ptr, 0xAA, size);
+
+  // Create host resource for async operation
+  camp::resources::Resource host_ctx{camp::resources::Host{}};
+
+  // Use async memset
+  auto event = umpire::memset(ptr, value, size, host_ctx);
+
+  // Wait for async operation to complete
+  static_cast<camp::resources::Event>(event).wait();
+
+  // Verify the memset was successful
+  for (std::size_t i = 0; i < size; ++i) {
+    ASSERT_EQ(ptr[i], value) << "Async host memset failed at byte " << i;
+  }
+
+  // Cleanup
+  allocator.deallocate(ptr);
+}
+
+#if defined(UMPIRE_ENABLE_CUDA)
+TEST(Memset, CudaMemsetAsync)
+{
+  constexpr std::size_t size = 1024;
+  constexpr int value = 0x99;
+
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto cuda_allocator = rm.getAllocator("DEVICE");
+  auto host_allocator = rm.getAllocator("HOST");
+
+  // Allocate device buffer
+  unsigned char* device_ptr = static_cast<unsigned char*>(cuda_allocator.allocate(size));
+
+  // Allocate host buffer for verification
+  unsigned char* host_ptr = static_cast<unsigned char*>(host_allocator.allocate(size));
+
+  // Create CUDA resource for async operation
+  camp::resources::Resource cuda_ctx{camp::resources::Cuda{}};
+
+  // Use async memset on device memory
+  auto event = umpire::memset(device_ptr, value, size, cuda_ctx);
+
+  // Wait for async operation to complete
+  static_cast<camp::resources::Event>(event).wait();
+
+  // Copy back to host for verification
+  umpire::copy(device_ptr, host_ptr, size);
+
+  // Verify the memset was successful
+  for (std::size_t i = 0; i < size; ++i) {
+    ASSERT_EQ(host_ptr[i], value) << "Async CUDA memset failed at byte " << i;
+  }
+
+  // Cleanup
+  cuda_allocator.deallocate(device_ptr);
+  host_allocator.deallocate(host_ptr);
+}
+#endif
+
+//------------------------------------------------------------------------------
+// Platform-by-value overload tests
+//------------------------------------------------------------------------------
+
+TEST(Memset, ExplicitPlatformHost)
+{
+  constexpr std::size_t size = 512;
+  constexpr int value = 0x33;
+
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto allocator = rm.getAllocator("HOST");
+
+  unsigned char* ptr = static_cast<unsigned char*>(allocator.allocate(size));
+
+  // Fill with initial pattern
+  std::memset(ptr, 0xAA, size);
+
+  // Use explicit platform memset
+  umpire::memset(camp::resources::Platform::host, ptr, value, size);
+
+  // Verify
+  for (std::size_t i = 0; i < size; ++i) {
+    ASSERT_EQ(ptr[i], value) << "Memset failed at byte " << i;
+  }
+
+  allocator.deallocate(ptr);
+}
+
+TEST(Memset, ExplicitPlatformHostAsync)
+{
+  constexpr std::size_t size = 512;
+  constexpr int value = 0x66;
+
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto allocator = rm.getAllocator("HOST");
+
+  unsigned char* ptr = static_cast<unsigned char*>(allocator.allocate(size));
+
+  // Fill with initial pattern
+  std::memset(ptr, 0xBB, size);
+
+  // Create host resource
+  camp::resources::Resource host_ctx{camp::resources::Host{}};
+
+  // Use explicit platform async memset
+  auto event = umpire::memset(camp::resources::Platform::host, ptr, value, size, host_ctx);
+
+  // Wait for completion
+  static_cast<camp::resources::Event>(event).wait();
+
+  // Verify
+  for (std::size_t i = 0; i < size; ++i) {
+    ASSERT_EQ(ptr[i], value) << "Async memset failed at byte " << i;
+  }
+
+  allocator.deallocate(ptr);
+}
+
+#if defined(UMPIRE_ENABLE_CUDA)
+TEST(Memset, ExplicitPlatformCuda)
+{
+  constexpr std::size_t size = 512;
+  constexpr int value = 0x44;
+
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto cuda_allocator = rm.getAllocator("DEVICE");
+  auto host_allocator = rm.getAllocator("HOST");
+
+  unsigned char* device_ptr = static_cast<unsigned char*>(cuda_allocator.allocate(size));
+  unsigned char* host_ptr = static_cast<unsigned char*>(host_allocator.allocate(size));
+
+  // Use explicit platform memset on device
+  umpire::memset(camp::resources::Platform::cuda, device_ptr, value, size);
+
+  // Copy back to verify
+  umpire::copy(device_ptr, host_ptr, size);
+
+  // Verify
+  for (std::size_t i = 0; i < size; ++i) {
+    ASSERT_EQ(host_ptr[i], value) << "CUDA memset failed at byte " << i;
+  }
+
+  cuda_allocator.deallocate(device_ptr);
+  host_allocator.deallocate(host_ptr);
+}
+
+TEST(Memset, ExplicitPlatformCudaAsync)
+{
+  constexpr std::size_t size = 512;
+  constexpr int value = 0xAB;
+
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto cuda_allocator = rm.getAllocator("DEVICE");
+  auto host_allocator = rm.getAllocator("HOST");
+
+  unsigned char* device_ptr = static_cast<unsigned char*>(cuda_allocator.allocate(size));
+  unsigned char* host_ptr = static_cast<unsigned char*>(host_allocator.allocate(size));
+
+  // Create CUDA resource
+  camp::resources::Resource cuda_ctx{camp::resources::Cuda{}};
+
+  // Use explicit platform async memset on device
+  auto event = umpire::memset(camp::resources::Platform::cuda, device_ptr, value, size, cuda_ctx);
+
+  // Wait for completion
+  static_cast<camp::resources::Event>(event).wait();
+
+  // Copy back to verify
+  umpire::copy(device_ptr, host_ptr, size);
+
+  // Verify
+  for (std::size_t i = 0; i < size; ++i) {
+    ASSERT_EQ(host_ptr[i], value) << "Async CUDA memset failed at byte " << i;
+  }
+
+  cuda_allocator.deallocate(device_ptr);
+  host_allocator.deallocate(host_ptr);
+}
+#endif

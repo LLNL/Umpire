@@ -324,3 +324,137 @@ TEST(Prefetch, ExplicitHipPrefetch)
   }
 }
 #endif // UMPIRE_ENABLE_HIP
+
+//------------------------------------------------------------------------------
+// Platform-by-value overload tests
+//------------------------------------------------------------------------------
+
+TEST(Prefetch, ExplicitPlatformHost)
+{
+  constexpr std::size_t size = 512;
+
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto allocator = rm.getAllocator("HOST");
+
+  void* ptr = allocator.allocate(size);
+
+  // Fill with test data
+  std::memset(ptr, 0xEE, size);
+
+  // Prefetch with explicit platform (no-op for host)
+  EXPECT_NO_THROW(umpire::prefetch(camp::resources::Platform::host, ptr, 0, size));
+
+  // Verify data is unchanged
+  unsigned char* byte_ptr = static_cast<unsigned char*>(ptr);
+  for (std::size_t i = 0; i < size; ++i) {
+    ASSERT_EQ(byte_ptr[i], 0xEE) << "Prefetch modified data at byte " << i;
+  }
+
+  allocator.deallocate(ptr);
+}
+
+TEST(Prefetch, ExplicitPlatformHostAsync)
+{
+  constexpr std::size_t size = 512;
+
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto allocator = rm.getAllocator("HOST");
+
+  void* ptr = allocator.allocate(size);
+
+  // Fill with test data
+  std::memset(ptr, 0xFF, size);
+
+  // Create host resource
+  camp::resources::Resource host_ctx{camp::resources::Host{}};
+
+  // Async prefetch with explicit platform (no-op for host)
+  auto event = umpire::prefetch(camp::resources::Platform::host, ptr, 0, size, host_ctx);
+
+  // Wait for completion
+  static_cast<camp::resources::Event>(event).wait();
+
+  // Verify data is unchanged
+  unsigned char* byte_ptr = static_cast<unsigned char*>(ptr);
+  for (std::size_t i = 0; i < size; ++i) {
+    ASSERT_EQ(byte_ptr[i], 0xFF) << "Async prefetch modified data at byte " << i;
+  }
+
+  allocator.deallocate(ptr);
+}
+
+#if defined(UMPIRE_ENABLE_CUDA)
+TEST(Prefetch, ExplicitPlatformCuda)
+{
+  constexpr std::size_t size = 512;
+
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  try {
+    auto um_allocator = rm.getAllocator("UM");
+    auto host_allocator = rm.getAllocator("HOST");
+
+    unsigned char* um_ptr = static_cast<unsigned char*>(um_allocator.allocate(size));
+    unsigned char* host_ptr = static_cast<unsigned char*>(host_allocator.allocate(size));
+
+    // Fill with test data
+    std::memset(um_ptr, 0xDD, size);
+
+    // Prefetch with explicit platform
+    EXPECT_NO_THROW(umpire::prefetch(camp::resources::Platform::cuda, um_ptr, 0, size));
+
+    // Copy to verify
+    std::memcpy(host_ptr, um_ptr, size);
+
+    // Verify data is intact
+    for (std::size_t i = 0; i < size; ++i) {
+      ASSERT_EQ(host_ptr[i], 0xDD) << "Prefetch corrupted data at byte " << i;
+    }
+
+    um_allocator.deallocate(um_ptr);
+    host_allocator.deallocate(host_ptr);
+  } catch (const std::runtime_error& e) {
+    GTEST_SKIP() << "Unified Memory not available: " << e.what();
+  }
+}
+
+TEST(Prefetch, ExplicitPlatformCudaAsync)
+{
+  constexpr std::size_t size = 512;
+
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  try {
+    auto um_allocator = rm.getAllocator("UM");
+    auto host_allocator = rm.getAllocator("HOST");
+
+    unsigned char* um_ptr = static_cast<unsigned char*>(um_allocator.allocate(size));
+    unsigned char* host_ptr = static_cast<unsigned char*>(host_allocator.allocate(size));
+
+    // Fill with test data
+    std::memset(um_ptr, 0xBC, size);
+
+    // Create CUDA resource
+    camp::resources::Resource cuda_ctx{camp::resources::Cuda{}};
+
+    // Async prefetch with explicit platform
+    auto event = umpire::prefetch(camp::resources::Platform::cuda, um_ptr, -1, size, cuda_ctx);
+
+    // Wait for completion
+    static_cast<camp::resources::Event>(event).wait();
+
+    // Copy to verify
+    std::memcpy(host_ptr, um_ptr, size);
+
+    // Verify data is intact
+    for (std::size_t i = 0; i < size; ++i) {
+      ASSERT_EQ(host_ptr[i], 0xBC) << "Async prefetch corrupted data at byte " << i;
+    }
+
+    um_allocator.deallocate(um_ptr);
+    host_allocator.deallocate(host_ptr);
+  } catch (const std::runtime_error& e) {
+    GTEST_SKIP() << "Unified Memory not available: " << e.what();
+  }
+}
+#endif // UMPIRE_ENABLE_CUDA
