@@ -34,8 +34,9 @@ struct cuda_default_allocator {
   //! \brief Construct an allocator targeting `device`.
   explicit cuda_default_allocator(int device = 0) : device_id(device) {}
 
-  // Copy constructor
+  //! \brief Copy this allocator wrapper, preserving the targeted device.
   cuda_default_allocator(const cuda_default_allocator&) = default;
+  //! \brief Assign from another allocator wrapper targeting a CUDA device.
   cuda_default_allocator& operator=(const cuda_default_allocator&) = default;
 
   /*!
@@ -224,7 +225,7 @@ using fast_cuda_device_memory = cuda_device_memory<cuda_default_allocator, false
 } // namespace resource
 } // namespace umpire
 
-// Provide cuda_allocator in umpire namespace for forward declaration compatibility
+//! \brief Backward-compatible alias for the default CUDA allocator wrapper.
 namespace umpire {
 using cuda_allocator = resource::cuda_default_allocator;
 }

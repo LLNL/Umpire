@@ -45,7 +45,9 @@ struct sycl_allocator {
   {
   }
 
+  //! \brief Copy this allocator wrapper, preserving the associated queue.
   sycl_allocator(const sycl_allocator&) = default;
+  //! \brief Assign from another allocator wrapper bound to a SYCL queue.
   sycl_allocator& operator=(const sycl_allocator&) = default;
 
   /*!

@@ -34,8 +34,9 @@ struct hip_default_allocator {
   //! \brief Construct an allocator targeting `device`.
   explicit hip_default_allocator(int device = 0) : device_id(device) {}
 
-  // Copy constructor
+  //! \brief Copy this allocator wrapper, preserving the targeted device.
   hip_default_allocator(const hip_default_allocator&) = default;
+  //! \brief Assign from another allocator wrapper targeting a HIP device.
   hip_default_allocator& operator=(const hip_default_allocator&) = default;
 
   /*!
@@ -224,7 +225,7 @@ using fast_hip_device_memory = hip_device_memory<hip_default_allocator, false>; 
 } // namespace resource
 } // namespace umpire
 
-// Provide hip_allocator in umpire namespace for forward declaration compatibility
+//! \brief Backward-compatible alias for the default HIP allocator wrapper.
 namespace umpire {
 using hip_allocator = resource::hip_default_allocator;
 }

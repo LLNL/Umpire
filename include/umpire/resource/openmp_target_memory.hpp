@@ -44,7 +44,9 @@ struct omp_target_allocator {
   {
   }
 
+  //! \brief Copy this allocator wrapper, preserving the targeted device.
   omp_target_allocator(const omp_target_allocator&) = default;
+  //! \brief Assign from another allocator wrapper targeting an OpenMP device.
   omp_target_allocator& operator=(const omp_target_allocator&) = default;
 
   /*!
