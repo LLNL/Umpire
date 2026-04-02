@@ -122,6 +122,42 @@ GPU-backed CUDA, HIP, SYCL, and OpenMP target test execution requires the
 appropriate hardware and should be validated in dedicated follow-up tasks on
 capable machines.
 
+### OpenMP Target Validation
+
+The API v2 OpenMP target resource and copy paths are intended to be validated
+on LC systems that provide an OpenMP target offload runtime rather than on the
+local macOS development machine. This repository already carries the
+RADIUSS shared CI configuration under
+``scripts/radiuss-spack-configs/``, including machine pipelines in
+``scripts/radiuss-spack-configs/gitlab/radiuss-jobs/tioga.yml`` and an
+Umpire Spack package with an ``+omptarget`` variant that sets
+``UMPIRE_ENABLE_OPENMP_TARGET`` in the generated host-config.
+
+A representative manual validation recipe on an OpenMP target-capable LC host
+for API v2 operations is:
+
+```bash
+# On an LC system with OpenMP target support (for example, tioga with CCE)
+cmake -S . -B build-omptarget -G Ninja \
+  -DCMAKE_C_COMPILER=cc \
+  -DCMAKE_CXX_COMPILER=CC \
+  -DENABLE_OPENMP=On \
+  -DUMPIRE_ENABLE_OPENMP_TARGET=On \
+  -DUMPIRE_ENABLE_TESTS=On
+
+cmake --build build-omptarget --parallel \
+  --target api_v2_operations_tests
+
+ctest --test-dir build-omptarget \
+  -R '^api_v2_operations_tests$' \
+  --output-on-failure
+```
+
+This flow does not run on the current macOS development host but documents a
+concrete OpenMP target-capable environment and configure/test invocation that
+follow-up beads such as ``umpire-e2h`` and ``umpire-4og`` can use when
+exercising ``openmp_target_memory`` on target-enabled hardware.
+
 ## Static Analysis
 
 On macOS with Homebrew LLVM 19, `clang-tidy` needs the active SDK sysroot to
