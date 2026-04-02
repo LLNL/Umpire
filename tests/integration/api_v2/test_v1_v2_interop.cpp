@@ -8,6 +8,7 @@
 #include "umpire/Umpire.hpp"
 #include "umpire/detail/registry.hpp"
 #include "umpire/resource/host_memory.hpp"
+#include "umpire/strategy/NamedAllocationStrategy.hpp"
 
 #include "camp/resource/host.hpp"
 #include "gtest/gtest.h"
@@ -15,6 +16,7 @@
 #include <algorithm>
 #include <array>
 #include <cstddef>
+#include <string>
 
 namespace {
 
@@ -23,6 +25,12 @@ using host_memory = umpire::resource::host_memory<>;
 host_memory& host()
 {
   return host_memory::get();
+}
+
+std::string unique_allocator_name(const char* prefix)
+{
+  static int counter = 0;
+  return std::string{prefix} + "_" + std::to_string(counter++);
 }
 
 } // namespace
@@ -133,4 +141,88 @@ TEST(ApiV1V2Interop, V1ZeroSizeAsyncReallocateReleasesV2HostAllocation)
   if (zero) {
     rm.deallocate(zero);
   }
+}
+
+TEST(ApiV1V2Interop, V1MoveToHostShortCircuitsAndPreservesV2Ownership)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto host_allocator = rm.getAllocator("HOST");
+  auto* ptr = static_cast<unsigned char*>(host().allocate(24));
+
+  ASSERT_TRUE(umpire::detail::registry::get().find_allocation(ptr).has_value());
+
+  void* moved = rm.move(ptr, host_allocator);
+
+  EXPECT_EQ(moved, ptr);
+  EXPECT_TRUE(umpire::detail::registry::get().find_allocation(moved).has_value());
+  EXPECT_EQ(host().get_current_size(), 24u);
+
+  rm.deallocate(moved);
+}
+
+TEST(ApiV1V2Interop, V1MoveToDistinctAllocatorTransfersOwnershipToV1)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto host_allocator = rm.getAllocator("HOST");
+  auto named_allocator = rm.makeAllocator<umpire::strategy::NamedAllocationStrategy>(
+    unique_allocator_name("API_V2_MOVED_HOST"), host_allocator);
+
+  auto* ptr = static_cast<unsigned char*>(host().allocate(24));
+  for (int i = 0; i < 24; ++i) {
+    ptr[i] = static_cast<unsigned char>(i + 11);
+  }
+
+  void* moved = rm.move(ptr, named_allocator);
+  auto* moved_bytes = static_cast<unsigned char*>(moved);
+
+  ASSERT_NE(moved, nullptr);
+  EXPECT_NE(moved, ptr);
+  EXPECT_FALSE(umpire::detail::registry::get().find_allocation(moved).has_value());
+  EXPECT_EQ(rm.getAllocator(moved).getName(), named_allocator.getName());
+  EXPECT_EQ(host().get_current_size(), 0u);
+
+  for (int i = 0; i < 24; ++i) {
+    EXPECT_EQ(moved_bytes[i], static_cast<unsigned char>(i + 11));
+  }
+
+  named_allocator.deallocate(moved);
+}
+
+TEST(ApiV1V2Interop, V1AllocatorSelectedReallocateWithHostPreservesV2Ownership)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto host_allocator = rm.getAllocator("HOST");
+  auto* ptr = static_cast<unsigned char*>(host().allocate(16));
+  for (int i = 0; i < 16; ++i) {
+    ptr[i] = static_cast<unsigned char>(0x20 + i);
+  }
+
+  auto* resized = static_cast<unsigned char*>(rm.reallocate(ptr, 64, host_allocator));
+
+  ASSERT_NE(resized, nullptr);
+  ASSERT_TRUE(umpire::detail::registry::get().find_allocation(resized).has_value());
+  EXPECT_EQ(host().get_current_size(), 64u);
+
+  for (int i = 0; i < 16; ++i) {
+    EXPECT_EQ(resized[i], static_cast<unsigned char>(0x20 + i));
+  }
+
+  rm.deallocate(resized);
+}
+
+TEST(ApiV1V2Interop, V1AllocatorSelectedReallocateRejectsDistinctAllocator)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto host_allocator = rm.getAllocator("HOST");
+  auto named_allocator = rm.makeAllocator<umpire::strategy::NamedAllocationStrategy>(
+    unique_allocator_name("API_V2_REALLOC_HOST"), host_allocator);
+
+  auto* ptr = static_cast<unsigned char*>(host().allocate(16));
+  ASSERT_TRUE(umpire::detail::registry::get().find_allocation(ptr).has_value());
+
+  EXPECT_THROW(static_cast<void>(rm.reallocate(ptr, 64, named_allocator)), umpire::runtime_error);
+  EXPECT_TRUE(umpire::detail::registry::get().find_allocation(ptr).has_value());
+  EXPECT_EQ(host().get_current_size(), 16u);
+
+  host().deallocate(ptr);
 }

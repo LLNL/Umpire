@@ -158,7 +158,10 @@ combinations:
 | v1 `ResourceManager::deallocate()` on v2 host allocation | Supported | `api_v2_v1_interop_tests` |
 | v1 `ResourceManager::reallocate(ptr, 0)` on v2 host allocation | Supported | `api_v2_v1_interop_tests` |
 | v1 `ResourceManager::reallocate(ptr, 0, ctx)` on v2 host allocation | Supported | `api_v2_v1_interop_tests` |
-| v1 `ResourceManager::move()` and allocator-selecting `reallocate(..., Allocator)` on v2 host allocations | Deferred | Follow-up bead `umpire-zl5` |
+| v1 `ResourceManager::move(ptr, HOST)` on v2 host allocation | Supported | `api_v2_v1_interop_tests` |
+| v1 `ResourceManager::move(ptr, distinct host allocator)` on v2 host allocation | Supported | `api_v2_v1_interop_tests` |
+| v1 `ResourceManager::reallocate(ptr, size, HOST)` on v2 host allocation | Supported | `api_v2_v1_interop_tests` |
+| v1 `ResourceManager::reallocate(ptr, size, distinct host allocator)` on v2 host allocation | Rejected with `umpire::runtime_error` | `api_v2_v1_interop_tests` |
 
 ## CI
 
