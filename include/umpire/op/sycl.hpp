@@ -24,9 +24,6 @@
 namespace umpire {
 namespace op {
 
-// Platform-specific type
-struct sycl_platform {};
-
 // SYCL implementation helpers
 namespace {
 // Size-aware calculation with type awareness
@@ -123,7 +120,7 @@ inline camp::resources::EventProxy<camp::resources::Resource> prefetch_async_imp
 
 // Device-to-device copy specialization
 template<>
-struct copy<sycl_platform, sycl_platform> {
+struct copy<resource::sycl_platform, resource::sycl_platform> {
   template <typename T>
   static void exec(T* src_ptr, T* dst_ptr, std::size_t len) {
     copy_impl(src_ptr, dst_ptr, len, sycl::usm::alloc::device);
@@ -138,7 +135,7 @@ struct copy<sycl_platform, sycl_platform> {
 
 // Host-to-device copy specialization
 template<>
-struct copy<resource::host_platform, sycl_platform> {
+struct copy<resource::host_platform, resource::sycl_platform> {
   template <typename T>
   static void exec(T* src_ptr, T* dst_ptr, std::size_t len) {
     copy_impl(src_ptr, dst_ptr, len, sycl::usm::alloc::host);
@@ -153,7 +150,7 @@ struct copy<resource::host_platform, sycl_platform> {
 
 // Device-to-host copy specialization
 template<>
-struct copy<sycl_platform, resource::host_platform> {
+struct copy<resource::sycl_platform, resource::host_platform> {
   template <typename T>
   static void exec(T* src_ptr, T* dst_ptr, std::size_t len) {
     copy_impl(src_ptr, dst_ptr, len, sycl::usm::alloc::host);
@@ -168,7 +165,7 @@ struct copy<sycl_platform, resource::host_platform> {
 
 // Memset specialization
 template<>
-struct memset<sycl_platform> {
+struct memset<resource::sycl_platform> {
   template <typename T>
   static void exec(T* ptr, int val, std::size_t len) {
     memset_impl(ptr, val, len);
@@ -183,7 +180,7 @@ struct memset<sycl_platform> {
 
 // Prefetch specialization
 template<>
-struct prefetch<sycl_platform> {
+struct prefetch<resource::sycl_platform> {
   template <typename T>
   static void exec(T* ptr, int device, std::size_t len) {
     prefetch_impl(ptr, device, len);

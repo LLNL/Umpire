@@ -25,9 +25,6 @@
 namespace umpire {
 namespace op {
 
-// Platform-specific type 
-struct openmp_target_platform {};
-
 // OpenMP Target implementation helpers
 namespace {
 // Size-aware calculation with type awareness
@@ -119,7 +116,7 @@ inline camp::resources::EventProxy<camp::resources::Resource> memset_async_impl(
 
 // Device-to-device copy specialization
 template<>
-struct copy<openmp_target_platform, openmp_target_platform> {
+struct copy<resource::omp_target_platform, resource::omp_target_platform> {
   template <typename T>
   static void exec(T* src_ptr, T* dst_ptr, std::size_t len) {
     copy_impl(src_ptr, dst_ptr, len);
@@ -134,7 +131,7 @@ struct copy<openmp_target_platform, openmp_target_platform> {
 
 // Host-to-device copy specialization
 template<>
-struct copy<resource::host_platform, openmp_target_platform> {
+struct copy<resource::host_platform, resource::omp_target_platform> {
   template <typename T>
   static void exec(T* src_ptr, T* dst_ptr, std::size_t len) {
     host_to_device_copy_impl(src_ptr, dst_ptr, len);
@@ -149,7 +146,7 @@ struct copy<resource::host_platform, openmp_target_platform> {
 
 // Device-to-host copy specialization
 template<>
-struct copy<openmp_target_platform, resource::host_platform> {
+struct copy<resource::omp_target_platform, resource::host_platform> {
   template <typename T>
   static void exec(T* src_ptr, T* dst_ptr, std::size_t len) {
     device_to_host_copy_impl(src_ptr, dst_ptr, len);
@@ -164,7 +161,7 @@ struct copy<openmp_target_platform, resource::host_platform> {
 
 // Memset specialization
 template<>
-struct memset<openmp_target_platform> {
+struct memset<resource::omp_target_platform> {
   template <typename T>
   static void exec(T* ptr, int val, std::size_t len) {
     memset_impl(ptr, val, len);
