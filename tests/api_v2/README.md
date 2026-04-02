@@ -213,15 +213,27 @@ use.
 - The `.github/workflows/build.yml` workflow uses these targets on:
   - `radiuss-cpu-runners` for generic builds (gcc/clang/tsan/hip/sycl/intel)
   - `radiuss-cuda-runners` for the `build_gpu` CUDA matrix
-- The API v2 workflow `.github/workflows/api_v2.yml` exposes a manual
-  `device_gpu_docker` job that reuses the same Docker targets on
-  `radiuss-cuda-runners`:
-  - trigger via the `API v2 Tests` workflow’s
-    `workflow_dispatch` (manual run) event
-  - select the `API v2 Device (Docker skeleton on radiuss-cuda-runners)` job
-  - extend the `cuda`, `cuda13`, `hip`, or `sycl` stages in `Dockerfile` (or
-    add new ones) with concrete API v2 device tests as part of follow-up beads
-    such as `umpire-4og`, `umpire-728`, and `umpire-e2h`
+- The API v2 workflow `.github/workflows/api_v2.yml` exposes manual backend
+  validation jobs:
+  - `device_cuda_validate` builds CUDA validation images
+    (`api_v2_cuda_validate`, `api_v2_cuda13_validate`) on
+    `radiuss-cuda-runners` and runs
+    `api_v2_cuda_device_memory_tests` plus `api_v2_operations_tests`
+    inside those containers.
+  - `device_sycl_validate` builds `api_v2_sycl_validate` on
+    `radiuss-cpu-runners` and runs
+    `api_v2_sycl_device_memory_tests` and `api_v2_operations_tests` in
+    that container.
+
+An operator with access to the GitHub-hosted repository and Actions can run the
+CUDA and SYCL device workflows as follows:
+
+1. Open the repository's "Actions" tab and select the "API v2 Tests" workflow.
+2. Use "Run workflow" (the manual `workflow_dispatch` entry point) on the
+   desired branch (for example, `feature/api-refactor`).
+3. Wait for the workflow to start and inspect the `device_cuda_validate` and
+   `device_sycl_validate` jobs to see pass/skip/failure output for the CUDA and
+   SYCL API v2 device tests.
 
 This wiring intentionally does not claim device validation is complete; it
 only guarantees that a hardware-backed CI path exists for future API v2

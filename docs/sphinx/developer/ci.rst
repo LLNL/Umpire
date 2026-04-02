@@ -68,11 +68,25 @@ For API v2 work, this repository also defines GitHub Actions workflows under
     ``radiuss-cuda-runners``, which are GPU-equipped self-hosted runners.
 - ``api_v2.yml``:
   - host-only jobs validate API v2 targets on GitHub-hosted Ubuntu and macOS.
-  - the ``device_gpu_docker`` job (manual ``workflow_dispatch`` only) reuses
-    the existing Docker targets (``cuda``, ``cuda13``, ``hip``, ``sycl``) on
-    ``radiuss-cuda-runners`` to provide a hardware-capable CI entry point for
-    future API v2 device-validation beads (for example ``umpire-4og``,
-    ``umpire-728``, and ``umpire-e2h``).
+  - the ``device_cuda_validate`` job (manual ``workflow_dispatch`` only) builds
+    backend-specific CUDA images (``api_v2_cuda_validate`` and
+    ``api_v2_cuda13_validate``) on ``radiuss-cuda-runners`` and runs
+    ``api_v2_cuda_device_memory_tests`` plus ``api_v2_operations_tests`` in
+    those containers.
+  - the ``device_sycl_validate`` job (also manual ``workflow_dispatch``) reuses
+    ``radiuss-cpu-runners`` to build the ``api_v2_sycl_validate`` image and run
+    ``api_v2_sycl_device_memory_tests`` and ``api_v2_operations_tests`` inside
+    that container.
+
+In practice, an operator with access to the GitHub-hosted repository can:
+
+1. Navigate to the repository's "Actions" tab.
+2. Select the "API v2 Tests" workflow defined in ``api_v2.yml``.
+3. Use "Run workflow" (the manual ``workflow_dispatch`` entry point) on the
+   desired branch (for example, ``feature/api-refactor``).
+4. After the workflow starts, expand the ``device_cuda_validate`` and
+   ``device_sycl_validate`` jobs to observe the API v2 CUDA and SYCL device
+   results.
 
 These configurations intentionally stop short of claiming device validation is
 complete; they provide a discoverable, reproducible CI path that downstream
