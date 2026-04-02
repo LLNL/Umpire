@@ -15,5 +15,6 @@ Features
   features/file_output
   features/logging_and_replay
   features/api_v2_design_rationale
+  features/api_v2_migration
   features/operations
   features/strategies
