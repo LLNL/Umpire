@@ -48,6 +48,8 @@ if (UMPIRE_ENABLE_API_V2)
     ${PROJECT_SOURCE_DIR}/include/umpire/platform.hpp
     ${PROJECT_SOURCE_DIR}/include/umpire/detail/registry.hpp
     ${PROJECT_SOURCE_DIR}/include/umpire/op/copy.hpp
+    ${PROJECT_SOURCE_DIR}/include/umpire/op/detail/traits.hpp
+    ${PROJECT_SOURCE_DIR}/include/umpire/op/detail/utils.hpp
     ${PROJECT_SOURCE_DIR}/include/umpire/op/dispatch.hpp
     ${PROJECT_SOURCE_DIR}/include/umpire/op/host.hpp
     ${PROJECT_SOURCE_DIR}/include/umpire/op/memset.hpp
@@ -283,10 +285,15 @@ install(FILES
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/umpire)
 
 if (UMPIRE_ENABLE_API_V2)
-  install(
-    DIRECTORY ${PROJECT_SOURCE_DIR}/include/umpire/
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/umpire
-    FILES_MATCHING PATTERN "*.hpp")
+  foreach(api_v2_header IN LISTS umpire_api_v2_headers)
+    get_filename_component(api_v2_header_dir "${api_v2_header}" DIRECTORY)
+    file(RELATIVE_PATH api_v2_header_dir_rel
+      "${PROJECT_SOURCE_DIR}/include"
+      "${api_v2_header_dir}")
+    install(
+      FILES ${api_v2_header}
+      DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${api_v2_header_dir_rel})
+  endforeach()
 endif ()
 
 umpire_add_code_checks(PREFIX umpire)
