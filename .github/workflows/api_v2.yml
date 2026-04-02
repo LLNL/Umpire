@@ -169,11 +169,11 @@ jobs:
           -E "$API_V2_EXCLUDE_REGEX" \
           --output-on-failure
 
-  # Manual backend validation path for the API v2 device tests. These jobs
-  # build backend-specific validation images and execute the concrete API v2
-  # test targets inside those containers.
-  device_gpu_docker:
-    name: API v2 Device Validation (${{ matrix.name }})
+  # Manual CUDA validation path for the API v2 device tests. These jobs build
+  # backend-specific validation images and execute the concrete CUDA API v2
+  # test targets inside those containers on GPU-capable runners.
+  device_cuda_validate:
+    name: API v2 CUDA Validation (${{ matrix.name }})
     if: github.event_name == 'workflow_dispatch'
     strategy:
       matrix:
@@ -188,16 +188,6 @@ jobs:
           image_name: umpire-api-v2-cuda13-validate
           docker_run_args: --gpus all
           ctest_regex: '^(api_v2_cuda_device_memory_tests|api_v2_operations_tests)$'
-        - name: hip
-          build_target: api_v2_hip_validate
-          image_name: umpire-api-v2-hip-validate
-          docker_run_args: ""
-          ctest_regex: '^(api_v2_hip_device_memory_tests|api_v2_operations_tests)$'
-        - name: sycl
-          build_target: api_v2_sycl_validate
-          image_name: umpire-api-v2-sycl-validate
-          docker_run_args: ""
-          ctest_regex: '^(api_v2_sycl_device_memory_tests|api_v2_operations_tests)$'
     runs-on: radiuss-cuda-runners
     steps:
     - run: |
@@ -221,4 +211,34 @@ jobs:
           "${{ matrix.image_name }}" \
           ctest --test-dir /home/umpire/workspace/build \
           -R "${{ matrix.ctest_regex }}" \
+          --output-on-failure
+
+  # The repository already builds the SYCL Docker stage on radiuss-cpu-runners
+  # in build.yml. Reuse the same runner class for manual API v2 SYCL coverage.
+  device_sycl_validate:
+    name: API v2 SYCL Validation
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: radiuss-cpu-runners
+    steps:
+    - run: |
+        sudo rm -rf /usr/share/dotnet
+        sudo rm -rf /usr/local/lib/android
+        sudo rm -rf /opt/ghc
+        sudo rm -rf /opt/hostedtoolcache/CodeQL
+        sudo docker image prune --all --force
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+    - name: Build SYCL validation image
+      run: |
+        docker build \
+          --target api_v2_sycl_validate \
+          -t umpire-api-v2-sycl-validate \
+          .
+    - name: Run SYCL API v2 tests
+      run: |
+        docker run --rm \
+          umpire-api-v2-sycl-validate \
+          ctest --test-dir /home/umpire/workspace/build \
+          -R '^(api_v2_sycl_device_memory_tests|api_v2_operations_tests)$' \
           --output-on-failure

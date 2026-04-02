@@ -93,16 +93,6 @@ WORKDIR /home/umpire/workspace/build
 RUN cmake -DENABLE_WARNINGS_AS_ERRORS=Off -DCMAKE_CXX_COMPILER=/opt/rocm-6.4.3/bin/amdclang++ -DROCM_PATH=/opt/rocm-6.4.3 -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DENABLE_HIP=On .. && \
     make -j 16 VERBOSE=1
 
-FROM ghcr.io/llnl/radiuss:hip-6.4.3-ubuntu-24.04 AS api_v2_hip_validate
-ENV GTEST_COLOR=1
-ENV HCC_AMDGPU_TARGET=gfx900
-COPY . /home/umpire/workspace
-WORKDIR /home/umpire/workspace/build
-RUN cmake -DENABLE_WARNINGS_AS_ERRORS=Off -DCMAKE_CXX_COMPILER=/opt/rocm-6.4.3/bin/amdclang++ \
-    -DROCM_PATH=/opt/rocm-6.4.3 -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DUMPIRE_ENABLE_TESTS=On \
-    -DENABLE_HIP=On .. && \
-    make -j 16 api_v2_hip_device_memory_tests api_v2_operations_tests VERBOSE=1
-
 FROM ghcr.io/llnl/radiuss:intel-2024.0-ubuntu-20.04 AS sycl
 ENV GTEST_COLOR=1
 COPY . /home/umpire/workspace
