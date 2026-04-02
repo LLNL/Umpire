@@ -12,6 +12,7 @@
 
 #include "umpire/Umpire.hpp"
 #include "umpire/config.hpp"
+#include "umpire/detail/registry.hpp"
 #include "umpire/op/MemoryOperation.hpp"
 #include "umpire/op/MemoryOperationRegistry.hpp"
 #include "umpire/resource/MemoryResourceRegistry.hpp"
@@ -46,6 +47,30 @@ static const char* s_null_resource_name{"__umpire_internal_null"};
 static const char* s_zero_byte_pool_name{"__umpire_internal_0_byte_pool"};
 
 namespace umpire {
+
+namespace {
+
+std::optional<allocation_record> find_v2_allocation(void* ptr)
+{
+  auto& registry = detail::registry::get();
+  auto record = registry.find_allocation(ptr);
+  if (record && record->strategy) {
+    return record;
+  }
+
+  record = registry.find_containing_allocation(ptr);
+  if (record && record->strategy) {
+    if (ptr != record->ptr) {
+      UMPIRE_ERROR(runtime_error,
+                   fmt::format("Cannot operate on an offset ptr (ptr={}, base={})", ptr, record->ptr));
+    }
+    return record;
+  }
+
+  return std::nullopt;
+}
+
+} // namespace
 
 ResourceManager& ResourceManager::getInstance()
 {
@@ -606,6 +631,10 @@ void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size)
   }
 
   if (new_size == 0) {
+    if (auto v2_record = find_v2_allocation(current_ptr)) {
+      v2_record->strategy->deallocate(current_ptr);
+      return getAllocator("HOST").allocate(0);
+    }
     auto alloc_record = m_allocations.find(current_ptr);
     auto alloc = Allocator(alloc_record->strategy);
     alloc.deallocate(current_ptr);
@@ -658,6 +687,10 @@ void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size, camp:
   }
 
   if (new_size == 0) {
+    if (auto v2_record = find_v2_allocation(current_ptr)) {
+      v2_record->strategy->deallocate(current_ptr);
+      return getAllocator("HOST").allocate(0);
+    }
     auto alloc_record = m_allocations.find(current_ptr);
     auto alloc = Allocator(alloc_record->strategy);
     alloc.deallocate(current_ptr);
@@ -1046,6 +1079,14 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::prefetch
 void ResourceManager::deallocate(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
+
+#if defined(UMPIRE_RM_USE_NEW_OPS)
+  if (auto v2_record = find_v2_allocation(ptr)) {
+    v2_record->strategy->deallocate(ptr);
+    return;
+  }
+#endif
+
   Allocator allocator{findAllocatorForPointer(ptr)};
 
   allocator.deallocate(ptr);

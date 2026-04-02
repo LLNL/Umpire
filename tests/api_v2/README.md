@@ -155,7 +155,10 @@ combinations:
 | v2 `host_memory<>::get()` allocation visible to v1 `ResourceManager` | Supported | `api_v2_v1_interop_tests` |
 | v1 `ResourceManager::memset()` on v2 host allocation | Supported | `api_v2_v1_interop_tests` |
 | v1 `ResourceManager::copy()` between v1/v2 host allocations | Supported | `api_v2_v1_interop_tests` |
-| Ownership-changing v1 operations on v2 allocations | Deferred | Follow-up bead `umpire-xco` |
+| v1 `ResourceManager::deallocate()` on v2 host allocation | Supported | `api_v2_v1_interop_tests` |
+| v1 `ResourceManager::reallocate(ptr, 0)` on v2 host allocation | Supported | `api_v2_v1_interop_tests` |
+| v1 `ResourceManager::reallocate(ptr, 0, ctx)` on v2 host allocation | Supported | `api_v2_v1_interop_tests` |
+| v1 `ResourceManager::move()` and allocator-selecting `reallocate(..., Allocator)` on v2 host allocations | Deferred | Follow-up bead `umpire-zl5` |
 
 ## CI
 
