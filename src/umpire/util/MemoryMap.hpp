@@ -54,11 +54,15 @@ class MemoryMap {
     using Reference = typename std::conditional<Const, const Content&, Content&>::type;
     using Pointer = typename std::conditional<Const, const Content*, Content*>::type;
 
-    Iterator_(Map* map, Key ptr);
-    Iterator_(Map* map, iterator_begin);
-    Iterator_(Map* map, iterator_end);
+    // cppcheck-suppress noExplicitConstructor
+    explicit Iterator_(Map* map, Key ptr);
+    // cppcheck-suppress noExplicitConstructor
+    explicit Iterator_(Map* map, iterator_begin);
+    // cppcheck-suppress noExplicitConstructor
+    explicit Iterator_(Map* map, iterator_end);
 
     template <bool OtherConst>
+    // cppcheck-suppress noExplicitConstructor
     Iterator_(const Iterator_<OtherConst>& other);
 
     Reference operator*();
@@ -83,7 +87,7 @@ class MemoryMap {
   using Iterator = Iterator_<false>;
   using ConstIterator = Iterator_<true>;
 
-  MemoryMap();
+  MemoryMap() = default;
   ~MemoryMap();
 
   // Would require a deep copy of the Judy data

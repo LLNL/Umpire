@@ -39,7 +39,7 @@ Allocator ResourceManager::makeAllocator(const std::string& name, Tracking track
   umpire::event::record([&](auto& event) {
     event.name("make_allocator")
         .category(event::category::operation)
-        .arg("allocator_ref", (void*)allocator.get())
+        .arg("allocator_ref", static_cast<void*>(allocator.get()))
         .arg("type", typeid(Strategy).name())
         .arg("introspection", is_tracked)
         .args(args...)

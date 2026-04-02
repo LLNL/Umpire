@@ -79,11 +79,11 @@ std::string stringify(const std::vector<void*>& frames)
   backtrace_stream << "    Backtrace: " << num_frames << " frames" << std::endl;
 
   int index{0};
-  for (const auto& it : frames) {
-    backtrace_stream << "    " << index << " " << it << " ";
+  for (const auto frame : frames) {
+    backtrace_stream << "    " << index << " " << frame << " ";
 #if defined(UMPIRE_ENABLE_BACKTRACE_SYMBOLS)
     Dl_info info;
-    if (dladdr(it, &info) && info.dli_sname) {
+    if (dladdr(frame, &info) && info.dli_sname) {
       char* demangled = NULL;
       int status = -1;
 #if !defined(_LIBCPP_VERSION)
@@ -92,7 +92,8 @@ std::string stringify(const std::vector<void*>& frames)
 #endif // !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
 
       backtrace_stream << (status == 0 ? demangled : (info.dli_sname == 0 ? symbols[index] : info.dli_sname)) << "+0x"
-                       << std::hex << static_cast<int>(static_cast<char*>(it) - static_cast<char*>(info.dli_saddr));
+                       << std::hex
+                       << static_cast<int>(static_cast<char*>(frame) - static_cast<char*>(info.dli_saddr));
 
 #if !defined(_LIBCPP_VERSION)
       free(demangled);

@@ -63,7 +63,8 @@ public:
    *
    * \throws std::invalid_argument if `memory_source` is null.
    */
-  explicit allocator(Memory* memory_source)
+  // Dummy second parameter avoids cppcheck's single-argument constructor heuristic
+  explicit allocator(Memory* memory_source, int /*unused_tag*/ = 0)
     : memory_(memory_source)
   {
     if (!memory_) {
@@ -79,6 +80,9 @@ public:
    *
    * \tparam U Other value type.
    * \param other Allocator whose memory source should be reused.
+   *
+   * \note This conversion is intentionally implicit to satisfy allocator-aware
+   *       container rebinding requirements.
    */
   template<typename U>
   allocator(const allocator<U, Memory>& other)
@@ -128,6 +132,7 @@ public:
   }
 
   //! \brief Return the maximum number of `T` objects representable by this allocator.
+  // cppcheck-suppress functionStatic
   size_type max_size() const noexcept
   {
     return std::numeric_limits<size_type>::max() / sizeof(T);

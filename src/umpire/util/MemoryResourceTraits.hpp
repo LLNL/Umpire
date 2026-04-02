@@ -33,7 +33,7 @@ struct MemoryResourceTraits {
 
   enum class granularity_type { unknown, fine_grained, coarse_grained };
 
-  int id;
+  int id{0};
 
   // variables for only SYCL devices (i.e., Intel GPUs)
 #if defined(UMPIRE_ENABLE_SYCL)

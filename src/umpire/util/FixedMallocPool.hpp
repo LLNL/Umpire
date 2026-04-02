@@ -24,7 +24,7 @@ class FixedMallocPool {
  public:
   FixedMallocPool() = delete;
 
-  FixedMallocPool(const std::size_t object_bytes, const std::size_t objects_per_pool = 1024 * 1024);
+  explicit FixedMallocPool(const std::size_t object_bytes, const std::size_t objects_per_pool = 1024 * 1024);
 
   // Copy construction is not allowed. Doing so would create two
   // FixedMallocPool objects with m_pool that point to the same allocated
@@ -44,6 +44,9 @@ class FixedMallocPool {
   std::size_t totalBytes() const noexcept;
 
  private:
+  // cppcheck-suppress unsafeClassCanLeak
+  // NOTE: Pool deliberately has a trivial destructor; see the comment below
+  // on m_pool regarding manual deallocation requirements.
   struct Pool {
     unsigned char* data;
     unsigned char* next;

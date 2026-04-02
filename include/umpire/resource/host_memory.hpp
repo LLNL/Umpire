@@ -26,12 +26,12 @@ namespace resource {
  */
 struct malloc_allocator {
   //! \brief Allocate `size` bytes of host memory with `std::malloc`.
-  char* allocate(std::size_t size) {
+  static char* allocate(std::size_t size) {
     return static_cast<char*>(std::malloc(size));
   }
 
   //! \brief Free memory returned from `allocate()`.
-  void deallocate(char* ptr, std::size_t /* size */) {
+  static void deallocate(char* ptr, std::size_t /* size */) {
     std::free(ptr);
   }
 };

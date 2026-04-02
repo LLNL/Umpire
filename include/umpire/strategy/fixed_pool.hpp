@@ -131,7 +131,7 @@ public:
   }
 
   //! @brief Destructor - returns all pools to parent
-  ~fixed_pool() {
+  ~fixed_pool() override {
     for (void* pool : pools_) {
       parent_->deallocate(pool);
     }

@@ -57,7 +57,7 @@ public:
   }
 
   //! @brief Virtual destructor
-  virtual ~allocation_strategy() = default;
+  ~allocation_strategy() override = default;
 
   //! @brief Get the platform of the underlying memory
   //!
