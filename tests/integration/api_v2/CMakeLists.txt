@@ -22,3 +22,12 @@ target_include_directories(
 blt_add_test(
   NAME api_v2_stl_compatibility_tests
   COMMAND api_v2_stl_compatibility_tests)
+
+blt_add_executable(
+  NAME api_v2_operations_headers_tests
+  SOURCES test_operations_headers.cpp
+  DEPENDS_ON ${integration_tests_depends})
+
+blt_add_test(
+  NAME api_v2_operations_headers_tests
+  COMMAND api_v2_operations_headers_tests)
