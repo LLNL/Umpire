@@ -292,6 +292,8 @@ declarations:
             return SHC_rv;
 
       - decl: Allocator makeAllocator_resource_aware_pool_untracked(const std::string& name, Allocator allocator, size_t initial_size, size_t block)
+        format:
+          F_name_impl: make_allocator_ra_pool_untracked
         splicer:
           c: |
             const std::string SHC_name_cxx(name);
