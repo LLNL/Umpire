@@ -110,7 +110,7 @@ public:
       return;
     }
 
-    auto* record = detail::registry::get().find_allocation(ptr);
+    auto record = detail::registry::get().find_allocation(ptr);
     if (!record) {
       throw umpire::unknown_allocation(
         fmt::format("size_limiter: cannot determine allocation size for pointer {:p}", ptr));

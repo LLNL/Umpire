@@ -10,7 +10,9 @@
 #include "umpire/memory.hpp"
 
 #include <cstdlib>
+#include <atomic>
 #include <gtest/gtest.h>
+#include <thread>
 #include <string>
 
 namespace {
@@ -84,4 +86,48 @@ TEST(memory, unknown_allocation_throws)
   } catch (...) {
     FAIL() << "Expected umpire::unknown_allocation";
   }
+}
+
+TEST(memory, registry_lookup_returns_stable_copy)
+{
+  test_memory mem;
+
+  void* ptr = mem.allocate(16);
+  auto record = umpire::detail::registry::get().find_allocation(ptr);
+
+  ASSERT_TRUE(record.has_value());
+  EXPECT_EQ(record->ptr, ptr);
+  EXPECT_EQ(record->size, 16);
+
+  mem.deallocate(ptr);
+  EXPECT_EQ(record->ptr, ptr);
+  EXPECT_EQ(record->size, 16);
+}
+
+TEST(memory, lookup_copy_survives_cross_thread_removal)
+{
+  test_memory mem;
+  void* ptr = mem.allocate(24);
+
+  std::optional<umpire::allocation_record> snapshot;
+  std::atomic<bool> lookup_complete{false};
+
+  std::thread reader([&]() {
+    snapshot = umpire::detail::registry::get().find_allocation(ptr);
+    lookup_complete.store(true, std::memory_order_release);
+  });
+
+  std::thread remover([&]() {
+    while (!lookup_complete.load(std::memory_order_acquire)) {
+      std::this_thread::yield();
+    }
+    mem.deallocate(ptr);
+  });
+
+  reader.join();
+  remover.join();
+
+  ASSERT_TRUE(snapshot.has_value());
+  EXPECT_EQ(snapshot->ptr, ptr);
+  EXPECT_EQ(snapshot->size, 24);
 }

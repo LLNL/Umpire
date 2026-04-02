@@ -35,7 +35,7 @@ void memory::track_allocation(void* ptr, std::size_t size)
 
 void memory::untrack_allocation(void* ptr)
 {
-  auto* record = detail::registry::get().find_allocation(ptr);
+  auto record = detail::registry::get().find_allocation(ptr);
   if (!record) {
     throw unknown_allocation(fmt::format("Attempted to deallocate unknown pointer {:p}", ptr));
   }

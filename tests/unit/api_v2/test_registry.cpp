@@ -33,13 +33,12 @@ TEST(Registry, AllocationTracking)
   r.register_allocation(rec);
   EXPECT_TRUE(r.has_allocation(&value));
 
-  auto* found = r.find_allocation(&value);
-  ASSERT_NE(found, nullptr);
+  auto found = r.find_allocation(&value);
+  ASSERT_TRUE(found.has_value());
   EXPECT_EQ(found->ptr, &value);
   EXPECT_EQ(found->size, sizeof(value));
 
   r.remove_allocation(&value);
   EXPECT_FALSE(r.has_allocation(&value));
-  EXPECT_EQ(r.find_allocation(&value), nullptr);
+  EXPECT_FALSE(r.find_allocation(&value).has_value());
 }
-

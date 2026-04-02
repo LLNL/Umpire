@@ -9,6 +9,7 @@
 
 #include <atomic>
 #include <mutex>
+#include <optional>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -22,6 +23,17 @@ class memory;
 namespace umpire {
 namespace detail {
 
+/*!
+ * \brief Process-wide registry for API v2 allocator and allocation metadata.
+ *
+ * Thread safety guarantees:
+ * - `get_id()`, allocator registration, allocator lookup, and allocation-map
+ *   membership queries are synchronized internally and may be called
+ *   concurrently.
+ * - `find_allocation()` returns a copy of the allocation metadata, so callers
+ *   never retain references into internal registry storage across concurrent
+ *   mutations.
+ */
 class registry {
 private:
   registry();
@@ -44,17 +56,21 @@ private:
 public:
   static registry& get();
 
+  //! Thread-safe unique ID generation for allocator instances.
   int get_id();
 
+  //! Thread-safe allocator registration and deregistration.
   void register_allocator(memory* alloc);
   void deregister_allocator(memory* alloc);
 
+  //! Thread-safe allocator lookup helpers.
   memory* find_allocator_by_id(int id);
   memory* find_allocator_by_name(const std::string& name);
   std::vector<memory*> get_allocators();
 
+  //! Thread-safe allocation tracking helpers.
   void register_allocation(const allocation_record& record);
-  allocation_record* find_allocation(void* ptr);
+  std::optional<allocation_record> find_allocation(void* ptr) const;
   void remove_allocation(void* ptr);
   bool has_allocation(void* ptr) const;
 };

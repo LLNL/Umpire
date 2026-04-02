@@ -82,11 +82,11 @@ void registry::register_allocation(const allocation_record& record)
   allocation_map_[record.ptr] = record;
 }
 
-allocation_record* registry::find_allocation(void* ptr)
+std::optional<allocation_record> registry::find_allocation(void* ptr) const
 {
   std::lock_guard<std::mutex> lock{allocation_mutex_};
   auto it = allocation_map_.find(ptr);
-  return (it == allocation_map_.end()) ? nullptr : &it->second;
+  return (it == allocation_map_.end()) ? std::nullopt : std::optional<allocation_record>{it->second};
 }
 
 void registry::remove_allocation(void* ptr)
