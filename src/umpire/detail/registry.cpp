@@ -8,6 +8,7 @@
 #include "umpire/memory.hpp"
 
 #include <algorithm>
+#include <cstdint>
 
 namespace umpire {
 namespace detail {
@@ -87,6 +88,22 @@ std::optional<allocation_record> registry::find_allocation(void* ptr) const
   std::lock_guard<std::mutex> lock{allocation_mutex_};
   auto it = allocation_map_.find(ptr);
   return (it == allocation_map_.end()) ? std::nullopt : std::optional<allocation_record>{it->second};
+}
+
+std::optional<allocation_record> registry::find_containing_allocation(void* ptr) const
+{
+  std::lock_guard<std::mutex> lock{allocation_mutex_};
+  const auto target = reinterpret_cast<std::uintptr_t>(ptr);
+
+  for (const auto& [base, record] : allocation_map_) {
+    (void)base;
+    const auto begin = reinterpret_cast<std::uintptr_t>(record.ptr);
+    if (target >= begin && (target - begin) < record.size) {
+      return record;
+    }
+  }
+
+  return std::nullopt;
 }
 
 void registry::remove_allocation(void* ptr)

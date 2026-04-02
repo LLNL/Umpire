@@ -15,7 +15,7 @@ TEST(allocation_record, ConstructAndAccess)
   int value{0};
   void* ptr = &value;
   constexpr std::size_t size{64};
-  umpire::strategy::AllocationStrategy* strategy{nullptr};
+  umpire::memory* strategy{nullptr};
 
   umpire::allocation_record record{ptr, size, strategy};
   EXPECT_EQ(record.ptr, ptr);

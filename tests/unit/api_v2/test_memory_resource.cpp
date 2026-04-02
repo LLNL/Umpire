@@ -7,9 +7,12 @@
 
 #include "umpire/detail/registry.hpp"
 #include "umpire/memory_resource.hpp"
+#include "umpire/op/reallocate.hpp"
 
+#include "camp/resource/host.hpp"
 #include <cstdlib>
 #include <gtest/gtest.h>
+#include <algorithm>
 #include <type_traits>
 
 namespace {
@@ -42,6 +45,11 @@ public:
   }
 };
 
+camp::resources::Resource host_resource()
+{
+  return camp::resources::Resource{camp::resources::Host{}};
+}
+
 } // namespace
 
 // Test platform type propagation
@@ -69,8 +77,11 @@ TEST(memory_resource, tracking_enabled_records_allocation)
 
   void* ptr = mem.allocate(1024);
   ASSERT_NE(ptr, nullptr);
+  auto record = umpire::detail::registry::get().find_allocation(ptr);
 
   // Verify allocation is tracked
+  ASSERT_TRUE(record.has_value());
+  EXPECT_EQ(record->strategy, &mem);
   EXPECT_EQ(mem.get_current_size(), 1024);
   EXPECT_EQ(mem.get_highwatermark(), 1024);
 
@@ -141,4 +152,44 @@ TEST(memory_resource, default_allocator_usage)
   using default_alloc = typename umpire::default_allocator_for<umpire::host_platform>::type;
   static_assert(std::is_same_v<default_alloc, std::allocator<char>>,
                 "Default allocator for host_platform should be std::allocator<char>");
+}
+
+TEST(memory_resource, tracked_owner_reallocate_preserves_typed_contents)
+{
+  test_resource_tracked mem;
+
+  auto* values = static_cast<int*>(mem.allocate(4 * sizeof(int)));
+  for (int i = 0; i < 4; ++i) {
+    values[i] = i + 17;
+  }
+
+  values = umpire::reallocate(&values, 8);
+
+  for (int i = 0; i < 4; ++i) {
+    EXPECT_EQ(values[i], i + 17);
+  }
+  EXPECT_EQ(mem.get_current_size(), 8 * sizeof(int));
+
+  mem.deallocate(values);
+}
+
+TEST(memory_resource, tracked_owner_async_reallocate_preserves_byte_contents)
+{
+  test_resource_tracked mem;
+  auto resource = host_resource();
+
+  void* ptr = mem.allocate(8);
+  auto* bytes = static_cast<unsigned char*>(ptr);
+  std::fill(bytes, bytes + 8, static_cast<unsigned char>(0xA5));
+
+  camp::resources::Event event = umpire::reallocate(&ptr, 16, resource);
+  event.wait();
+
+  bytes = static_cast<unsigned char*>(ptr);
+  for (int i = 0; i < 8; ++i) {
+    EXPECT_EQ(bytes[i], 0xA5);
+  }
+  EXPECT_EQ(mem.get_current_size(), 16);
+
+  mem.deallocate(ptr);
 }

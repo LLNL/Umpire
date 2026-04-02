@@ -12,13 +12,10 @@
 #include "umpire/util/backtrace.hpp"
 
 namespace umpire {
-
-namespace strategy {
-class AllocationStrategy;
-}
+class memory;
 
 struct allocation_record {
-  allocation_record(void* p, std::size_t s, strategy::AllocationStrategy* strat) : ptr{p}, size{s}, strategy{strat}
+  allocation_record(void* p, std::size_t s, memory* strat) : ptr{p}, size{s}, strategy{strat}
   {
   }
 
@@ -28,7 +25,7 @@ struct allocation_record {
 
   void* ptr;
   std::size_t size;
-  strategy::AllocationStrategy* strategy;
+  memory* strategy;
 
 #if defined(UMPIRE_ENABLE_BACKTRACE)
   util::backtrace allocation_backtrace;

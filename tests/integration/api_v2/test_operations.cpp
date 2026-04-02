@@ -8,6 +8,7 @@
 #include "umpire/op/copy.hpp"
 #include "umpire/op/memset.hpp"
 #include "umpire/op/prefetch.hpp"
+#include "umpire/op/reallocate.hpp"
 #include "umpire/resource/host_memory.hpp"
 
 #include "camp/resource/host.hpp"
@@ -90,4 +91,39 @@ TEST(ApiV2Operations, HostResourceBackedBuffersWorkWithOperationTemplates)
 
   host().deallocate(src);
   host().deallocate(dst);
+}
+
+TEST(ApiV2Operations, V2HostReallocatePreservesTypedContents)
+{
+  auto* values = static_cast<int*>(host().allocate(4 * sizeof(int)));
+  for (int i = 0; i < 4; ++i) {
+    values[i] = i + 21;
+  }
+
+  values = umpire::reallocate(&values, 8);
+
+  for (int i = 0; i < 4; ++i) {
+    EXPECT_EQ(values[i], i + 21);
+  }
+
+  host().deallocate(values);
+}
+
+TEST(ApiV2Operations, V2HostAsyncReallocatePreservesByteContents)
+{
+  auto resource = host_resource();
+  void* ptr = host().allocate(8);
+  auto* bytes = static_cast<unsigned char*>(ptr);
+  std::fill(bytes, bytes + 8, static_cast<unsigned char>(0xAB));
+
+  auto event = umpire::reallocate(&ptr, 16, resource);
+  (void)event;
+  resource.get_event().wait();
+
+  bytes = static_cast<unsigned char*>(ptr);
+  for (int i = 0; i < 8; ++i) {
+    EXPECT_EQ(bytes[i], 0xAB);
+  }
+
+  host().deallocate(ptr);
 }

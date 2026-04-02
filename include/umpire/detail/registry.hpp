@@ -71,6 +71,7 @@ public:
   //! Thread-safe allocation tracking helpers.
   void register_allocation(const allocation_record& record);
   std::optional<allocation_record> find_allocation(void* ptr) const;
+  std::optional<allocation_record> find_containing_allocation(void* ptr) const;
   void remove_allocation(void* ptr);
   bool has_allocation(void* ptr) const;
 };

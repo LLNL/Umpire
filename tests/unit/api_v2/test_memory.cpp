@@ -98,10 +98,12 @@ TEST(memory, registry_lookup_returns_stable_copy)
   ASSERT_TRUE(record.has_value());
   EXPECT_EQ(record->ptr, ptr);
   EXPECT_EQ(record->size, 16);
+  EXPECT_EQ(record->strategy, &mem);
 
   mem.deallocate(ptr);
   EXPECT_EQ(record->ptr, ptr);
   EXPECT_EQ(record->size, 16);
+  EXPECT_EQ(record->strategy, &mem);
 }
 
 TEST(memory, lookup_copy_survives_cross_thread_removal)
@@ -130,4 +132,5 @@ TEST(memory, lookup_copy_survives_cross_thread_removal)
   ASSERT_TRUE(snapshot.has_value());
   EXPECT_EQ(snapshot->ptr, ptr);
   EXPECT_EQ(snapshot->size, 24);
+  EXPECT_EQ(snapshot->strategy, &mem);
 }

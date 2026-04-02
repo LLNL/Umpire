@@ -4,6 +4,8 @@
 
 #include "umpire/ResourceManager.hpp"
 #include "umpire/config.hpp"
+#include "umpire/detail/registry.hpp"
+#include "umpire/memory.hpp"
 #include "umpire/op/detail/traits.hpp"
 #include "umpire/resource/platform.hpp"
 
@@ -135,6 +137,104 @@ constexpr auto decay_ptr(T* ptr)
   } else {
     return ptr;
   }
+}
+
+inline auto find_v2_allocation(void* ptr)
+{
+  auto& registry = ::umpire::detail::registry::get();
+  auto record = registry.find_allocation(ptr);
+  if (record && record->strategy) {
+    return record;
+  }
+
+  record = registry.find_containing_allocation(ptr);
+  if (record && record->strategy) {
+    if (ptr != record->ptr) {
+      UMPIRE_ERROR(runtime_error,
+                   fmt::format("Cannot reallocate an offset ptr (ptr={}, base={})", ptr, record->ptr));
+    }
+    return record;
+  }
+
+  return std::optional<::umpire::allocation_record>{};
+}
+
+template <typename T>
+inline std::size_t reallocate_size_bytes(std::size_t new_size)
+{
+  if constexpr (std::is_void_v<T>) {
+    return new_size;
+  } else {
+    return new_size * sizeof(T);
+  }
+}
+
+template <typename T>
+inline T* reallocate_v2(T** ptr, std::size_t new_size)
+{
+  auto* current_ptr = *ptr;
+  auto record = find_v2_allocation(current_ptr);
+
+  if (!record) {
+    return nullptr;
+  }
+
+  auto* owner = record->strategy;
+  const auto platform = owner->get_platform();
+  const std::size_t old_bytes = record->size;
+  const std::size_t new_bytes = reallocate_size_bytes<T>(new_size);
+
+  if (new_bytes == 0) {
+    owner->deallocate(current_ptr);
+    auto* new_ptr = static_cast<T*>(owner->allocate(0));
+    *ptr = new_ptr;
+    return new_ptr;
+  }
+
+  auto* new_ptr = static_cast<T*>(owner->allocate(new_bytes));
+  const std::size_t copy_bytes = min(old_bytes, new_bytes);
+
+  dispatch<copy>(platform, platform, static_cast<void*>(current_ptr), static_cast<void*>(new_ptr), copy_bytes);
+  owner->deallocate(current_ptr);
+  *ptr = new_ptr;
+
+  return new_ptr;
+}
+
+template <typename T>
+inline camp::resources::EventProxy<camp::resources::Resource> reallocate_v2_async(T** ptr, std::size_t new_size,
+                                                                                   camp::resources::Resource& ctx)
+{
+  auto* current_ptr = *ptr;
+  auto record = find_v2_allocation(current_ptr);
+
+  if (!record) {
+    return camp::resources::EventProxy<camp::resources::Resource>{ctx};
+  }
+
+  auto* owner = record->strategy;
+  const auto platform = owner->get_platform();
+  const std::size_t old_bytes = record->size;
+  const std::size_t new_bytes = reallocate_size_bytes<T>(new_size);
+
+  if (new_bytes == 0) {
+    owner->deallocate(current_ptr);
+    auto* new_ptr = static_cast<T*>(owner->allocate(0));
+    *ptr = new_ptr;
+    return camp::resources::EventProxy<camp::resources::Resource>{ctx};
+  }
+
+  auto* new_ptr = static_cast<T*>(owner->allocate(new_bytes));
+  const std::size_t copy_bytes = min(old_bytes, new_bytes);
+  auto event = dispatch<copy>(
+      platform, platform, static_cast<void*>(current_ptr), static_cast<void*>(new_ptr), copy_bytes, ctx);
+
+  // Without chained events, wait before deallocating to avoid freeing in-flight source storage.
+  ctx.get_event().wait();
+  owner->deallocate(current_ptr);
+  *ptr = new_ptr;
+
+  return event;
 }
 } // namespace detail
 
@@ -352,6 +452,11 @@ inline T* reallocate(T** src, std::size_t size)
   if (*src == nullptr) {
     return op::reallocate<resource::host_platform>::exec(src, size);
   }
+
+  if (auto record = op::detail::find_v2_allocation(*src)) {
+    return op::detail::dispatch<op::reallocate>(record->strategy->get_platform(), src, size);
+  }
+
   return op::op_caller<op::reallocate>::exec(src, size);
 }
 
@@ -364,6 +469,11 @@ inline camp::resources::EventProxy<camp::resources::Resource> reallocate(T** src
   if (*src == nullptr) {
     return op::reallocate<resource::host_platform>::exec(src, size, ctx);
   }
+
+  if (auto record = op::detail::find_v2_allocation(*src)) {
+    return op::detail::dispatch<op::reallocate>(record->strategy->get_platform(), src, size, ctx);
+  }
+
   return op::op_caller<op::reallocate>::exec(src, size, ctx);
 }
 
@@ -451,6 +561,10 @@ T* op::reallocate<Src>::exec(T** ptr, std::size_t new_size)
     return new_ptr;
   }
 
+  if (auto* new_ptr = detail::reallocate_v2(ptr, new_size)) {
+    return new_ptr;
+  }
+
   auto& rm = ResourceManager::getInstance();
   auto& allocation_map = rm.m_allocations;
 
@@ -515,6 +629,10 @@ camp::resources::EventProxy<camp::resources::Resource> op::reallocate<Src>::exec
     return camp::resources::EventProxy<camp::resources::Resource>{ctx};
   }
 
+  if (detail::find_v2_allocation(current_ptr)) {
+    return detail::reallocate_v2_async(ptr_ptr, new_size, ctx);
+  }
+
   auto& rm = ResourceManager::getInstance();
   auto& allocation_map = rm.m_allocations;
 
@@ -553,15 +671,8 @@ camp::resources::EventProxy<camp::resources::Resource> op::reallocate<Src>::exec
   // Note: We cast to void* so that detail::get_size<void>(len) returns len as-is (bytes)
   auto event = umpire::copy(static_cast<void*>(current_ptr), static_cast<void*>(new_ptr), copy_bytes, ctx);
 
-  // IMPORTANT: In a fully async implementation, we would need to chain the deallocation
-  // to happen after the copy completes. However, since we don't have that mechanism yet,
-  // and ResourceManager's reallocate operation doesn't wait on the event, we need to
-  // deallocate here as we did in the synchronous case.
-  //
-  // This has the potential to cause race conditions if the memory is deallocated before
-  // the copy completes, but for most allocators, the memory won't be immediately reused.
-  // A better solution would be to have the ResourceManager wait on the event before returning
-  // or implement a chained operation system.
+  // Without chained events, wait before deallocating to avoid freeing in-flight source storage.
+  ctx.get_event().wait();
   allocator.deallocate(current_ptr);
 
   // Update the pointer
@@ -581,6 +692,10 @@ void* op::reallocate<Src>::exec(void** ptr_ptr, std::size_t new_size)
     Allocator allocator = rm.getDefaultAllocator();
     void* new_ptr = allocator.allocate(new_size); // No sizeof multiplication for void*
     *ptr_ptr = new_ptr;
+    return new_ptr;
+  }
+
+  if (auto* new_ptr = detail::reallocate_v2(ptr_ptr, new_size)) {
     return new_ptr;
   }
 
@@ -642,6 +757,10 @@ camp::resources::EventProxy<camp::resources::Resource> op::reallocate<Src>::exec
     return camp::resources::EventProxy<camp::resources::Resource>{ctx};
   }
 
+  if (detail::find_v2_allocation(current_ptr)) {
+    return detail::reallocate_v2_async(ptr_ptr, new_size, ctx);
+  }
+
   auto& rm = ResourceManager::getInstance();
   auto& allocation_map = rm.m_allocations;
 
@@ -675,7 +794,8 @@ camp::resources::EventProxy<camp::resources::Resource> op::reallocate<Src>::exec
   // Copy data from old to new location asynchronously (void* naturally uses bytes)
   auto event = umpire::copy(static_cast<void*>(current_ptr), static_cast<void*>(new_ptr), copy_bytes, ctx);
 
-  // Deallocate old memory
+  // Wait for the async copy to complete before freeing the source allocation.
+  ctx.get_event().wait();
   allocator.deallocate(current_ptr);
 
   // Update the pointer

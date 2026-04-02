@@ -28,7 +28,7 @@ memory::~memory()
 
 void memory::track_allocation(void* ptr, std::size_t size)
 {
-  allocation_record record{ptr, size, nullptr};
+  allocation_record record{ptr, size, this};
   detail::registry::get().register_allocation(record);
   update_statistics(static_cast<std::ptrdiff_t>(size));
 }
