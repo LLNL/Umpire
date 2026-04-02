@@ -67,6 +67,24 @@ WORKDIR /home/umpire/workspace/build
 RUN cmake -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DCMAKE_CXX_COMPILER=g++ -DENABLE_CUDA=On -DCMAKE_CUDA_COMPILER=/usr/local/cuda/bin/nvcc -DCMAKE_CUDA_ARCHITECTURES=75 .. && \
     make -j 16
 
+FROM ghcr.io/llnl/radiuss:ubuntu-22.04-cuda-12-3 AS api_v2_cuda_validate
+ENV GTEST_COLOR=1
+COPY . /home/umpire/workspace
+WORKDIR /home/umpire/workspace/build
+RUN cmake -DENABLE_WARNINGS_AS_ERRORS=Off -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On \
+    -DUMPIRE_ENABLE_TESTS=On -DCMAKE_CXX_COMPILER=g++ -DENABLE_CUDA=On \
+    -DCMAKE_CUDA_COMPILER=/usr/local/cuda/bin/nvcc -DCMAKE_CUDA_ARCHITECTURES=70 .. && \
+    make -j 8 api_v2_cuda_device_memory_tests api_v2_operations_tests
+
+FROM ghcr.io/llnl/radiuss:cuda-13-0-ubuntu-24.04 AS api_v2_cuda13_validate
+ENV GTEST_COLOR=1
+COPY . /home/umpire/workspace
+WORKDIR /home/umpire/workspace/build
+RUN cmake -DENABLE_WARNINGS_AS_ERRORS=Off -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On \
+    -DUMPIRE_ENABLE_TESTS=On -DCMAKE_CXX_COMPILER=g++ -DENABLE_CUDA=On \
+    -DCMAKE_CUDA_COMPILER=/usr/local/cuda/bin/nvcc -DCMAKE_CUDA_ARCHITECTURES=75 .. && \
+    make -j 16 api_v2_cuda_device_memory_tests api_v2_operations_tests
+
 FROM ghcr.io/llnl/radiuss:hip-6.4.3-ubuntu-24.04 AS hip
 ENV GTEST_COLOR=1
 ENV HCC_AMDGPU_TARGET=gfx900
@@ -75,6 +93,16 @@ WORKDIR /home/umpire/workspace/build
 RUN cmake -DENABLE_WARNINGS_AS_ERRORS=Off -DCMAKE_CXX_COMPILER=/opt/rocm-6.4.3/bin/amdclang++ -DROCM_PATH=/opt/rocm-6.4.3 -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DENABLE_HIP=On .. && \
     make -j 16 VERBOSE=1
 
+FROM ghcr.io/llnl/radiuss:hip-6.4.3-ubuntu-24.04 AS api_v2_hip_validate
+ENV GTEST_COLOR=1
+ENV HCC_AMDGPU_TARGET=gfx900
+COPY . /home/umpire/workspace
+WORKDIR /home/umpire/workspace/build
+RUN cmake -DENABLE_WARNINGS_AS_ERRORS=Off -DCMAKE_CXX_COMPILER=/opt/rocm-6.4.3/bin/amdclang++ \
+    -DROCM_PATH=/opt/rocm-6.4.3 -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DUMPIRE_ENABLE_TESTS=On \
+    -DENABLE_HIP=On .. && \
+    make -j 16 api_v2_hip_device_memory_tests api_v2_operations_tests VERBOSE=1
+
 FROM ghcr.io/llnl/radiuss:intel-2024.0-ubuntu-20.04 AS sycl
 ENV GTEST_COLOR=1
 COPY . /home/umpire/workspace
@@ -82,6 +110,16 @@ WORKDIR /home/umpire/workspace/build
 RUN /bin/bash -c "source /opt/intel/oneapi/setvars.sh 2>&1 > /dev/null && \
     cmake -DCMAKE_CXX_COMPILER=icpx -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_FLAGS=-fsycl -DENABLE_WARNINGS_AS_ERRORS=Off -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DUMPIRE_ENABLE_SYCL=On .. && \
     make -j 16"
+
+FROM ghcr.io/llnl/radiuss:intel-2024.0-ubuntu-20.04 AS api_v2_sycl_validate
+ENV GTEST_COLOR=1
+COPY . /home/umpire/workspace
+WORKDIR /home/umpire/workspace/build
+RUN /bin/bash -c "source /opt/intel/oneapi/setvars.sh 2>&1 > /dev/null && \
+    cmake -DCMAKE_CXX_COMPILER=icpx -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_FLAGS=-fsycl \
+    -DENABLE_WARNINGS_AS_ERRORS=Off -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DUMPIRE_ENABLE_TESTS=On \
+    -DUMPIRE_ENABLE_SYCL=On .. && \
+    make -j 16 api_v2_sycl_device_memory_tests api_v2_operations_tests"
 
 FROM ghcr.io/llnl/radiuss:intel-2024.0-ubuntu-20.04 AS intel
 ENV GTEST_COLOR=1

@@ -128,6 +128,17 @@ if (UMPIRE_ENABLE_API_V2)
       COMMAND api_v2_hip_device_memory_tests)
   endif()
 
+  if (UMPIRE_ENABLE_SYCL)
+    blt_add_executable(
+      NAME api_v2_sycl_device_memory_tests
+      SOURCES api_v2/resources/test_sycl_device_memory.cpp
+      DEPENDS_ON ${unit_depends})
+
+    blt_add_test(
+      NAME api_v2_sycl_device_memory_tests
+      COMMAND api_v2_sycl_device_memory_tests)
+  endif()
+
   if (UMPIRE_ENABLE_OPENMP_TARGET)
     blt_add_executable(
       NAME api_v2_openmp_target_memory_tests

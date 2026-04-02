@@ -169,16 +169,35 @@ jobs:
           -E "$API_V2_EXCLUDE_REGEX" \
           --output-on-failure
 
-  # Optional device-validation entry point for future API v2 CUDA/HIP/SYCL work.
-  # This job does not currently run any API v2 device tests; it exists to
-  # provide a hardware-capable CI path on GPU-equipped runners for follow-up
-  # beads such as umpire-4og, umpire-728, and umpire-e2h.
+  # Manual backend validation path for the API v2 device tests. These jobs
+  # build backend-specific validation images and execute the concrete API v2
+  # test targets inside those containers.
   device_gpu_docker:
-    name: API v2 Device (Docker skeleton on radiuss-cuda-runners)
+    name: API v2 Device Validation (${{ matrix.name }})
     if: github.event_name == 'workflow_dispatch'
     strategy:
       matrix:
-        target: [cuda, cuda13, hip, sycl]
+        include:
+        - name: cuda
+          build_target: api_v2_cuda_validate
+          image_name: umpire-api-v2-cuda-validate
+          docker_run_args: --gpus all
+          ctest_regex: '^(api_v2_cuda_device_memory_tests|api_v2_operations_tests)$'
+        - name: cuda13
+          build_target: api_v2_cuda13_validate
+          image_name: umpire-api-v2-cuda13-validate
+          docker_run_args: --gpus all
+          ctest_regex: '^(api_v2_cuda_device_memory_tests|api_v2_operations_tests)$'
+        - name: hip
+          build_target: api_v2_hip_validate
+          image_name: umpire-api-v2-hip-validate
+          docker_run_args: ""
+          ctest_regex: '^(api_v2_hip_device_memory_tests|api_v2_operations_tests)$'
+        - name: sycl
+          build_target: api_v2_sycl_validate
+          image_name: umpire-api-v2-sycl-validate
+          docker_run_args: ""
+          ctest_regex: '^(api_v2_sycl_device_memory_tests|api_v2_operations_tests)$'
     runs-on: radiuss-cuda-runners
     steps:
     - run: |
@@ -190,10 +209,16 @@ jobs:
     - uses: actions/checkout@v2
       with:
         submodules: recursive
-    - uses: docker/setup-buildx-action@v3
-    - uses: docker/build-push-action@v6
-      with:
-        # Reuse the existing Dockerfile targets used by build.yml; future
-        # device-validation beads are expected to extend these stages (or add
-        # new ones) with API v2 device tests.
-        target: ${{ matrix.target }}
+    - name: Build backend validation image
+      run: |
+        docker build \
+          --target "${{ matrix.build_target }}" \
+          -t "${{ matrix.image_name }}" \
+          .
+    - name: Run backend API v2 tests
+      run: |
+        docker run --rm ${{ matrix.docker_run_args }} \
+          "${{ matrix.image_name }}" \
+          ctest --test-dir /home/umpire/workspace/build \
+          -R "${{ matrix.ctest_regex }}" \
+          --output-on-failure
