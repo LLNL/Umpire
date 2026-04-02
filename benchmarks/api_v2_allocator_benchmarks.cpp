@@ -265,3 +265,5 @@ static void BM_Dispatch_CompileTimeHostLoop(benchmark::State& state)
   state.SetItemsProcessed(state.iterations() * static_cast<std::int64_t>(count));
 }
 BENCHMARK(BM_Dispatch_CompileTimeHostLoop)->Range(256, 1 << 16);
+
+BENCHMARK_MAIN();
