@@ -175,4 +175,13 @@ if (UMPIRE_ENABLE_API_V2)
   blt_add_benchmark(
     NAME api_v2_fixed_pool_benchmarks
     COMMAND api_v2_fixed_pool_benchmarks)
+
+  blt_add_executable(
+    NAME api_v2_allocator_benchmarks
+    SOURCES api_v2_allocator_benchmarks.cpp
+    DEPENDS_ON ${benchmark_depends})
+
+  blt_add_benchmark(
+    NAME api_v2_allocator_benchmarks
+    COMMAND api_v2_allocator_benchmarks)
 endif ()
