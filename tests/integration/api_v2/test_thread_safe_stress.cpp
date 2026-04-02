@@ -251,6 +251,8 @@ namespace {
 // Simple passthrough strategy for composition testing
 class passthrough_strategy : public umpire::allocation_strategy {
 public:
+  using platform = umpire::host_platform;
+
   passthrough_strategy(const std::string& name, umpire::memory* parent)
     : allocation_strategy(name, parent) {}
 
