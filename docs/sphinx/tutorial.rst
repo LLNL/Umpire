@@ -27,6 +27,7 @@ sections.
    :maxdepth: 1
    :caption: Tutorial
 
+   tutorial/api_v2_tutorial.rst
    tutorial/allocators.rst
    tutorial/resources.rst
    tutorial/operations.rst
