@@ -87,7 +87,6 @@ protected:
 
   // Helper for derived classes to conditionally track
   void* allocate_impl(std::size_t size) {
-    using value_type = typename std::allocator_traits<Allocator>::value_type;
     void* ptr = static_cast<void*>(allocator_.allocate(size));
     if constexpr (Tracking) {
       track_allocation(ptr, size);
@@ -99,8 +98,8 @@ protected:
     if constexpr (Tracking) {
       untrack_allocation(ptr);
     }
-    using value_type = typename std::allocator_traits<Allocator>::value_type;
-    allocator_.deallocate(static_cast<value_type*>(ptr), size);
+    using pointer = typename std::allocator_traits<Allocator>::pointer;
+    allocator_.deallocate(static_cast<pointer>(ptr), size);
   }
 
 public:
