@@ -1,0 +1,13 @@
+execute_process(
+  COMMAND
+    "@CMAKE_CTEST_COMMAND@"
+    -R "^api_v2_"
+    -E "@API_V2_COVERAGE_EXCLUDED_TESTS@"
+    --output-on-failure
+  RESULT_VARIABLE api_v2_ctest_result)
+
+if(NOT api_v2_ctest_result EQUAL 0)
+  message(STATUS
+    "API v2 coverage test runner exited with status ${api_v2_ctest_result}; "
+    "continuing so coverage data can still be captured.")
+endif()

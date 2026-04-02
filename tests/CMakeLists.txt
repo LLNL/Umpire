@@ -23,4 +23,73 @@ if (UMPIRE_ENABLE_DEVELOPER_DEFAULTS)
 endif()
 add_subdirectory(install)
 
+if ((ENABLE_COVERAGE OR UMPIRE_ENABLE_COVERAGE)
+    AND EXISTS "${LCOV_EXECUTABLE}"
+    AND EXISTS "${GENHTML_EXECUTABLE}"
+    AND EXISTS "${GCOV_EXECUTABLE}")
+  set(api_v2_coverage_targets
+    api_v2_registry_tests
+    api_v2_memory_tests
+    api_v2_memory_resource_tests
+    api_v2_allocator_tests
+    api_v2_allocation_strategy_tests
+    api_v2_host_memory_tests
+    api_v2_null_resource_tests
+    api_v2_thread_safe_tests
+    api_v2_quick_pool_tests
+    api_v2_size_limiter_tests
+    api_v2_monotonic_buffer_tests
+    api_v2_named_tests
+    api_v2_registry_threading_tests
+    api_v2_memory_threading_tests
+    api_v2_thread_safe_stress_tests
+    api_v2_stl_compatibility_tests
+    api_v2_operations_headers_tests
+    api_v2_operations_tests)
+  set(api_v2_coverage_excluded_tests
+    "api_v2_fixed_pool_tests|api_v2_dynamic_pool_list_tests")
+  set(API_V2_COVERAGE_EXCLUDED_TESTS "${api_v2_coverage_excluded_tests}")
+  configure_file(
+    ${PROJECT_SOURCE_DIR}/cmake/RunApiV2CoverageTests.cmake.in
+    ${PROJECT_BINARY_DIR}/RunApiV2CoverageTests.cmake
+    @ONLY)
+
+  add_custom_target(coverage_api_v2
+    COMMAND
+      ${LCOV_EXECUTABLE}
+      --gcov-tool ${GCOV_EXECUTABLE}
+      --directory=${PROJECT_BINARY_DIR}
+      --zerocounters
+    COMMAND
+      ${CMAKE_COMMAND}
+      -P ${PROJECT_BINARY_DIR}/RunApiV2CoverageTests.cmake
+    COMMAND
+      ${LCOV_EXECUTABLE}
+      --ignore-errors empty,inconsistent,unsupported,format
+      --no-external
+      --gcov-tool ${GCOV_EXECUTABLE}
+      --base-directory ${PROJECT_SOURCE_DIR}
+      --directory=${PROJECT_BINARY_DIR}
+      --capture
+      --output-file coverage_api_v2.info
+    COMMAND
+      ${CMAKE_COMMAND}
+      -E copy
+      coverage_api_v2.info
+      coverage_api_v2.info.cleaned
+    COMMAND
+      ${GENHTML_EXECUTABLE}
+      --ignore-errors inconsistent,corrupt,category
+      -o coverage_api_v2
+      coverage_api_v2.info.cleaned
+    BYPRODUCTS
+      coverage_api_v2.info
+      coverage_api_v2.info.cleaned
+    WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+    COMMENT "Resetting API v2 coverage counters, running host-safe API v2 tests, and generating coverage report.")
+  add_dependencies(coverage_api_v2 ${api_v2_coverage_targets})
+
+  message(STATUS "Coverage target 'coverage_api_v2' available for API v2 tests.")
+endif()
+
 umpire_add_code_checks(PREFIX tests RECURSIVE TRUE)
