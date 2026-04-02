@@ -46,6 +46,16 @@ struct default_allocator_for<hip_platform> {
 };
 #endif
 
+#if defined(UMPIRE_ENABLE_SYCL)
+// Forward declaration - will be defined in sycl_device_memory.hpp
+struct sycl_allocator;
+
+template<>
+struct default_allocator_for<sycl_platform> {
+  using type = sycl_allocator;
+};
+#endif
+
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
 // Forward declaration - will be defined in openmp_target_memory.hpp
 struct omp_target_allocator;

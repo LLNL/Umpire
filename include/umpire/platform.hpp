@@ -21,6 +21,9 @@ using resource::cuda_platform;
 #if defined(UMPIRE_ENABLE_HIP)
 using resource::hip_platform;
 #endif
+#if defined(UMPIRE_ENABLE_SYCL)
+using resource::sycl_platform;
+#endif
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
 using resource::omp_target_platform;
 #endif

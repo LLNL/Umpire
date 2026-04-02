@@ -19,6 +19,9 @@ struct cuda_platform {};
 #if defined(UMPIRE_ENABLE_HIP)
 struct hip_platform {};
 #endif
+#if defined(UMPIRE_ENABLE_SYCL)
+struct sycl_platform {};
+#endif
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
 struct omp_target_platform {};
 #endif
@@ -43,6 +46,12 @@ struct platform_for<cuda_platform> {
 template <>
 struct platform_for<hip_platform> {
   static constexpr camp::resources::Platform value = camp::resources::Platform::hip;
+};
+#endif
+#if defined(UMPIRE_ENABLE_SYCL)
+template <>
+struct platform_for<sycl_platform> {
+  static constexpr camp::resources::Platform value = camp::resources::Platform::sycl;
 };
 #endif
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
