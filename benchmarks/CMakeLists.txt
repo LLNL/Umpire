@@ -157,20 +157,22 @@ blt_add_benchmark(
   NAME copy_performance_benchmark
   COMMAND copy_performance_benchmark)
 
-blt_add_executable(
-  NAME api_v2_host_memory_benchmarks
-  SOURCES api_v2_host_memory_benchmarks.cpp
-  DEPENDS_ON ${benchmark_depends})
+if (UMPIRE_ENABLE_API_V2)
+  blt_add_executable(
+    NAME api_v2_host_memory_benchmarks
+    SOURCES api_v2_host_memory_benchmarks.cpp
+    DEPENDS_ON ${benchmark_depends})
 
-blt_add_benchmark(
-  NAME api_v2_host_memory_benchmarks
-  COMMAND api_v2_host_memory_benchmarks)
+  blt_add_benchmark(
+    NAME api_v2_host_memory_benchmarks
+    COMMAND api_v2_host_memory_benchmarks)
 
-blt_add_executable(
-  NAME api_v2_fixed_pool_benchmarks
-  SOURCES api_v2_fixed_pool_benchmarks.cpp
-  DEPENDS_ON ${benchmark_depends})
+  blt_add_executable(
+    NAME api_v2_fixed_pool_benchmarks
+    SOURCES api_v2_fixed_pool_benchmarks.cpp
+    DEPENDS_ON ${benchmark_depends})
 
-blt_add_benchmark(
-  NAME api_v2_fixed_pool_benchmarks
-  COMMAND api_v2_fixed_pool_benchmarks)
+  blt_add_benchmark(
+    NAME api_v2_fixed_pool_benchmarks
+    COMMAND api_v2_fixed_pool_benchmarks)
+endif ()

@@ -171,7 +171,9 @@ endif()
 
 install(TARGETS ${umpire_examples} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
-add_subdirectory(api_v2)
+if (UMPIRE_ENABLE_API_V2)
+  add_subdirectory(api_v2)
+endif ()
 
 add_subdirectory(tutorial)
 

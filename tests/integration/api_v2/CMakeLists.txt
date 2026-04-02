@@ -4,6 +4,10 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
+if (NOT UMPIRE_ENABLE_API_V2)
+  return()
+endif ()
+
 blt_add_executable(
   NAME api_v2_stl_compatibility_tests
   SOURCES test_stl_compatibility.cpp

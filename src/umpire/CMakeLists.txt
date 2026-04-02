@@ -35,6 +35,64 @@ set (umpire_sources
   ResourceManager.cpp
   Umpire.cpp)
 
+set(umpire_api_v2_headers)
+
+if (UMPIRE_ENABLE_API_V2)
+  set(umpire_api_v2_headers
+    ${PROJECT_SOURCE_DIR}/include/umpire/allocation_record.hpp
+    ${PROJECT_SOURCE_DIR}/include/umpire/allocator.hpp
+    ${PROJECT_SOURCE_DIR}/include/umpire/error.hpp
+    ${PROJECT_SOURCE_DIR}/include/umpire/memory.hpp
+    ${PROJECT_SOURCE_DIR}/include/umpire/memory_resource.hpp
+    ${PROJECT_SOURCE_DIR}/include/umpire/op.hpp
+    ${PROJECT_SOURCE_DIR}/include/umpire/platform.hpp
+    ${PROJECT_SOURCE_DIR}/include/umpire/detail/registry.hpp
+    ${PROJECT_SOURCE_DIR}/include/umpire/op/copy.hpp
+    ${PROJECT_SOURCE_DIR}/include/umpire/op/dispatch.hpp
+    ${PROJECT_SOURCE_DIR}/include/umpire/op/host.hpp
+    ${PROJECT_SOURCE_DIR}/include/umpire/op/memset.hpp
+    ${PROJECT_SOURCE_DIR}/include/umpire/op/openmp_target.hpp
+    ${PROJECT_SOURCE_DIR}/include/umpire/op/operations.hpp
+    ${PROJECT_SOURCE_DIR}/include/umpire/op/prefetch.hpp
+    ${PROJECT_SOURCE_DIR}/include/umpire/op/reallocate.hpp
+    ${PROJECT_SOURCE_DIR}/include/umpire/resource/host_memory.hpp
+    ${PROJECT_SOURCE_DIR}/include/umpire/resource/null_resource.hpp
+    ${PROJECT_SOURCE_DIR}/include/umpire/resource/platform.hpp
+    ${PROJECT_SOURCE_DIR}/include/umpire/strategy/allocation_strategy.hpp
+    ${PROJECT_SOURCE_DIR}/include/umpire/strategy/dynamic_pool_list.hpp
+    ${PROJECT_SOURCE_DIR}/include/umpire/strategy/fixed_pool.hpp
+    ${PROJECT_SOURCE_DIR}/include/umpire/strategy/monotonic_buffer.hpp
+    ${PROJECT_SOURCE_DIR}/include/umpire/strategy/named.hpp
+    ${PROJECT_SOURCE_DIR}/include/umpire/strategy/quick_pool.hpp
+    ${PROJECT_SOURCE_DIR}/include/umpire/strategy/size_limiter.hpp
+    ${PROJECT_SOURCE_DIR}/include/umpire/strategy/thread_safe.hpp)
+
+  if (UMPIRE_ENABLE_CUDA)
+    list(APPEND umpire_api_v2_headers
+      ${PROJECT_SOURCE_DIR}/include/umpire/op/cuda.hpp
+      ${PROJECT_SOURCE_DIR}/include/umpire/resource/cuda_device_memory.hpp)
+  endif ()
+
+  if (UMPIRE_ENABLE_HIP)
+    list(APPEND umpire_api_v2_headers
+      ${PROJECT_SOURCE_DIR}/include/umpire/op/hip.hpp
+      ${PROJECT_SOURCE_DIR}/include/umpire/resource/hip_device_memory.hpp)
+  endif ()
+
+  if (UMPIRE_ENABLE_SYCL)
+    list(APPEND umpire_api_v2_headers
+      ${PROJECT_SOURCE_DIR}/include/umpire/op/sycl.hpp
+      ${PROJECT_SOURCE_DIR}/include/umpire/resource/sycl_device_memory.hpp)
+  endif ()
+
+  if (UMPIRE_ENABLE_OPENMP_TARGET)
+    list(APPEND umpire_api_v2_headers
+      ${PROJECT_SOURCE_DIR}/include/umpire/resource/openmp_target_memory.hpp)
+  endif ()
+
+  list(APPEND umpire_sources api_v2_instantiations.cpp)
+endif ()
+
 if (UMPIRE_ENABLE_DEVICE_ALLOCATOR AND (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP))
   set(umpire_device_headers
     DeviceAllocator.hpp
@@ -141,6 +199,13 @@ blt_add_library(
   DEPENDS_ON ${umpire_depends}
   DEFINES ${umpire_defines})
 
+if (UMPIRE_ENABLE_API_V2)
+  target_sources(umpire PRIVATE ${umpire_api_v2_headers})
+  target_compile_definitions(umpire PUBLIC UMPIRE_ENABLE_API_V2=1)
+else ()
+  target_compile_definitions(umpire PUBLIC UMPIRE_ENABLE_API_V2=0)
+endif ()
+
 if (NOT WIN32 AND NOT ${CMAKE_VERSION} VERSION_LESS 3.18)
   target_link_options(
     umpire INTERFACE
@@ -216,5 +281,12 @@ install(FILES
 install(FILES
   ${CMAKE_BINARY_DIR}/include/umpire/config.hpp
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/umpire)
+
+if (UMPIRE_ENABLE_API_V2)
+  install(
+    DIRECTORY ${PROJECT_SOURCE_DIR}/include/umpire/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/umpire
+    FILES_MATCHING PATTERN "*.hpp")
+endif ()
 
 umpire_add_code_checks(PREFIX umpire)

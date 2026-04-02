@@ -141,6 +141,7 @@ cmake_dependent_option( UMPIRE_ENABLE_BENCHMARKS "Build Umpire benchmarks" On
                         "ENABLE_BENCHMARKS" Off )
 cmake_dependent_option( UMPIRE_ENABLE_EXAMPLES "Build Umpire examples" On
                         "ENABLE_EXAMPLES" Off )
+option(UMPIRE_ENABLE_API_V2 "Enable experimental API v2" ON)
 
 cmake_dependent_option( UMPIRE_ENABLE_DOCS "Build Umpire docs" Off
                         "ENABLE_DOCS" Off )
@@ -173,6 +174,12 @@ endif ()
 include(cmake/SetupCMakeBasics.cmake)
 include(cmake/SetupCompilerFlags.cmake)
 include(cmake/SetupUmpireThirdParty.cmake)
+
+if (UMPIRE_ENABLE_API_V2)
+  message(STATUS "API v2 enabled")
+else ()
+  message(STATUS "API v2 disabled")
+endif ()
 
 if (WIN32)
   if ((NOT UMPIRE_ENABLE_FILESYSTEM) OR (CMAKE_CXX_STANDARD LESS 17))
