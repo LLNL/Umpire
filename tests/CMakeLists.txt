@@ -46,7 +46,8 @@ if ((ENABLE_COVERAGE OR UMPIRE_ENABLE_COVERAGE)
     api_v2_thread_safe_stress_tests
     api_v2_stl_compatibility_tests
     api_v2_operations_headers_tests
-    api_v2_operations_tests)
+    api_v2_operations_tests
+    api_v2_v1_interop_tests)
   set(api_v2_coverage_excluded_tests
     "api_v2_fixed_pool_tests")
   set(API_V2_COVERAGE_EXCLUDED_TESTS "${api_v2_coverage_excluded_tests}")

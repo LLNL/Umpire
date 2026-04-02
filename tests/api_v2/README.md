@@ -37,6 +37,7 @@ The current API v2 integration test executables are defined in
 - `api_v2_stl_compatibility_tests`
 - `api_v2_operations_headers_tests`
 - `api_v2_operations_tests`
+- `api_v2_v1_interop_tests`
 
 To run the full host-only API v2 test set after configuring and building:
 
@@ -143,6 +144,18 @@ cmake --build build-coverage --target coverage_api_v2
 
 When coverage tools are available, the generated report is written under
 `build-coverage/coverage_api_v2/`.
+
+## Host Compatibility Matrix
+
+The current host-only interoperability coverage validates these supported
+combinations:
+
+| Scenario | Status | Coverage |
+|----------|--------|----------|
+| v2 `host_memory<>::get()` allocation visible to v1 `ResourceManager` | Supported | `api_v2_v1_interop_tests` |
+| v1 `ResourceManager::memset()` on v2 host allocation | Supported | `api_v2_v1_interop_tests` |
+| v1 `ResourceManager::copy()` between v1/v2 host allocations | Supported | `api_v2_v1_interop_tests` |
+| Ownership-changing v1 operations on v2 allocations | Deferred | Follow-up bead `umpire-xco` |
 
 ## CI
 

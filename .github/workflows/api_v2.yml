@@ -20,6 +20,7 @@ env:
     api_v2_registry_threading_tests api_v2_memory_threading_tests
     api_v2_thread_safe_stress_tests api_v2_stl_compatibility_tests
     api_v2_operations_headers_tests api_v2_operations_tests
+    api_v2_v1_interop_tests
   API_V2_TSAN_TARGETS: >-
     api_v2_registry_threading_tests api_v2_memory_threading_tests
     api_v2_thread_safe_stress_tests

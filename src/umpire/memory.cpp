@@ -6,13 +6,41 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/memory.hpp"
 
+#include "umpire/ResourceManager.hpp"
 #include "umpire/allocation_record.hpp"
 #include "umpire/detail/registry.hpp"
 #include "umpire/error.hpp"
+#include "umpire/util/AllocationRecord.hpp"
 
 #include "fmt/format.h"
 
 namespace umpire {
+
+namespace {
+
+bool should_bridge_to_v1_host_allocator(const memory& mem)
+{
+  return mem.get_name() == "HOST" && mem.get_platform() == resource::Platform::host;
+}
+
+void register_with_v1_host_allocator(void* ptr, std::size_t size)
+{
+  auto& rm = ResourceManager::getInstance();
+  if (!rm.hasAllocator(ptr)) {
+    auto host_allocator = rm.getAllocator("HOST");
+    rm.registerAllocation(ptr, util::AllocationRecord{ptr, size, host_allocator.getAllocationStrategy()});
+  }
+}
+
+void deregister_from_v1_host_allocator(void* ptr)
+{
+  auto& rm = ResourceManager::getInstance();
+  if (rm.hasAllocator(ptr)) {
+    rm.deregisterAllocation(ptr);
+  }
+}
+
+} // namespace
 
 memory::memory(const std::string& name)
   : id_{detail::registry::get().get_id()}
@@ -30,6 +58,9 @@ void memory::track_allocation(void* ptr, std::size_t size)
 {
   allocation_record record{ptr, size, this};
   detail::registry::get().register_allocation(record);
+  if (should_bridge_to_v1_host_allocator(*this)) {
+    register_with_v1_host_allocator(ptr, size);
+  }
   update_statistics(static_cast<std::ptrdiff_t>(size));
 }
 
@@ -42,6 +73,9 @@ void memory::untrack_allocation(void* ptr)
 
   std::size_t size = record->size;
   detail::registry::get().remove_allocation(ptr);
+  if (should_bridge_to_v1_host_allocator(*this)) {
+    deregister_from_v1_host_allocator(ptr);
+  }
   update_statistics(-static_cast<std::ptrdiff_t>(size));
 }
 
