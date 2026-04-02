@@ -87,7 +87,7 @@ class MemoryMap {
   using Iterator = Iterator_<false>;
   using ConstIterator = Iterator_<true>;
 
-  MemoryMap() = default;
+  MemoryMap();
   ~MemoryMap();
 
   // Would require a deep copy of the Judy data
