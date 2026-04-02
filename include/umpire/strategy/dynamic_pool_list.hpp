@@ -249,7 +249,6 @@ public:
 
         if (remainder > min_alloc_size_) {
           // Split block
-          void* alloc_ptr = it->ptr;
           void* remainder_ptr = static_cast<char*>(it->ptr) + size;
 
           // Update current block to allocated portion

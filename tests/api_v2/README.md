@@ -44,13 +44,13 @@ To run the full host-only API v2 test set after configuring and building:
 ctest --test-dir build -R '^api_v2_' --output-on-failure
 ```
 
-On the current `feature/api-refactor` branch, host validation should exclude two
-pre-existing broken strategy tests that are tracked separately in Beads:
+On the current `feature/api-refactor` branch, host validation should exclude the
+remaining pre-existing broken strategy test tracked separately in Beads:
 
 ```bash
 ctest --test-dir build \
   -R '^api_v2_' \
-  -E 'api_v2_fixed_pool_tests|api_v2_dynamic_pool_list_tests' \
+  -E 'api_v2_fixed_pool_tests' \
   --output-on-failure
 ```
 
@@ -69,7 +69,7 @@ cmake -S . -B build \
 cmake --build build --parallel
 ctest --test-dir build \
   -R '^api_v2_' \
-  -E 'api_v2_fixed_pool_tests|api_v2_dynamic_pool_list_tests' \
+  -E 'api_v2_fixed_pool_tests' \
   --output-on-failure
 ```
 
@@ -94,7 +94,7 @@ cmake -S . -B build-asan \
 cmake --build build-asan --parallel
 ctest --test-dir build-asan \
   -R '^api_v2_' \
-  -E 'api_v2_fixed_pool_tests|api_v2_dynamic_pool_list_tests' \
+  -E 'api_v2_fixed_pool_tests' \
   --output-on-failure
 ```
 
@@ -127,8 +127,7 @@ The repository already supports BLT coverage builds via `ENABLE_COVERAGE=On`.
 The API v2-specific test wiring adds a `coverage_api_v2` target that filters the
 coverage run to the `api_v2_*` CTest entries and builds the current host-safe
 API v2 test executables before collecting coverage. The target currently
-excludes `api_v2_fixed_pool_tests` and `api_v2_dynamic_pool_list_tests` until
-their follow-up fixes land.
+excludes `api_v2_fixed_pool_tests` until its follow-up fix lands.
 
 ```bash
 cmake -S . -B build-coverage \

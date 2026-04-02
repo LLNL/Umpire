@@ -22,6 +22,8 @@ namespace {
 // Test memory implementation for unit testing
 class test_memory : public umpire::memory {
 public:
+  using platform = umpire::host_platform;
+
   test_memory() : umpire::memory{"test_parent"} { }
 
   void* allocate(std::size_t size) override
@@ -283,7 +285,6 @@ TEST(dynamic_pool_list, coalesce_adjacent_free_blocks)
 
   // Free middle block first
   pool.deallocate(ptr2);
-  std::size_t blocks_after_one_free = pool.get_block_count();
 
   // Free adjacent blocks - should trigger coalescing
   pool.deallocate(ptr1);

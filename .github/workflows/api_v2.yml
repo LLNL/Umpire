@@ -9,12 +9,13 @@ on:
 name: API v2 Tests
 
 env:
-  API_V2_EXCLUDE_REGEX: api_v2_fixed_pool_tests|api_v2_dynamic_pool_list_tests
+  API_V2_EXCLUDE_REGEX: api_v2_fixed_pool_tests
   API_V2_HOST_TARGETS: >-
     api_v2_registry_tests api_v2_memory_tests api_v2_memory_resource_tests
     api_v2_allocator_tests api_v2_allocation_strategy_tests
     api_v2_host_memory_tests api_v2_null_resource_tests
-    api_v2_thread_safe_tests api_v2_quick_pool_tests api_v2_size_limiter_tests
+    api_v2_thread_safe_tests api_v2_dynamic_pool_list_tests
+    api_v2_quick_pool_tests api_v2_size_limiter_tests
     api_v2_monotonic_buffer_tests api_v2_named_tests
     api_v2_registry_threading_tests api_v2_memory_threading_tests
     api_v2_thread_safe_stress_tests api_v2_stl_compatibility_tests
