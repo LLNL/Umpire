@@ -122,6 +122,43 @@ GPU-backed CUDA, HIP, SYCL, and OpenMP target test execution requires the
 appropriate hardware and should be validated in dedicated follow-up tasks on
 capable machines.
 
+## Static Analysis
+
+On macOS with Homebrew LLVM 19, `clang-tidy` needs the active SDK sysroot to
+find libc++ and platform headers correctly:
+
+```bash
+SDKROOT=$(xcrun --show-sdk-path)
+
+/opt/homebrew/opt/llvm@19/bin/clang-tidy \
+  -p build \
+  --extra-arg=-isysroot \
+  --extra-arg="$SDKROOT" \
+  tests/integration/api_v2/test_v1_v2_interop.cpp \
+  src/umpire/api_v2_instantiations.cpp
+```
+
+The representative `cppcheck` pass used for API v2 host validation should
+enable inline suppressions and explicitly suppress the known
+`noExplicitConstructor` false positives on the intentionally implicit
+`allocator<T, Memory>` rebind constructor:
+
+```bash
+cppcheck \
+  --inline-suppr \
+  --suppress=noExplicitConstructor:include/umpire/allocator.hpp \
+  --suppress=noExplicitConstructor:include/umpire/Allocator.hpp \
+  --enable=warning,style,performance,portability \
+  --std=c++17 \
+  --language=c++ \
+  --quiet \
+  --error-exitcode=1 \
+  -I include \
+  -I src \
+  tests/integration/api_v2/test_v1_v2_interop.cpp \
+  src/umpire/api_v2_instantiations.cpp
+```
+
 ## Coverage
 
 The repository already supports BLT coverage builds via `ENABLE_COVERAGE=On`.
