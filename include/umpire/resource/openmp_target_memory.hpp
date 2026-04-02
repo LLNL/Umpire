@@ -23,11 +23,22 @@
 
 namespace umpire {
 
-// OpenMP target allocator wrapper that uses omp_target_alloc/omp_target_free.
-// Doesn't require size in deallocate.
+/*!
+ * \brief Backend allocator wrapper for OpenMP target memory.
+ *
+ * The allocator binds allocations to an OpenMP target device selected by
+ * device ordinal.
+ */
 struct omp_target_allocator {
+  //! OpenMP target device ordinal used for allocation and free.
   int device_id;
 
+  /*!
+   * \brief Construct an allocator targeting an OpenMP device.
+   *
+   * \param device Target device ordinal. Defaults to the current OpenMP target
+   *        default device.
+   */
   explicit omp_target_allocator(int device = omp_get_default_device())
     : device_id(device)
   {
@@ -36,11 +47,24 @@ struct omp_target_allocator {
   omp_target_allocator(const omp_target_allocator&) = default;
   omp_target_allocator& operator=(const omp_target_allocator&) = default;
 
+  /*!
+   * \brief Allocate target memory with `omp_target_alloc`.
+   *
+   * \param size Number of bytes to allocate.
+   * \return Pointer to target memory, or `nullptr` if the runtime cannot
+   *         satisfy the request.
+   */
   char* allocate(std::size_t size)
   {
     return static_cast<char*>(omp_target_alloc(size, device_id));
   }
 
+  /*!
+   * \brief Deallocate target memory with `omp_target_free`.
+   *
+   * \param ptr Pointer returned by allocate().
+   * \param Unused size parameter required by the allocator wrapper interface.
+   */
   void deallocate(char* ptr, std::size_t /* size */) noexcept
   {
     omp_target_free(ptr, device_id);
@@ -49,6 +73,15 @@ struct omp_target_allocator {
 
 namespace resource {
 
+/*!
+ * \brief API v2 resource for OpenMP target allocations.
+ *
+ * The default singleton targets the current OpenMP default device. Additional
+ * instances can bind to specific devices for explicit multi-device workflows.
+ *
+ * \tparam Allocator Backend allocator wrapper.
+ * \tparam Tracking Whether allocations are recorded in the shared v2 registry.
+ */
 template<
   typename Allocator = omp_target_allocator,
   bool Tracking = true
@@ -72,27 +105,48 @@ private:
   }
 
 public:
+  //! Return the default singleton bound to the OpenMP default target device.
   static openmp_target_memory& get()
   {
     return instance();
   }
 
+  /*!
+   * \brief Construct a named OpenMP target resource.
+   *
+   * \param name Human-readable resource name.
+   * \param device_id OpenMP target device ordinal to use.
+   */
   explicit openmp_target_memory(const std::string& name, int device_id = omp_get_default_device())
     : base(name, Allocator(device_id))
     , device_id_(device_id)
   {
   }
 
+  /*!
+   * \brief Construct a resource named from its device ordinal.
+   *
+   * \param device_id OpenMP target device ordinal to use.
+   */
   explicit openmp_target_memory(int device_id)
     : openmp_target_memory(fmt::format("OMP_TARGET_{}", device_id), device_id)
   {
   }
 
+  //! Return the OpenMP target device ordinal used by this resource.
   int get_device_id() const
   {
     return device_id_;
   }
 
+  /*!
+   * \brief Allocate OpenMP target memory.
+   *
+   * \param size Number of bytes to allocate.
+   * \return Pointer to target memory, or `nullptr` for a zero-byte request.
+   *
+   * \throws out_of_memory_error if the allocation cannot be satisfied.
+   */
   void* allocate(std::size_t size) override
   {
     if (size == 0) {
@@ -114,6 +168,11 @@ public:
     return ptr;
   }
 
+  /*!
+   * \brief Deallocate OpenMP target memory previously returned by this resource.
+   *
+   * \param ptr Pointer to release. `nullptr` is a no-op.
+   */
   void deallocate(void* ptr) override
   {
     if (!ptr) return;
@@ -126,7 +185,9 @@ public:
   }
 };
 
+//! Tracking-enabled OpenMP target resource alias.
 using default_openmp_target_memory = openmp_target_memory<omp_target_allocator, true>;
+//! OpenMP target resource alias with tracking disabled.
 using fast_openmp_target_memory = openmp_target_memory<omp_target_allocator, false>;
 
 } // namespace resource

@@ -22,17 +22,31 @@
 namespace umpire {
 namespace resource {
 
-// HIP allocator wrapper that uses hipMalloc/hipFree
-// Doesn't require size in deallocate (hipFree doesn't need it)
+/*!
+ * \brief Backend allocator wrapper for HIP device memory.
+ *
+ * The allocator binds allocations to a specific HIP device and satisfies the
+ * allocator interface expected by `memory_resource`.
+ */
 struct hip_default_allocator {
   int device_id;
 
+  //! \brief Construct an allocator targeting `device`.
   explicit hip_default_allocator(int device = 0) : device_id(device) {}
 
   // Copy constructor
   hip_default_allocator(const hip_default_allocator&) = default;
   hip_default_allocator& operator=(const hip_default_allocator&) = default;
 
+  /*!
+   * \brief Allocate device memory with `hipMalloc`.
+   *
+   * \param size Number of bytes to allocate on the configured device.
+   * \return Pointer to device memory.
+   *
+   * \throws runtime_error if device selection fails.
+   * \throws out_of_memory_error if `hipMalloc` fails.
+   */
   char* allocate(std::size_t size) {
     // Set the device before allocation
     hipError_t error = ::hipSetDevice(device_id);
@@ -53,6 +67,12 @@ struct hip_default_allocator {
     return static_cast<char*>(ptr);
   }
 
+  /*!
+   * \brief Deallocate device memory with `hipFree`.
+   *
+   * This function is `noexcept` to match allocator expectations; backend
+   * failures are intentionally swallowed.
+   */
   void deallocate(char* ptr, std::size_t /* size */) noexcept {
     // hipFree doesn't require size parameter
     // Set device before deallocation
@@ -69,18 +89,15 @@ struct hip_default_allocator {
   }
 };
 
-// HIP device memory resource implementation
-//
-// Template parameters:
-// - Allocator: Underlying allocator (default: hip_default_allocator)
-// - Tracking: Enable allocation tracking (default: true)
-//
-// Usage:
-// - Default HIP allocations: Use hip_device_memory::get() singleton (device 0)
-// - Specific device: hip_device_memory("GPU_1", 1) for device 1
-// - Multi-GPU: Create separate instances for each device
-// - High-frequency allocations: Consider wrapping with fixed_pool or quick_pool
-// - Zero overhead needed: Use hip_device_memory<hip_default_allocator, false>
+/*!
+ * \brief API v2 resource for HIP device allocations.
+ *
+ * The default singleton targets HIP device 0. Additional instances can bind to
+ * other devices and participate in strategy composition.
+ *
+ * \tparam Allocator Backend allocator wrapper.
+ * \tparam Tracking Whether allocations are recorded in the v2 registry.
+ */
 template<
   typename Allocator = hip_default_allocator,
   bool Tracking = true
@@ -104,12 +121,20 @@ private:
   {}
 
 public:
-  // Singleton access (device 0)
+  //! \brief Return the default singleton for HIP device 0.
   static hip_device_memory& get() {
     return instance();
   }
 
-  // Allow custom instances for specific devices
+  /*!
+   * \brief Construct a named HIP resource for a specific device.
+   *
+   * \param name Human-readable resource name.
+   * \param device_id HIP device ordinal to target.
+   * \param alloc Allocator instance used for raw allocations.
+   *
+   * \throws runtime_error if the requested device is unavailable.
+   */
   explicit hip_device_memory(const std::string& name, int device_id = 0,
                               Allocator alloc = Allocator())
     : base(name, std::move(alloc))
@@ -131,23 +156,29 @@ public:
     }
   }
 
-  // Allow custom instances with just device_id
+  /*!
+   * \brief Construct a HIP resource named from its device ordinal.
+   *
+   * \param device_id HIP device ordinal to target.
+   */
   explicit hip_device_memory(int device_id)
     : hip_device_memory(fmt::format("HIP_DEVICE_{}", device_id), device_id,
                         hip_default_allocator(device_id))
   {}
 
-  // Get the device ID for this resource
+  //! \brief Return the HIP device ordinal targeted by this resource.
   int get_device_id() const {
     return device_id_;
   }
 
-  // Implement pure virtual from memory
-  // Allocates HIP device memory of the specified size
-  //
-  // @param size Number of bytes to allocate (0 returns nullptr)
-  // @return Pointer to allocated device memory (never null for non-zero size)
-  // @throws out_of_memory_error if allocation fails
+  /*!
+   * \brief Allocate HIP device memory.
+   *
+   * \param size Number of bytes to allocate.
+   * \return Pointer to device memory, or `nullptr` for a zero-byte request.
+   *
+   * \throws out_of_memory_error if the allocation cannot be satisfied.
+   */
   void* allocate(std::size_t size) override {
     if (size == 0) {
       return nullptr;  // Match hipMalloc behavior
@@ -168,10 +199,11 @@ public:
     return ptr;
   }
 
-  // Deallocates memory previously allocated by this resource
-  // MUST be noexcept as required by the interface
-  //
-  // @param ptr Pointer to deallocate (nullptr is safe no-op)
+  /*!
+   * \brief Deallocate device memory previously returned by this resource.
+   *
+   * \param ptr Pointer to release. `nullptr` is a no-op.
+   */
   void deallocate(void* ptr) override {
     if (!ptr) return;  // nullptr deallocation is safe no-op
 
@@ -184,8 +216,9 @@ public:
   }
 };
 
-// Convenience aliases
+//! \brief Tracking-enabled HIP device resource alias.
 using default_hip_device_memory = hip_device_memory<hip_default_allocator, true>;
+//! \brief HIP device resource alias with tracking disabled.
 using fast_hip_device_memory = hip_device_memory<hip_default_allocator, false>;  // No tracking overhead
 
 } // namespace resource

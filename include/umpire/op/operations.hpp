@@ -11,37 +11,96 @@
 namespace umpire {
 namespace op {
 
+/*!
+ * \brief Base metadata for a typed memory operation.
+ *
+ * Operation tags are used with the dispatch layer to select platform-specific
+ * implementations at compile time and runtime.
+ */
 struct operation {
+  //! \brief Number of platform type parameters required by the operation.
   static constexpr int arity = -1;
+  //! \brief Human-readable operation name used for diagnostics.
   static constexpr const char* name = "UNKNOWN";
 };
 
+/*!
+ * \brief Operation tag for memory copies between two platforms.
+ *
+ * \tparam Src Source platform tag.
+ * \tparam Dst Destination platform tag.
+ */
 template <typename Src, typename Dst>
 struct copy : public operation {
   static constexpr int arity = 2;
   static constexpr const char* name = "COPY";
 };
 
+/*!
+ * \brief Operation tag for filling memory on a single platform.
+ *
+ * \tparam Src Platform tag describing the destination memory.
+ */
 template <typename Src>
 struct memset : public operation {
   static constexpr int arity = 1;
   static constexpr const char* name = "MEMSET";
 };
 
+/*!
+ * \brief Operation tag for reallocation on a single platform.
+ *
+ * The generic reallocate path performs allocate-copy-free semantics using the
+ * owner discovered from allocation tracking.
+ *
+ * \tparam Src Platform tag describing the underlying allocation.
+ */
 template <typename Src>
 struct reallocate : public operation {
   static constexpr int arity = 1;
   static constexpr const char* name = "REALLOCATE";
 
+  /*!
+   * \brief Reallocate a typed pointer synchronously.
+   *
+   * \tparam T Pointee type. For non-void pointers, `new_size` is an element count.
+   * \param ptr Address of the pointer to reallocate.
+   * \param new_size Requested element count or byte count for `void`.
+   * \return Updated pointer value.
+   */
   template <typename T>
   static T* exec(T** ptr, std::size_t new_size);
 
+  /*!
+   * \brief Reallocate a typed pointer asynchronously when the backend supports it.
+   *
+   * \tparam T Pointee type. For non-void pointers, `new_size` is an element count.
+   * \param ptr_ptr Address of the pointer to reallocate.
+   * \param new_size Requested element count or byte count for `void`.
+   * \param ctx Execution resource describing the asynchronous context.
+   * \return Event proxy tracking completion of the reallocation sequence.
+   */
   template <typename T>
   static camp::resources::EventProxy<camp::resources::Resource> exec(T** ptr_ptr, std::size_t new_size,
                                                                      camp::resources::Resource& ctx);
 
+  /*!
+   * \brief Reallocate a raw `void*` synchronously using byte semantics.
+   *
+   * \param ptr_ptr Address of the pointer to reallocate.
+   * \param new_size Requested size in bytes.
+   * \return Updated pointer value.
+   */
   static void* exec(void** ptr_ptr, std::size_t new_size);
 
+  /*!
+   * \brief Reallocate a raw `void*` asynchronously using byte semantics.
+   *
+   * \param ptr_ptr Address of the pointer to reallocate.
+   * \param new_size Requested size in bytes.
+   * \param ctx Execution resource describing the asynchronous context.
+   * \return Event proxy tracking completion of the reallocation sequence.
+   */
   static camp::resources::EventProxy<camp::resources::Resource> exec(void** ptr_ptr, std::size_t new_size,
                                                                      camp::resources::Resource& ctx);
 };

@@ -17,30 +17,36 @@
 namespace umpire {
 namespace resource {
 
-// Helper: malloc-based allocator (doesn't require size in deallocate)
-// This avoids the issue where std::allocator::deallocate() requires size
-// but our deallocate() interface doesn't provide it.
+/*!
+ * \brief Default host allocator wrapper used by `host_memory`.
+ *
+ * This adapter exposes a `std::allocator`-like interface on top of
+ * `std::malloc` and `std::free`, which keeps deallocation compatible with the
+ * pointer-only API v2 `memory` interface.
+ */
 struct malloc_allocator {
+  //! \brief Allocate `size` bytes of host memory with `std::malloc`.
   char* allocate(std::size_t size) {
     return static_cast<char*>(std::malloc(size));
   }
 
+  //! \brief Free memory returned from `allocate()`.
   void deallocate(char* ptr, std::size_t /* size */) {
     std::free(ptr);
   }
 };
 
-// Host memory resource implementation
-//
-// Template parameters:
-// - Allocator: Underlying allocator (default: malloc_allocator for simplicity)
-// - Tracking: Enable allocation tracking (default: true)
-//
-// Usage:
-// - Default host allocations: Use host_memory::get() singleton
-// - High-frequency allocations: Consider wrapping with fixed_pool or quick_pool
-// - Multi-threaded: Wrap with thread_safe<host_memory>
-// - Zero overhead needed: Use host_memory<malloc_allocator, false> to disable tracking
+/*!
+ * \brief Concrete API v2 memory resource for ordinary host allocations.
+ *
+ * `host_memory` is the standard entry point for CPU-accessible API v2
+ * allocations. It can be used directly, wrapped in strategies, or paired with
+ * `umpire::allocator<T, Memory>` for standard-library containers.
+ *
+ * \tparam Allocator Backend allocator wrapper used for host allocation.
+ * \tparam Tracking Whether allocations should be tracked in the shared v2
+ *         registry.
+ */
 template<
   typename Allocator = malloc_allocator,
   bool Tracking = true
@@ -59,21 +65,29 @@ private:
   host_memory() : base("HOST") {}
 
 public:
-  // Singleton access
+  //! \brief Return the process-wide default HOST resource singleton.
   static host_memory& get() {
     return instance();
   }
 
-  // Allow custom instances (for testing, custom allocators)
+  /*!
+   * \brief Construct a named host resource with a custom allocator instance.
+   *
+   * \param name Human-readable resource name.
+   * \param alloc Allocator object used to satisfy allocation requests.
+   */
   explicit host_memory(const std::string& name, Allocator alloc = Allocator())
     : base(name, std::move(alloc)) {}
 
-  // Implement pure virtual from memory
-  // Allocates host memory of the specified size
-  //
-  // @param size Number of bytes to allocate (0 returns nullptr)
-  // @return Pointer to allocated memory (never null for non-zero size)
-  // @throws out_of_memory_error if allocation fails
+  /*!
+   * \brief Allocate host memory.
+   *
+   * \param size Number of bytes to allocate.
+   * \return Pointer to host-accessible storage, or `nullptr` for a zero-byte
+   *         request.
+   *
+   * \throws out_of_memory_error if the allocation cannot be satisfied.
+   */
   void* allocate(std::size_t size) override {
     if (size == 0) {
       return nullptr;  // Match std::malloc behavior
@@ -93,9 +107,11 @@ public:
     return ptr;
   }
 
-  // Deallocates memory previously allocated by this resource
-  //
-  // @param ptr Pointer to deallocate (nullptr is safe no-op)
+  /*!
+   * \brief Deallocate memory previously returned by this resource.
+   *
+   * \param ptr Pointer to release. `nullptr` is a no-op.
+   */
   void deallocate(void* ptr) override {
     if (!ptr) return;  // nullptr deallocation is safe no-op
 
@@ -108,8 +124,9 @@ public:
   }
 };
 
-// Convenience aliases
+//! \brief Tracking-enabled host resource using `malloc_allocator`.
 using default_host_memory = host_memory<malloc_allocator, true>;
+//! \brief Host resource alias with tracking disabled for low-overhead paths.
 using fast_host_memory = host_memory<malloc_allocator, false>;  // No tracking overhead
 
 } // namespace resource

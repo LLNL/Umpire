@@ -22,10 +22,24 @@
 
 namespace umpire {
 
+/*!
+ * \brief Backend allocator wrapper for SYCL device memory.
+ *
+ * The allocator owns a SYCL queue and uses it for all allocation and
+ * deallocation requests.
+ */
 struct sycl_allocator {
+  //! Queue used for SYCL allocation and free operations.
   sycl::queue queue;
 
+  //! Construct an allocator with a default-constructed queue.
   sycl_allocator() = default;
+
+  /*!
+   * \brief Construct an allocator from an existing queue.
+   *
+   * \param q Queue used for subsequent allocation and deallocation.
+   */
   explicit sycl_allocator(sycl::queue q)
     : queue(std::move(q))
   {
@@ -34,6 +48,14 @@ struct sycl_allocator {
   sycl_allocator(const sycl_allocator&) = default;
   sycl_allocator& operator=(const sycl_allocator&) = default;
 
+  /*!
+   * \brief Allocate device memory with `sycl::malloc_device`.
+   *
+   * \param size Number of bytes to allocate.
+   * \return Pointer to device memory.
+   *
+   * \throws runtime_error if the SYCL backend reports an error.
+   */
   char* allocate(std::size_t size)
   {
     try {
@@ -44,6 +66,12 @@ struct sycl_allocator {
     }
   }
 
+  /*!
+   * \brief Deallocate device memory with `sycl::free`.
+   *
+   * \param ptr Pointer returned by allocate().
+   * \param Unused size parameter required by the allocator wrapper interface.
+   */
   void deallocate(char* ptr, std::size_t /* size */)
   {
     sycl::free(ptr, queue);
@@ -52,8 +80,19 @@ struct sycl_allocator {
 
 namespace resource {
 
+//! Alias for the default SYCL allocator wrapper.
 using sycl_default_allocator = sycl_allocator;
 
+/*!
+ * \brief API v2 resource for SYCL device allocations.
+ *
+ * Instances bind to a SYCL queue supplied by the caller. That queue is also
+ * exposed through accessors so higher-level code can launch kernels and copies
+ * on the same execution context.
+ *
+ * \tparam Allocator Backend allocator wrapper.
+ * \tparam Tracking Whether allocations are recorded in the shared v2 registry.
+ */
 template<
   typename Allocator = sycl_allocator,
   bool Tracking = true
@@ -65,22 +104,39 @@ private:
   sycl::queue queue_;
 
 public:
+  /*!
+   * \brief Construct a named SYCL resource bound to a queue.
+   *
+   * \param name Human-readable resource name.
+   * \param queue Queue used for memory operations.
+   */
   explicit sycl_device_memory(const std::string& name, sycl::queue queue)
     : base(name, Allocator(queue))
     , queue_(std::move(queue))
   {
   }
 
+  //! Access the mutable queue associated with this resource.
   sycl::queue& get_queue()
   {
     return queue_;
   }
 
+  //! Access the queue associated with this resource.
   const sycl::queue& get_queue() const
   {
     return queue_;
   }
 
+  /*!
+   * \brief Allocate SYCL device memory.
+   *
+   * \param size Number of bytes to allocate.
+   * \return Pointer to device memory, or `nullptr` for a zero-byte request.
+   *
+   * \throws runtime_error if the SYCL backend reports an error.
+   * \throws out_of_memory_error if allocation returns a null pointer.
+   */
   void* allocate(std::size_t size) override
   {
     if (size == 0) {
@@ -109,6 +165,13 @@ public:
     return ptr;
   }
 
+  /*!
+   * \brief Deallocate SYCL device memory previously returned by this resource.
+   *
+   * \param ptr Pointer to release. `nullptr` is a no-op.
+   *
+   * \throws runtime_error if `sycl::free` reports an error.
+   */
   void deallocate(void* ptr) override
   {
     if (!ptr) return;
@@ -127,7 +190,9 @@ public:
   }
 };
 
+//! Tracking-enabled SYCL device resource alias.
 using default_sycl_device_memory = sycl_device_memory<sycl_default_allocator, true>;
+//! SYCL device resource alias with tracking disabled.
 using fast_sycl_device_memory = sycl_device_memory<sycl_default_allocator, false>;
 
 } // namespace resource

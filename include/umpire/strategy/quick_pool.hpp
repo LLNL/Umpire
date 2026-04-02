@@ -53,7 +53,9 @@ class quick_pool : public allocation_strategy {
 public:
   //! @brief Platform type propagated from wrapped memory source
   using platform = typename Memory::platform;
+  //! @brief Number of fixed-size bins maintained by the pool.
   static constexpr std::size_t NUM_BINS = 9;
+  //! @brief Array type used to configure per-bin sizes and chunk counts.
   using configuration_array = std::array<std::size_t, NUM_BINS>;
 
 private:
@@ -183,16 +185,28 @@ private:
   }
 
 public:
+  //! @brief Return the default power-of-two bin sizes.
   static constexpr configuration_array default_bin_sizes()
   {
     return {16, 32, 64, 128, 256, 512, 1024, 2048, 4096};
   }
 
+  //! @brief Return the default per-bin chunk lengths.
   static constexpr configuration_array default_blocks_per_bin()
   {
     return {1024, 1024, 512, 256, 128, 64, 32, 16, 8};
   }
 
+  /*!
+   * \brief Construct a quick pool with optional custom bin geometry.
+   *
+   * \param name Name for this pool instance.
+   * \param parent Memory source to wrap.
+   * \param bin_sizes Strictly increasing power-of-two bin sizes.
+   * \param blocks_per_bin Number of blocks to allocate when growing each bin.
+   *
+   * \throws std::invalid_argument if the configuration is inconsistent.
+   */
   explicit quick_pool(
     const std::string& name,
     Memory* parent,
@@ -213,6 +227,7 @@ public:
     }
   }
 
+  //! @brief Destructor that returns all backing chunks to the parent.
   ~quick_pool()
   {
     for (void* chunk : chunks_) {
@@ -220,6 +235,15 @@ public:
     }
   }
 
+  /*!
+   * \brief Allocate storage from the nearest fitting bin.
+   *
+   * Requests larger than the biggest configured bin are forwarded directly to
+   * the parent after adding internal header storage.
+   *
+   * \param size Number of user-visible bytes to allocate.
+   * \return Pointer to user storage, or `nullptr` for a zero-byte request.
+   */
   void* allocate(std::size_t size) override
   {
     if (size == 0) {
@@ -260,6 +284,13 @@ public:
     return store_header(ptr, bin_index, size);
   }
 
+  /*!
+   * \brief Deallocate storage previously returned by this pool.
+   *
+   * \param user_ptr Pointer to user storage. `nullptr` is a no-op.
+   *
+   * \throws std::runtime_error if the internal allocation header is invalid.
+   */
   void deallocate(void* user_ptr) override
   {
     if (!user_ptr) {
@@ -289,49 +320,61 @@ public:
       fmt::format("quick_pool: invalid bin index {} for pointer {:p}", bin_index, user_ptr));
   }
 
+  //! @brief No-op release hook; quick_pool does not track fully free chunks.
   void release()
   {
     // No-op: tracking completely free chunks would add more metadata than this
     // simple fast-path pool intends to maintain.
   }
 
+  //! @brief Return total bytes reserved from the parent, including headers.
   std::size_t get_total_allocated() const { return total_allocated_; }
+  //! @brief Return live user-visible bytes currently allocated.
   std::size_t get_user_allocated() const { return user_allocated_; }
+  //! @brief Return the number of backing chunks allocated across all bins.
   std::size_t get_chunk_count() const { return chunks_.size(); }
 
+  //! @brief Return the default size of the bin at `index`, or 0 if out of range.
   static std::size_t get_bin_size(std::size_t index)
   {
     const auto bins = default_bin_sizes();
     return index < NUM_BINS ? bins[index] : 0;
   }
 
+  //! @brief Return the configured size of the bin at `index`, or 0 if out of range.
   std::size_t get_configured_bin_size(std::size_t index) const
   {
     return index < NUM_BINS ? bin_sizes_[index] : 0;
   }
 
+  //! @brief Return the configured chunk length of the bin at `index`, or 0 if out of range.
   std::size_t get_blocks_per_bin(std::size_t index) const
   {
     return index < NUM_BINS ? blocks_per_bin_[index] : 0;
   }
 
+  //! @brief Return the compile-time number of bins.
   static constexpr std::size_t get_num_bins() { return NUM_BINS; }
 
+  //! @brief Return the current live allocation count in the bin at `index`.
   std::size_t get_bin_allocations(std::size_t index) const
   {
     return index < NUM_BINS ? bin_allocations_[index] : 0;
   }
 
+  //! @brief Return the current free-list length of the bin at `index`.
   std::size_t get_bin_free_count(std::size_t index) const
   {
     return index < NUM_BINS ? free_lists_[index].size() : 0;
   }
 
+  //! @brief Compute internal fragmentation against the default bin layout.
   static double calculate_fragmentation(std::size_t size)
   {
     return calculate_fragmentation(size, default_bin_sizes());
   }
 
+  //! @brief Compute internal fragmentation against this pool's configured bins.
   double calculate_configured_fragmentation(std::size_t size) const
   {
     return calculate_fragmentation(size, bin_sizes_);

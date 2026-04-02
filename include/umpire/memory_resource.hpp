@@ -16,20 +16,29 @@
 
 namespace umpire {
 
-// Forward declaration of default allocator metafunction
+/*!
+ * \brief Maps a platform tag to its default low-level allocator wrapper.
+ *
+ * API v2 resources select their allocator implementation through this trait so
+ * callers can usually rely on the default template argument instead of naming
+ * the backend allocator explicitly.
+ *
+ * \tparam Platform Platform tag such as `host_platform` or `cuda_platform`.
+ */
 template<typename Platform>
 struct default_allocator_for;
 
-// Default allocator selection based on platform
+//! \brief Default allocator for host resources.
 template<>
 struct default_allocator_for<host_platform> {
   using type = std::allocator<char>;
 };
 
 #if defined(UMPIRE_ENABLE_CUDA)
-// Forward declaration - will be defined in cuda_device_memory.hpp
+//! \brief Forward declaration for the default CUDA allocator wrapper.
 struct cuda_allocator;
 
+//! \brief Default allocator for CUDA device resources.
 template<>
 struct default_allocator_for<cuda_platform> {
   using type = cuda_allocator;
@@ -37,9 +46,10 @@ struct default_allocator_for<cuda_platform> {
 #endif
 
 #if defined(UMPIRE_ENABLE_HIP)
-// Forward declaration - will be defined in hip_device_memory.hpp
+//! \brief Forward declaration for the default HIP allocator wrapper.
 struct hip_allocator;
 
+//! \brief Default allocator for HIP device resources.
 template<>
 struct default_allocator_for<hip_platform> {
   using type = hip_allocator;
@@ -47,9 +57,10 @@ struct default_allocator_for<hip_platform> {
 #endif
 
 #if defined(UMPIRE_ENABLE_SYCL)
-// Forward declaration - will be defined in sycl_device_memory.hpp
+//! \brief Forward declaration for the default SYCL allocator wrapper.
 struct sycl_allocator;
 
+//! \brief Default allocator for SYCL device resources.
 template<>
 struct default_allocator_for<sycl_platform> {
   using type = sycl_allocator;
@@ -57,19 +68,35 @@ struct default_allocator_for<sycl_platform> {
 #endif
 
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
-// Forward declaration - will be defined in openmp_target_memory.hpp
+//! \brief Forward declaration for the default OpenMP target allocator wrapper.
 struct omp_target_allocator;
 
+//! \brief Default allocator for OpenMP target resources.
 template<>
 struct default_allocator_for<omp_target_platform> {
   using type = omp_target_allocator;
 };
 #endif
 
-// Template parameters:
-// - Platform: Type tag (host_platform, cuda_platform, etc.)
-// - Allocator: Underlying allocation mechanism (default varies by platform)
-// - Tracking: Enable/disable allocation tracking (default true)
+/*!
+ * \brief Common CRTP-style base for typed API v2 memory resources.
+ *
+ * `memory_resource` connects a compile-time platform tag with a concrete
+ * allocator implementation and optional registry tracking. Derived resource
+ * types provide the public allocation semantics while reusing the allocator
+ * storage and platform reporting implemented here.
+ *
+ * Thread safety guarantees:
+ * - Read-only operations such as `get_name()`, `get_id()`, and
+ *   `get_platform()` are safe after construction.
+ * - Allocation and deallocation are only as thread-safe as the derived
+ *   resource and wrapped allocator implementation.
+ *
+ * \tparam Platform Platform tag (`host_platform`, `cuda_platform`, etc.).
+ * \tparam Allocator Backend allocator used to satisfy raw allocation requests.
+ * \tparam Tracking Whether allocations should be registered in the shared v2
+ *         registry for introspection and interoperability.
+ */
 template<
   typename Platform,
   typename Allocator = typename default_allocator_for<Platform>::type,
@@ -77,15 +104,23 @@ template<
 >
 class memory_resource : public memory {
 public:
-  // Type aliases for propagation through templates
+  //! \brief Compile-time platform tag propagated through composed types.
   using platform = Platform;
+  //! \brief Low-level allocator type used by this resource.
   using allocator_type = Allocator;
+  //! \brief Indicates whether allocation tracking is enabled for this resource.
   static constexpr bool tracking_enabled = Tracking;
 
 protected:
-  Allocator allocator_;  // Underlying allocator (e.g., std::allocator, cudaMalloc wrapper)
+  //! \brief Stored backend allocator instance.
+  Allocator allocator_;
 
-  // Helper for derived classes to conditionally track
+  /*!
+   * \brief Allocate bytes through the backend allocator and optionally track them.
+   *
+   * \param size Number of bytes to allocate.
+   * \return Pointer returned by the backend allocator.
+   */
   void* allocate_impl(std::size_t size) {
     void* ptr = static_cast<void*>(allocator_.allocate(size));
     if constexpr (Tracking) {
@@ -94,6 +129,12 @@ protected:
     return ptr;
   }
 
+  /*!
+   * \brief Deallocate bytes through the backend allocator and optionally untrack them.
+   *
+   * \param ptr Pointer to release.
+   * \param size Original byte count when required by the backend allocator.
+   */
   void deallocate_impl(void* ptr, std::size_t size) {
     if constexpr (Tracking) {
       untrack_allocation(ptr);
@@ -103,19 +144,25 @@ protected:
   }
 
 public:
-  // Constructor
+  /*!
+   * \brief Construct a named resource around an allocator instance.
+   *
+   * \param name Human-readable resource name exposed through `memory`.
+   * \param alloc Allocator object to use for future requests.
+   */
   explicit memory_resource(const std::string& name, Allocator alloc = Allocator())
     : memory(name)
     , allocator_(std::move(alloc))
   {}
 
-  // Implement pure virtual from memory base
+  /*!
+   * \brief Report the runtime platform corresponding to `Platform`.
+   *
+   * \return The CAMP platform enum associated with the compile-time tag.
+   */
   resource::Platform get_platform() const override {
     return platform_for<Platform>::value;
   }
-
-  // Note: allocate() and deallocate() still pure virtual
-  // Concrete resources (host_memory, cuda_device_memory) will implement
 };
 
 } // namespace umpire

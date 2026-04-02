@@ -54,25 +54,33 @@ private:
   mutable std::mutex allocation_mutex_;
 
 public:
+  //! Access the process-wide singleton registry.
   static registry& get();
 
-  //! Thread-safe unique ID generation for allocator instances.
+  //! Generate a unique integer identifier for a memory object.
   int get_id();
 
-  //! Thread-safe allocator registration and deregistration.
+  //! Register a memory object for lookup by id and name.
   void register_allocator(memory* alloc);
+  //! Remove a memory object from registry lookup tables.
   void deregister_allocator(memory* alloc);
 
-  //! Thread-safe allocator lookup helpers.
+  //! Find a registered memory object by id.
   memory* find_allocator_by_id(int id);
+  //! Find a registered memory object by name.
   memory* find_allocator_by_name(const std::string& name);
+  //! Return a snapshot of registered memory objects.
   std::vector<memory*> get_allocators();
 
-  //! Thread-safe allocation tracking helpers.
+  //! Register a live tracked allocation.
   void register_allocation(const allocation_record& record);
+  //! Find the record whose base pointer matches `ptr`.
   std::optional<allocation_record> find_allocation(void* ptr) const;
+  //! Find the record whose range contains `ptr`.
   std::optional<allocation_record> find_containing_allocation(void* ptr) const;
+  //! Remove the record whose base pointer matches `ptr`.
   void remove_allocation(void* ptr);
+  //! Return whether `ptr` is the base pointer of a tracked allocation.
   bool has_allocation(void* ptr) const;
 };
 
