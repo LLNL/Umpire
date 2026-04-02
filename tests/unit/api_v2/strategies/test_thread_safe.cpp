@@ -6,6 +6,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "umpire/strategy/thread_safe.hpp"
+#include "umpire/error.hpp"
 #include "umpire/resource/host_memory.hpp"
 #include "umpire/memory.hpp"
 
@@ -23,6 +24,8 @@ namespace {
 // Test memory implementation for unit testing
 class test_memory : public umpire::memory {
 public:
+  using platform = umpire::host_platform;
+
   test_memory() : umpire::memory{"test_parent"} { }
 
   void* allocate(std::size_t size) override
@@ -46,6 +49,8 @@ public:
 // Memory implementation that throws on allocate (for exception testing)
 class throwing_memory : public umpire::memory {
 public:
+  using platform = umpire::host_platform;
+
   throwing_memory() : umpire::memory{"throwing_parent"} { }
 
   void* allocate(std::size_t /* size */) override
@@ -72,6 +77,8 @@ private:
   std::atomic<int> deallocation_count_{0};
 
 public:
+  using platform = umpire::host_platform;
+
   instrumented_memory() : umpire::memory{"instrumented_parent"} { }
 
   void* allocate(std::size_t size) override
@@ -212,12 +219,19 @@ TEST(thread_safe, single_threaded_zero_size_allocation)
   strategy.deallocate(ptr);
 }
 
-TEST(thread_safe, single_threaded_nullptr_deallocation)
+TEST(thread_safe, single_threaded_nullptr_deallocation_preserves_parent_behavior)
 {
   test_memory parent;
   umpire::strategy::thread_safe<test_memory> strategy("thread_safe", &parent);
 
-  // Should not crash
+  EXPECT_THROW(strategy.deallocate(nullptr), umpire::unknown_allocation);
+}
+
+TEST(thread_safe, single_threaded_nullptr_deallocation_noop_when_parent_allows_it)
+{
+  auto& parent = umpire::resource::host_memory<>::get();
+  umpire::strategy::thread_safe<umpire::resource::host_memory<>> strategy("thread_safe_host", &parent);
+
   EXPECT_NO_THROW(strategy.deallocate(nullptr));
 }
 
@@ -400,7 +414,7 @@ TEST(thread_safe, multithreaded_variable_sizes)
   threads.reserve(num_threads);
 
   for (int t = 0; t < num_threads; ++t) {
-    threads.emplace_back([&strategy, t]() {
+    threads.emplace_back([&strategy]() {
       std::vector<void*> ptrs;
       ptrs.reserve(allocs_per_thread);
 

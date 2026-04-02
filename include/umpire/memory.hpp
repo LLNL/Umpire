@@ -19,6 +19,18 @@ struct allocation_record;
 
 namespace umpire {
 
+/*!
+ * \brief Common API v2 base class for memory resources and strategies.
+ *
+ * Thread safety guarantees:
+ * - Construction/destruction register with the shared v2 registry.
+ * - Read-only introspection (`get_id()`, `get_name()`, `get_current_size()`,
+ *   `get_actual_size()`, `get_highwatermark()`) is safe for concurrent reads
+ *   after construction.
+ * - Thread safety of `allocate()` and `deallocate()` is defined by the
+ *   concrete implementation. Use wrappers such as `thread_safe<Memory>` when
+ *   concurrent mutation must be serialized.
+ */
 class memory {
 private:
   int id_;

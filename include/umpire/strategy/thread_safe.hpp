@@ -11,9 +11,24 @@
 
 #include <mutex>
 #include <string>
+#include <type_traits>
 
 namespace umpire {
 namespace strategy {
+
+namespace detail {
+
+template <typename Memory, typename = void>
+struct thread_safe_platform {
+  using type = void;
+};
+
+template <typename Memory>
+struct thread_safe_platform<Memory, std::void_t<typename Memory::platform>> {
+  using type = typename Memory::platform;
+};
+
+} // namespace detail
 
 //! @brief Thread-safe wrapper strategy using mutex synchronization
 //!
@@ -25,9 +40,13 @@ namespace strategy {
 //! - All allocate() and deallocate() calls are serialized via std::mutex
 //! - Exception-safe: mutex is released even if parent throws
 //! - Uses RAII (std::lock_guard) for automatic lock management
+//! - The wrapped parent need not be thread-safe when accessed only through
+//!   this wrapper; direct concurrent access to the parent remains unsupported
+//!   unless the parent documents stronger guarantees
 //!
 //! @par Platform Propagation
-//! The platform type is propagated from the wrapped memory source:
+//! When the wrapped memory source provides a `platform` alias, thread_safe
+//! propagates it:
 //! - thread_safe<host_memory>::platform is host_platform
 //! - thread_safe<cuda_device_memory>::platform is cuda_platform
 //!
@@ -48,8 +67,8 @@ namespace strategy {
 template<typename Memory>
 class thread_safe : public allocation_strategy {
 public:
-  //! @brief Platform type propagated from wrapped memory source
-  using platform = typename Memory::platform;
+  //! @brief Platform type propagated from wrapped memory source when available
+  using platform = typename detail::thread_safe_platform<Memory>::type;
 
 private:
   mutable std::mutex mutex_;  //!< Mutex for serializing operations

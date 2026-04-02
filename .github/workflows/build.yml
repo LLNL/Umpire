@@ -4,7 +4,7 @@ jobs:
   build_docker:
     strategy:
       matrix:
-        target: [gcc, clang, hip, sycl, intel]
+        target: [gcc, clang, tsan, hip, sycl, intel]
     runs-on: radiuss-cpu-runners
     steps:
     - run: |

@@ -43,6 +43,16 @@ RUN cmake -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DCMAKE_CXX_COMPILER=clang++ -DC
     make -j 2 && \
     ctest -T test -E operation_tests --output-on-failure
 
+FROM ghcr.io/llnl/radiuss:clang-15-ubuntu-22.04 AS tsan
+ENV GTEST_COLOR=1
+COPY . /home/umpire/workspace
+WORKDIR /home/umpire/workspace/build
+RUN cmake -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang \
+    -DUMPIRE_ENABLE_C=On -DCMAKE_CXX_FLAGS="-fsanitize=thread" -DCMAKE_C_FLAGS="-fsanitize=thread" \
+    -DENABLE_TESTS=On -DUMPIRE_ENABLE_TSAN=On -DUMPIRE_ENABLE_SANITIZER_TESTS=On .. && \
+    make -j 2 api_v2_registry_threading_tests api_v2_memory_threading_tests api_v2_thread_safe_stress_tests thread_sanitizer_tests && \
+    ctest -R "api_v2_registry_threading_tests|api_v2_memory_threading_tests|api_v2_thread_safe_stress_tests|thread_sanitizer_tests" --output-on-failure
+
 FROM ghcr.io/llnl/radiuss:ubuntu-22.04-cuda-12-3 AS cuda
 ENV GTEST_COLOR=1
 COPY . /home/umpire/workspace
@@ -81,4 +91,3 @@ RUN /bin/bash -c "source /opt/intel/oneapi/setvars.sh 2>&1 > /dev/null && \
     cmake -DCMAKE_CXX_COMPILER=icpx -DCMAKE_C_COMPILER=icx -DENABLE_WARNINGS_AS_ERRORS=Off -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On .. && \
     make -j 16 && \
     ctest -T test --output-on-failure"
-

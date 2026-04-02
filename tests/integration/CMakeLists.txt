@@ -201,6 +201,15 @@ blt_add_test(
   COMMAND api_v2_registry_threading_tests)
 
 blt_add_executable(
+  NAME api_v2_memory_threading_tests
+  SOURCES api_v2/test_memory_threading.cpp
+  DEPENDS_ON ${integration_tests_depends})
+
+blt_add_test(
+  NAME api_v2_memory_threading_tests
+  COMMAND api_v2_memory_threading_tests)
+
+blt_add_executable(
   NAME api_v2_thread_safe_stress_tests
   SOURCES api_v2/test_thread_safe_stress.cpp
   DEPENDS_ON ${integration_tests_depends})
