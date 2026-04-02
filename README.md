@@ -6,6 +6,12 @@
 Umpire is a resource management library that allows the discovery, provision,
 and management of memory on machines with multiple memory devices like NUMA and GPUs.
 
+Recent releases also include an experimental API v2 layer that adds:
+- typed `allocator<T, Memory>` support for STL containers
+- explicit memory resource classes such as `host_memory`
+- composable strategy wrappers such as `thread_safe`, `fixed_pool`, and `size_limiter`
+- template-based memory operations in `include/umpire/op/`
+
 Umpire uses CMake and BLT to handle builds. Since BLT is included as a
 submodule, first make sure you run:
 
@@ -16,6 +22,11 @@ simple as:
 
     $ mkdir build && cd build
     $ cmake ..
+
+To build and exercise the API v2 examples and tests during development:
+
+    $ cmake -S . -B build -DUMPIRE_ENABLE_TESTS=On
+    $ cmake --build build --target api_v2_allocator_tests api_v2_operations_tests api_v2_stl_compatibility_tests
 
 CMake will provide output about which compiler is being used. Once CMake has
 completed, Umpire can be built with Make:
@@ -29,6 +40,9 @@ For more advanced configuration you can use standard CMake variables.
 Both user and code documentation is available [here](http://umpire.readthedocs.io/).
 
 The Umpire [tutorial](https://umpire.readthedocs.io/en/develop/sphinx/tutorial.html) provides a step by step introduction to Umpire features.
+
+API v2 design context is documented in
+[docs/sphinx/features/api_v2_design_rationale.rst](docs/sphinx/features/api_v2_design_rationale.rst).
 
 If you have build problems, we have comprehensive [build system documentation](https://umpire.readthedocs.io/en/develop/sphinx/advanced_configuration.html) too!
 
