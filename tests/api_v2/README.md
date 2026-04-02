@@ -159,6 +159,34 @@ cppcheck \
   src/umpire/api_v2_instantiations.cpp
 ```
 
+## Device Validation CI Path
+
+This repository cannot run CUDA, HIP, SYCL, or OpenMP target tests on the
+current macOS development machine, but the CI configuration already includes
+GPU-capable runners and Docker targets that future device-validation beads can
+use.
+
+- The shared Dockerfile defines device-oriented build targets:
+  - `cuda`, `cuda13` (CUDA-capable images)
+  - `hip` (HIP-capable image)
+  - `sycl` (Intel oneAPI/SYCL-capable image)
+- The `.github/workflows/build.yml` workflow uses these targets on:
+  - `radiuss-cpu-runners` for generic builds (gcc/clang/tsan/hip/sycl/intel)
+  - `radiuss-cuda-runners` for the `build_gpu` CUDA matrix
+- The API v2 workflow `.github/workflows/api_v2.yml` exposes a manual
+  `device_gpu_docker` job that reuses the same Docker targets on
+  `radiuss-cuda-runners`:
+  - trigger via the `API v2 Tests` workflow’s
+    `workflow_dispatch` (manual run) event
+  - select the `API v2 Device (Docker skeleton on radiuss-cuda-runners)` job
+  - extend the `cuda`, `cuda13`, `hip`, or `sycl` stages in `Dockerfile` (or
+    add new ones) with concrete API v2 device tests as part of follow-up beads
+    such as `umpire-4og`, `umpire-728`, and `umpire-e2h`
+
+This wiring intentionally does not claim device validation is complete; it
+only guarantees that a hardware-backed CI path exists for future API v2
+device-validation work once suitable hosts are provisioned.
+
 ## Coverage
 
 The repository already supports BLT coverage builds via `ENABLE_COVERAGE=On`.

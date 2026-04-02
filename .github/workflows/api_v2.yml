@@ -5,6 +5,7 @@ on:
       - develop
       - feature/api-refactor
   pull_request: []
+  workflow_dispatch: {}
 
 name: API v2 Tests
 
@@ -167,3 +168,32 @@ jobs:
           -R '^api_v2_' \
           -E "$API_V2_EXCLUDE_REGEX" \
           --output-on-failure
+
+  # Optional device-validation entry point for future API v2 CUDA/HIP/SYCL work.
+  # This job does not currently run any API v2 device tests; it exists to
+  # provide a hardware-capable CI path on GPU-equipped runners for follow-up
+  # beads such as umpire-4og, umpire-728, and umpire-e2h.
+  device_gpu_docker:
+    name: API v2 Device (Docker skeleton on radiuss-cuda-runners)
+    if: github.event_name == 'workflow_dispatch'
+    strategy:
+      matrix:
+        target: [cuda, cuda13, hip, sycl]
+    runs-on: radiuss-cuda-runners
+    steps:
+    - run: |
+        sudo rm -rf /usr/share/dotnet
+        sudo rm -rf /usr/local/lib/android
+        sudo rm -rf /opt/ghc
+        sudo rm -rf /opt/hostedtoolcache/CodeQL
+        sudo docker image prune --all --force
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+    - uses: docker/setup-buildx-action@v3
+    - uses: docker/build-push-action@v6
+      with:
+        # Reuse the existing Dockerfile targets used by build.yml; future
+        # device-validation beads are expected to extend these stages (or add
+        # new ones) with API v2 device tests.
+        target: ${{ matrix.target }}
