@@ -27,6 +27,7 @@ Backend-specific unit tests are added when those backends are enabled:
 
 - `api_v2_cuda_device_memory_tests`
 - `api_v2_hip_device_memory_tests`
+- `api_v2_openmp_target_memory_tests`
 
 The current API v2 integration test executables are defined in
 `tests/integration/CMakeLists.txt` and `tests/integration/api_v2/CMakeLists.txt`:
@@ -146,17 +147,20 @@ cmake -S . -B build-omptarget -G Ninja \
   -DUMPIRE_ENABLE_TESTS=On
 
 cmake --build build-omptarget --parallel \
-  --target api_v2_operations_tests
+  --target api_v2_openmp_target_memory_tests api_v2_operations_tests
 
 ctest --test-dir build-omptarget \
-  -R '^api_v2_operations_tests$' \
+  -R '^(api_v2_openmp_target_memory_tests|api_v2_operations_tests)$' \
   --output-on-failure
 ```
 
 This flow does not run on the current macOS development host but documents a
 concrete OpenMP target-capable environment and configure/test invocation that
 follow-up beads such as ``umpire-e2h`` and ``umpire-4og`` can use when
-exercising ``openmp_target_memory`` on target-enabled hardware.
+exercising ``openmp_target_memory`` on target-enabled hardware. The
+``api_v2_openmp_target_memory_tests`` target covers resource construction,
+tracking, allocation, host-to-target copies, and basic deallocation semantics,
+but actual execution still requires an OpenMP target-capable runtime.
 
 ## Static Analysis
 

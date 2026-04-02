@@ -42,10 +42,10 @@ host looks like:
     -DUMPIRE_ENABLE_TESTS=On
 
   cmake --build build-omptarget --parallel \
-    --target api_v2_operations_tests
+    --target api_v2_openmp_target_memory_tests api_v2_operations_tests
 
   ctest --test-dir build-omptarget \
-    -R '^api_v2_operations_tests$' \
+    -R '^(api_v2_openmp_target_memory_tests|api_v2_operations_tests)$' \
     --output-on-failure
 
 This configuration does not rely on the local macOS development machine for
