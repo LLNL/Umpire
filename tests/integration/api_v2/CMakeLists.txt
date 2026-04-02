@@ -50,6 +50,10 @@ blt_add_executable(
   SOURCES test_v1_v2_interop.cpp
   DEPENDS_ON ${integration_tests_depends})
 
+blt_add_target_compile_flags(
+  TO api_v2_v1_interop_tests
+  FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
+
 target_include_directories(
   api_v2_v1_interop_tests
   BEFORE PRIVATE

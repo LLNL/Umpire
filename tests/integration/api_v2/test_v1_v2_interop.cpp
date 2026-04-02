@@ -16,6 +16,7 @@
 #include <algorithm>
 #include <array>
 #include <cstddef>
+#include <cstdint>
 #include <string>
 
 namespace {
@@ -33,12 +34,19 @@ std::string unique_allocator_name(const char* prefix)
   return std::string{prefix} + "_" + std::to_string(counter++);
 }
 
+bool has_allocator_at(std::uintptr_t address)
+{
+  // NOLINTNEXTLINE(clang-analyzer-unix.Malloc)
+  return umpire::ResourceManager::getInstance().hasAllocator(reinterpret_cast<void*>(address));
+}
+
 } // namespace
 
 TEST(ApiV1V2Interop, V2HostAllocationsAppearInV1ResourceManager)
 {
   auto& rm = umpire::ResourceManager::getInstance();
   void* ptr = host().allocate(64);
+  auto ptr_value = reinterpret_cast<std::uintptr_t>(ptr);
 
   ASSERT_TRUE(rm.hasAllocator(ptr));
 
@@ -49,7 +57,7 @@ TEST(ApiV1V2Interop, V2HostAllocationsAppearInV1ResourceManager)
   EXPECT_EQ(rm.getAllocator(ptr).getName(), "HOST");
 
   host().deallocate(ptr);
-  EXPECT_FALSE(rm.hasAllocator(ptr));
+  EXPECT_FALSE(has_allocator_at(ptr_value));
 }
 
 TEST(ApiV1V2Interop, V1MemsetOperatesOnV2HostAllocation)
@@ -165,7 +173,7 @@ TEST(ApiV1V2Interop, V1MoveToDistinctAllocatorTransfersOwnershipToV1)
   auto& rm = umpire::ResourceManager::getInstance();
   auto host_allocator = rm.getAllocator("HOST");
   auto named_allocator = rm.makeAllocator<umpire::strategy::NamedAllocationStrategy>(
-    unique_allocator_name("API_V2_MOVED_HOST"), host_allocator);
+      unique_allocator_name("API_V2_MOVED_HOST"), host_allocator);
 
   auto* ptr = static_cast<unsigned char*>(host().allocate(24));
   for (int i = 0; i < 24; ++i) {
@@ -215,7 +223,7 @@ TEST(ApiV1V2Interop, V1AllocatorSelectedReallocateRejectsDistinctAllocator)
   auto& rm = umpire::ResourceManager::getInstance();
   auto host_allocator = rm.getAllocator("HOST");
   auto named_allocator = rm.makeAllocator<umpire::strategy::NamedAllocationStrategy>(
-    unique_allocator_name("API_V2_REALLOC_HOST"), host_allocator);
+      unique_allocator_name("API_V2_REALLOC_HOST"), host_allocator);
 
   auto* ptr = static_cast<unsigned char*>(host().allocate(16));
   ASSERT_TRUE(umpire::detail::registry::get().find_allocation(ptr).has_value());
