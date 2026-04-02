@@ -239,10 +239,13 @@ The integration layer SHALL:
 - Use `platform_for<Platform>` to map platform tags to `camp::resources::Platform` values
 - Use the existing `MemoryOperationRegistry` to look up the correct `MemoryOperation` by name and pair of `Platform` enums
 - Support cross-platform operations (e.g., host-to-device copy) using the pre-existing operation implementations
+- Throw `umpire::runtime_error` with a clear message when runtime platform lookup reaches a platform pair that the current build does not dispatch
 
 The integration layer SHALL NOT:
 - Change or replace the existing `MemoryOperation` subclasses
 - Change or replace the `MemoryOperationRegistry` lookup behavior
+
+Direct template wrappers SHALL only be available for the platform tags and platform pairs whose `op::*` specializations are compiled into the current build. Disabled backends and unsupported direct template pairs SHALL therefore be rejected at compile time rather than deferred to a runtime error path.
 
 #### Scenario: Platform-dispatched copy
 - **WHEN** a new API function template `copy<SrcPlatform, DstPlatform>(void* dst, const void* src, std::size_t size)` is called
@@ -256,11 +259,16 @@ The integration layer SHALL NOT:
 - **AND** it uses `MemoryOperationRegistry::getInstance().find("MEMSET", {platform, platform})` to obtain the operation
 - **AND** the platform-specific memset implementation is used
 
-#### Scenario: Unsupported platform pair
+#### Scenario: Unsupported runtime platform pair
 - **WHEN** `copy<sycl_platform, cuda_platform>()` is called
-- **AND** no registered operation supports this platform combination
+- **AND** runtime platform dispatch reaches a platform combination that the current build does not support
 - **THEN** `umpire::runtime_error` is thrown
 - **AND** the error message indicates the unsupported platform pair
+
+#### Scenario: Unsupported direct template pair is unavailable
+- **WHEN** code attempts to instantiate a direct template wrapper for a disabled backend or for a platform pair with no compiled `op::*` specialization
+- **THEN** the program is ill-formed at compile time
+- **AND** the call does not reach runtime dispatch
 
 #### Scenario: Operation error propagation
 - **WHEN** a platform-specific operation (e.g., `cudaMemcpy`) fails

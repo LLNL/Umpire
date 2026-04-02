@@ -17,6 +17,8 @@
 #include <algorithm>
 #include <array>
 #include <cstddef>
+#include <type_traits>
+#include <utility>
 
 namespace {
 
@@ -30,6 +32,27 @@ camp::resources::Resource host_resource()
 host_memory& host()
 {
   return host_memory::get();
+}
+
+template <typename SrcPlatform, typename DstPlatform, typename = void>
+struct has_direct_copy_exec : std::false_type {};
+
+template <typename SrcPlatform, typename DstPlatform>
+struct has_direct_copy_exec<
+    SrcPlatform,
+    DstPlatform,
+    std::void_t<decltype(umpire::op::copy<SrcPlatform, DstPlatform>::template exec<int>(
+        std::declval<int*>(), std::declval<int*>(), std::declval<std::size_t>()))>> : std::true_type {};
+
+void expect_unsupported_runtime_dispatch(camp::resources::Platform src_platform,
+                                         camp::resources::Platform dst_platform)
+{
+  int src = 7;
+  int dst = 0;
+
+  EXPECT_THROW((umpire::op::detail::dispatch<umpire::op::copy>(
+                   src_platform, dst_platform, &src, &dst, std::size_t{1})),
+               umpire::runtime_error);
 }
 
 } // namespace
@@ -67,6 +90,83 @@ TEST(ApiV2Operations, DirectHostTemplateAsyncOperationsComplete)
   (void)prefetch_event;
   resource.get_event().wait();
   EXPECT_TRUE(std::all_of(dst.begin(), dst.end(), [](unsigned char value) { return value == 0x11; }));
+}
+
+TEST(ApiV2Operations, RuntimeDispatchRejectsPairsWithoutCompiledSupport)
+{
+  bool exercised = false;
+
+#if !defined(UMPIRE_ENABLE_CUDA)
+  exercised = true;
+  expect_unsupported_runtime_dispatch(camp::resources::Platform::cuda, camp::resources::Platform::host);
+#endif
+#if !defined(UMPIRE_ENABLE_HIP)
+  exercised = true;
+  expect_unsupported_runtime_dispatch(camp::resources::Platform::hip, camp::resources::Platform::host);
+#endif
+#if !defined(UMPIRE_ENABLE_SYCL)
+  exercised = true;
+  expect_unsupported_runtime_dispatch(camp::resources::Platform::sycl, camp::resources::Platform::host);
+#endif
+#if !defined(UMPIRE_ENABLE_OPENMP_TARGET)
+  exercised = true;
+  expect_unsupported_runtime_dispatch(camp::resources::Platform::omp_target, camp::resources::Platform::host);
+#endif
+
+  if (!exercised) {
+    GTEST_SKIP() << "All backend dispatch paths are compiled on this build.";
+  }
+}
+
+TEST(ApiV2Operations, DirectTemplateCopyAvailabilityMatchesCompiledSpecializations)
+{
+  EXPECT_TRUE((has_direct_copy_exec<umpire::host_platform, umpire::host_platform>::value));
+
+#if defined(UMPIRE_ENABLE_CUDA)
+  EXPECT_TRUE((has_direct_copy_exec<umpire::cuda_platform, umpire::cuda_platform>::value));
+  EXPECT_TRUE((has_direct_copy_exec<umpire::cuda_platform, umpire::host_platform>::value));
+  EXPECT_TRUE((has_direct_copy_exec<umpire::host_platform, umpire::cuda_platform>::value));
+#endif
+#if defined(UMPIRE_ENABLE_HIP)
+  EXPECT_TRUE((has_direct_copy_exec<umpire::hip_platform, umpire::hip_platform>::value));
+  EXPECT_TRUE((has_direct_copy_exec<umpire::hip_platform, umpire::host_platform>::value));
+  EXPECT_TRUE((has_direct_copy_exec<umpire::host_platform, umpire::hip_platform>::value));
+#endif
+#if defined(UMPIRE_ENABLE_SYCL)
+  EXPECT_TRUE((has_direct_copy_exec<umpire::sycl_platform, umpire::sycl_platform>::value));
+  EXPECT_TRUE((has_direct_copy_exec<umpire::sycl_platform, umpire::host_platform>::value));
+  EXPECT_TRUE((has_direct_copy_exec<umpire::host_platform, umpire::sycl_platform>::value));
+#endif
+#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
+  EXPECT_TRUE((has_direct_copy_exec<umpire::omp_target_platform, umpire::omp_target_platform>::value));
+  EXPECT_TRUE((has_direct_copy_exec<umpire::omp_target_platform, umpire::host_platform>::value));
+  EXPECT_TRUE((has_direct_copy_exec<umpire::host_platform, umpire::omp_target_platform>::value));
+#endif
+
+#if defined(UMPIRE_ENABLE_CUDA) && defined(UMPIRE_ENABLE_HIP)
+  EXPECT_FALSE((has_direct_copy_exec<umpire::cuda_platform, umpire::hip_platform>::value));
+  EXPECT_FALSE((has_direct_copy_exec<umpire::hip_platform, umpire::cuda_platform>::value));
+#endif
+#if defined(UMPIRE_ENABLE_CUDA) && defined(UMPIRE_ENABLE_SYCL)
+  EXPECT_FALSE((has_direct_copy_exec<umpire::cuda_platform, umpire::sycl_platform>::value));
+  EXPECT_FALSE((has_direct_copy_exec<umpire::sycl_platform, umpire::cuda_platform>::value));
+#endif
+#if defined(UMPIRE_ENABLE_CUDA) && defined(UMPIRE_ENABLE_OPENMP_TARGET)
+  EXPECT_FALSE((has_direct_copy_exec<umpire::cuda_platform, umpire::omp_target_platform>::value));
+  EXPECT_FALSE((has_direct_copy_exec<umpire::omp_target_platform, umpire::cuda_platform>::value));
+#endif
+#if defined(UMPIRE_ENABLE_HIP) && defined(UMPIRE_ENABLE_SYCL)
+  EXPECT_FALSE((has_direct_copy_exec<umpire::hip_platform, umpire::sycl_platform>::value));
+  EXPECT_FALSE((has_direct_copy_exec<umpire::sycl_platform, umpire::hip_platform>::value));
+#endif
+#if defined(UMPIRE_ENABLE_HIP) && defined(UMPIRE_ENABLE_OPENMP_TARGET)
+  EXPECT_FALSE((has_direct_copy_exec<umpire::hip_platform, umpire::omp_target_platform>::value));
+  EXPECT_FALSE((has_direct_copy_exec<umpire::omp_target_platform, umpire::hip_platform>::value));
+#endif
+#if defined(UMPIRE_ENABLE_SYCL) && defined(UMPIRE_ENABLE_OPENMP_TARGET)
+  EXPECT_FALSE((has_direct_copy_exec<umpire::sycl_platform, umpire::omp_target_platform>::value));
+  EXPECT_FALSE((has_direct_copy_exec<umpire::omp_target_platform, umpire::sycl_platform>::value));
+#endif
 }
 
 TEST(ApiV2Operations, HostResourceBackedBuffersWorkWithOperationTemplates)

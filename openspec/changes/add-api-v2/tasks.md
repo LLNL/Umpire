@@ -214,9 +214,9 @@
   - [ ] 16.3.1 Look up "REALLOCATE" operation for platform
   - [ ] 16.3.2 Invoke and return new pointer
 - [ ] 16.4 Implement `prefetch<Platform>(void* ptr, std::size_t size)` template (if applicable) in `include/umpire/op/prefetch.hpp`
-- [ ] 16.5 Add error handling for unsupported platform pairs (throw with clear message)
+- [ ] 16.5 Reconcile unsupported platform-pair behavior: runtime dispatch throws with a clear message, while direct template wrappers are only available for compiled specializations
 - [ ] 16.6 Add unit tests for each operation template with supported platforms
-- [ ] 16.7 Add tests for unsupported platform combinations (expect exception)
+- [ ] 16.7 Add tests for unsupported runtime platform combinations and direct-template compile-time availability boundaries
 - [ ] 16.8 Add integration tests: allocate on platform A, copy to platform B, use on platform B
 
 ## 17. Error Handling
