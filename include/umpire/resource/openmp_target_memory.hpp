@@ -63,7 +63,8 @@ struct omp_target_allocator {
    * \brief Deallocate target memory with `omp_target_free`.
    *
    * \param ptr Pointer returned by allocate().
-   * \param Unused size parameter required by the allocator wrapper interface.
+   * \param size Unused size parameter required by the allocator wrapper
+   *        interface.
    */
   void deallocate(char* ptr, std::size_t /* size */) noexcept
   {
@@ -185,9 +186,9 @@ public:
   }
 };
 
-//! Tracking-enabled OpenMP target resource alias.
+//! \brief Tracking-enabled OpenMP target resource alias.
 using default_openmp_target_memory = openmp_target_memory<omp_target_allocator, true>;
-//! OpenMP target resource alias with tracking disabled.
+//! \brief OpenMP target resource alias with tracking disabled.
 using fast_openmp_target_memory = openmp_target_memory<omp_target_allocator, false>;
 
 } // namespace resource

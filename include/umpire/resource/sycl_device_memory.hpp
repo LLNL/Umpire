@@ -70,7 +70,8 @@ struct sycl_allocator {
    * \brief Deallocate device memory with `sycl::free`.
    *
    * \param ptr Pointer returned by allocate().
-   * \param Unused size parameter required by the allocator wrapper interface.
+   * \param size Unused size parameter required by the allocator wrapper
+   *        interface.
    */
   void deallocate(char* ptr, std::size_t /* size */)
   {
