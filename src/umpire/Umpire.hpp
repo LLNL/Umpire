@@ -152,6 +152,15 @@ std::string get_backtrace(void* ptr);
 std::size_t get_process_memory_usage();
 
 /*!
+ * \brief Get resident memory usage for memory mappings whose name contains
+ * the provided substring.
+ *
+ * On Linux, this uses /proc/self/smaps and sums the RSS values for matching
+ * mappings. Returns 0 on unsupported platforms.
+ */
+std::size_t get_mapping_memory_usage(const std::string& mapping_name);
+
+/*!
  * \brief Get high watermark memory usage of the current process (uses underlying
  * system-dependent calls)
  */

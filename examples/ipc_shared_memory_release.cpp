@@ -7,13 +7,8 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <cctype>
-#include <cstdio>
-#include <cstring>
-#include <fstream>
 #include <iostream>
 #include <string>
-#include <vector>
 
 #include <unistd.h>
 
@@ -57,44 +52,6 @@ void touch_one_byte_per_page(std::uint8_t* buffer, std::size_t bytes)
   }
 }
 
-std::size_t get_smaps_rss_bytes_for_mapping(const std::string& mapping_name_substr)
-{
-#if defined(__linux__)
-  std::ifstream smaps("/proc/self/smaps");
-  if (!smaps) {
-    return 0;
-  }
-
-  std::size_t rss_kb{0};
-  bool in_target{false};
-
-  std::string line;
-  while (std::getline(smaps, line)) {
-    const bool is_header = (!line.empty() && std::isxdigit(static_cast<unsigned char>(line[0])) && line.find('-') != std::string::npos);
-
-    if (is_header) {
-      in_target = (line.find(mapping_name_substr) != std::string::npos);
-      continue;
-    }
-
-    if (!in_target) {
-      continue;
-    }
-
-    constexpr const char* rss_prefix = "Rss:";
-    if (line.rfind(rss_prefix, 0) == 0) {
-      std::size_t value_kb{0};
-      std::sscanf(line.c_str(), "Rss: %zu kB", &value_kb);
-      rss_kb += value_kb;
-    }
-  }
-
-  return rss_kb * 1024;
-#else
-  (void)mapping_name_substr;
-  return 0;
-#endif
-}
 } // namespace
 
 int main(int, char**)
@@ -112,7 +69,7 @@ int main(int, char**)
   const std::size_t rss_before = umpire::get_process_memory_usage();
   std::cout << "RSS before: " << format_bytes(rss_before) << "\n";
 
-  const std::size_t shm_rss_before = get_smaps_rss_bytes_for_mapping(allocator_name);
+  const std::size_t shm_rss_before = umpire::get_mapping_memory_usage(allocator_name);
   if (shm_rss_before > 0) {
     std::cout << "Shared segment RSS before: " << format_bytes(shm_rss_before) << "\n";
   }
@@ -123,7 +80,7 @@ int main(int, char**)
   const std::size_t rss_after_touch = umpire::get_process_memory_usage();
   std::cout << "RSS after touching allocation: " << format_bytes(rss_after_touch) << "\n";
 
-  const std::size_t shm_rss_after_touch = get_smaps_rss_bytes_for_mapping(allocator_name);
+  const std::size_t shm_rss_after_touch = umpire::get_mapping_memory_usage(allocator_name);
   if (shm_rss_after_touch > 0) {
     std::cout << "Shared segment RSS after touch: " << format_bytes(shm_rss_after_touch) << "\n";
   }
@@ -133,7 +90,7 @@ int main(int, char**)
   const std::size_t rss_after_free = umpire::get_process_memory_usage();
   std::cout << "RSS after deallocate (before release): " << format_bytes(rss_after_free) << "\n";
 
-  const std::size_t shm_rss_after_free = get_smaps_rss_bytes_for_mapping(allocator_name);
+  const std::size_t shm_rss_after_free = umpire::get_mapping_memory_usage(allocator_name);
   if (shm_rss_after_free > 0) {
     std::cout << "Shared segment RSS after deallocate: " << format_bytes(shm_rss_after_free) << "\n";
   }
@@ -143,7 +100,7 @@ int main(int, char**)
   const std::size_t rss_after_release = umpire::get_process_memory_usage();
   std::cout << "RSS after allocator.release(): " << format_bytes(rss_after_release) << "\n";
 
-  const std::size_t shm_rss_after_release = get_smaps_rss_bytes_for_mapping(allocator_name);
+  const std::size_t shm_rss_after_release = umpire::get_mapping_memory_usage(allocator_name);
   if (shm_rss_after_release > 0) {
     std::cout << "Shared segment RSS after release: " << format_bytes(shm_rss_after_release) << "\n";
   } else {

@@ -232,8 +232,6 @@ TEST_F(SharedMemoryTest, UnitTests)
       allocator.deallocate(ptr);
     }
     MPI_Barrier(MPI_COMM_WORLD);
-
-    MPI_Barrier(MPI_COMM_WORLD);
   }
 }
 } // namespace

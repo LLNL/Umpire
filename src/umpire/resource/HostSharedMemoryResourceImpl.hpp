@@ -320,7 +320,6 @@ class HostSharedMemoryResource::impl {
     offset_to_pointer(m_segment->free_blocks_off, block_ptr);
 
     while (block_ptr != nullptr) {
-#if defined(__linux__)
       char* const block_begin = reinterpret_cast<char*>(block_ptr);
       char* const block_end = block_begin + block_ptr->block_size;
 
@@ -344,7 +343,6 @@ class HostSharedMemoryResource::impl {
                                 << m_segment_name << ": " << strerror(madvise_err));
         }
       }
-#endif
 
       offset_to_pointer(block_ptr->next_block_off, block_ptr);
     }
