@@ -176,14 +176,17 @@ declarations:
         cxx_template:
         - instantiation: <umpire::strategy::DynamicPoolList>
           format:
+            F_name_impl_template: make_alloc_dynamic_p_list
             template_suffix: _list_pool
             function_suffix: ""
         - instantiation: <umpire::strategy::QuickPool>
           format:
+            F_name_impl_template: make_alloc_quick_p
             template_suffix: _quick_pool
             function_suffix: ""
         - instantiation: <umpire::strategy::ResourceAwarePool>
           format:
+            F_name_impl_template: make_alloc_res_aware_p
             template_suffix: _resource_aware_pool
             function_suffix: ""
 
@@ -193,6 +196,7 @@ declarations:
         cxx_template:
         - instantiation: <umpire::strategy::AllocationAdvisor>
           format:
+            F_name_impl_template: make_alloc_alloc_advisor
             template_suffix: _advisor
             function_suffix: ""
 
@@ -202,10 +206,12 @@ declarations:
         cxx_template:
         - instantiation: <umpire::strategy::NamedAllocationStrategy>
           format:
+            F_name_impl_template: make_alloc_named_alloc
             template_suffix: _named
             function_suffix: ""
         - instantiation: <umpire::strategy::ThreadSafeAllocator>
           format:
+            F_name_impl_template: make_alloc_thread_safe
             template_suffix: _thread_safe
             function_suffix: ""
 
@@ -215,22 +221,27 @@ declarations:
         cxx_template:
           - instantiation: <umpire::strategy::FixedPool>
             format:
+              F_name_impl_template: make_alloc_fixed_p
               template_suffix: _fixed_pool
               function_suffix: ""
           - instantiation: <umpire::strategy::AlignedAllocator>
             format:
+              F_name_impl_template: make_alloc_aligned_alloc
               template_suffix: _aligned_allocator
               function_suffix: ""
           - instantiation: <umpire::strategy::SizeLimiter>
             format:
+              F_name_impl_template: make_alloc_size_limit
               template_suffix: _size_limiter
               function_suffix: ""
           - instantiation: <umpire::strategy::MonotonicAllocationStrategy>
             format:
+              F_name_impl_template: make_alloc_monotonic
               template_suffix: _monotonic
               function_suffix: ""
           - instantiation: <umpire::strategy::SlotPool>
             format:
+              F_name_impl_template: make_alloc_slot_p
               template_suffix: _slot_pool
               function_suffix: ""
 
@@ -240,6 +251,7 @@ declarations:
         cxx_template:
           - instantiation: <umpire::strategy::NamingShim>
             format:
+              F_name_impl_template: make_alloc_naming_shim
               template_suffix: _naming_shim
               function_suffix: ""
 
@@ -249,6 +261,7 @@ declarations:
         cxx_template:
           - instantiation: <umpire::strategy::MixedPool>
             format:
+              F_name_impl_template: make_alloc_mixed_p
               template_suffix: _mixed_pool
               function_suffix: ""
 
@@ -258,14 +271,16 @@ declarations:
         cxx_template:
           - instantiation: <umpire::strategy::AllocationPrefetcher>
             format:
+              F_name_impl_template: make_alloc_alloc_prefetch
               template_suffix: _prefetcher
               function_suffix: ""
 
-      # Untracked pool allocators - using splicer to handle bool template parameter
-      # Note: Keep generated Fortran identifiers <= 63 chars (gfortran default limit).
-      # The ResourceAwarePool untracked + bufferify wrapper is particularly close to
-      # the limit due to the extra `_bufferify` suffix.
+      # Untracked pool allocators - using splicer to handle bool template parameter.
+      # Keep generated Fortran bufferify helper identifiers comfortably below the
+      # 63-character gfortran limit by using shorter impl names.
       - decl: Allocator makeAllocator_list_pool_untracked(const std::string& name, Allocator allocator, size_t initial_size, size_t block)
+        format:
+          F_name_impl: make_alloc_dynamic_p_list_u
         splicer:
           c: |
             const std::string SHC_name_cxx(name);
@@ -279,6 +294,8 @@ declarations:
             return SHC_rv;
 
       - decl: Allocator makeAllocator_quick_pool_untracked(const std::string& name, Allocator allocator, size_t initial_size, size_t block)
+        format:
+          F_name_impl: make_alloc_quick_p_u
         splicer:
           c: |
             const std::string SHC_name_cxx(name);
@@ -293,7 +310,7 @@ declarations:
 
       - decl: Allocator makeAllocator_resource_aware_pool_untracked(const std::string& name, Allocator allocator, size_t initial_size, size_t block)
         format:
-          F_name_impl: make_allocator_ra_pool_untracked
+          F_name_impl: make_alloc_res_aware_p_u
         splicer:
           c: |
             const std::string SHC_name_cxx(name);
@@ -307,6 +324,8 @@ declarations:
             return SHC_rv;
 
       - decl: Allocator makeAllocator_fixed_pool_untracked(const std::string& name, Allocator allocator, size_t object_size)
+        format:
+          F_name_impl: make_alloc_fixed_p_u
         splicer:
           c: |
             const std::string SHC_name_cxx(name);
@@ -320,6 +339,8 @@ declarations:
             return SHC_rv;
 
       - decl: Allocator makeAllocator_monotonic_untracked(const std::string& name, Allocator allocator, size_t object_size)
+        format:
+          F_name_impl: make_alloc_monotonic_u
         splicer:
           c: |
             const std::string SHC_name_cxx(name);
@@ -333,6 +354,8 @@ declarations:
             return SHC_rv;
 
       - decl: Allocator makeAllocator_slot_pool_untracked(const std::string& name, Allocator allocator, size_t object_size)
+        format:
+          F_name_impl: make_alloc_slot_p_u
         splicer:
           c: |
             const std::string SHC_name_cxx(name);
@@ -346,6 +369,8 @@ declarations:
             return SHC_rv;
 
       - decl: Allocator makeAllocator_mixed_pool_untracked(const std::string& name, Allocator allocator, size_t smallest_fixed_obj_size, size_t largest_fixed_obj_size, size_t max_initial_fixed_pool_size, size_t fixed_size_multiplier, size_t quick_pool_initial_alloc_size, size_t quick_pool_min_alloc_size, size_t quick_pool_align_bytes)
+        format:
+          F_name_impl: make_alloc_mixed_p_u
         splicer:
           c: |
             const std::string SHC_name_cxx(name);
