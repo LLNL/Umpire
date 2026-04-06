@@ -11,6 +11,7 @@
 
 #include "camp/list.hpp"
 #include "umpire/ResourceManager.hpp"
+#include "umpire/event/event.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/error.hpp"
 #include "umpire/util/make_unique.hpp"
