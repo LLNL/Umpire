@@ -244,7 +244,7 @@ module umpire_mod
         procedure :: make_allocator_prefetcher => resourcemanager_make_allocator_prefetcher
         procedure :: make_allocator_list_pool_untracked => resourcemanager_make_allocator_list_pool_untracked
         procedure :: make_allocator_quick_pool_untracked => resourcemanager_make_allocator_quick_pool_untracked
-        procedure :: make_allocator_resource_aware_pool_untracked => resourcemanager_make_allocator_resource_aware_pool_untracked
+        procedure :: make_allocator_resource_aware_pool_untracked => make_allocator_ra_pool_untracked
         procedure :: make_allocator_fixed_pool_untracked => resourcemanager_make_allocator_fixed_pool_untracked
         procedure :: make_allocator_monotonic_untracked => resourcemanager_make_allocator_monotonic_untracked
         procedure :: make_allocator_slot_pool_untracked => resourcemanager_make_allocator_slot_pool_untracked
@@ -3382,8 +3382,8 @@ contains
         ! splicer end class.ResourceManager.method.make_allocator_quick_pool_untracked
     end function resourcemanager_make_allocator_quick_pool_untracked
 
-    function resourcemanager_make_allocator_resource_aware_pool_untracked( &
-            obj, name, allocator, initial_size, block) &
+    function make_allocator_ra_pool_untracked(obj, name, allocator, &
+            initial_size, block) &
             result(SHT_rv)
         use iso_c_binding, only : C_INT, C_PTR, C_SIZE_T
         class(UmpireResourceManager) :: obj
@@ -3398,7 +3398,7 @@ contains
             name, len_trim(name, kind=C_INT), allocator%cxxmem, &
             initial_size, block, SHT_rv%cxxmem)
         ! splicer end class.ResourceManager.method.make_allocator_resource_aware_pool_untracked
-    end function resourcemanager_make_allocator_resource_aware_pool_untracked
+    end function make_allocator_ra_pool_untracked
 
     function resourcemanager_make_allocator_fixed_pool_untracked(obj, &
             name, allocator, object_size) &
