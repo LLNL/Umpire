@@ -275,116 +275,58 @@ declarations:
               template_suffix: _prefetcher
               function_suffix: ""
 
-      # Untracked pool allocators - using splicer to handle bool template parameter.
-      # Keep generated Fortran bufferify helper identifiers comfortably below the
-      # 63-character gfortran limit by using shorter impl names.
-      - decl: Allocator makeAllocator_list_pool_untracked(const std::string& name, Allocator allocator, size_t initial_size, size_t block)
-        format:
-          F_name_impl: make_alloc_dynamic_p_list_u
-        splicer:
-          c: |
-            const std::string SHC_name_cxx(name);
-            umpire::Allocator *SHC_allocator_cxx =
-                static_cast<umpire::Allocator *>(allocator.addr);
-            umpire::Allocator *SHC_rv_cxx = new umpire::Allocator;
-            *SHC_rv_cxx = SH_this->makeAllocator<umpire::strategy::DynamicPoolList, false>(
-                SHC_name_cxx, *SHC_allocator_cxx, initial_size, block);
-            SHC_rv->addr  = SHC_rv_cxx;
-            SHC_rv->idtor = 1;
-            return SHC_rv;
+      # Untracked pool allocators use the bool template instantiations directly.
+      # Keep the template suffixes short so generated Fortran bufferify helpers
+      # stay below compiler identifier limits.
+      - decl: template <typename T, bool B> Allocator makeAllocator(const std::string& name, Allocator allocator, size_t initial_size, size_t block);
+        options:
+          F_create_generic: False
+        cxx_template:
+        - instantiation: <umpire::strategy::DynamicPoolList, false>
+          format:
+            F_name_impl_template: make_alloc_dynamic_p_list_u
+            template_suffix: _dynamic_p_list_u
+            function_suffix: ""
+        - instantiation: <umpire::strategy::QuickPool, false>
+          format:
+            F_name_impl_template: make_alloc_quick_p_u
+            template_suffix: _quick_p_u
+            function_suffix: ""
+        - instantiation: <umpire::strategy::ResourceAwarePool, false>
+          format:
+            F_name_impl_template: make_alloc_res_aware_p_u
+            template_suffix: _res_aware_p_u
+            function_suffix: ""
 
-      - decl: Allocator makeAllocator_quick_pool_untracked(const std::string& name, Allocator allocator, size_t initial_size, size_t block)
-        format:
-          F_name_impl: make_alloc_quick_p_u
-        splicer:
-          c: |
-            const std::string SHC_name_cxx(name);
-            umpire::Allocator *SHC_allocator_cxx =
-                static_cast<umpire::Allocator *>(allocator.addr);
-            umpire::Allocator *SHC_rv_cxx = new umpire::Allocator;
-            *SHC_rv_cxx = SH_this->makeAllocator<umpire::strategy::QuickPool, false>(
-                SHC_name_cxx, *SHC_allocator_cxx, initial_size, block);
-            SHC_rv->addr  = SHC_rv_cxx;
-            SHC_rv->idtor = 1;
-            return SHC_rv;
+      - decl: template <typename T, bool B> Allocator makeAllocator(const std::string& name, Allocator allocator, size_t object_size);
+        options:
+          F_create_generic: False
+        cxx_template:
+          - instantiation: <umpire::strategy::FixedPool, false>
+            format:
+              F_name_impl_template: make_alloc_fixed_p_u
+              template_suffix: _fixed_p_u
+              function_suffix: ""
+          - instantiation: <umpire::strategy::MonotonicAllocationStrategy, false>
+            format:
+              F_name_impl_template: make_alloc_monotonic_u
+              template_suffix: _monotonic_u
+              function_suffix: ""
+          - instantiation: <umpire::strategy::SlotPool, false>
+            format:
+              F_name_impl_template: make_alloc_slot_p_u
+              template_suffix: _slot_p_u
+              function_suffix: ""
 
-      - decl: Allocator makeAllocator_resource_aware_pool_untracked(const std::string& name, Allocator allocator, size_t initial_size, size_t block)
-        format:
-          F_name_impl: make_alloc_res_aware_p_u
-        splicer:
-          c: |
-            const std::string SHC_name_cxx(name);
-            umpire::Allocator *SHC_allocator_cxx =
-                static_cast<umpire::Allocator *>(allocator.addr);
-            umpire::Allocator *SHC_rv_cxx = new umpire::Allocator;
-            *SHC_rv_cxx = SH_this->makeAllocator<umpire::strategy::ResourceAwarePool, false>(
-                SHC_name_cxx, *SHC_allocator_cxx, initial_size, block);
-            SHC_rv->addr  = SHC_rv_cxx;
-            SHC_rv->idtor = 1;
-            return SHC_rv;
-
-      - decl: Allocator makeAllocator_fixed_pool_untracked(const std::string& name, Allocator allocator, size_t object_size)
-        format:
-          F_name_impl: make_alloc_fixed_p_u
-        splicer:
-          c: |
-            const std::string SHC_name_cxx(name);
-            umpire::Allocator *SHC_allocator_cxx =
-                static_cast<umpire::Allocator *>(allocator.addr);
-            umpire::Allocator *SHC_rv_cxx = new umpire::Allocator;
-            *SHC_rv_cxx = SH_this->makeAllocator<umpire::strategy::FixedPool, false>(
-                SHC_name_cxx, *SHC_allocator_cxx, object_size);
-            SHC_rv->addr  = SHC_rv_cxx;
-            SHC_rv->idtor = 1;
-            return SHC_rv;
-
-      - decl: Allocator makeAllocator_monotonic_untracked(const std::string& name, Allocator allocator, size_t object_size)
-        format:
-          F_name_impl: make_alloc_monotonic_u
-        splicer:
-          c: |
-            const std::string SHC_name_cxx(name);
-            umpire::Allocator *SHC_allocator_cxx =
-                static_cast<umpire::Allocator *>(allocator.addr);
-            umpire::Allocator *SHC_rv_cxx = new umpire::Allocator;
-            *SHC_rv_cxx = SH_this->makeAllocator<umpire::strategy::MonotonicAllocationStrategy, false>(
-                SHC_name_cxx, *SHC_allocator_cxx, object_size);
-            SHC_rv->addr  = SHC_rv_cxx;
-            SHC_rv->idtor = 1;
-            return SHC_rv;
-
-      - decl: Allocator makeAllocator_slot_pool_untracked(const std::string& name, Allocator allocator, size_t object_size)
-        format:
-          F_name_impl: make_alloc_slot_p_u
-        splicer:
-          c: |
-            const std::string SHC_name_cxx(name);
-            umpire::Allocator *SHC_allocator_cxx =
-                static_cast<umpire::Allocator *>(allocator.addr);
-            umpire::Allocator *SHC_rv_cxx = new umpire::Allocator;
-            *SHC_rv_cxx = SH_this->makeAllocator<umpire::strategy::SlotPool, false>(
-                SHC_name_cxx, *SHC_allocator_cxx, object_size);
-            SHC_rv->addr  = SHC_rv_cxx;
-            SHC_rv->idtor = 1;
-            return SHC_rv;
-
-      - decl: Allocator makeAllocator_mixed_pool_untracked(const std::string& name, Allocator allocator, size_t smallest_fixed_obj_size, size_t largest_fixed_obj_size, size_t max_initial_fixed_pool_size, size_t fixed_size_multiplier, size_t quick_pool_initial_alloc_size, size_t quick_pool_min_alloc_size, size_t quick_pool_align_bytes)
-        format:
-          F_name_impl: make_alloc_mixed_p_u
-        splicer:
-          c: |
-            const std::string SHC_name_cxx(name);
-            umpire::Allocator *SHC_allocator_cxx =
-                static_cast<umpire::Allocator *>(allocator.addr);
-            umpire::Allocator *SHC_rv_cxx = new umpire::Allocator;
-            *SHC_rv_cxx = SH_this->makeAllocator<umpire::strategy::MixedPool, false>(
-                SHC_name_cxx, *SHC_allocator_cxx, smallest_fixed_obj_size,
-                largest_fixed_obj_size, max_initial_fixed_pool_size,
-                fixed_size_multiplier, quick_pool_initial_alloc_size,
-                quick_pool_min_alloc_size, quick_pool_align_bytes);
-            SHC_rv->addr  = SHC_rv_cxx;
-            SHC_rv->idtor = 1;
-            return SHC_rv;
+      - decl: template <typename T, bool B> Allocator makeAllocator(const std::string& name, Allocator allocator, size_t smallest_fixed_obj_size, size_t largest_fixed_obj_size, size_t max_initial_fixed_pool_size, size_t fixed_size_multiplier, size_t quick_pool_initial_alloc_size, size_t quick_pool_min_alloc_size, size_t quick_pool_align_bytes);
+        options:
+          F_create_generic: False
+        cxx_template:
+          - instantiation: <umpire::strategy::MixedPool, false>
+            format:
+              F_name_impl_template: make_alloc_mixed_p_u
+              template_suffix: _mixed_p_u
+              function_suffix: ""
 
       - decl: void addAlias(const std::string& name, Allocator allocator)
       - decl: void removeAlias(const std::string& name, Allocator allocator)
