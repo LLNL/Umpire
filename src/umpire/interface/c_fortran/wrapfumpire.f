@@ -242,13 +242,13 @@ module umpire_mod
         procedure :: make_allocator_naming_shim => resourcemanager_make_allocator_naming_shim
         procedure :: make_allocator_mixed_pool => resourcemanager_make_allocator_mixed_pool
         procedure :: make_allocator_prefetcher => resourcemanager_make_allocator_prefetcher
-        procedure :: make_allocator_list_pool_untracked => resourcemanager_make_allocator_list_pool_untracked
-        procedure :: make_allocator_quick_pool_untracked => resourcemanager_make_allocator_quick_pool_untracked
-        procedure :: make_allocator_resource_aware_pool_untracked => make_allocator_ra_pool_untracked
-        procedure :: make_allocator_fixed_pool_untracked => resourcemanager_make_allocator_fixed_pool_untracked
-        procedure :: make_allocator_monotonic_untracked => resourcemanager_make_allocator_monotonic_untracked
-        procedure :: make_allocator_slot_pool_untracked => resourcemanager_make_allocator_slot_pool_untracked
-        procedure :: make_allocator_mixed_pool_untracked => resourcemanager_make_allocator_mixed_pool_untracked
+        procedure :: make_allocator_list_pool_untracked => make_alloc_dynamic_p_list_u
+        procedure :: make_allocator_quick_pool_untracked => make_alloc_quick_p_u
+        procedure :: make_allocator_resource_aware_pool_untracked => make_alloc_res_aware_p_u
+        procedure :: make_allocator_fixed_pool_untracked => make_alloc_fixed_p_u
+        procedure :: make_allocator_monotonic_untracked => make_alloc_monotonic_u
+        procedure :: make_allocator_slot_pool_untracked => make_alloc_slot_p_u
+        procedure :: make_allocator_mixed_pool_untracked => make_alloc_mixed_p_u
         procedure :: add_alias => resourcemanager_add_alias
         procedure :: remove_alias => resourcemanager_remove_alias
         procedure :: get_allocator_for_ptr => resourcemanager_get_allocator_for_ptr
@@ -472,7 +472,7 @@ module umpire_mod
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_list_pool
 
-        function c_resourcemanager_make_alloc_dynamic_p_list_bufferify( &
+        function c_resourcemanager_make_allocator_bufferify_list_pool( &
                 self, name, Lname, allocator, initial_size, block, &
                 SHT_crv) &
                 result(SHT_rv) &
@@ -488,7 +488,7 @@ module umpire_mod
             integer(C_SIZE_T), value, intent(IN) :: block
             type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
-        end function c_resourcemanager_make_alloc_dynamic_p_list_bufferify
+        end function c_resourcemanager_make_allocator_bufferify_list_pool
 
         function c_resourcemanager_make_allocator_quick_pool(self, name, &
                 allocator, initial_size, block, SHT_crv) &
@@ -506,7 +506,7 @@ module umpire_mod
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_quick_pool
 
-        function c_resourcemanager_make_alloc_quick_p_bufferify( &
+        function c_resourcemanager_make_allocator_bufferify_quick_pool( &
                 self, name, Lname, allocator, initial_size, block, &
                 SHT_crv) &
                 result(SHT_rv) &
@@ -522,7 +522,7 @@ module umpire_mod
             integer(C_SIZE_T), value, intent(IN) :: block
             type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
-        end function c_resourcemanager_make_alloc_quick_p_bufferify
+        end function c_resourcemanager_make_allocator_bufferify_quick_pool
 
         function c_resourcemanager_make_allocator_resource_aware_pool( &
                 self, name, allocator, initial_size, block, SHT_crv) &
@@ -540,7 +540,7 @@ module umpire_mod
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_resource_aware_pool
 
-        function c_resourcemanager_make_alloc_res_aware_p_bufferify( &
+        function c_resourcemanager_make_allocator_bufferify_resource_aware_pool( &
                 self, name, Lname, allocator, initial_size, block, &
                 SHT_crv) &
                 result(SHT_rv) &
@@ -556,7 +556,7 @@ module umpire_mod
             integer(C_SIZE_T), value, intent(IN) :: block
             type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
-        end function c_resourcemanager_make_alloc_res_aware_p_bufferify
+        end function c_resourcemanager_make_allocator_bufferify_resource_aware_pool
 
         function c_resourcemanager_make_allocator_advisor(self, name, &
                 allocator, advice_op, device_id, SHT_crv) &
@@ -574,7 +574,7 @@ module umpire_mod
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_advisor
 
-        function c_resourcemanager_make_alloc_alloc_advisor_bufferify( &
+        function c_resourcemanager_make_allocator_bufferify_advisor( &
                 self, name, Lname, allocator, advice_op, Ladvice_op, &
                 device_id, SHT_crv) &
                 result(SHT_rv) &
@@ -591,7 +591,7 @@ module umpire_mod
             integer(C_INT), value, intent(IN) :: device_id
             type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
-        end function c_resourcemanager_make_alloc_alloc_advisor_bufferify
+        end function c_resourcemanager_make_allocator_bufferify_advisor
 
         function c_resourcemanager_make_allocator_named(self, name, &
                 allocator, SHT_crv) &
@@ -607,7 +607,7 @@ module umpire_mod
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_named
 
-        function c_resourcemanager_make_alloc_named_alloc_bufferify(self, &
+        function c_resourcemanager_make_allocator_bufferify_named(self, &
                 name, Lname, allocator, SHT_crv) &
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_make_allocator_bufferify_named")
@@ -620,7 +620,7 @@ module umpire_mod
             type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
             type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
-        end function c_resourcemanager_make_alloc_named_alloc_bufferify
+        end function c_resourcemanager_make_allocator_bufferify_named
 
         function c_resourcemanager_make_allocator_thread_safe(self, &
                 name, allocator, SHT_crv) &
@@ -636,7 +636,7 @@ module umpire_mod
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_thread_safe
 
-        function c_resourcemanager_make_alloc_thread_safe_bufferify( &
+        function c_resourcemanager_make_allocator_bufferify_thread_safe( &
                 self, name, Lname, allocator, SHT_crv) &
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_make_allocator_bufferify_thread_safe")
@@ -649,7 +649,7 @@ module umpire_mod
             type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
             type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
-        end function c_resourcemanager_make_alloc_thread_safe_bufferify
+        end function c_resourcemanager_make_allocator_bufferify_thread_safe
 
         function c_resourcemanager_make_allocator_fixed_pool(self, name, &
                 allocator, object_size, SHT_crv) &
@@ -666,7 +666,7 @@ module umpire_mod
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_fixed_pool
 
-        function c_resourcemanager_make_alloc_fixed_p_bufferify( &
+        function c_resourcemanager_make_allocator_bufferify_fixed_pool( &
                 self, name, Lname, allocator, object_size, SHT_crv) &
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_make_allocator_bufferify_fixed_pool")
@@ -680,7 +680,7 @@ module umpire_mod
             integer(C_SIZE_T), value, intent(IN) :: object_size
             type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
-        end function c_resourcemanager_make_alloc_fixed_p_bufferify
+        end function c_resourcemanager_make_allocator_bufferify_fixed_pool
 
         function c_resourcemanager_make_allocator_aligned_allocator( &
                 self, name, allocator, object_size, SHT_crv) &
@@ -697,7 +697,7 @@ module umpire_mod
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_aligned_allocator
 
-        function c_resourcemanager_make_alloc_aligned_alloc_bufferify( &
+        function c_resourcemanager_make_allocator_bufferify_aligned_allocator( &
                 self, name, Lname, allocator, object_size, SHT_crv) &
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_make_allocator_bufferify_aligned_allocator")
@@ -711,7 +711,7 @@ module umpire_mod
             integer(C_SIZE_T), value, intent(IN) :: object_size
             type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
-        end function c_resourcemanager_make_alloc_aligned_alloc_bufferify
+        end function c_resourcemanager_make_allocator_bufferify_aligned_allocator
 
         function c_resourcemanager_make_allocator_size_limiter(self, &
                 name, allocator, object_size, SHT_crv) &
@@ -728,7 +728,7 @@ module umpire_mod
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_size_limiter
 
-        function c_resourcemanager_make_alloc_size_limit_bufferify( &
+        function c_resourcemanager_make_allocator_bufferify_size_limiter( &
                 self, name, Lname, allocator, object_size, SHT_crv) &
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_make_allocator_bufferify_size_limiter")
@@ -742,7 +742,7 @@ module umpire_mod
             integer(C_SIZE_T), value, intent(IN) :: object_size
             type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
-        end function c_resourcemanager_make_alloc_size_limit_bufferify
+        end function c_resourcemanager_make_allocator_bufferify_size_limiter
 
         function c_resourcemanager_make_allocator_monotonic(self, name, &
                 allocator, object_size, SHT_crv) &
@@ -759,7 +759,7 @@ module umpire_mod
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_monotonic
 
-        function c_resourcemanager_make_alloc_monotonic_bufferify( &
+        function c_resourcemanager_make_allocator_bufferify_monotonic( &
                 self, name, Lname, allocator, object_size, SHT_crv) &
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_make_allocator_bufferify_monotonic")
@@ -773,7 +773,7 @@ module umpire_mod
             integer(C_SIZE_T), value, intent(IN) :: object_size
             type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
-        end function c_resourcemanager_make_alloc_monotonic_bufferify
+        end function c_resourcemanager_make_allocator_bufferify_monotonic
 
         function c_resourcemanager_make_allocator_slot_pool(self, name, &
                 allocator, object_size, SHT_crv) &
@@ -790,7 +790,7 @@ module umpire_mod
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_slot_pool
 
-        function c_resourcemanager_make_alloc_slot_p_bufferify( &
+        function c_resourcemanager_make_allocator_bufferify_slot_pool( &
                 self, name, Lname, allocator, object_size, SHT_crv) &
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_make_allocator_bufferify_slot_pool")
@@ -804,7 +804,7 @@ module umpire_mod
             integer(C_SIZE_T), value, intent(IN) :: object_size
             type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
-        end function c_resourcemanager_make_alloc_slot_p_bufferify
+        end function c_resourcemanager_make_allocator_bufferify_slot_pool
 
         function c_resourcemanager_make_allocator_naming_shim(self, &
                 name, allocator, SHT_crv) &
@@ -820,7 +820,7 @@ module umpire_mod
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_naming_shim
 
-        function c_resourcemanager_make_alloc_naming_shim_bufferify( &
+        function c_resourcemanager_make_allocator_bufferify_naming_shim( &
                 self, name, Lname, allocator, SHT_crv) &
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_make_allocator_bufferify_naming_shim")
@@ -833,7 +833,7 @@ module umpire_mod
             type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
             type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
-        end function c_resourcemanager_make_alloc_naming_shim_bufferify
+        end function c_resourcemanager_make_allocator_bufferify_naming_shim
 
         function c_resourcemanager_make_allocator_mixed_pool(self, name, &
                 allocator, smallest_fixed_obj_size, &
@@ -860,7 +860,7 @@ module umpire_mod
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_mixed_pool
 
-        function c_resourcemanager_make_alloc_mixed_p_bufferify( &
+        function c_resourcemanager_make_allocator_bufferify_mixed_pool( &
                 self, name, Lname, allocator, smallest_fixed_obj_size, &
                 largest_fixed_obj_size, max_initial_fixed_pool_size, &
                 fixed_size_multiplier, quick_pool_initial_alloc_size, &
@@ -884,7 +884,7 @@ module umpire_mod
             integer(C_SIZE_T), value, intent(IN) :: quick_pool_align_bytes
             type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
-        end function c_resourcemanager_make_alloc_mixed_p_bufferify
+        end function c_resourcemanager_make_allocator_bufferify_mixed_pool
 
         function c_resourcemanager_make_allocator_prefetcher(self, name, &
                 allocator, device_id, SHT_crv) &
@@ -901,7 +901,7 @@ module umpire_mod
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_prefetcher
 
-        function c_resourcemanager_make_alloc_alloc_prefetch_bufferify( &
+        function c_resourcemanager_make_allocator_bufferify_prefetcher( &
                 self, name, Lname, allocator, device_id, SHT_crv) &
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_make_allocator_bufferify_prefetcher")
@@ -915,7 +915,7 @@ module umpire_mod
             integer(C_INT), value, intent(IN) :: device_id
             type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
-        end function c_resourcemanager_make_alloc_alloc_prefetch_bufferify
+        end function c_resourcemanager_make_allocator_bufferify_prefetcher
 
         function c_resourcemanager_make_allocator_list_pool_untracked( &
                 self, name, allocator, initial_size, block, SHT_crv) &
@@ -933,7 +933,7 @@ module umpire_mod
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_list_pool_untracked
 
-        function c_resourcemanager_make_alloc_dynamic_p_list_u_bufferify( &
+        function c_resourcemanager_make_allocator_list_pool_untracked_bufferify( &
                 self, name, Lname, allocator, initial_size, block, &
                 SHT_crv) &
                 result(SHT_rv) &
@@ -949,7 +949,7 @@ module umpire_mod
             integer(C_SIZE_T), value, intent(IN) :: block
             type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
-        end function c_resourcemanager_make_alloc_dynamic_p_list_u_bufferify
+        end function c_resourcemanager_make_allocator_list_pool_untracked_bufferify
 
         function c_resourcemanager_make_allocator_quick_pool_untracked( &
                 self, name, allocator, initial_size, block, SHT_crv) &
@@ -967,7 +967,7 @@ module umpire_mod
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_quick_pool_untracked
 
-        function c_resourcemanager_make_alloc_quick_p_u_bufferify( &
+        function c_resourcemanager_make_allocator_quick_pool_untracked_bufferify( &
                 self, name, Lname, allocator, initial_size, block, &
                 SHT_crv) &
                 result(SHT_rv) &
@@ -983,7 +983,7 @@ module umpire_mod
             integer(C_SIZE_T), value, intent(IN) :: block
             type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
-        end function c_resourcemanager_make_alloc_quick_p_u_bufferify
+        end function c_resourcemanager_make_allocator_quick_pool_untracked_bufferify
 
         function c_resourcemanager_make_allocator_resource_aware_pool_untracked( &
                 self, name, allocator, initial_size, block, SHT_crv) &
@@ -1001,7 +1001,7 @@ module umpire_mod
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_resource_aware_pool_untracked
 
-        function c_resourcemanager_make_alloc_res_aware_p_u_bufferify( &
+        function c_resourcemanager_make_allocator_resource_aware_pool_untracked_bufferify( &
                 self, name, Lname, allocator, initial_size, block, &
                 SHT_crv) &
                 result(SHT_rv) &
@@ -1017,7 +1017,7 @@ module umpire_mod
             integer(C_SIZE_T), value, intent(IN) :: block
             type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
-        end function c_resourcemanager_make_alloc_res_aware_p_u_bufferify
+        end function c_resourcemanager_make_allocator_resource_aware_pool_untracked_bufferify
 
         function c_resourcemanager_make_allocator_fixed_pool_untracked( &
                 self, name, allocator, object_size, SHT_crv) &
@@ -1034,7 +1034,7 @@ module umpire_mod
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_fixed_pool_untracked
 
-        function c_resourcemanager_make_alloc_fixed_p_u_bufferify( &
+        function c_resourcemanager_make_allocator_fixed_pool_untracked_bufferify( &
                 self, name, Lname, allocator, object_size, SHT_crv) &
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_make_allocator_fixed_pool_untracked_bufferify")
@@ -1048,7 +1048,7 @@ module umpire_mod
             integer(C_SIZE_T), value, intent(IN) :: object_size
             type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
-        end function c_resourcemanager_make_alloc_fixed_p_u_bufferify
+        end function c_resourcemanager_make_allocator_fixed_pool_untracked_bufferify
 
         function c_resourcemanager_make_allocator_monotonic_untracked( &
                 self, name, allocator, object_size, SHT_crv) &
@@ -1065,7 +1065,7 @@ module umpire_mod
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_monotonic_untracked
 
-        function c_resourcemanager_make_alloc_monotonic_u_bufferify( &
+        function c_resourcemanager_make_allocator_monotonic_untracked_bufferify( &
                 self, name, Lname, allocator, object_size, SHT_crv) &
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_make_allocator_monotonic_untracked_bufferify")
@@ -1079,7 +1079,7 @@ module umpire_mod
             integer(C_SIZE_T), value, intent(IN) :: object_size
             type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
-        end function c_resourcemanager_make_alloc_monotonic_u_bufferify
+        end function c_resourcemanager_make_allocator_monotonic_untracked_bufferify
 
         function c_resourcemanager_make_allocator_slot_pool_untracked( &
                 self, name, allocator, object_size, SHT_crv) &
@@ -1096,7 +1096,7 @@ module umpire_mod
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_slot_pool_untracked
 
-        function c_resourcemanager_make_alloc_slot_p_u_bufferify( &
+        function c_resourcemanager_make_allocator_slot_pool_untracked_bufferify( &
                 self, name, Lname, allocator, object_size, SHT_crv) &
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_make_allocator_slot_pool_untracked_bufferify")
@@ -1110,7 +1110,7 @@ module umpire_mod
             integer(C_SIZE_T), value, intent(IN) :: object_size
             type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
-        end function c_resourcemanager_make_alloc_slot_p_u_bufferify
+        end function c_resourcemanager_make_allocator_slot_pool_untracked_bufferify
 
         function c_resourcemanager_make_allocator_mixed_pool_untracked( &
                 self, name, allocator, smallest_fixed_obj_size, &
@@ -1137,7 +1137,7 @@ module umpire_mod
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_mixed_pool_untracked
 
-        function c_resourcemanager_make_alloc_mixed_p_u_bufferify( &
+        function c_resourcemanager_make_allocator_mixed_pool_untracked_bufferify( &
                 self, name, Lname, allocator, smallest_fixed_obj_size, &
                 largest_fixed_obj_size, max_initial_fixed_pool_size, &
                 fixed_size_multiplier, quick_pool_initial_alloc_size, &
@@ -1161,7 +1161,7 @@ module umpire_mod
             integer(C_SIZE_T), value, intent(IN) :: quick_pool_align_bytes
             type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
-        end function c_resourcemanager_make_alloc_mixed_p_u_bufferify
+        end function c_resourcemanager_make_allocator_mixed_pool_untracked_bufferify
 
         subroutine c_resourcemanager_add_alias(self, name, allocator) &
                 bind(C, name="umpire_resourcemanager_add_alias")
@@ -3107,7 +3107,7 @@ contains
         type(UmpireAllocator) :: SHT_rv
         ! splicer begin class.ResourceManager.method.make_allocator_list_pool
         type(C_PTR) :: SHT_prv
-        SHT_prv = c_resourcemanager_make_alloc_dynamic_p_list_bufferify(obj%cxxmem, &
+        SHT_prv = c_resourcemanager_make_allocator_bufferify_list_pool(obj%cxxmem, &
             name, len_trim(name, kind=C_INT), allocator%cxxmem, &
             initial_size, block, SHT_rv%cxxmem)
         ! splicer end class.ResourceManager.method.make_allocator_list_pool
@@ -3125,7 +3125,7 @@ contains
         type(UmpireAllocator) :: SHT_rv
         ! splicer begin class.ResourceManager.method.make_allocator_quick_pool
         type(C_PTR) :: SHT_prv
-        SHT_prv = c_resourcemanager_make_alloc_quick_p_bufferify(obj%cxxmem, &
+        SHT_prv = c_resourcemanager_make_allocator_bufferify_quick_pool(obj%cxxmem, &
             name, len_trim(name, kind=C_INT), allocator%cxxmem, &
             initial_size, block, SHT_rv%cxxmem)
         ! splicer end class.ResourceManager.method.make_allocator_quick_pool
@@ -3143,7 +3143,7 @@ contains
         type(UmpireAllocator) :: SHT_rv
         ! splicer begin class.ResourceManager.method.make_allocator_resource_aware_pool
         type(C_PTR) :: SHT_prv
-        SHT_prv = c_resourcemanager_make_alloc_res_aware_p_bufferify(obj%cxxmem, &
+        SHT_prv = c_resourcemanager_make_allocator_bufferify_resource_aware_pool(obj%cxxmem, &
             name, len_trim(name, kind=C_INT), allocator%cxxmem, &
             initial_size, block, SHT_rv%cxxmem)
         ! splicer end class.ResourceManager.method.make_allocator_resource_aware_pool
@@ -3161,7 +3161,7 @@ contains
         type(UmpireAllocator) :: SHT_rv
         ! splicer begin class.ResourceManager.method.make_allocator_advisor
         type(C_PTR) :: SHT_prv
-        SHT_prv = c_resourcemanager_make_alloc_alloc_advisor_bufferify(obj%cxxmem, &
+        SHT_prv = c_resourcemanager_make_allocator_bufferify_advisor(obj%cxxmem, &
             name, len_trim(name, kind=C_INT), allocator%cxxmem, &
             advice_op, len_trim(advice_op, kind=C_INT), device_id, &
             SHT_rv%cxxmem)
@@ -3177,7 +3177,7 @@ contains
         type(UmpireAllocator) :: SHT_rv
         ! splicer begin class.ResourceManager.method.make_allocator_named
         type(C_PTR) :: SHT_prv
-        SHT_prv = c_resourcemanager_make_alloc_named_alloc_bufferify(obj%cxxmem, &
+        SHT_prv = c_resourcemanager_make_allocator_bufferify_named(obj%cxxmem, &
             name, len_trim(name, kind=C_INT), allocator%cxxmem, &
             SHT_rv%cxxmem)
         ! splicer end class.ResourceManager.method.make_allocator_named
@@ -3193,7 +3193,7 @@ contains
         type(UmpireAllocator) :: SHT_rv
         ! splicer begin class.ResourceManager.method.make_allocator_thread_safe
         type(C_PTR) :: SHT_prv
-        SHT_prv = c_resourcemanager_make_alloc_thread_safe_bufferify(obj%cxxmem, &
+        SHT_prv = c_resourcemanager_make_allocator_bufferify_thread_safe(obj%cxxmem, &
             name, len_trim(name, kind=C_INT), allocator%cxxmem, &
             SHT_rv%cxxmem)
         ! splicer end class.ResourceManager.method.make_allocator_thread_safe
@@ -3210,7 +3210,7 @@ contains
         type(UmpireAllocator) :: SHT_rv
         ! splicer begin class.ResourceManager.method.make_allocator_fixed_pool
         type(C_PTR) :: SHT_prv
-        SHT_prv = c_resourcemanager_make_alloc_fixed_p_bufferify(obj%cxxmem, &
+        SHT_prv = c_resourcemanager_make_allocator_bufferify_fixed_pool(obj%cxxmem, &
             name, len_trim(name, kind=C_INT), allocator%cxxmem, &
             object_size, SHT_rv%cxxmem)
         ! splicer end class.ResourceManager.method.make_allocator_fixed_pool
@@ -3227,7 +3227,7 @@ contains
         type(UmpireAllocator) :: SHT_rv
         ! splicer begin class.ResourceManager.method.make_allocator_aligned_allocator
         type(C_PTR) :: SHT_prv
-        SHT_prv = c_resourcemanager_make_alloc_aligned_alloc_bufferify(obj%cxxmem, &
+        SHT_prv = c_resourcemanager_make_allocator_bufferify_aligned_allocator(obj%cxxmem, &
             name, len_trim(name, kind=C_INT), allocator%cxxmem, &
             object_size, SHT_rv%cxxmem)
         ! splicer end class.ResourceManager.method.make_allocator_aligned_allocator
@@ -3244,7 +3244,7 @@ contains
         type(UmpireAllocator) :: SHT_rv
         ! splicer begin class.ResourceManager.method.make_allocator_size_limiter
         type(C_PTR) :: SHT_prv
-        SHT_prv = c_resourcemanager_make_alloc_size_limit_bufferify(obj%cxxmem, &
+        SHT_prv = c_resourcemanager_make_allocator_bufferify_size_limiter(obj%cxxmem, &
             name, len_trim(name, kind=C_INT), allocator%cxxmem, &
             object_size, SHT_rv%cxxmem)
         ! splicer end class.ResourceManager.method.make_allocator_size_limiter
@@ -3261,7 +3261,7 @@ contains
         type(UmpireAllocator) :: SHT_rv
         ! splicer begin class.ResourceManager.method.make_allocator_monotonic
         type(C_PTR) :: SHT_prv
-        SHT_prv = c_resourcemanager_make_alloc_monotonic_bufferify(obj%cxxmem, &
+        SHT_prv = c_resourcemanager_make_allocator_bufferify_monotonic(obj%cxxmem, &
             name, len_trim(name, kind=C_INT), allocator%cxxmem, &
             object_size, SHT_rv%cxxmem)
         ! splicer end class.ResourceManager.method.make_allocator_monotonic
@@ -3278,7 +3278,7 @@ contains
         type(UmpireAllocator) :: SHT_rv
         ! splicer begin class.ResourceManager.method.make_allocator_slot_pool
         type(C_PTR) :: SHT_prv
-        SHT_prv = c_resourcemanager_make_alloc_slot_p_bufferify(obj%cxxmem, &
+        SHT_prv = c_resourcemanager_make_allocator_bufferify_slot_pool(obj%cxxmem, &
             name, len_trim(name, kind=C_INT), allocator%cxxmem, &
             object_size, SHT_rv%cxxmem)
         ! splicer end class.ResourceManager.method.make_allocator_slot_pool
@@ -3294,7 +3294,7 @@ contains
         type(UmpireAllocator) :: SHT_rv
         ! splicer begin class.ResourceManager.method.make_allocator_naming_shim
         type(C_PTR) :: SHT_prv
-        SHT_prv = c_resourcemanager_make_alloc_naming_shim_bufferify(obj%cxxmem, &
+        SHT_prv = c_resourcemanager_make_allocator_bufferify_naming_shim(obj%cxxmem, &
             name, len_trim(name, kind=C_INT), allocator%cxxmem, &
             SHT_rv%cxxmem)
         ! splicer end class.ResourceManager.method.make_allocator_naming_shim
@@ -3320,7 +3320,7 @@ contains
         type(UmpireAllocator) :: SHT_rv
         ! splicer begin class.ResourceManager.method.make_allocator_mixed_pool
         type(C_PTR) :: SHT_prv
-        SHT_prv = c_resourcemanager_make_alloc_mixed_p_bufferify(obj%cxxmem, &
+        SHT_prv = c_resourcemanager_make_allocator_bufferify_mixed_pool(obj%cxxmem, &
             name, len_trim(name, kind=C_INT), allocator%cxxmem, &
             smallest_fixed_obj_size, largest_fixed_obj_size, &
             max_initial_fixed_pool_size, fixed_size_multiplier, &
@@ -3340,14 +3340,14 @@ contains
         type(UmpireAllocator) :: SHT_rv
         ! splicer begin class.ResourceManager.method.make_allocator_prefetcher
         type(C_PTR) :: SHT_prv
-        SHT_prv = c_resourcemanager_make_alloc_alloc_prefetch_bufferify(obj%cxxmem, &
+        SHT_prv = c_resourcemanager_make_allocator_bufferify_prefetcher(obj%cxxmem, &
             name, len_trim(name, kind=C_INT), allocator%cxxmem, &
             device_id, SHT_rv%cxxmem)
         ! splicer end class.ResourceManager.method.make_allocator_prefetcher
     end function resourcemanager_make_allocator_prefetcher
 
-    function resourcemanager_make_allocator_list_pool_untracked(obj, &
-            name, allocator, initial_size, block) &
+    function make_alloc_dynamic_p_list_u(obj, name, allocator, &
+            initial_size, block) &
             result(SHT_rv)
         use iso_c_binding, only : C_INT, C_PTR, C_SIZE_T
         class(UmpireResourceManager) :: obj
@@ -3358,14 +3358,14 @@ contains
         type(UmpireAllocator) :: SHT_rv
         ! splicer begin class.ResourceManager.method.make_allocator_list_pool_untracked
         type(C_PTR) :: SHT_prv
-        SHT_prv = c_resourcemanager_make_alloc_dynamic_p_list_u_bufferify(obj%cxxmem, &
+        SHT_prv = c_resourcemanager_make_allocator_list_pool_untracked_bufferify(obj%cxxmem, &
             name, len_trim(name, kind=C_INT), allocator%cxxmem, &
             initial_size, block, SHT_rv%cxxmem)
         ! splicer end class.ResourceManager.method.make_allocator_list_pool_untracked
-    end function resourcemanager_make_allocator_list_pool_untracked
+    end function make_alloc_dynamic_p_list_u
 
-    function resourcemanager_make_allocator_quick_pool_untracked(obj, &
-            name, allocator, initial_size, block) &
+    function make_alloc_quick_p_u(obj, name, allocator, initial_size, &
+            block) &
             result(SHT_rv)
         use iso_c_binding, only : C_INT, C_PTR, C_SIZE_T
         class(UmpireResourceManager) :: obj
@@ -3376,13 +3376,13 @@ contains
         type(UmpireAllocator) :: SHT_rv
         ! splicer begin class.ResourceManager.method.make_allocator_quick_pool_untracked
         type(C_PTR) :: SHT_prv
-        SHT_prv = c_resourcemanager_make_alloc_quick_p_u_bufferify(obj%cxxmem, &
+        SHT_prv = c_resourcemanager_make_allocator_quick_pool_untracked_bufferify(obj%cxxmem, &
             name, len_trim(name, kind=C_INT), allocator%cxxmem, &
             initial_size, block, SHT_rv%cxxmem)
         ! splicer end class.ResourceManager.method.make_allocator_quick_pool_untracked
-    end function resourcemanager_make_allocator_quick_pool_untracked
+    end function make_alloc_quick_p_u
 
-    function make_allocator_ra_pool_untracked(obj, name, allocator, &
+    function make_alloc_res_aware_p_u(obj, name, allocator, &
             initial_size, block) &
             result(SHT_rv)
         use iso_c_binding, only : C_INT, C_PTR, C_SIZE_T
@@ -3394,14 +3394,13 @@ contains
         type(UmpireAllocator) :: SHT_rv
         ! splicer begin class.ResourceManager.method.make_allocator_resource_aware_pool_untracked
         type(C_PTR) :: SHT_prv
-        SHT_prv = c_resourcemanager_make_alloc_res_aware_p_u_bufferify(obj%cxxmem, &
+        SHT_prv = c_resourcemanager_make_allocator_resource_aware_pool_untracked_bufferify(obj%cxxmem, &
             name, len_trim(name, kind=C_INT), allocator%cxxmem, &
             initial_size, block, SHT_rv%cxxmem)
         ! splicer end class.ResourceManager.method.make_allocator_resource_aware_pool_untracked
-    end function make_allocator_ra_pool_untracked
+    end function make_alloc_res_aware_p_u
 
-    function resourcemanager_make_allocator_fixed_pool_untracked(obj, &
-            name, allocator, object_size) &
+    function make_alloc_fixed_p_u(obj, name, allocator, object_size) &
             result(SHT_rv)
         use iso_c_binding, only : C_INT, C_PTR, C_SIZE_T
         class(UmpireResourceManager) :: obj
@@ -3411,14 +3410,13 @@ contains
         type(UmpireAllocator) :: SHT_rv
         ! splicer begin class.ResourceManager.method.make_allocator_fixed_pool_untracked
         type(C_PTR) :: SHT_prv
-        SHT_prv = c_resourcemanager_make_alloc_fixed_p_u_bufferify(obj%cxxmem, &
+        SHT_prv = c_resourcemanager_make_allocator_fixed_pool_untracked_bufferify(obj%cxxmem, &
             name, len_trim(name, kind=C_INT), allocator%cxxmem, &
             object_size, SHT_rv%cxxmem)
         ! splicer end class.ResourceManager.method.make_allocator_fixed_pool_untracked
-    end function resourcemanager_make_allocator_fixed_pool_untracked
+    end function make_alloc_fixed_p_u
 
-    function resourcemanager_make_allocator_monotonic_untracked(obj, &
-            name, allocator, object_size) &
+    function make_alloc_monotonic_u(obj, name, allocator, object_size) &
             result(SHT_rv)
         use iso_c_binding, only : C_INT, C_PTR, C_SIZE_T
         class(UmpireResourceManager) :: obj
@@ -3428,14 +3426,13 @@ contains
         type(UmpireAllocator) :: SHT_rv
         ! splicer begin class.ResourceManager.method.make_allocator_monotonic_untracked
         type(C_PTR) :: SHT_prv
-        SHT_prv = c_resourcemanager_make_alloc_monotonic_u_bufferify(obj%cxxmem, &
+        SHT_prv = c_resourcemanager_make_allocator_monotonic_untracked_bufferify(obj%cxxmem, &
             name, len_trim(name, kind=C_INT), allocator%cxxmem, &
             object_size, SHT_rv%cxxmem)
         ! splicer end class.ResourceManager.method.make_allocator_monotonic_untracked
-    end function resourcemanager_make_allocator_monotonic_untracked
+    end function make_alloc_monotonic_u
 
-    function resourcemanager_make_allocator_slot_pool_untracked(obj, &
-            name, allocator, object_size) &
+    function make_alloc_slot_p_u(obj, name, allocator, object_size) &
             result(SHT_rv)
         use iso_c_binding, only : C_INT, C_PTR, C_SIZE_T
         class(UmpireResourceManager) :: obj
@@ -3445,17 +3442,17 @@ contains
         type(UmpireAllocator) :: SHT_rv
         ! splicer begin class.ResourceManager.method.make_allocator_slot_pool_untracked
         type(C_PTR) :: SHT_prv
-        SHT_prv = c_resourcemanager_make_alloc_slot_p_u_bufferify(obj%cxxmem, &
+        SHT_prv = c_resourcemanager_make_allocator_slot_pool_untracked_bufferify(obj%cxxmem, &
             name, len_trim(name, kind=C_INT), allocator%cxxmem, &
             object_size, SHT_rv%cxxmem)
         ! splicer end class.ResourceManager.method.make_allocator_slot_pool_untracked
-    end function resourcemanager_make_allocator_slot_pool_untracked
+    end function make_alloc_slot_p_u
 
-    function resourcemanager_make_allocator_mixed_pool_untracked(obj, &
-            name, allocator, smallest_fixed_obj_size, &
-            largest_fixed_obj_size, max_initial_fixed_pool_size, &
-            fixed_size_multiplier, quick_pool_initial_alloc_size, &
-            quick_pool_min_alloc_size, quick_pool_align_bytes) &
+    function make_alloc_mixed_p_u(obj, name, allocator, &
+            smallest_fixed_obj_size, largest_fixed_obj_size, &
+            max_initial_fixed_pool_size, fixed_size_multiplier, &
+            quick_pool_initial_alloc_size, quick_pool_min_alloc_size, &
+            quick_pool_align_bytes) &
             result(SHT_rv)
         use iso_c_binding, only : C_INT, C_PTR, C_SIZE_T
         class(UmpireResourceManager) :: obj
@@ -3471,14 +3468,14 @@ contains
         type(UmpireAllocator) :: SHT_rv
         ! splicer begin class.ResourceManager.method.make_allocator_mixed_pool_untracked
         type(C_PTR) :: SHT_prv
-        SHT_prv = c_resourcemanager_make_alloc_mixed_p_u_bufferify(obj%cxxmem, &
+        SHT_prv = c_resourcemanager_make_allocator_mixed_pool_untracked_bufferify(obj%cxxmem, &
             name, len_trim(name, kind=C_INT), allocator%cxxmem, &
             smallest_fixed_obj_size, largest_fixed_obj_size, &
             max_initial_fixed_pool_size, fixed_size_multiplier, &
             quick_pool_initial_alloc_size, quick_pool_min_alloc_size, &
             quick_pool_align_bytes, SHT_rv%cxxmem)
         ! splicer end class.ResourceManager.method.make_allocator_mixed_pool_untracked
-    end function resourcemanager_make_allocator_mixed_pool_untracked
+    end function make_alloc_mixed_p_u
 
     subroutine resourcemanager_add_alias(obj, name, allocator)
         use iso_c_binding, only : C_INT
