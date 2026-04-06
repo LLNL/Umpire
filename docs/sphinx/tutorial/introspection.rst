@@ -12,9 +12,9 @@ as well as other useful bits and pieces you might want to know.
 Umpire supports multiple *introspection levels* to control the overhead of
 recording allocation metadata:
 
-- ``low``: track only allocator + size for each pointer
-- ``medium``: ``low`` + named-allocation labels
-- ``high``: ``medium`` + allocation backtraces (if enabled via ``UMPIRE_BACKTRACE``)
+- ``off``: disable public introspection queries
+- ``basic``: track only exact allocation-pointer ownership
+- ``on``: track full allocation metadata and backtraces (if enabled via ``UMPIRE_BACKTRACE``)
 
 The level can be set via the ``UMPIRE_INTROSPECTION_LEVEL`` environment
 variable, or programmatically with
@@ -44,7 +44,8 @@ You can also find out how big the allocation is, in case you forgot:
    :end-before: _sphinx_tag_tut_getsize_end
    :language: C++
 
-Remember that these functions will work on any allocation made using an
-Allocator or :class:`umpire::TypedAllocator`.
+These functions require the global introspection level to be ``on``. With
+``basic``, only exact-pointer ownership checks such as
+``umpire::ResourceManager::hasAllocator`` remain available.
 
 .. literalinclude:: ../../../examples/tutorial/tut_introspection.cpp

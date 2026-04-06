@@ -114,7 +114,7 @@ TEST(IntrospectionTest, RegisterNull)
   EXPECT_THROW(rm.registerAllocation(nullptr, record), umpire::runtime_error);
 }
 
-TEST(IntrospectionLevelTest, NamedAllocationRecordedByLevel)
+TEST(IntrospectionLevelTest, OnTracksNamedAllocationMetadata)
 {
   auto& rm = umpire::ResourceManager::getInstance();
   IntrospectionLevelGuard guard{rm};
@@ -124,27 +124,55 @@ TEST(IntrospectionLevelTest, NamedAllocationRecordedByLevel)
   const std::string alloc_name{"my_named_alloc"};
   constexpr std::size_t size{64};
 
-  rm.setIntrospectionLevel(umpire::IntrospectionLevel::Low);
-  {
-    void* p = allocator.allocate(alloc_name, size);
-    ASSERT_TRUE(rm.hasAllocator(p));
-    EXPECT_TRUE(rm.findAllocationRecord(p)->name.empty());
-    allocator.deallocate(p);
-  }
-
-  rm.setIntrospectionLevel(umpire::IntrospectionLevel::Medium);
+  rm.setIntrospectionLevel(umpire::IntrospectionLevel::On);
   {
     void* p = allocator.allocate(alloc_name, size);
     ASSERT_TRUE(rm.hasAllocator(p));
     EXPECT_EQ(rm.findAllocationRecord(p)->name, alloc_name);
     allocator.deallocate(p);
   }
+}
 
-  rm.setIntrospectionLevel(umpire::IntrospectionLevel::High);
+TEST(IntrospectionLevelTest, BasicTracksExactPointerOwnershipOnly)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  IntrospectionLevelGuard guard{rm};
+
+  umpire::Allocator allocator{rm.getAllocator("HOST")};
+
+  const std::string alloc_name{"my_named_alloc"};
+  constexpr std::size_t size{64};
+
+  rm.setIntrospectionLevel(umpire::IntrospectionLevel::Basic);
+
   {
     void* p = allocator.allocate(alloc_name, size);
     ASSERT_TRUE(rm.hasAllocator(p));
-    EXPECT_EQ(rm.findAllocationRecord(p)->name, alloc_name);
+    EXPECT_FALSE(rm.hasAllocator(static_cast<char*>(p) + 1));
+    EXPECT_THROW(rm.findAllocationRecord(p), umpire::runtime_error);
+    EXPECT_THROW(rm.getAllocator(p), umpire::runtime_error);
+    EXPECT_THROW(rm.getSize(p), umpire::runtime_error);
+    EXPECT_THROW(umpire::get_allocator_records(allocator), umpire::runtime_error);
+    allocator.deallocate(p);
+  }
+}
+
+TEST(IntrospectionLevelTest, OffDisablesPublicOwnershipQueries)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  IntrospectionLevelGuard guard{rm};
+
+  umpire::Allocator allocator{rm.getAllocator("HOST")};
+  constexpr std::size_t size{64};
+
+  rm.setIntrospectionLevel(umpire::IntrospectionLevel::Off);
+
+  {
+    void* p = allocator.allocate(size);
+    EXPECT_FALSE(rm.hasAllocator(p));
+    EXPECT_THROW(rm.findAllocationRecord(p), umpire::runtime_error);
+    EXPECT_THROW(rm.getAllocator(p), umpire::runtime_error);
+    EXPECT_THROW(rm.getSize(p), umpire::runtime_error);
     allocator.deallocate(p);
   }
 }

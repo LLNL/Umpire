@@ -36,10 +36,10 @@ void Inspector::registerAllocation(void* ptr, std::size_t size, strategy::Alloca
   }
 
   auto& rm = ResourceManager::getInstance();
-  if (rm.getIntrospectionLevel() == IntrospectionLevel::Low) {
-    rm.registerAllocation(ptr, {ptr, size, s});
-  } else {
+  if (rm.getIntrospectionLevel() == IntrospectionLevel::On) {
     rm.registerAllocation(ptr, {ptr, size, s, name});
+  } else {
+    rm.registerAllocation(ptr, {ptr, size, s});
   }
 }
 

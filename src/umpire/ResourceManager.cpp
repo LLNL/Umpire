@@ -56,22 +56,37 @@ bool case_insensitive_match(const std::string& s1, const std::string& s2)
          });
 }
 
-IntrospectionLevel parse_introspection_level(const char* enval) noexcept
+IntrospectionLevel parse_introspection_level(const char* enval)
 {
   if (!enval) {
-    return IntrospectionLevel::High;
+    return IntrospectionLevel::On;
   }
 
   const std::string val{enval};
-  if (case_insensitive_match(val, "LOW")) {
-    return IntrospectionLevel::Low;
-  } else if (case_insensitive_match(val, "MEDIUM")) {
-    return IntrospectionLevel::Medium;
-  } else if (case_insensitive_match(val, "HIGH")) {
-    return IntrospectionLevel::High;
+  if (case_insensitive_match(val, "OFF")) {
+    return IntrospectionLevel::Off;
+  } else if (case_insensitive_match(val, "BASIC")) {
+    return IntrospectionLevel::Basic;
+  } else if (case_insensitive_match(val, "ON")) {
+    return IntrospectionLevel::On;
   }
 
-  return IntrospectionLevel::High;
+  UMPIRE_ERROR(runtime_error,
+               fmt::format("Invalid value \"{}\" for {}. Expected one of: on, basic, off.", val,
+                           s_introspection_level_env_name));
+  return IntrospectionLevel::On;
+}
+
+bool requires_full_introspection(IntrospectionLevel level) noexcept
+{
+  return level == IntrospectionLevel::On;
+}
+
+void throw_requires_full_introspection(const char* operation, IntrospectionLevel level)
+{
+  UMPIRE_ERROR(runtime_error,
+               fmt::format("{} requires introspection level \"on\". Current level is \"{}\".", operation,
+                           to_string(level)));
 }
 } // namespace
 
@@ -85,6 +100,7 @@ ResourceManager& ResourceManager::getInstance()
 
 ResourceManager::ResourceManager()
     : m_allocations(),
+      m_exact_allocations(),
       m_allocators(),
       m_shared_allocator_names(),
       m_allocators_by_id(),
@@ -95,7 +111,8 @@ ResourceManager::ResourceManager()
       m_zero_byte_pool(nullptr),
       m_introspection_level{parse_introspection_level(std::getenv(s_introspection_level_env_name))},
       m_id(0),
-      m_mutex()
+      m_mutex(),
+      m_exact_allocations_mutex()
 {
   UMPIRE_LOG(Debug, "() entering");
 
@@ -115,7 +132,7 @@ ResourceManager::~ResourceManager()
     if (allocator->getCurrentSize() != 0) {
       std::stringstream ss;
 
-      umpire::print_allocator_records(Allocator{allocator.get()}, ss);
+      printTrackedAllocationRecords(allocator.get(), ss);
 
       UMPIRE_LOG(Error, allocator->getName()
                             << " Allocator still has " << allocator->getCurrentSize() << " bytes allocated" << std::endl
@@ -411,7 +428,7 @@ void ResourceManager::destroyAllocator(const std::string& name, bool free_alloca
                  fmt::format("Cannot destroy builtin allocator \"{}\"", name));
   }
 
-  auto records = umpire::get_allocator_records(Allocator(strategy));
+  auto records = getTrackedAllocationRecords(strategy);
 
   if (isStrictDestructionMode()) {
     if (!records.empty() && !free_allocations) {
@@ -531,6 +548,10 @@ void ResourceManager::destroyAllocator(int id, bool free_allocations)
 Allocator ResourceManager::getAllocator(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
+  const auto level = getIntrospectionLevel();
+  if (!requires_full_introspection(level)) {
+    throw_requires_full_introspection("ResourceManager::getAllocator(void*)", level);
+  }
   return Allocator(findAllocatorForPointer(ptr));
 }
 
@@ -552,7 +573,97 @@ bool ResourceManager::hasAllocator(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
 
-  return m_allocations.contains(ptr);
+  const auto level = getIntrospectionLevel();
+  if (level == IntrospectionLevel::On) {
+    return m_allocations.contains(ptr);
+  }
+  if (level == IntrospectionLevel::Basic) {
+    return hasExactAllocation(ptr);
+  }
+
+  return false;
+}
+
+void ResourceManager::registerExactAllocation(void* ptr, const util::AllocationRecord& record)
+{
+  std::lock_guard<std::mutex> lock(m_exact_allocations_mutex);
+  m_exact_allocations[ptr].push_back({record.size, record.strategy});
+}
+
+util::AllocationRecord ResourceManager::deregisterExactAllocation(void* ptr)
+{
+  std::lock_guard<std::mutex> lock(m_exact_allocations_mutex);
+
+  auto iter = m_exact_allocations.find(ptr);
+  if (iter == m_exact_allocations.end() || iter->second.empty()) {
+    UMPIRE_ERROR(runtime_error, fmt::format("Cannot remove {}", ptr));
+  }
+
+  auto record = iter->second.back();
+  iter->second.pop_back();
+  if (iter->second.empty()) {
+    m_exact_allocations.erase(iter);
+  }
+
+  return {ptr, record.size, record.strategy};
+}
+
+bool ResourceManager::hasExactAllocation(void* ptr) const
+{
+  std::lock_guard<std::mutex> lock(m_exact_allocations_mutex);
+  auto iter = m_exact_allocations.find(ptr);
+  return iter != m_exact_allocations.end() && !iter->second.empty();
+}
+
+ResourceManager::ExactAllocationRecord ResourceManager::getExactAllocation(void* ptr) const
+{
+  std::lock_guard<std::mutex> lock(m_exact_allocations_mutex);
+
+  auto iter = m_exact_allocations.find(ptr);
+  if (iter == m_exact_allocations.end() || iter->second.empty()) {
+    UMPIRE_ERROR(unknown_pointer_error, fmt::format("Allocation not mapped: {}", ptr));
+  }
+
+  return iter->second.back();
+}
+
+std::vector<util::AllocationRecord>
+ResourceManager::getTrackedAllocationRecords(strategy::AllocationStrategy* strategy) const
+{
+  std::vector<util::AllocationRecord> records;
+  if (getIntrospectionLevel() == IntrospectionLevel::On) {
+    std::copy_if(m_allocations.begin(), m_allocations.end(), std::back_inserter(records),
+                 [strategy](const util::AllocationRecord& rec) { return rec.strategy == strategy; });
+    return records;
+  }
+
+  std::lock_guard<std::mutex> lock(m_exact_allocations_mutex);
+  for (const auto& entry : m_exact_allocations) {
+    for (const auto& record : entry.second) {
+      if (record.strategy == strategy) {
+        records.emplace_back(entry.first, record.size, record.strategy);
+      }
+    }
+  }
+
+  return records;
+}
+
+void ResourceManager::printTrackedAllocationRecords(strategy::AllocationStrategy* strategy, std::ostream& os) const
+{
+  if (getIntrospectionLevel() == IntrospectionLevel::On) {
+    m_allocations.print([strategy](const util::AllocationRecord& rec) { return rec.strategy == strategy; }, os);
+    return;
+  }
+
+  for (const auto& record : getTrackedAllocationRecords(strategy)) {
+    auto end_ptr = static_cast<unsigned char*>(record.ptr) + record.size;
+    os << record.ptr << " {" << std::endl;
+    os << "  size: " << record.size << ", "
+       << "range: " << reinterpret_cast<void*>(record.ptr) << " -- " << reinterpret_cast<void*>(end_ptr)
+       << std::endl;
+    os << "}" << std::endl;
+  }
 }
 
 void ResourceManager::registerAllocation(void* ptr, util::AllocationRecord record)
@@ -565,23 +676,31 @@ void ResourceManager::registerAllocation(void* ptr, util::AllocationRecord recor
              "(ptr=" << ptr << ", size=" << record.size << ", strategy=" << record.strategy << ") with " << this);
 
   const auto level = getIntrospectionLevel();
-  if (level == IntrospectionLevel::High) {
+  if (level == IntrospectionLevel::On) {
     UMPIRE_RECORD_BACKTRACE(record);
-  } else if (level == IntrospectionLevel::Low) {
-    record.name.clear();
+    m_allocations.insert(ptr, record);
+  } else {
+    registerExactAllocation(ptr, record);
   }
-
-  m_allocations.insert(ptr, record);
 }
 
 util::AllocationRecord ResourceManager::deregisterAllocation(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
-  return m_allocations.remove(ptr);
+  if (getIntrospectionLevel() == IntrospectionLevel::On) {
+    return m_allocations.remove(ptr);
+  }
+
+  return deregisterExactAllocation(ptr);
 }
 
 const util::AllocationRecord* ResourceManager::findAllocationRecord(void* ptr) const
 {
+  const auto level = getIntrospectionLevel();
+  if (!requires_full_introspection(level)) {
+    throw_requires_full_introspection("ResourceManager::findAllocationRecord(void*)", level);
+  }
+
   auto alloc_record = m_allocations.find(ptr);
 
   if (!alloc_record->strategy) {
@@ -596,6 +715,10 @@ const util::AllocationRecord* ResourceManager::findAllocationRecord(void* ptr) c
 void ResourceManager::copy(void* dst_ptr, void* src_ptr, std::size_t size)
 {
   UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", dst_ptr=" << dst_ptr << ", size=" << size << ")");
+  const auto level = getIntrospectionLevel();
+  if (!requires_full_introspection(level)) {
+    throw_requires_full_introspection("ResourceManager::copy", level);
+  }
 
   auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
@@ -641,6 +764,10 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::copy(voi
                                                                              std::size_t size)
 {
   UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", dst_ptr=" << dst_ptr << ", size=" << size << ")");
+  const auto level = getIntrospectionLevel();
+  if (!requires_full_introspection(level)) {
+    throw_requires_full_introspection("ResourceManager::copy", level);
+  }
 
   auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
@@ -684,6 +811,10 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::copy(voi
 void ResourceManager::memset(void* ptr, int value, std::size_t length)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ", value=" << value << ", length=" << length << ")");
+  const auto level = getIntrospectionLevel();
+  if (!requires_full_introspection(level)) {
+    throw_requires_full_introspection("ResourceManager::memset", level);
+  }
 
   auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
@@ -721,6 +852,10 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::memset(v
                                                                                std::size_t length)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ", value=" << value << ", length=" << length << ")");
+  const auto level = getIntrospectionLevel();
+  if (!requires_full_introspection(level)) {
+    throw_requires_full_introspection("ResourceManager::memset", level);
+  }
 
   auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
@@ -756,6 +891,11 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::memset(v
 
 void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size)
 {
+  const auto level = getIntrospectionLevel();
+  if (!requires_full_introspection(level)) {
+    throw_requires_full_introspection("ResourceManager::reallocate", level);
+  }
+
   strategy::AllocationStrategy* strategy;
 
   if (current_ptr != nullptr) {
@@ -790,6 +930,11 @@ void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size)
 
 void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size, camp::resources::Resource& ctx)
 {
+  const auto level = getIntrospectionLevel();
+  if (!requires_full_introspection(level)) {
+    throw_requires_full_introspection("ResourceManager::reallocate", level);
+  }
+
   strategy::AllocationStrategy* strategy;
 
   if (current_ptr != nullptr) {
@@ -825,6 +970,11 @@ void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size, camp:
 
 void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size, Allocator alloc)
 {
+  const auto level = getIntrospectionLevel();
+  if (!requires_full_introspection(level)) {
+    throw_requires_full_introspection("ResourceManager::reallocate", level);
+  }
+
   umpire::event::record([&](auto& event) {
     event.name("reallocate")
         .category(event::category::operation)
@@ -851,6 +1001,11 @@ void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size, Alloc
 void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size, Allocator alloc,
                                   camp::resources::Resource& ctx)
 {
+  const auto level = getIntrospectionLevel();
+  if (!requires_full_introspection(level)) {
+    throw_requires_full_introspection("ResourceManager::reallocate", level);
+  }
+
   umpire::event::record([&](auto& event) {
     event.name("reallocate")
         .category(event::category::operation)
@@ -879,6 +1034,10 @@ void* ResourceManager::reallocate_impl(void* current_ptr, std::size_t new_size, 
 {
   UMPIRE_LOG(Debug, "(current_ptr=" << current_ptr << ", new_size=" << new_size << ", with Allocator "
                                     << allocator.getName() << ")");
+  const auto level = getIntrospectionLevel();
+  if (!requires_full_introspection(level)) {
+    throw_requires_full_introspection("ResourceManager::reallocate", level);
+  }
 
   void* new_ptr;
 
@@ -930,6 +1089,10 @@ void* ResourceManager::reallocate_impl(void* current_ptr, std::size_t new_size, 
 {
   UMPIRE_LOG(Debug, "(current_ptr=" << current_ptr << ", new_size=" << new_size << ", with Allocator "
                                     << allocator.getName() << ")");
+  const auto level = getIntrospectionLevel();
+  if (!requires_full_introspection(level)) {
+    throw_requires_full_introspection("ResourceManager::reallocate", level);
+  }
 
   void* new_ptr;
 
@@ -979,6 +1142,10 @@ void* ResourceManager::reallocate_impl(void* current_ptr, std::size_t new_size, 
 void* ResourceManager::move(void* ptr, Allocator allocator)
 {
   UMPIRE_LOG(Debug, "(src_ptr=" << ptr << ", allocator=" << allocator.getName() << ")");
+  const auto level = getIntrospectionLevel();
+  if (!requires_full_introspection(level)) {
+    throw_requires_full_introspection("ResourceManager::move", level);
+  }
 
   auto alloc_record = m_allocations.find(ptr);
 
@@ -1056,6 +1223,10 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::prefetch
                                                                                  camp::resources::Resource& ctx)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ", device=" << device << ")");
+  const auto level = getIntrospectionLevel();
+  if (!requires_full_introspection(level)) {
+    throw_requires_full_introspection("ResourceManager::prefetch", level);
+  }
 
   auto& op_registry = op::MemoryOperationRegistry::getInstance();
   auto alloc_record = m_allocations.find(ptr);
@@ -1081,6 +1252,11 @@ void ResourceManager::deallocate(void* ptr)
 
 std::size_t ResourceManager::getSize(void* ptr) const
 {
+  const auto level = getIntrospectionLevel();
+  if (!requires_full_introspection(level)) {
+    throw_requires_full_introspection("ResourceManager::getSize(void*)", level);
+  }
+
   auto record = m_allocations.find(ptr);
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ") returning " << record->size);
   return record->size;
@@ -1105,14 +1281,25 @@ strategy::AllocationStrategy* ResourceManager::findAllocatorForId(int id)
 
 strategy::AllocationStrategy* ResourceManager::findAllocatorForPointer(void* ptr)
 {
-  auto allocation_record = m_allocations.find(ptr);
+  if (getIntrospectionLevel() == IntrospectionLevel::On) {
+    auto allocation_record = m_allocations.find(ptr);
 
-  if (!allocation_record->strategy) {
+    if (!allocation_record->strategy) {
+      UMPIRE_ERROR(runtime_error, fmt::format("Cannot find allocator for pointer: {}", ptr));
+    }
+
+    UMPIRE_LOG(Debug, "(ptr=" << ptr << ") returning " << allocation_record->strategy);
+    return allocation_record->strategy;
+  }
+
+  auto allocation_record = getExactAllocation(ptr);
+
+  if (!allocation_record.strategy) {
     UMPIRE_ERROR(runtime_error, fmt::format("Cannot find allocator for pointer: {}", ptr));
   }
 
-  UMPIRE_LOG(Debug, "(ptr=" << ptr << ") returning " << allocation_record->strategy);
-  return allocation_record->strategy;
+  UMPIRE_LOG(Debug, "(ptr=" << ptr << ") returning " << allocation_record.strategy);
+  return allocation_record.strategy;
 }
 
 std::vector<std::string> ResourceManager::getAllocatorNames() const noexcept

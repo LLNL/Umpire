@@ -11,8 +11,8 @@ metadata.
 
 .. note::
     Disabling introspection turns off *all* allocation metadata tracking for
-    that Allocator. If you still need pointer->(allocator,size) tracking but want
-    to reduce overhead, consider using a lower global introspection level via
+    that Allocator. If you still need exact-pointer ownership tracking but want
+    to reduce overhead, consider using the global ``basic`` introspection level via
     ``UMPIRE_INTROSPECTION_LEVEL``.
 
 .. warning::

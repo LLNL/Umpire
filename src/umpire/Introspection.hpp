@@ -14,23 +14,23 @@ namespace umpire {
 /*!
  * \brief Controls how much allocation metadata Umpire records for tracked allocations.
  *
- * - Low:    Track pointer->(allocator,size) only (fastest, non-invasive).
- * - Medium: Low + track allocation names (from named allocations).
- * - High:   Medium + track allocation backtraces (if enabled via UMPIRE_BACKTRACE).
+ * - Off:   Disable public introspection tracking.
+ * - Basic: Track exact allocation-pointer ownership only.
+ * - On:    Track full allocation metadata and backtraces (if enabled).
  */
-enum class IntrospectionLevel { Low, Medium, High };
+enum class IntrospectionLevel { Off, Basic, On };
 
 inline std::string to_string(IntrospectionLevel level)
 {
   switch (level) {
-    case IntrospectionLevel::Low:
-      return "low";
-    case IntrospectionLevel::Medium:
-      return "medium";
-    case IntrospectionLevel::High:
-      return "high";
+    case IntrospectionLevel::Off:
+      return "off";
+    case IntrospectionLevel::Basic:
+      return "basic";
+    case IntrospectionLevel::On:
+      return "on";
   }
-  return "high";
+  return "on";
 }
 
 } // end namespace umpire
