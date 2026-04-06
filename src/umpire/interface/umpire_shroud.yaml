@@ -277,7 +277,9 @@ declarations:
 
       # Untracked pool allocators use the bool template instantiations directly.
       # Keep the template suffixes short so generated Fortran bufferify helpers
-      # stay below compiler identifier limits.
+      # stay below compiler identifier limits. The generated C bufferify
+      # wrappers for these explicit non-type template instantiations are
+      # corrected via the C splicer file listed below.
       - decl: template <typename T, bool B> Allocator makeAllocator(const std::string& name, Allocator allocator, size_t initial_size, size_t block);
         options:
           F_create_generic: False
@@ -393,5 +395,7 @@ declarations:
       - decl: void deregisterAllocation(void* ptr)
 
 splicer:
+  c:
+  - c_fortran/gencumpiresplicer.inc
   f:
   - c_fortran/genfumpiresplicer.f
