@@ -1,0 +1,141 @@
+---
+# Prometheus alert rules for Umpire memory allocation monitoring
+#
+# To use these alerts, add this file to your Prometheus configuration:
+#
+# rule_files:
+#   - "umpire-alerts.yml"
+#
+# Alerts will be evaluated at the interval specified in the alert group.
+# Firing alerts can be sent to Alertmanager for notification (email, Slack, PagerDuty, etc.)
+
+groups:
+  - name: umpire_memory_alerts
+    interval: 30s
+    rules:
+      # Alert when allocation rate exceeds deallocation rate by more than 20% for 10 minutes
+      # This indicates a potential memory leak
+      - alert: UmpireMemoryLeak
+        expr: |
+          rate(umpire_allocations_total[5m]) >
+          rate(umpire_deallocations_total[5m]) * 1.2
+        for: 10m
+        labels:
+          severity: warning
+          component: umpire
+          alert_type: leak
+        annotations:
+          summary: "Memory leak detected in rank {{ $labels.rank }}"
+          description: |
+            Allocation rate ({{ $value | humanize }}ops/sec) exceeds deallocation rate by >20% for 10 minutes.
+            This indicates a potential memory leak in rank {{ $labels.rank }}.
+            Check the application code for missing deallocations or increase monitoring interval.
+          dashboard: "https://grafana.example.com/d/umpire-overview"
+          runbook_url: "https://docs.example.com/umpire/troubleshooting/memory-leaks"
+
+      # Alert when memory usage exceeds 10GB for 5 minutes
+      # Adjust threshold based on your system's available memory
+      - alert: UmpireHighMemoryUsage
+        expr: umpire_bytes_allocated > 10 * 1024 * 1024 * 1024
+        for: 5m
+        labels:
+          severity: warning
+          component: umpire
+          alert_type: high_usage
+        annotations:
+          summary: "High memory usage in rank {{ $labels.rank }}"
+          description: |
+            Allocator {{ $labels.allocator }} in rank {{ $labels.rank }} is using {{ $value | humanize }}B.
+            This exceeds the 10GB threshold and may lead to OOM errors.
+            Consider increasing memory limits or optimizing memory usage.
+          dashboard: "https://grafana.example.com/d/umpire-overview"
+          runbook_url: "https://docs.example.com/umpire/troubleshooting/high-memory"
+
+      # Alert when allocation rate exceeds 1000 ops/sec for 2 minutes
+      # This could indicate an allocation storm or unexpected behavior
+      - alert: UmpireAllocationStorm
+        expr: rate(umpire_allocations_total[1m]) > 1000
+        for: 2m
+        labels:
+          severity: info
+          component: umpire
+          alert_type: high_rate
+        annotations:
+          summary: "High allocation rate detected in rank {{ $labels.rank }}"
+          description: |
+            Rank {{ $labels.rank }} is allocating {{ $value | humanize }} times per second.
+            This may be expected during initialization, but sustained high rates could
+            indicate inefficient memory usage patterns or excessive fragmentation.
+          dashboard: "https://grafana.example.com/d/umpire-overview"
+          runbook_url: "https://docs.example.com/umpire/troubleshooting/allocation-storms"
+
+      # Alert when cumulative memory across all ranks exceeds 1TB
+      # Adjust threshold based on your cluster's total memory
+      - alert: UmpireClusterMemoryUsage
+        expr: sum(umpire_bytes_allocated) > 1 * 1024 * 1024 * 1024 * 1024
+        for: 5m
+        labels:
+          severity: critical
+          component: umpire
+          alert_type: cluster_high_usage
+        annotations:
+          summary: "Total cluster memory usage exceeds 1TB"
+          description: |
+            Cumulative memory usage across all ranks is {{ $value | humanize }}B.
+            This exceeds the 1TB threshold and may impact cluster performance.
+            Review per-rank usage in the dashboard to identify hotspots.
+          dashboard: "https://grafana.example.com/d/umpire-overview"
+          runbook_url: "https://docs.example.com/umpire/troubleshooting/cluster-memory"
+
+      # Alert when deallocation rate drops to zero (potential stuck process)
+      - alert: UmpireNoDeallocationActivity
+        expr: rate(umpire_deallocations_total[5m]) == 0 and rate(umpire_allocations_total[5m]) > 0
+        for: 15m
+        labels:
+          severity: warning
+          component: umpire
+          alert_type: stalled_dealloc
+        annotations:
+          summary: "No deallocation activity in rank {{ $labels.rank }}"
+          description: |
+            Rank {{ $labels.rank }} is still allocating but has stopped deallocating for 15 minutes.
+            This may indicate a stalled process or memory accumulation issue.
+            Check if the process is still responsive.
+          dashboard: "https://grafana.example.com/d/umpire-overview"
+          runbook_url: "https://docs.example.com/umpire/troubleshooting/stalled-process"
+
+      # Alert when average allocation size grows unexpectedly large
+      - alert: UmpireLargeAllocationSize
+        expr: |
+          (rate(umpire_allocation_size_bytes_sum[5m]) /
+           rate(umpire_allocation_size_bytes_count[5m])) > 100 * 1024 * 1024
+        for: 5m
+        labels:
+          severity: info
+          component: umpire
+          alert_type: large_alloc
+        annotations:
+          summary: "Large average allocation size detected in rank {{ $labels.rank }}"
+          description: |
+            Average allocation size is {{ $value | humanize }}B in rank {{ $labels.rank }}.
+            This exceeds 100MB and may indicate large contiguous allocations.
+            Verify this is expected behavior for your application.
+          dashboard: "https://grafana.example.com/d/umpire-overview"
+          runbook_url: "https://docs.example.com/umpire/best-practices/allocation-sizes"
+
+      # Alert when metrics stop updating (potential monitoring failure)
+      - alert: UmpireMetricsStale
+        expr: time() - timestamp(umpire_allocations_total) > 300
+        for: 1m
+        labels:
+          severity: critical
+          component: umpire
+          alert_type: monitoring_failure
+        annotations:
+          summary: "Umpire metrics are stale for rank {{ $labels.rank }}"
+          description: |
+            Metrics from rank {{ $labels.rank }} haven't updated in over 5 minutes.
+            This indicates a problem with the streaming infrastructure, network connectivity,
+            or the process may have crashed. Check prometheus_backend logs.
+          dashboard: "https://grafana.example.com/d/umpire-overview"
+          runbook_url: "https://docs.example.com/umpire/troubleshooting/metrics-stale"

@@ -38,6 +38,7 @@ option(UMPIRE_ENABLE_ASAN "Enable use with address sanitizer tools" Off)
 option(UMPIRE_ENABLE_SANITIZER_TESTS "Enable address sanitizer tests" Off)
 option(UMPIRE_ENABLE_DEVICE_ALLOCATOR "Enable Device Allocator" Off)
 option(UMPIRE_ENABLE_SQLITE_EXPERIMENTAL "Build with sqlite event integration (experimental)" Off)
+option(UMPIRE_ENABLE_STREAMING "Enable event streaming infrastructure (Prometheus metrics)" Off)
 option(UMPIRE_DISABLE_ALLOCATIONMAP_DEBUG "Disable verbose output from AllocationMap during debug builds" Off)
 set(UMPIRE_FMT_TARGET fmt::fmt-header-only CACHE STRING "Name of fmt target to use") 
 

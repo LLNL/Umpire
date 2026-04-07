@@ -10,11 +10,13 @@ set (umpire_event_headers
   event_store.hpp
   event_store_recorder.hpp
   json_file_store.hpp
+  recorder_chain.hpp
   recorder_factory.hpp)
 
 set (umpire_event_sources
   event_store_recorder.cpp
   json_file_store.cpp
+  recorder_chain.cpp
   recorder_factory.cpp)
 
 set (umpire_event_depends ${UMPIRE_FMT_TARGET} umpire_tpl_json camp)
@@ -31,15 +33,29 @@ if (UMPIRE_ENABLE_HIP)
     blt::hip_runtime)
 endif ()
 
-if (NOT WIN32)
-set (umpire_event_headers ${umpire_event_headers} quest_database.hpp)
-set (umpire_event_sources ${umpire_event_sources} quest_database.cpp)
-endif()
 
 if (UMPIRE_ENABLE_SQLITE_EXPERIMENTAL)
   set (umpire_event_headers ${umpire_event_headers} sqlite_database.hpp)
   set (umpire_event_sources ${umpire_event_sources} sqlite_database.cpp)
   set (umpire_event_depends ${umpire_event_depends} SQLite::SQLite3)
+endif()
+
+if (UMPIRE_ENABLE_STREAMING)
+  set (umpire_event_headers ${umpire_event_headers}
+    streaming_backend.hpp
+    streaming_event_sink.hpp
+    metrics_aggregator.hpp
+    prometheus_backend.hpp)
+  set (umpire_event_sources ${umpire_event_sources}
+    streaming_event_sink.cpp
+    metrics_aggregator.cpp
+    prometheus_backend.cpp)
+
+  # Find libcurl for HTTP POST to Prometheus
+  find_package(CURL REQUIRED)
+
+  # TODO: Add snappy for Prometheus remote-write protobuf compression
+  # find_package(Snappy REQUIRED)
 endif()
 
 blt_add_library(
@@ -56,6 +72,11 @@ target_include_directories(
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+
+if (UMPIRE_ENABLE_STREAMING)
+  target_link_libraries(umpire_event PUBLIC ${CURL_LIBRARIES})
+  target_include_directories(umpire_event SYSTEM PUBLIC ${CURL_INCLUDE_DIRS})
+endif()
 
 install(FILES
   ${umpire_event_headers}

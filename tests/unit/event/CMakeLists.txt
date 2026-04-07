@@ -44,3 +44,26 @@ blt_add_executable(
 blt_add_test(
   NAME event_recording_tests
   COMMAND event_recording_tests)
+
+# Streaming infrastructure tests (only when UMPIRE_ENABLE_STREAMING is On)
+if (UMPIRE_ENABLE_STREAMING)
+  # Metrics aggregator tests
+  blt_add_executable(
+    NAME metrics_aggregator_tests
+    SOURCES metrics_aggregator_tests.cpp
+    DEPENDS_ON umpire gtest)
+
+  blt_add_test(
+    NAME metrics_aggregator_tests
+    COMMAND metrics_aggregator_tests)
+
+  # Recorder chain tests
+  blt_add_executable(
+    NAME recorder_chain_tests
+    SOURCES recorder_chain_tests.cpp
+    DEPENDS_ON umpire gtest)
+
+  blt_add_test(
+    NAME recorder_chain_tests
+    COMMAND recorder_chain_tests)
+endif()
