@@ -1093,9 +1093,8 @@ int ResourceManager::getNextId() noexcept
 std::string ResourceManager::getAllocatorInformation() const noexcept
 {
   std::ostringstream info;
-
-  for (auto& it : m_allocators_by_name) {
-    info << *it.second << " ";
+  for (const auto& name : resource::MemoryResourceRegistry::getInstance().getResourceNames()) {
+    info << name << ' ';
   }
 
   return info.str();
