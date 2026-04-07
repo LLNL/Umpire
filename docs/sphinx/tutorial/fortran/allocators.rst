@@ -3,7 +3,7 @@
 =======================
 FORTRAN API: Allocators
 =======================
-
+    
 The fundamental concept for accessing memory through Umpire is an
 :class:`umpire:Allocator`. In FORTRAN, this means using the type
 ``UmpireAllocator``. This type provides an ``allocate_pointer`` function to
