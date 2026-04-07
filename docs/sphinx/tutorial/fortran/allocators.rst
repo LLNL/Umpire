@@ -31,3 +31,7 @@ deallocate memory:
 
 In this case, we allocate a one-dimensional array using the generic
 ``allocate`` function.
+
+.. note:: 
+
+   Umpire's FORTRAN interface is generated with the help of `Shroud <https://shroud.readthedocs.io/en/latest/>`_.
