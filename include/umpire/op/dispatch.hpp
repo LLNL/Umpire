@@ -42,7 +42,7 @@ inline auto dispatch(camp::resources::Platform platform, Args&&... args)
 #endif
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
     case camp::resources::Platform::omp_target:
-      return Op<resource::openmp_target_platform>::exec(std::forward<Args>(args)...);
+      return Op<resource::omp_target_platform>::exec(std::forward<Args>(args)...);
 #endif
     default:
       UMPIRE_ERROR(runtime_error, "Unknown platform for operation");
@@ -81,7 +81,7 @@ inline auto dispatch(camp::resources::Platform src_platform, camp::resources::Pl
 #endif
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
       case camp::resources::Platform::omp_target:
-        return Op<resource::openmp_target_platform, resource::openmp_target_platform>::exec(
+        return Op<resource::omp_target_platform, resource::omp_target_platform>::exec(
             std::forward<Args>(args)...);
 #endif
       default:
@@ -119,10 +119,10 @@ inline auto dispatch(camp::resources::Platform src_platform, camp::resources::Pl
 
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
   if (src_platform == camp::resources::Platform::host && dst_platform == camp::resources::Platform::omp_target) {
-    return Op<resource::host_platform, resource::openmp_target_platform>::exec(std::forward<Args>(args)...);
+    return Op<resource::host_platform, resource::omp_target_platform>::exec(std::forward<Args>(args)...);
   }
   if (src_platform == camp::resources::Platform::omp_target && dst_platform == camp::resources::Platform::host) {
-    return Op<resource::openmp_target_platform, resource::host_platform>::exec(std::forward<Args>(args)...);
+    return Op<resource::omp_target_platform, resource::host_platform>::exec(std::forward<Args>(args)...);
   }
 #endif
 
@@ -194,7 +194,7 @@ inline T* reallocate_v2(T** ptr, std::size_t new_size)
   auto* new_ptr = static_cast<T*>(owner->allocate(new_bytes));
   const std::size_t copy_bytes = min(old_bytes, new_bytes);
 
-  dispatch<copy>(platform, platform, static_cast<void*>(current_ptr), static_cast<void*>(new_ptr), copy_bytes);
+  dispatch<::umpire::op::copy>(platform, platform, static_cast<void*>(current_ptr), static_cast<void*>(new_ptr), copy_bytes);
   owner->deallocate(current_ptr);
   *ptr = new_ptr;
 
@@ -226,7 +226,7 @@ inline camp::resources::EventProxy<camp::resources::Resource> reallocate_v2_asyn
 
   auto* new_ptr = static_cast<T*>(owner->allocate(new_bytes));
   const std::size_t copy_bytes = min(old_bytes, new_bytes);
-  auto event = dispatch<copy>(
+  auto event = dispatch<::umpire::op::copy>(
       platform, platform, static_cast<void*>(current_ptr), static_cast<void*>(new_ptr), copy_bytes, ctx);
 
   // Without chained events, wait before deallocating to avoid freeing in-flight source storage.

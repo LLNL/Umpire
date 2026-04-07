@@ -30,7 +30,11 @@ namespace {
 // Size-aware calculation with type awareness
 template<typename T>
 inline std::size_t calculate_size(T* ptr, std::size_t count) {
-  return std::is_same<T, void>::value ? count : count * sizeof(T);
+  if constexpr (std::is_same<T, void>::value) {
+    return count;
+  } else {
+    return count * sizeof(T);
+  }
 }
 
 // Helper function for device-to-device copy operations

@@ -20,6 +20,7 @@
 #include <vector>
 
 using namespace umpire::resource;
+using umpire::omp_target_allocator;
 
 namespace {
 

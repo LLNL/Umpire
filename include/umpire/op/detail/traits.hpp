@@ -28,7 +28,7 @@ struct supports_memory_advice<resource::sycl_platform> : std::true_type {};
 
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
 template <>
-struct supports_memory_advice<resource::openmp_target_platform> : std::true_type {};
+struct supports_memory_advice<resource::omp_target_platform> : std::true_type {};
 #endif
 
 } // namespace detail

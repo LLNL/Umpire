@@ -46,8 +46,11 @@ struct default_allocator_for<cuda_platform> {
 #endif
 
 #if defined(UMPIRE_ENABLE_HIP)
-//! \brief Forward declaration for the default HIP allocator wrapper.
-struct hip_allocator;
+//! \brief Forward declaration for the default HIP allocator wrapper (defined in hip_device_memory.hpp).
+namespace resource {
+struct hip_default_allocator;
+}
+using hip_allocator = resource::hip_default_allocator;
 
 //! \brief Default allocator for HIP device resources.
 template<>

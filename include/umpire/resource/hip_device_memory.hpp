@@ -205,7 +205,7 @@ public:
    *
    * \param ptr Pointer to release. `nullptr` is a no-op.
    */
-  void deallocate(void* ptr) override {
+  void deallocate(void* ptr) noexcept override {
     if (!ptr) return;  // nullptr deallocation is safe no-op
 
     if constexpr (Tracking) {
