@@ -11,6 +11,7 @@
 #include "umpire/config.hpp"
 #include "umpire/event/event.hpp"
 #include "umpire/event/recorder_factory.hpp"
+#include "umpire/replay/Replay.hpp"
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/error.hpp"
@@ -20,10 +21,15 @@ namespace umpire {
 inline void* Allocator::do_allocate(std::size_t bytes)
 {
   void* ret = nullptr;
+  replay::ReplayAllocateToken replay_token{};
 
   UMPIRE_ASSERT(UMPIRE_VERSION_OK());
 
   UMPIRE_LOG(Debug, "(" << bytes << ")");
+
+  if (replay::is_enabled()) {
+    replay_token = replay::begin_allocate(m_allocator, bytes);
+  }
 
   if (0 == bytes) {
     ret = allocateNull();
@@ -43,6 +49,7 @@ inline void* Allocator::do_allocate(std::size_t bytes)
 
   umpire::event::record<umpire::event::allocate>(
       [&](auto& event) { event.size(bytes).ref((void*)m_allocator).ptr(ret); });
+  replay::commit_allocate(ret, replay_token);
 
   return ret;
 }
@@ -80,10 +87,15 @@ inline void Allocator::thread_safe_resource_deallocate(void* ptr, camp::resource
 inline void* Allocator::do_named_allocate(const std::string& name, std::size_t bytes)
 {
   void* ret = nullptr;
+  replay::ReplayAllocateToken replay_token{};
 
   UMPIRE_ASSERT(UMPIRE_VERSION_OK());
 
   UMPIRE_LOG(Debug, "(" << bytes << ")");
+
+  if (replay::is_enabled()) {
+    replay_token = replay::begin_allocate(m_allocator, bytes);
+  }
 
   if (0 == bytes) {
     ret = allocateNull();
@@ -97,16 +109,22 @@ inline void* Allocator::do_named_allocate(const std::string& name, std::size_t b
 
   umpire::event::record<umpire::event::named_allocate>(
       [&](auto& event) { event.name(name).size(bytes).ref((void*)m_allocator).ptr(ret); });
+  replay::commit_allocate(ret, replay_token);
   return ret;
 }
 
 inline void* Allocator::do_resource_allocate(std::size_t bytes, camp::resources::Resource const& r)
 {
   void* ret = nullptr;
+  replay::ReplayAllocateToken replay_token{};
 
   UMPIRE_ASSERT(UMPIRE_VERSION_OK());
 
   UMPIRE_LOG(Debug, "(" << bytes << ")");
+
+  if (replay::is_enabled()) {
+    replay_token = replay::begin_allocate(m_allocator, bytes);
+  }
 
   if (0 == bytes) {
     ret = allocateNull();
@@ -120,12 +138,13 @@ inline void* Allocator::do_resource_allocate(std::size_t bytes, camp::resources:
 
   umpire::event::record<umpire::event::allocate_resource>(
       [&](auto& event) { event.size(bytes).ref((void*)m_allocator).ptr(ret).res(camp::resources::to_string(r)); });
+  replay::commit_allocate(ret, replay_token);
   return ret;
 }
 
 inline void Allocator::do_deallocate(void* ptr)
 {
-  umpire::event::record<umpire::event::deallocate>([&](auto& event) { event.ref((void*)m_allocator).ptr(ptr); });
+  auto replay_token = replay::begin_deallocate(m_allocator, ptr);
 
   UMPIRE_LOG(Debug, "(" << ptr << ")");
 
@@ -144,12 +163,14 @@ inline void Allocator::do_deallocate(void* ptr)
       }
     }
   }
+
+  umpire::event::record<umpire::event::deallocate>([&](auto& event) { event.ref((void*)m_allocator).ptr(ptr); });
+  replay::commit_deallocate(replay_token);
 }
 
 inline void Allocator::do_resource_deallocate(void* ptr, camp::resources::Resource const& r)
 {
-  umpire::event::record<umpire::event::deallocate_resource>(
-      [&](auto& event) { event.ref((void*)m_allocator).ptr(ptr).res(camp::resources::to_string(r)); });
+  auto replay_token = replay::begin_deallocate(m_allocator, ptr);
 
   UMPIRE_LOG(Debug, "(" << ptr << ")");
 
@@ -168,6 +189,10 @@ inline void Allocator::do_resource_deallocate(void* ptr, camp::resources::Resour
       }
     }
   }
+
+  umpire::event::record<umpire::event::deallocate_resource>(
+      [&](auto& event) { event.ref((void*)m_allocator).ptr(ptr).res(camp::resources::to_string(r)); });
+  replay::commit_deallocate(replay_token);
 }
 
 inline void* Allocator::allocate(std::size_t bytes)

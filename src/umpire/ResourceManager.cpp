@@ -14,6 +14,7 @@
 #include "umpire/config.hpp"
 #include "umpire/op/MemoryOperation.hpp"
 #include "umpire/op/MemoryOperationRegistry.hpp"
+#include "umpire/replay/Replay.hpp"
 #include "umpire/resource/MemoryResourceRegistry.hpp"
 #include "umpire/strategy/FixedPool.hpp"
 #if defined(UMPIRE_ENABLE_NUMA)
@@ -159,8 +160,19 @@ Allocator ResourceManager::makeResource(const std::string& name, MemoryResourceT
     m_shared_allocator_names.push_back(name);
   }
 
+  const bool replay_enabled = replay::is_enabled();
+  replay::ReplayMakeAllocatorToken replay_token{};
+  if (replay_enabled) {
+    replay_token =
+        replay::begin_make_allocator(name, traits.tracking, "MemoryResource", replay::serialize_memory_resource_args(name, traits));
+  }
+
   std::unique_ptr<strategy::AllocationStrategy> allocator{registry.makeMemoryResource(name, getNextId(), traits)};
   allocator->setTracking(traits.tracking);
+
+  if (replay_enabled) {
+    replay::commit_make_allocator(allocator.get(), replay_token);
+  }
 
   umpire::event::record([&](auto& event) {
     event.name("make_memory_resource")
