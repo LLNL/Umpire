@@ -280,6 +280,8 @@ declarations:
       # C bufferify wrappers are overridden by the C splicer include listed
       # below, since Shroud emits invalid member calls for those helpers.
       - decl: Allocator makeAllocator_list_pool_untracked(const std::string& name, Allocator allocator, size_t initial_size, size_t block)
+        options:
+          F_C_name_template: c_resourcemanager_make_alloc_dynamic_p_list_u{function_suffix}{template_suffix}
         format:
           F_name_impl: make_alloc_dynamic_p_list_u
         splicer:
@@ -295,6 +297,8 @@ declarations:
             return SHC_rv;
 
       - decl: Allocator makeAllocator_quick_pool_untracked(const std::string& name, Allocator allocator, size_t initial_size, size_t block)
+        options:
+          F_C_name_template: c_resourcemanager_make_alloc_quick_p_u{function_suffix}{template_suffix}
         format:
           F_name_impl: make_alloc_quick_p_u
         splicer:
@@ -310,6 +314,8 @@ declarations:
             return SHC_rv;
 
       - decl: Allocator makeAllocator_resource_aware_pool_untracked(const std::string& name, Allocator allocator, size_t initial_size, size_t block)
+        options:
+          F_C_name_template: c_resourcemanager_make_alloc_res_aware_p_u{function_suffix}{template_suffix}
         format:
           F_name_impl: make_alloc_res_aware_p_u
         splicer:
@@ -325,6 +331,8 @@ declarations:
             return SHC_rv;
 
       - decl: Allocator makeAllocator_fixed_pool_untracked(const std::string& name, Allocator allocator, size_t object_size)
+        options:
+          F_C_name_template: c_resourcemanager_make_alloc_fixed_p_u{function_suffix}{template_suffix}
         format:
           F_name_impl: make_alloc_fixed_p_u
         splicer:
@@ -340,6 +348,8 @@ declarations:
             return SHC_rv;
 
       - decl: Allocator makeAllocator_monotonic_untracked(const std::string& name, Allocator allocator, size_t object_size)
+        options:
+          F_C_name_template: c_resourcemanager_make_alloc_monotonic_u{function_suffix}{template_suffix}
         format:
           F_name_impl: make_alloc_monotonic_u
         splicer:
@@ -355,6 +365,8 @@ declarations:
             return SHC_rv;
 
       - decl: Allocator makeAllocator_slot_pool_untracked(const std::string& name, Allocator allocator, size_t object_size)
+        options:
+          F_C_name_template: c_resourcemanager_make_alloc_slot_p_u{function_suffix}{template_suffix}
         format:
           F_name_impl: make_alloc_slot_p_u
         splicer:
@@ -370,6 +382,8 @@ declarations:
             return SHC_rv;
 
       - decl: Allocator makeAllocator_mixed_pool_untracked(const std::string& name, Allocator allocator, size_t smallest_fixed_obj_size, size_t largest_fixed_obj_size, size_t max_initial_fixed_pool_size, size_t fixed_size_multiplier, size_t quick_pool_initial_alloc_size, size_t quick_pool_min_alloc_size, size_t quick_pool_align_bytes)
+        options:
+          F_C_name_template: c_resourcemanager_make_alloc_mixed_p_u{function_suffix}{template_suffix}
         format:
           F_name_impl: make_alloc_mixed_p_u
         splicer:
