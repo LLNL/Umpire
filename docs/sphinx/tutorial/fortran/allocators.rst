@@ -10,7 +10,7 @@ The fundamental concept for accessing memory through Umpire is an
 allocate raw memory, and a generic ``allocate`` procedure that takes an array
 pointer and an array of dimensions and will allocate the correct amount of
 memory.
-
+      
 As with the native C++ interface, all allocators are accessed via the
 :class:`umpire::ResourceManager`. In the FORTRAN API, there is a corresponding
 ``UmpireResourceManager`` type. To get an ``UmpireAllocator``:
