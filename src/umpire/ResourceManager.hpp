@@ -57,8 +57,10 @@ class ResourceManager {
 
   /*!
    * \brief Set the global introspection level for tracked allocations.
+   *
+   * \throws runtime_error if allocations already exist
    */
-  void setIntrospectionLevel(IntrospectionLevel level) noexcept;
+  void setIntrospectionLevel(IntrospectionLevel level);
 
   /*!
    * \brief Get the global introspection level for tracked allocations.
@@ -419,6 +421,8 @@ class ResourceManager {
 
   util::AllocationMap m_allocations;
   std::unordered_map<void*, std::vector<ExactAllocationRecord>> m_exact_allocations;
+
+  bool m_allocations_exist{false};  // Track if any allocations made
 
   std::list<std::unique_ptr<strategy::AllocationStrategy>> m_allocators;
   std::vector<std::string> m_shared_allocator_names;

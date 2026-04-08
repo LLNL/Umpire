@@ -41,7 +41,6 @@ namespace umpire {
 
 void print_allocator_records(Allocator allocator, std::ostream& os)
 {
-  std::stringstream ss;
   auto& rm = umpire::ResourceManager::getInstance();
   const auto level = rm.getIntrospectionLevel();
 
@@ -51,6 +50,12 @@ void print_allocator_records(Allocator allocator, std::ostream& os)
                              to_string(level)));
   }
 
+  if (rm.getIntrospectionLevel() != IntrospectionLevel::On) {
+    UMPIRE_ERROR(runtime_error,
+      "print_allocator_records() requires IntrospectionLevel::On");
+  }
+
+  std::stringstream ss;
   auto strategy = allocator.getAllocationStrategy();
 
   rm.printTrackedAllocationRecords(strategy, ss);
@@ -78,6 +83,11 @@ bool pointer_overlaps(void* left_ptr, void* right_ptr)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
+  if (rm.getIntrospectionLevel() != IntrospectionLevel::On) {
+    UMPIRE_ERROR(runtime_error,
+      "pointer_overlaps() requires IntrospectionLevel::On");
+  }
+
   try {
     auto left_record = rm.findAllocationRecord(left_ptr);
     auto right_record = rm.findAllocationRecord(right_ptr);
@@ -96,6 +106,11 @@ bool pointer_overlaps(void* left_ptr, void* right_ptr)
 bool pointer_contains(void* left_ptr, void* right_ptr)
 {
   auto& rm = umpire::ResourceManager::getInstance();
+
+  if (rm.getIntrospectionLevel() != IntrospectionLevel::On) {
+    UMPIRE_ERROR(runtime_error,
+      "pointer_contains() requires IntrospectionLevel::On");
+  }
 
   try {
     auto left_record = rm.findAllocationRecord(left_ptr);
@@ -129,6 +144,12 @@ std::string get_backtrace(void* ptr)
 {
 #if defined(UMPIRE_ENABLE_BACKTRACE)
   auto& rm = umpire::ResourceManager::getInstance();
+
+  if (rm.getIntrospectionLevel() != IntrospectionLevel::On) {
+    UMPIRE_ERROR(runtime_error,
+      "get_backtrace() requires IntrospectionLevel::On");
+  }
+
   auto record = rm.findAllocationRecord(ptr);
   return umpire::util::backtracer<>::print(record->allocation_backtrace);
 #else

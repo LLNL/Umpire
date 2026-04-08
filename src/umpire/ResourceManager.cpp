@@ -25,6 +25,7 @@
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/io.hpp"
 #include "umpire/util/make_unique.hpp"
+#include "umpire/util/pointer_utils.hpp"
 #include "umpire/util/wrap_allocator.hpp"
 
 #if defined(UMPIRE_ENABLE_CUDA)
@@ -181,8 +182,12 @@ void ResourceManager::initialize()
   UMPIRE_LOG(Debug, "() leaving");
 }
 
-void ResourceManager::setIntrospectionLevel(IntrospectionLevel level) noexcept
+void ResourceManager::setIntrospectionLevel(IntrospectionLevel level)
 {
+  if (m_allocations_exist) {
+    UMPIRE_ERROR(runtime_error,
+      "Cannot change introspection level after allocations have been made");
+  }
   m_introspection_level.store(level, std::memory_order_relaxed);
 }
 
@@ -672,6 +677,8 @@ void ResourceManager::registerAllocation(void* ptr, util::AllocationRecord recor
     UMPIRE_ERROR(runtime_error, "Cannot register nullptr!");
   }
 
+  m_allocations_exist = true;  // Mark that allocations exist
+
   UMPIRE_LOG(Debug,
              "(ptr=" << ptr << ", size=" << record.size << ", strategy=" << record.strategy << ") with " << this);
 
@@ -1147,6 +1154,13 @@ void* ResourceManager::move(void* ptr, Allocator allocator)
     throw_requires_full_introspection("ResourceManager::move", level);
   }
 
+  const auto level = getIntrospectionLevel();
+
+  if (level != IntrospectionLevel::On) {
+    UMPIRE_ERROR(runtime_error,
+      "move() requires IntrospectionLevel::On");
+  }
+
   auto alloc_record = m_allocations.find(ptr);
 
   // short-circuit if ptr was allocated by 'allocator'
@@ -1226,6 +1240,13 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::prefetch
   const auto level = getIntrospectionLevel();
   if (!requires_full_introspection(level)) {
     throw_requires_full_introspection("ResourceManager::prefetch", level);
+  }
+
+  const auto level = getIntrospectionLevel();
+
+  if (level != IntrospectionLevel::On) {
+    UMPIRE_ERROR(runtime_error,
+      "prefetch() requires IntrospectionLevel::On");
   }
 
   auto& op_registry = op::MemoryOperationRegistry::getInstance();

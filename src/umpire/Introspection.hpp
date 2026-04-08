@@ -12,7 +12,7 @@
 namespace umpire {
 
 /*!
- * \brief Controls how much allocation metadata Umpire records for tracked allocations.
+ * \brief Controls the tracking strategy Umpire uses for allocations.
  *
  * - Off:   Disable public introspection tracking.
  * - Basic: Track exact allocation-pointer ownership only.
