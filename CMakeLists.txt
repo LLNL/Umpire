@@ -197,7 +197,7 @@ install(FILES
   "${PROJECT_BINARY_DIR}/umpire-config-version.cmake"
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/umpire)
 
-install(EXPORT umpire-targets NAMESPACE Umpire:: DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/umpire)
+install(EXPORT umpire-targets NAMESPACE umpire:: DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/umpire)
 
 if (UMPIRE_ENABLE_TESTS)
   add_subdirectory(tests)
