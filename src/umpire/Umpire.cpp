@@ -19,7 +19,9 @@
 
 #include "umpire/ResourceManager.hpp"
 #include "umpire/config.hpp"
+#if defined(UMPIRE_ENABLE_IPC_SHARED_MEMORY)
 #include "umpire/resource/HostSharedMemoryResource.hpp"
+#endif
 #include "umpire/resource/MemoryResource.hpp"
 #if defined(UMPIRE_ENABLE_MPI) && defined(UMPIRE_ENABLE_IPC_SHARED_MEMORY)
 #if defined(UMPIRE_ENABLE_DEVICE)
