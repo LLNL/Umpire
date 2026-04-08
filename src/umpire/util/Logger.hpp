@@ -7,7 +7,16 @@
 #ifndef UMPIRE_Logger_HPP
 #define UMPIRE_Logger_HPP
 
+#include <memory>
 #include <string>
+
+// Forward declare spdlog types to avoid including spdlog.h in header
+namespace spdlog {
+class logger;
+namespace level {
+enum level_enum : int;
+}
+} // namespace spdlog
 
 namespace umpire {
 namespace util {
@@ -18,39 +27,39 @@ enum Level {
   Warning,
   Info,
   Debug,
-
   Num_Levels
 };
 } // end namespace message
 
 class Logger {
  public:
-  void setLoggingMsgLevel(message::Level level) noexcept;
-
-  void logMessage(message::Level level, const std::string& message, const std::string& fileName, int line) noexcept;
-
+  // Initialize the global logger (called once from ResourceManager)
   static void initialize();
 
+  // Finalize and flush logs (called from ResourceManager destructor)
   static void finalize();
 
-  static Logger* getActiveLogger();
+  // Check if a log level should be logged (for macro optimization)
+  static bool shouldLog(message::Level level) noexcept;
 
-  inline bool logLevelEnabled(message::Level level)
-  {
-    if (level < 0 || level >= message::Num_Levels || m_is_enabled[level] == false)
-      return false;
-    else
-      return true;
-  };
+  // Log a message at the specified level
+  static void log(message::Level level, const std::string& message,
+                  const std::string& fileName, int line) noexcept;
 
-  ~Logger() noexcept = default;
-  Logger(const Logger&) = delete;
-  Logger& operator=(const Logger&) = delete;
+  // Get the underlying spdlog logger (for advanced usage)
+  static std::shared_ptr<spdlog::logger> getSpdlogger();
 
  private:
-  Logger() noexcept;
+  Logger() = delete;
+  ~Logger() = delete;
 
-  bool m_is_enabled[message::Num_Levels];
+  static spdlog::level::level_enum convertLevel(message::Level level) noexcept;
+  static message::Level parseEnvLogLevel() noexcept;
+  static std::string generateLogFilename();
+
+  static std::shared_ptr<spdlog::logger> s_logger;
+  static message::Level s_level;
+  static bool s_initialized;
 };
 
 } // end namespace util

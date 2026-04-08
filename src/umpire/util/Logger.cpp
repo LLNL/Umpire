@@ -4,69 +4,203 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-
 #include "umpire/util/Logger.hpp"
 
-#include <algorithm> // for std::equal
-#include <cctype>    // for std::toupper
-#include <cstdlib>   // for getenv()
+#include <algorithm>
+#include <cctype>
+#include <cstdlib>
+#include <vector>
+
+#include "spdlog/async.h"
+#include "spdlog/sinks/basic_file_sink.h"
+#include "spdlog/sinks/null_sink.h"
+#include "spdlog/sinks/stdout_color_sinks.h"
+#include "spdlog/spdlog.h"
 
 #include "umpire/util/io.hpp"
+
+#if !defined(_MSC_VER)
+#include <unistd.h>
+#else
+#include <process.h>
+#define getpid _getpid
+#endif
 
 namespace umpire {
 namespace util {
 
-static const char* env_name = "UMPIRE_LOG_LEVEL";
-static message::Level defaultLevel = message::Info;
+// Static member initialization
+std::shared_ptr<spdlog::logger> Logger::s_logger = nullptr;
+message::Level Logger::s_level = message::Info;
+bool Logger::s_initialized = false;
 
 static const char* MessageLevelName[message::Num_Levels] = {"ERROR", "WARNING", "INFO", "DEBUG"};
 
-static int case_insensitive_match(const std::string s1, const std::string s2)
+static bool case_insensitive_match(const std::string& s1, const std::string& s2)
 {
-  return (s1.size() == s2.size()) && std::equal(s1.begin(), s1.end(), s2.begin(), [](char c1, char c2) {
-           return (std::toupper(c1) == std::toupper(c2));
-         });
+  return (s1.size() == s2.size()) &&
+         std::equal(s1.begin(), s1.end(), s2.begin(),
+                    [](char c1, char c2) { return std::toupper(c1) == std::toupper(c2); });
 }
 
-Logger::Logger() noexcept
-    : // by default, all message streams are disabled
-      m_is_enabled{false, false, false, false}
+message::Level Logger::parseEnvLogLevel() noexcept
 {
-  message::Level level{defaultLevel};
-  const char* enval = std::getenv(env_name);
+  const char* env_level = std::getenv("UMPIRE_LOG_LEVEL");
+  if (!env_level) {
+    return message::Info; // default
+  }
 
-  if (enval) {
-    for (int i = 0; i < message::Num_Levels; ++i) {
-      if (case_insensitive_match(enval, MessageLevelName[i])) {
-        level = static_cast<message::Level>(i);
-        break;
-      }
+  std::string level_str(env_level);
+  for (int i = 0; i < message::Num_Levels; ++i) {
+    if (case_insensitive_match(level_str, MessageLevelName[i])) {
+      return static_cast<message::Level>(i);
     }
   }
 
-  setLoggingMsgLevel(level);
+  return message::Info; // fallback
 }
 
-void Logger::setLoggingMsgLevel(message::Level level) noexcept
+std::string Logger::generateLogFilename()
 {
-  for (int i = 0; i < message::Num_Levels; ++i)
-    m_is_enabled[i] = (i <= level);
+  const std::string& output_dir = get_io_output_dir();
+  const std::string& basename = get_io_output_basename();
+  const int pid = getpid();
+
+  // Reuse existing make_unique_filename from io.cpp
+  return make_unique_filename(output_dir, basename, pid, "log");
 }
 
-void Logger::logMessage(message::Level level, const std::string& message, const std::string& fileName,
-                        int line) noexcept
+spdlog::level::level_enum Logger::convertLevel(message::Level level) noexcept
 {
-  if (!logLevelEnabled(level))
+  switch (level) {
+  case message::Error:
+    return spdlog::level::err;
+  case message::Warning:
+    return spdlog::level::warn;
+  case message::Info:
+    return spdlog::level::info;
+  case message::Debug:
+    return spdlog::level::debug;
+  default:
+    return spdlog::level::info;
+  }
+}
+
+void Logger::initialize()
+{
+  if (s_initialized) {
     return;
+  }
 
-  umpire::log() << "[" << MessageLevelName[level] << "]"
-                << "[" << fileName << ":" << line << "]:" << message << std::endl;
+  // Parse log level from environment
+  s_level = parseEnvLogLevel();
+
+  // Check if logging is enabled (UMPIRE_LOG_LEVEL must be set)
+  const char* env_enable_log = std::getenv("UMPIRE_LOG_LEVEL");
+  if (!env_enable_log) {
+    // Logging disabled - create a null logger
+    auto null_sink = std::make_shared<spdlog::sinks::null_sink_mt>();
+    s_logger = std::make_shared<spdlog::logger>("umpire", null_sink);
+    spdlog::register_logger(s_logger);
+    s_initialized = true;
+    return;
+  }
+
+  // Check for async mode
+  const char* env_async = std::getenv("UMPIRE_LOG_ASYNC");
+  const bool use_async = (env_async && (std::string(env_async) == "1" ||
+                                        case_insensitive_match(env_async, "true") ||
+                                        case_insensitive_match(env_async, "on")));
+
+  // Get queue size for async logging
+  const char* env_queue_size = std::getenv("UMPIRE_LOG_QUEUE_SIZE");
+  const size_t queue_size = env_queue_size ? std::atoi(env_queue_size) : 8192;
+
+  // Initialize async thread pool if needed
+  if (use_async && !spdlog::thread_pool()) {
+    spdlog::init_thread_pool(queue_size, 1);
+  }
+
+  // Create sinks
+  std::vector<spdlog::sink_ptr> sinks;
+
+  // File sink (always enabled when UMPIRE_LOG_LEVEL is set)
+  std::string log_filename = generateLogFilename();
+  auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(log_filename, false);
+  sinks.push_back(file_sink);
+
+  // Optional console sink
+  const char* env_console = std::getenv("UMPIRE_LOG_TO_CONSOLE");
+  const bool log_to_console = (env_console && (std::string(env_console) == "1" ||
+                                                case_insensitive_match(env_console, "true") ||
+                                                case_insensitive_match(env_console, "on")));
+  if (log_to_console) {
+    auto console_sink = std::make_shared<spdlog::sinks::stderr_color_sink_mt>();
+    sinks.push_back(console_sink);
+  }
+
+  // Create logger (sync or async)
+  if (use_async) {
+    s_logger = std::make_shared<spdlog::async_logger>("umpire", sinks.begin(), sinks.end(),
+                                                       spdlog::thread_pool(),
+                                                       spdlog::async_overflow_policy::block);
+  } else {
+    s_logger = std::make_shared<spdlog::logger>("umpire", sinks.begin(), sinks.end());
+  }
+
+  // Register with spdlog
+  spdlog::register_logger(s_logger);
+
+  // Set format pattern to match current output: [LEVEL][file:line]: message
+  s_logger->set_pattern("[%^%L%$][%s:%#]: %v");
+
+  // Set log level
+  s_logger->set_level(convertLevel(s_level));
+
+  // Flush on every message for Error level (safety)
+  s_logger->flush_on(spdlog::level::err);
+
+  s_initialized = true;
 }
 
-Logger* Logger::getActiveLogger()
+void Logger::finalize()
 {
-  static Logger logger;
-  return &logger;
+  if (s_logger) {
+    s_logger->flush();
+    spdlog::drop("umpire");
+    s_logger.reset();
+  }
+
+  // Shutdown async thread pool if it exists
+  if (spdlog::thread_pool()) {
+    spdlog::shutdown();
+  }
+
+  s_initialized = false;
+}
+
+bool Logger::shouldLog(message::Level level) noexcept
+{
+  if (!s_initialized || !s_logger) {
+    return false;
+  }
+  return level <= s_level;
+}
+
+void Logger::log(message::Level level, const std::string& message, const std::string& fileName,
+                 int line) noexcept
+{
+  if (!s_initialized || !s_logger || !shouldLog(level)) {
+    return;
+  }
+
+  // Use spdlog's source location logging
+  s_logger->log(spdlog::source_loc{fileName.c_str(), line, ""}, convertLevel(level), message);
+}
+
+std::shared_ptr<spdlog::logger> Logger::getSpdlogger()
+{
+  return s_logger;
 }
 
 } // end namespace util

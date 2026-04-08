@@ -160,5 +160,55 @@ if (NOT TARGET ${UMPIRE_FMT_TARGET})
   endif ()
 endif ()
 
+##############################################################################
+# spdlog
+##############################################################################
+if (NOT TARGET spdlog::spdlog)
+  # Try to find external spdlog installation
+  if (DEFINED spdlog_DIR)
+    find_package(spdlog REQUIRED
+      NO_DEFAULT_PATH
+      PATHS
+        ${spdlog_DIR}
+        ${spdlog_DIR}/lib/cmake/spdlog)
+
+    set_target_properties(spdlog::spdlog PROPERTIES IMPORTED_GLOBAL TRUE)
+    blt_convert_to_system_includes(TARGET spdlog::spdlog)
+    set(UMPIRE_CONFIG_spdlog_DIR ${spdlog_DIR} CACHE PATH "")
+  else ()
+    if (NOT EXISTS ${PROJECT_SOURCE_DIR}/src/tpl/umpire/spdlog/CMakeLists.txt)
+      message(FATAL_ERROR "spdlog submodule not initialized. Run 'git submodule update --init --recursive' in the git repository or set spdlog_DIR to use an external build of spdlog.")
+    else ()
+      # Configure spdlog to use external fmt (if available)
+      if (TARGET ${UMPIRE_FMT_TARGET})
+        set(SPDLOG_FMT_EXTERNAL ON CACHE BOOL "Use external fmt library")
+        set(SPDLOG_FMT_EXTERNAL_HO OFF CACHE BOOL "Use external fmt header-only library")
+
+        # Help spdlog find the fmt package by setting fmt_DIR
+        # This works whether fmt is external or from our submodule
+        if (DEFINED fmt_DIR)
+          # External fmt case - use the user-provided path
+          set(fmt_DIR ${fmt_DIR} CACHE PATH "Path to fmt")
+        else ()
+          # Submodule fmt case - point to build directory where fmt exports its config
+          set(fmt_DIR ${CMAKE_BINARY_DIR}/src/tpl/umpire/fmt CACHE PATH "Path to fmt")
+        endif ()
+      else ()
+        # No fmt available, let spdlog use its bundled fmt
+        set(SPDLOG_FMT_EXTERNAL OFF CACHE BOOL "Use external fmt library")
+      endif ()
+
+      # Disable unnecessary spdlog features
+      set(SPDLOG_INSTALL ON CACHE BOOL "Generate install target")
+      set(SPDLOG_BUILD_SHARED OFF CACHE BOOL "Build shared library")
+
+      # In this case, spdlog will be installed inside of Umpire install prefix
+      set(UMPIRE_CONFIG_spdlog_DIR ${CMAKE_INSTALL_PREFIX} CACHE PATH "")
+
+      add_subdirectory(umpire/spdlog)
+    endif ()
+  endif ()
+endif ()
+
 set(UMPIRE_ENABLE_TESTS ${OLD_ENABLE_TESTS})
 set(UMPIRE_ENABLE_FORTRAN ${OLD_ENABLE_FORTRAN})
