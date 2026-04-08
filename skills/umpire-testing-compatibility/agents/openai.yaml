@@ -1,0 +1,4 @@
+interface:
+  display_name: "Umpire Testing"
+  short_description: "Testing, API, and ABI guidance"
+  default_prompt: "Use this skill when adding or modifying tests, reviewing API or ABI impact, or checking compatibility constraints in Umpire."

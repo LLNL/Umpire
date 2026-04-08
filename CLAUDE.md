@@ -1,10 +1,21 @@
-# CLAUDE.md
+# Umpire Agent Guide
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to coding agents working in this repository.
 
 ## Overview
 
 Umpire is a resource management library for discovering, provisioning, and managing memory on machines with multiple memory devices like NUMA nodes and GPUs. It provides a unified interface to allocate and free data across different memory spaces (host, device, unified, pinned, etc.) and supports various memory allocation strategies (pools, advisors, prefetchers, etc.).
+
+## Repo Skills
+
+Use the narrowest matching repo-local skill under `skills/` before making non-trivial changes:
+
+- `skills/umpire-core/`: Core architecture, allocator semantics, ResourceManager, strategies, memory resources and operations, introspection, thread-safety, error handling, and hot-path performance rules
+- `skills/umpire-platform-backends/`: CUDA, HIP, SYCL, OpenMP target, NUMA, conditional compilation, platform-specific builds, and CI/Uberenv reproduction
+- `skills/umpire-testing-compatibility/`: Unit/integration/application tests, API and ABI impact, release-note expectations, and compatibility checks
+- `skills/umpire-fortran-interface/`: Shroud-generated Fortran interface, wrapper regeneration, and Fortran examples/tests
+
+Use more than one only when a task genuinely spans multiple areas, such as a backend change that also needs new tests.
 
 ## ⚠️ WARNING: Auto-Generated Code
 
@@ -65,6 +76,7 @@ ctest -R <test_name_pattern>  # Run specific tests
 
 ### Common CMake Options
 
+- `UMPIRE_ENABLE_*` options are Umpire-owned; some build examples also use BLT-facing `ENABLE_*` options, and `UMPIRE_ENABLE_OPENMP_TARGET` is distinct from `UMPIRE_ENABLE_OPENMP`
 - `BLT_CXX_STD`: C++ standard (default: c++20, minimum: c++20)
 - `UMPIRE_ENABLE_CUDA`: Build with CUDA support (default: depends on ENABLE_CUDA)
 - `UMPIRE_ENABLE_HIP`: Build with HIP support (default: depends on ENABLE_HIP)
@@ -345,7 +357,7 @@ When adding allocators, strategies, or resources:
 
 ## Maintaining This File
 
-**When to update CLAUDE.md:**
+**When to update this file:**
 
 This file should be updated when making changes that affect how future developers (human or AI) work with the codebase:
 
@@ -358,9 +370,9 @@ This file should be updated when making changes that affect how future developer
 - Adding new categories of files that should/shouldn't be edited
 - Introducing new performance constraints or safety requirements
 
-**At minimum:** When completing a major feature or architectural change, ask the user whether CLAUDE.md should be updated to reflect the changes. Consider:
+**At minimum:** When completing a major feature or architectural change, ask the user whether `AGENTS.md` and `CLAUDE.md` should be updated to reflect the changes. Consider:
 - Would a future developer benefit from knowing about this?
 - Does this change how someone should approach working with the codebase?
 - Are there new constraints or patterns that should be documented?
 
-Keeping this file up-to-date ensures that future Claude Code instances and human developers have accurate, helpful guidance.
+Keeping this file up-to-date ensures that future coding agents and human developers have accurate, helpful guidance.

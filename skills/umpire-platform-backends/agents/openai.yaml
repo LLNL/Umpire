@@ -1,0 +1,4 @@
+interface:
+  display_name: "Umpire Backends"
+  short_description: "Backend, build, and CI guidance"
+  default_prompt: "Use this skill when working on CUDA, HIP, SYCL, OpenMP target, NUMA, platform-specific configuration, or CI reproduction for Umpire."

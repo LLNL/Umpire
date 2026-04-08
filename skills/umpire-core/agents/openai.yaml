@@ -1,0 +1,4 @@
+interface:
+  display_name: "Umpire Core"
+  short_description: "Core allocator and architecture guidance"
+  default_prompt: "Use this skill when working on Umpire core architecture, allocator semantics, strategies, resources, operations, or performance-sensitive internals."

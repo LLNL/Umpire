@@ -1,0 +1,4 @@
+interface:
+  display_name: "Umpire Fortran"
+  short_description: "Shroud and Fortran interface guidance"
+  default_prompt: "Use this skill when touching the generated Fortran interface, Shroud YAML, wrappers, or Fortran examples and tests in Umpire."
