@@ -347,7 +347,10 @@ class HostSharedMemoryResource::impl {
       offset_to_pointer(block_ptr->next_block_off, block_ptr);
     }
 
-    pthread_mutex_unlock(&m_segment->mutex);
+    if ((err = pthread_mutex_unlock(&m_segment->mutex)) != 0) {
+      UMPIRE_ERROR(runtime_error, fmt::format("Failed to unlock mutex for shared memory segment {}: {}", m_segment_name,
+                                              strerror(err)));
+    }
   }
 
   std::size_t getActualSize() const noexcept

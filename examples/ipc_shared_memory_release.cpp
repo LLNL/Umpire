@@ -74,7 +74,14 @@ int main(int, char**)
     std::cout << "Shared segment RSS before: " << format_bytes(shm_rss_before) << "\n";
   }
 
-  void* ptr = allocator.allocate("buffer", alloc_size);
+  void* ptr = nullptr;
+  try {
+    ptr = allocator.allocate("buffer", alloc_size);
+  } catch (const std::exception& e) {
+    std::cerr << "Failed to allocate " << format_bytes(alloc_size) << ": " << e.what() << "\n";
+    return 1;
+  }
+
   touch_one_byte_per_page(static_cast<std::uint8_t*>(ptr), alloc_size);
 
   const std::size_t rss_after_touch = umpire::get_process_memory_usage();

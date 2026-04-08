@@ -203,6 +203,15 @@ class SharedMemoryTest : public ::testing::Test {
       rss = umpire::get_mapping_memory_usage(mapping_name);
     }
 
+    // Verify that the expected change actually occurred
+    if (expect_less) {
+      EXPECT_LT(rss, reference) << "RSS did not decrease as expected after 200ms (reference: " << reference
+                                << ", final: " << rss << ")";
+    } else {
+      EXPECT_GT(rss, reference) << "RSS did not increase as expected after 200ms (reference: " << reference
+                                << ", final: " << rss << ")";
+    }
+
     return rss;
   }
 };
@@ -332,6 +341,10 @@ TEST_F(SharedMemoryTest, ReleaseReclaimsFreedPages)
   const std::string rss_probe_name{"ReleaseRssProbe"};
 
   MPI_Barrier(MPI_COMM_WORLD);
+  // Only rank 0 performs the RSS measurement to avoid contention on the shared segment.
+  // The test verifies that release() correctly returns freed pages to the OS, which can
+  // be reliably measured from a single process. Other ranks wait at barriers to ensure
+  // synchronization.
   if (m_rank == 0) {
     const std::size_t rss_before = umpire::get_mapping_memory_usage(allocator_name);
 

@@ -187,8 +187,10 @@ std::size_t get_mapping_memory_usage(const std::string& mapping_name)
   std::string line;
 
   while (std::getline(smaps, line)) {
+    // Memory mapping header lines follow the format: "address-address perms ..."
+    // Check if line starts with hex digits and contains a hyphen in the first field
     const bool is_header = (!line.empty() && std::isxdigit(static_cast<unsigned char>(line[0])) &&
-                            line.find('-') != std::string::npos);
+                            line.find('-') != std::string::npos && line.find('-') < 20);
 
     if (is_header) {
       in_target_mapping = (line.find(mapping_name) != std::string::npos);
