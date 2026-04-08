@@ -7,6 +7,7 @@
 #include "gtest/gtest.h"
 #include "umpire/event/event.hpp"
 #include "umpire/event/json_file_store.hpp"
+#include "umpire/util/error.hpp"
 
 #include <cstdio>
 #include <fstream>
@@ -56,24 +57,22 @@ class JsonFileStoreTest : public ::testing::Test {
 
 TEST_F(JsonFileStoreTest, FileCreation)
 {
-  // File should not exist before store is created
+  // File should not exist before store is created.
   ASSERT_FALSE(file_exists(test_filename));
 
   {
     umpire::event::json_file_store store(test_filename);
+    ASSERT_TRUE(file_exists(test_filename));
 
-    // Create a simple event and insert it (this triggers file creation)
+    // Create a simple event and insert it.
     umpire::event::event e;
     e.name = "test_event";
     e.cat = umpire::event::category::operation;
 
     store.insert(e);
-
-    // File should exist now
-    ASSERT_TRUE(file_exists(test_filename));
   }
 
-  // File should still exist after store is destroyed
+  // File should still exist after store is destroyed.
   ASSERT_TRUE(file_exists(test_filename));
 }
 
@@ -298,4 +297,10 @@ TEST_F(JsonFileStoreTest, ReadOnlyMode)
     ASSERT_EQ(1, events.size());
     ASSERT_EQ("existing_event", events[0].name);
   }
+}
+
+TEST_F(JsonFileStoreTest, ReadOnlyOpenRequiresExistingFile)
+{
+  ASSERT_FALSE(file_exists(test_filename));
+  ASSERT_THROW(umpire::event::json_file_store store(test_filename, true), umpire::runtime_error);
 }

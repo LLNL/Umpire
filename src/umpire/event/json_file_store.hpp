@@ -39,7 +39,6 @@ class json_file_store : public event_store {
   virtual std::vector<event> get_events();
 
  private:
-  void open_store();
   FILE* m_fstream{nullptr};
   std::string m_filename;
   bool m_read_only;
