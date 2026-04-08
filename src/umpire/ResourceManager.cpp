@@ -12,6 +12,7 @@
 
 #include "umpire/Umpire.hpp"
 #include "umpire/config.hpp"
+#include "umpire/event/operation_recording.hpp"
 #include "umpire/op/MemoryOperation.hpp"
 #include "umpire/op/MemoryOperationRegistry.hpp"
 #include "umpire/replay/Replay.hpp"
@@ -160,28 +161,23 @@ Allocator ResourceManager::makeResource(const std::string& name, MemoryResourceT
     m_shared_allocator_names.push_back(name);
   }
 
-  const bool replay_enabled = replay::is_enabled();
-  replay::ReplayMakeAllocatorToken replay_token{};
-  if (replay_enabled) {
-    replay_token =
-        replay::begin_make_allocator(name, traits.tracking, "MemoryResource", replay::serialize_memory_resource_args(name, traits));
-  }
-
-  std::unique_ptr<strategy::AllocationStrategy> allocator{registry.makeMemoryResource(name, getNextId(), traits)};
-  allocator->setTracking(traits.tracking);
-
-  if (replay_enabled) {
-    replay::commit_make_allocator(allocator.get(), replay_token);
-  }
-
-  umpire::event::record([&](auto& event) {
-    event.name("make_memory_resource")
-        .category(event::category::operation)
-        .arg("allocator_ref", (void*)allocator.get())
-        .arg("introspection", traits.tracking)
-        .tag("allocator_name", name)
-        .tag("replay", "true");
-  });
+  auto allocator = umpire::event::record_make_resource(
+      name, traits.tracking, replay::serialize_memory_resource_args(name, traits),
+      [&]() -> std::unique_ptr<strategy::AllocationStrategy> {
+        auto created = std::unique_ptr<strategy::AllocationStrategy>{registry.makeMemoryResource(name, getNextId(), traits)};
+        created->setTracking(traits.tracking);
+        return created;
+      },
+      [&](strategy::AllocationStrategy* created) {
+        umpire::event::record([&](auto& event) {
+          event.name("make_memory_resource")
+              .category(event::category::operation)
+              .arg("allocator_ref", (void*)created)
+              .arg("introspection", traits.tracking)
+              .tag("allocator_name", name)
+              .tag("replay", "true");
+        });
+      });
 
   int id{allocator->getId()};
   m_allocators_by_name[name] = allocator.get();

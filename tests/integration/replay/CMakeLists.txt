@@ -20,11 +20,20 @@ blt_add_executable(
   SOURCES replay_tests.cpp
   DEPENDS_ON ${replay_integration_tests_depends})
 
+blt_add_executable(
+  NAME replay_failure_tests
+  SOURCES replay_failure_tests.cpp
+  DEPENDS_ON ${replay_integration_tests_depends})
+
 if (BASH_PROGRAM)
   if (NOT C_COMPILER_FAMILY_IS_PGI)
     add_test(
       NAME replay_tests
       COMMAND ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/replay_tests.bash ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+
+    add_test(
+      NAME replay_failure_tests
+      COMMAND ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/replay_failure_tests.bash ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
   endif()
 else ()
   message(STATUS "Bash not configured, replay tests disabled.")
