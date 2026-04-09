@@ -8,6 +8,7 @@
 #include "umpire/config.hpp"
 #include "umpire/util/MPI.hpp"
 #include "umpire/util/io.hpp"
+#include "umpire/util/Logger.hpp"
 
 #if defined(UMPIRE_ENABLE_MPI)
 #include "mpi.h"
@@ -33,10 +34,18 @@ int main(int argc, char** argv)
 
   CLI11_PARSE(app, argc, argv);
 
-  umpire::util::initialize_io(enable_logging);
+  if (enable_logging) {
+#if defined(_MSC_VER)
+    _putenv_s("UMPIRE_LOG_LEVEL", "Info");
+#else
+    setenv("UMPIRE_LOG_LEVEL", "Info", 1);
+#endif
+    umpire::util::Logger::initialize();
+    umpire::util::Logger::log(umpire::util::message::Info, "testing log stream", __FILE__, __LINE__);
+    umpire::util::Logger::finalize();
+  }
 
-  umpire::log() << "testing log stream" << std::endl;
-  umpire::error() << "testing error stream" << std::endl;
+  std::cerr << "testing error stream" << std::endl;
 
 #if defined(UMPIRE_ENABLE_MPI)
   MPI_Finalize();
