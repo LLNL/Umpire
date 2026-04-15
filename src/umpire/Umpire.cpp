@@ -50,11 +50,6 @@ void print_allocator_records(Allocator allocator, std::ostream& os)
                              to_string(level)));
   }
 
-  if (rm.getIntrospectionLevel() != IntrospectionLevel::On) {
-    UMPIRE_ERROR(runtime_error,
-      "print_allocator_records() requires IntrospectionLevel::On");
-  }
-
   std::stringstream ss;
   auto strategy = allocator.getAllocationStrategy();
 

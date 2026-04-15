@@ -415,4 +415,3 @@ TEST(IntrospectionLevelTest, BasicModeMultiGPU)
   }
 }
 #endif
->>>>>>> ea8e4485 (Use pointer-only approach for basic introspection)

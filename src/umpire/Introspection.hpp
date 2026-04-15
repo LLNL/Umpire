@@ -15,7 +15,7 @@ namespace umpire {
  * \brief Controls the tracking strategy Umpire uses for allocations.
  *
  * - Off:   Disable public introspection tracking.
- * - Basic: Track exact allocation-pointer ownership only.
+ * - Basic: Use runtime API queries (zero storage overhead).
  * - On:    Track full allocation metadata and backtraces (if enabled).
  */
 enum class IntrospectionLevel { Off, Basic, On };
