@@ -57,7 +57,11 @@ bool directory_exists(const std::string& path)
   if (stat(path.c_str(), &info)) {
     return false;
   } else {
+#if defined(_MSC_VER)
+    return (info.st_mode & _S_IFDIR) != 0;
+#else
     return S_ISDIR(info.st_mode);
+#endif
   }
 #endif
 }
