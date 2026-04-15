@@ -381,18 +381,9 @@ class ResourceManager {
  private:
   ResourceManager();
 
-  struct ExactAllocationRecord {
-    std::size_t size;
-    strategy::AllocationStrategy* strategy;
-  };
-
   strategy::AllocationStrategy* findAllocatorForPointer(void* ptr);
   strategy::AllocationStrategy* findAllocatorForId(int id);
   strategy::AllocationStrategy* getAllocationStrategy(const std::string& name);
-  void registerExactAllocation(void* ptr, const util::AllocationRecord& record);
-  util::AllocationRecord deregisterExactAllocation(void* ptr);
-  bool hasExactAllocation(void* ptr) const;
-  ExactAllocationRecord getExactAllocation(void* ptr) const;
   std::vector<util::AllocationRecord> getTrackedAllocationRecords(strategy::AllocationStrategy* strategy) const;
   void printTrackedAllocationRecords(strategy::AllocationStrategy* strategy, std::ostream& os) const;
 
@@ -420,7 +411,6 @@ class ResourceManager {
   void* reallocate_impl(void* current_ptr, std::size_t new_size, Allocator allocator, camp::resources::Resource& ctx);
 
   util::AllocationMap m_allocations;
-  std::unordered_map<void*, std::vector<ExactAllocationRecord>> m_exact_allocations;
 
   bool m_allocations_exist{false};  // Track if any allocations made
 
@@ -441,7 +431,6 @@ class ResourceManager {
   int m_id;
 
   std::mutex m_mutex;
-  mutable std::mutex m_exact_allocations_mutex;
 
   // Methods that need access to m_allocations to print/filter records
   friend void print_allocator_records(Allocator, std::ostream&);

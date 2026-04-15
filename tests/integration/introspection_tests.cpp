@@ -152,7 +152,7 @@ TEST(IntrospectionLevelTest, BasicTracksExactPointerOwnershipOnly)
     ASSERT_TRUE(rm.hasAllocator(p));
     EXPECT_FALSE(rm.hasAllocator(static_cast<char*>(p) + 1));
     EXPECT_THROW(rm.findAllocationRecord(p), umpire::runtime_error);
-    EXPECT_THROW(rm.getAllocator(p), umpire::runtime_error);
+    EXPECT_NO_THROW(rm.getAllocator(p));  // Works via API inference
     EXPECT_THROW(rm.getSize(p), umpire::runtime_error);
     EXPECT_THROW(umpire::get_allocator_records(allocator), umpire::runtime_error);
     allocator.deallocate(p);

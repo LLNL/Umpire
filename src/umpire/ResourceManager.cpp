@@ -583,92 +583,36 @@ bool ResourceManager::hasAllocator(void* ptr)
     return m_allocations.contains(ptr);
   }
   if (level == IntrospectionLevel::Basic) {
-    return hasExactAllocation(ptr);
+    return util::inferAllocatorFromPointer(ptr, *this) != nullptr;
   }
 
-  return false;
-}
-
-void ResourceManager::registerExactAllocation(void* ptr, const util::AllocationRecord& record)
-{
-  std::lock_guard<std::mutex> lock(m_exact_allocations_mutex);
-  m_exact_allocations[ptr].push_back({record.size, record.strategy});
-}
-
-util::AllocationRecord ResourceManager::deregisterExactAllocation(void* ptr)
-{
-  std::lock_guard<std::mutex> lock(m_exact_allocations_mutex);
-
-  auto iter = m_exact_allocations.find(ptr);
-  if (iter == m_exact_allocations.end() || iter->second.empty()) {
-    UMPIRE_ERROR(runtime_error, fmt::format("Cannot remove {}", ptr));
-  }
-
-  auto record = iter->second.back();
-  iter->second.pop_back();
-  if (iter->second.empty()) {
-    m_exact_allocations.erase(iter);
-  }
-
-  return {ptr, record.size, record.strategy};
-}
-
-bool ResourceManager::hasExactAllocation(void* ptr) const
-{
-  std::lock_guard<std::mutex> lock(m_exact_allocations_mutex);
-  auto iter = m_exact_allocations.find(ptr);
-  return iter != m_exact_allocations.end() && !iter->second.empty();
-}
-
-ResourceManager::ExactAllocationRecord ResourceManager::getExactAllocation(void* ptr) const
-{
-  std::lock_guard<std::mutex> lock(m_exact_allocations_mutex);
-
-  auto iter = m_exact_allocations.find(ptr);
-  if (iter == m_exact_allocations.end() || iter->second.empty()) {
-    UMPIRE_ERROR(unknown_pointer_error, fmt::format("Allocation not mapped: {}", ptr));
-  }
-
-  return iter->second.back();
+  return false;  // Off mode
 }
 
 std::vector<util::AllocationRecord>
 ResourceManager::getTrackedAllocationRecords(strategy::AllocationStrategy* strategy) const
 {
+  if (getIntrospectionLevel() != IntrospectionLevel::On) {
+    UMPIRE_ERROR(runtime_error,
+      "getTrackedAllocationRecords() requires IntrospectionLevel::On");
+  }
+
   std::vector<util::AllocationRecord> records;
-  if (getIntrospectionLevel() == IntrospectionLevel::On) {
-    std::copy_if(m_allocations.begin(), m_allocations.end(), std::back_inserter(records),
-                 [strategy](const util::AllocationRecord& rec) { return rec.strategy == strategy; });
-    return records;
-  }
-
-  std::lock_guard<std::mutex> lock(m_exact_allocations_mutex);
-  for (const auto& entry : m_exact_allocations) {
-    for (const auto& record : entry.second) {
-      if (record.strategy == strategy) {
-        records.emplace_back(entry.first, record.size, record.strategy);
-      }
-    }
-  }
-
+  std::copy_if(m_allocations.begin(), m_allocations.end(), std::back_inserter(records),
+               [strategy](const util::AllocationRecord& rec) { return rec.strategy == strategy; });
   return records;
 }
 
 void ResourceManager::printTrackedAllocationRecords(strategy::AllocationStrategy* strategy, std::ostream& os) const
 {
-  if (getIntrospectionLevel() == IntrospectionLevel::On) {
-    m_allocations.print([strategy](const util::AllocationRecord& rec) { return rec.strategy == strategy; }, os);
-    return;
+  if (getIntrospectionLevel() != IntrospectionLevel::On) {
+    UMPIRE_ERROR(runtime_error,
+      "printTrackedAllocationRecords() requires IntrospectionLevel::On");
   }
 
-  for (const auto& record : getTrackedAllocationRecords(strategy)) {
-    auto end_ptr = static_cast<unsigned char*>(record.ptr) + record.size;
-    os << record.ptr << " {" << std::endl;
-    os << "  size: " << record.size << ", "
-       << "range: " << reinterpret_cast<void*>(record.ptr) << " -- " << reinterpret_cast<void*>(end_ptr)
-       << std::endl;
-    os << "}" << std::endl;
-  }
+  m_allocations.print([strategy](const util::AllocationRecord& rec) {
+    return rec.strategy == strategy;
+  }, os);
 }
 
 void ResourceManager::registerAllocation(void* ptr, util::AllocationRecord record)
@@ -686,19 +630,20 @@ void ResourceManager::registerAllocation(void* ptr, util::AllocationRecord recor
   if (level == IntrospectionLevel::On) {
     UMPIRE_RECORD_BACKTRACE(record);
     m_allocations.insert(ptr, record);
-  } else {
-    registerExactAllocation(ptr, record);
   }
+  // Off/Basic modes: no storage, just stats updated by caller
 }
 
 util::AllocationRecord ResourceManager::deregisterAllocation(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
-  if (getIntrospectionLevel() == IntrospectionLevel::On) {
+  const auto level = getIntrospectionLevel();
+  if (level == IntrospectionLevel::On) {
     return m_allocations.remove(ptr);
   }
 
-  return deregisterExactAllocation(ptr);
+  // Basic/Off modes: return empty record (caller must infer strategy if needed)
+  return util::AllocationRecord{};
 }
 
 const util::AllocationRecord* ResourceManager::findAllocationRecord(void* ptr) const
@@ -1302,25 +1247,29 @@ strategy::AllocationStrategy* ResourceManager::findAllocatorForId(int id)
 
 strategy::AllocationStrategy* ResourceManager::findAllocatorForPointer(void* ptr)
 {
-  if (getIntrospectionLevel() == IntrospectionLevel::On) {
-    auto allocation_record = m_allocations.find(ptr);
+  const auto level = getIntrospectionLevel();
 
-    if (!allocation_record->strategy) {
-      UMPIRE_ERROR(runtime_error, fmt::format("Cannot find allocator for pointer: {}", ptr));
-    }
-
-    UMPIRE_LOG(Debug, "(ptr=" << ptr << ") returning " << allocation_record->strategy);
-    return allocation_record->strategy;
+  if (level == IntrospectionLevel::Off) {
+    UMPIRE_ERROR(runtime_error,
+      "findAllocatorForPointer() requires introspection to be enabled");
   }
 
-  auto allocation_record = getExactAllocation(ptr);
+  if (level == IntrospectionLevel::Basic) {
+    auto* strategy = util::inferAllocatorFromPointer(ptr, *this);
+    if (!strategy) {
+      UMPIRE_ERROR(runtime_error, fmt::format("Cannot infer allocator for pointer: {}", ptr));
+    }
+    UMPIRE_LOG(Debug, "(ptr=" << ptr << ") returning " << strategy);
+    return strategy;
+  }
 
-  if (!allocation_record.strategy) {
+  // IntrospectionLevel::On
+  auto allocation_record = m_allocations.find(ptr);
+  if (!allocation_record->strategy) {
     UMPIRE_ERROR(runtime_error, fmt::format("Cannot find allocator for pointer: {}", ptr));
   }
-
-  UMPIRE_LOG(Debug, "(ptr=" << ptr << ") returning " << allocation_record.strategy);
-  return allocation_record.strategy;
+  UMPIRE_LOG(Debug, "(ptr=" << ptr << ") returning " << allocation_record->strategy);
+  return allocation_record->strategy;
 }
 
 std::vector<std::string> ResourceManager::getAllocatorNames() const noexcept
