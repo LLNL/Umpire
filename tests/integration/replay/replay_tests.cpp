@@ -13,6 +13,7 @@
 #include "umpire/Umpire.hpp"
 #include "umpire/config.hpp"
 #include "umpire/op/MemoryOperation.hpp"
+#include "umpire/resource/host_memory.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
 #include "umpire/strategy/AllocationPrefetcher.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
@@ -146,6 +147,13 @@ void testAllocation(std::string name)
     alloc.release();
   } catch (...) {
   }
+}
+
+void testTrackedV2HostReplayLifecycle()
+{
+  auto& host = umpire::resource::host_memory<>::get();
+  void* ptr = host.allocate(96);
+  host.deallocate(ptr);
 }
 
 template <typename Strategy, bool intro, typename... Args>
@@ -315,6 +323,8 @@ static void runTest()
     testAllocator<umpire::strategy::FixedPool, false>(name + "1", base_alloc, fpa1);
     testAllocator<umpire::strategy::FixedPool, false>(name + "2", base_alloc, fpa1, fpa2);
   }
+
+  testTrackedV2HostReplayLifecycle();
 
   // test registering external pointers
   {

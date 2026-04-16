@@ -193,6 +193,8 @@ The current host-only compatibility coverage validates:
 
 - v2 ``resource::host_memory<>::get()`` allocations appear in the v1
   ``ResourceManager``
+- tracked v2 ``resource::host_memory<>::get()`` allocation/deallocation
+  lifecycles can be recorded and replayed through the existing replay toolchain
 - v1 ``ResourceManager::memset()`` works on v2 host allocations
 - v1 ``ResourceManager::copy()`` works across v1/v2 host allocations
 
@@ -211,10 +213,13 @@ The following remains deferred:
 
 - ownership-changing v1 operations on v2 allocations, such as broader
   reallocation/deallocation flows that rely on full shared ownership semantics
+- legacy v1 replay event coverage for v2-backed allocations beyond direct
+  tracked HOST allocation/deallocation lifecycle
 - backend-specific non-host legacy entry points that still assume the v1
   allocation map for ownership or size lookup
 
 The host-safe implementation work is tracked separately as ``umpire-8zd``.
+Replay follow-up work is tracked separately as ``umpire-5ld``.
 Backend-capable non-host follow-up work is tracked separately as
 ``umpire-rhg``.
 
@@ -373,7 +378,9 @@ Deferred / Separate Follow-Up Areas
 -----------------------------------
 
 - replay validation for v2-backed allocations is tracked separately in
-  ``umpire-ifd.2``
+  ``umpire-ifd.2``; direct tracked HOST allocation/deallocation replay is now
+  validated locally, while broader legacy v1-on-v2 replay semantics remain
+  separate follow-up work in ``umpire-5ld``
 - introspection and leak-reporting validation for v2-backed allocations is
   tracked separately in ``umpire-7uq``
 - host-side safe delegation implementation is tracked separately in

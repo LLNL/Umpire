@@ -10,6 +10,7 @@
 #include "umpire/allocation_record.hpp"
 #include "umpire/detail/registry.hpp"
 #include "umpire/error.hpp"
+#include "umpire/event/event.hpp"
 #include "umpire/util/AllocationRecord.hpp"
 
 #include "fmt/format.h"
@@ -62,6 +63,9 @@ void memory::track_allocation(void* ptr, std::size_t size)
     register_with_v1_host_allocator(ptr, size);
   }
   update_statistics(static_cast<std::ptrdiff_t>(size));
+
+  umpire::event::record<umpire::event::allocate>(
+      [&](auto& event) { event.size(size).ref(static_cast<void*>(this)).ptr(ptr); });
 }
 
 void memory::untrack_allocation(void* ptr)
@@ -72,6 +76,10 @@ void memory::untrack_allocation(void* ptr)
   }
 
   std::size_t size = record->size;
+
+  umpire::event::record<umpire::event::deallocate>(
+      [&](auto& event) { event.ref(static_cast<void*>(this)).ptr(ptr); });
+
   detail::registry::get().remove_allocation(ptr);
   if (should_bridge_to_v1_host_allocator(*this)) {
     deregister_from_v1_host_allocator(ptr);
