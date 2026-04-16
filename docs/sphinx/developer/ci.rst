@@ -88,9 +88,9 @@ host looks like:
 
 This configuration does not rely on the local macOS development machine for
 OpenMP target support. Instead, it records a concrete host path and
-configure/test invocation that downstream beads (for example ``umpire-e2h``
-and ``umpire-4og``) can use when exercising ``openmp_target_memory`` and
-related API v2 operations on capable hardware.
+configure/test invocation that downstream validation work can use when
+exercising ``openmp_target_memory`` and related API v2 operations on capable
+hardware.
 
 GitHub CI and device-capable runners
 ------------------------------------

@@ -27,6 +27,7 @@ Backend-specific unit tests are added when those backends are enabled:
 
 - `api_v2_cuda_device_memory_tests`
 - `api_v2_hip_device_memory_tests`
+- `api_v2_sycl_device_memory_tests`
 - `api_v2_openmp_target_memory_tests`
 
 The current API v2 integration test executables are defined in
@@ -43,16 +44,8 @@ The current API v2 integration test executables are defined in
 To run the full host-only API v2 test set after configuring and building:
 
 ```bash
-ctest --test-dir build -R '^api_v2_' --output-on-failure
-```
-
-On the current `feature/api-refactor` branch, host validation should exclude the
-remaining pre-existing broken strategy test tracked separately in Beads:
-
-```bash
 ctest --test-dir build \
   -R '^api_v2_' \
-  -E 'api_v2_fixed_pool_tests' \
   --output-on-failure
 ```
 
@@ -66,12 +59,12 @@ cmake -S . -B build \
   -DCMAKE_C_COMPILER=/opt/homebrew/opt/llvm@19/bin/clang \
   -DCMAKE_CXX_COMPILER=/opt/homebrew/opt/llvm@19/bin/clang++ \
   -DCMAKE_CXX_FLAGS='-stdlib=libc++' \
+  -DCMAKE_EXPORT_COMPILE_COMMANDS=On \
   -DUMPIRE_ENABLE_TESTS=On
 
 cmake --build build --parallel
 ctest --test-dir build \
   -R '^api_v2_' \
-  -E 'api_v2_fixed_pool_tests' \
   --output-on-failure
 ```
 
@@ -88,6 +81,7 @@ cmake -S . -B build-asan \
   -DCMAKE_C_COMPILER=/opt/homebrew/opt/llvm@19/bin/clang \
   -DCMAKE_CXX_COMPILER=/opt/homebrew/opt/llvm@19/bin/clang++ \
   -DCMAKE_CXX_FLAGS='-stdlib=libc++ -fsanitize=address' \
+  -DCMAKE_EXPORT_COMPILE_COMMANDS=On \
   -DUMPIRE_ENABLE_TESTS=On \
   -DUMPIRE_ENABLE_TOOLS=On \
   -DUMPIRE_ENABLE_ASAN=On \
@@ -96,7 +90,6 @@ cmake -S . -B build-asan \
 cmake --build build-asan --parallel
 ctest --test-dir build-asan \
   -R '^api_v2_' \
-  -E 'api_v2_fixed_pool_tests' \
   --output-on-failure
 ```
 
@@ -108,6 +101,7 @@ cmake -S . -B build-tsan \
   -DCMAKE_CXX_COMPILER=/opt/homebrew/opt/llvm@19/bin/clang++ \
   -DCMAKE_C_FLAGS='-fsanitize=thread' \
   -DCMAKE_CXX_FLAGS='-stdlib=libc++ -fsanitize=thread' \
+  -DCMAKE_EXPORT_COMPILE_COMMANDS=On \
   -DUMPIRE_ENABLE_TESTS=On \
   -DUMPIRE_ENABLE_TSAN=On \
   -DUMPIRE_ENABLE_SANITIZER_TESTS=On
@@ -191,8 +185,8 @@ ctest --test-dir build-omptarget \
 
 This flow does not run on the current macOS development host but documents a
 concrete OpenMP target-capable environment and configure/test invocation that
-follow-up beads such as ``umpire-e2h`` and ``umpire-4og`` can use when
-exercising ``openmp_target_memory`` on target-enabled hardware. The
+downstream validation work can use when exercising ``openmp_target_memory`` on
+target-enabled hardware. The
 ``api_v2_openmp_target_memory_tests`` target covers resource construction,
 tracking, allocation, host-to-target copies, and basic deallocation semantics,
 but actual execution still requires an OpenMP target-capable runtime.
@@ -200,7 +194,9 @@ but actual execution still requires an OpenMP target-capable runtime.
 ## Static Analysis
 
 On macOS with Homebrew LLVM 19, `clang-tidy` needs the active SDK sysroot to
-find libc++ and platform headers correctly:
+find libc++ and platform headers correctly. The configured build directory must
+also contain `compile_commands.json`, so the examples above enable
+`-DCMAKE_EXPORT_COMPILE_COMMANDS=On`:
 
 ```bash
 SDKROOT=$(xcrun --show-sdk-path)
@@ -279,14 +275,15 @@ device-validation work once suitable hosts are provisioned.
 The repository already supports BLT coverage builds via `ENABLE_COVERAGE=On`.
 The API v2-specific test wiring adds a `coverage_api_v2` target that filters the
 coverage run to the `api_v2_*` CTest entries and builds the current host-safe
-API v2 test executables before collecting coverage. The target currently
-excludes `api_v2_fixed_pool_tests` until its follow-up fix lands.
+API v2 test executables, including `api_v2_fixed_pool_tests`, before collecting
+coverage.
 
 ```bash
 cmake -S . -B build-coverage \
   -DCMAKE_C_COMPILER=/opt/homebrew/opt/llvm@19/bin/clang \
   -DCMAKE_CXX_COMPILER=/opt/homebrew/opt/llvm@19/bin/clang++ \
   -DCMAKE_CXX_FLAGS='-stdlib=libc++' \
+  -DCMAKE_EXPORT_COMPILE_COMMANDS=On \
   -DUMPIRE_ENABLE_TESTS=On \
   -DENABLE_COVERAGE=On
 
