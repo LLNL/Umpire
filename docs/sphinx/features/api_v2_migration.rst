@@ -17,8 +17,10 @@ This guide focuses on the current branch state:
   ``umpire::allocator<T, Memory>``
 - host-side v1/v2 interoperability is validated for allocation visibility plus
   v1 ``copy()`` and ``memset()`` on v2 host allocations
-- ownership-changing v1 operations on v2 allocations are tracked separately in
-  Beads under ``umpire-xco``
+- selected ownership-changing v1 operations on bridged v2 host allocations now
+  have focused interoperability coverage
+- non-host legacy delegation for CUDA, HIP, SYCL, and OpenMP target resources
+  remains backend-specific work and is not implied by the host-safe results
 
 When To Migrate
 ---------------
@@ -197,12 +199,24 @@ The current host-only compatibility coverage validates:
 That means mixed migration is practical for ordinary host-side movement and
 inspection paths.
 
+These results do not extend automatically to CUDA, HIP, SYCL, or OpenMP target
+API v2 resources. The current compatibility bridge in ``src/umpire/memory.cpp``
+only mirrors the canonical ``HOST`` resource into the legacy v1 allocation map.
+Tracked non-host API v2 allocations still participate in the shared v2
+registry, but legacy v1 entry points that discover ownership, size, or platform
+through ``ResourceManager::m_allocations`` remain separate backend-specific
+work.
+
 The following remains deferred:
 
 - ownership-changing v1 operations on v2 allocations, such as broader
   reallocation/deallocation flows that rely on full shared ownership semantics
+- backend-specific non-host legacy entry points that still assume the v1
+  allocation map for ownership or size lookup
 
-That deferred work is tracked separately as ``umpire-xco``.
+The host-safe implementation work is tracked separately as ``umpire-8zd``.
+Backend-capable non-host follow-up work is tracked separately as
+``umpire-rhg``.
 
 Legacy V1 Surface Audit
 -----------------------
@@ -279,6 +293,42 @@ ResourceManager migration surface
 |                                                           |                    | host interoperability.                                      |
 +-----------------------------------------------------------+--------------------+-------------------------------------------------------------+
 
+Backend-Specific Non-Host Assessment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The host-safe classifications above must not be generalized to tracked API v2
+CUDA, HIP, SYCL, or OpenMP target allocations. The current implementation
+splits into four backend-sensitive categories:
+
+- ``ResourceManager::deallocate(ptr)`` and the zero-size ``reallocate``
+  overloads:
+  in the ``UMPIRE_RM_USE_NEW_OPS`` path these first consult the shared API v2
+  registry via ``find_v2_allocation`` and can therefore route tracked non-host
+  allocations to their owning v2 resource or strategy. This is an
+  implementation hook, not yet a published support claim, because no
+  backend-capable interoperability coverage exercises those legacy entry points
+  on non-host v2 allocations.
+- owner-preserving ``umpire::reallocate`` and
+  ``ResourceManager::reallocate(ptr, size)``:
+  the v2 path performs allocate-copy-free on the existing owner and dispatches
+  same-platform copy through the API v2 operation layer. The resulting
+  semantics are backend-specific because correctness depends on the compiled
+  device/offload copy specializations, runtime behavior, and async lifetime
+  ordering on real hardware.
+- allocator-selected ``ResourceManager::move`` and
+  ``ResourceManager::reallocate(..., Allocator)``:
+  these still resolve the source owner through ``getAllocator(ptr)`` or the v1
+  ``m_allocations`` map. Because only the canonical ``HOST`` resource is
+  mirrored into that map today, these overloads are not currently safe to
+  classify as supported for non-host v2 allocations.
+- legacy ``ResourceManager::copy``, ``memset``, and ``prefetch`` on non-host
+  v2 allocations:
+  even in the new-ops path, these entry points and the generic operation
+  callers still derive size and platform information from the v1 allocation
+  map. Until those paths consult the shared v2 registry directly or non-host
+  v2 allocations are bridged into ``m_allocations``, host conclusions must not
+  be extended to device or offload resources.
+
 Allocator migration surface
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -332,7 +382,7 @@ Deferred / Separate Follow-Up Areas
   ``umpire-v0s``, and ``umpire-ds5``
 - backend-specific non-host delegation semantics remain separate work because
   they require backend-aware ownership and validation beyond this host-only
-  migration audit
+  migration audit; concrete follow-on work is tracked in ``umpire-rhg``
 
 Recommended Migration Order
 ---------------------------

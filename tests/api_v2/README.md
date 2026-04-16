@@ -319,6 +319,37 @@ interop behavior and the migration guide for the implementation-facing
 classification of the relevant v1 `ResourceManager` and `Allocator` entry
 points.
 
+## Non-Host Legacy Boundary
+
+The host compatibility matrix above does not extend to tracked API v2 CUDA,
+HIP, SYCL, or OpenMP target allocations.
+
+Current implementation-facing assessment:
+
+- Shared API v2 tracking exists for tracked non-host resources, but
+  `src/umpire/memory.cpp` only mirrors the canonical `HOST` resource into the
+  legacy `ResourceManager` allocation map.
+- Existing remote device coverage such as `api_v2_*_device_memory_tests` and
+  `api_v2_operations_tests` validates API v2 backend resources and direct API
+  v2 operation dispatch, not legacy v1-on-v2 delegation semantics.
+- `ResourceManager::deallocate()` and the zero-size `reallocate()` overloads
+  have v2-owner hooks for tracked non-host allocations, but they are not yet a
+  published support claim because no backend-capable v1-on-v2 interoperability
+  validation covers them.
+- Owner-preserving `umpire::reallocate()` and
+  `ResourceManager::reallocate(ptr, size)` remain backend-specific for tracked
+  non-host v2 allocations because they depend on same-platform copy dispatch
+  and device/offload lifetime ordering on real hardware.
+- `ResourceManager::move()` and allocator-selected `reallocate()` are not
+  currently safe to claim for non-host v2 allocations because they still
+  resolve source ownership through the legacy `m_allocations` map.
+- Legacy `ResourceManager::copy()`, `memset()`, and `prefetch()` should also
+  be treated as unresolved for non-host v2 allocations because the generic
+  operation callers still derive platform and size data from the legacy
+  allocation map.
+- Follow-up bead `umpire-rhg` tracks the backend-capable implementation and
+  validation work needed before any non-host support claim is published.
+
 ## CI
 
 The API v2 GitHub Actions workflow is defined in `.github/workflows/api_v2.yml`.
