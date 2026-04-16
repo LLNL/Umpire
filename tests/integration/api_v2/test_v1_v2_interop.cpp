@@ -218,6 +218,43 @@ TEST(ApiV1V2Interop, V1AllocatorSelectedReallocateWithHostPreservesV2Ownership)
   rm.deallocate(resized);
 }
 
+TEST(ApiV1V2Interop, V1AllocatorSelectedZeroSizeReallocateWithHostReleasesV2Ownership)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto host_allocator = rm.getAllocator("HOST");
+  auto* ptr = static_cast<unsigned char*>(host().allocate(16));
+  ASSERT_TRUE(umpire::detail::registry::get().find_allocation(ptr).has_value());
+  EXPECT_EQ(host().get_current_size(), 16u);
+
+  void* zero = rm.reallocate(ptr, 0, host_allocator);
+
+  EXPECT_FALSE(umpire::detail::registry::get().find_allocation(ptr).has_value());
+  EXPECT_EQ(host().get_current_size(), 0u);
+
+  if (zero) {
+    rm.deallocate(zero);
+  }
+}
+
+TEST(ApiV1V2Interop, V1AllocatorSelectedZeroSizeAsyncReallocateWithHostReleasesV2Ownership)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto host_allocator = rm.getAllocator("HOST");
+  auto* ptr = static_cast<unsigned char*>(host().allocate(24));
+  ASSERT_TRUE(umpire::detail::registry::get().find_allocation(ptr).has_value());
+  EXPECT_EQ(host().get_current_size(), 24u);
+
+  camp::resources::Resource ctx{camp::resources::Host{}};
+  void* zero = rm.reallocate(ptr, 0, host_allocator, ctx);
+
+  EXPECT_FALSE(umpire::detail::registry::get().find_allocation(ptr).has_value());
+  EXPECT_EQ(host().get_current_size(), 0u);
+
+  if (zero) {
+    rm.deallocate(zero);
+  }
+}
+
 TEST(ApiV1V2Interop, V1AllocatorSelectedReallocateRejectsDistinctAllocator)
 {
   auto& rm = umpire::ResourceManager::getInstance();

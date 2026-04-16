@@ -744,6 +744,10 @@ void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size, Alloc
   }
 
   if (new_size == 0) {
+    if (auto v2_record = find_v2_allocation(current_ptr)) {
+      v2_record->strategy->deallocate(current_ptr);
+      return alloc.allocate(new_size);
+    }
     auto alloc_record = m_allocations.find(current_ptr);
     auto a = Allocator(alloc_record->strategy);
     a.deallocate(current_ptr);
@@ -795,6 +799,10 @@ void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size, Alloc
   }
 
   if (new_size == 0) {
+    if (auto v2_record = find_v2_allocation(current_ptr)) {
+      v2_record->strategy->deallocate(current_ptr);
+      return alloc.allocate(new_size);
+    }
     auto alloc_record = m_allocations.find(current_ptr);
     auto a = Allocator(alloc_record->strategy);
     a.deallocate(current_ptr);
