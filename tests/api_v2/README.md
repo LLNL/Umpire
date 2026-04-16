@@ -312,6 +312,13 @@ combinations:
 | v1 `ResourceManager::reallocate(ptr, size, HOST)` on v2 host allocation | Supported | `api_v2_v1_interop_tests` |
 | v1 `ResourceManager::reallocate(ptr, size, distinct host allocator)` on v2 host allocation | Rejected with `umpire::runtime_error` | `api_v2_v1_interop_tests` |
 
+The host compatibility table above is intentionally narrower than the broader
+legacy-surface migration audit in
+`docs/sphinx/features/api_v2_migration.rst`. Use this table for checked host
+interop behavior and the migration guide for the implementation-facing
+classification of the relevant v1 `ResourceManager` and `Allocator` entry
+points.
+
 ## CI
 
 The API v2 GitHub Actions workflow is defined in `.github/workflows/api_v2.yml`.

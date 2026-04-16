@@ -204,6 +204,136 @@ The following remains deferred:
 
 That deferred work is tracked separately as ``umpire-xco``.
 
+Legacy V1 Surface Audit
+-----------------------
+
+The current branch now has enough implementation detail to classify the v1
+entry points that matter most for migration. This is an implementation-facing
+audit of the existing ``ResourceManager`` and ``Allocator`` surface, not a
+promise that every v1 path should be rewritten to call a v2 entry point.
+
+The classifications used here are:
+
+- ``Delegate to API v2``:
+  ownership or operation semantics are already routed through API v2-backed
+  behavior for bridged host allocations, or should be expanded in that
+  direction without changing user-visible semantics
+- ``Remain native v1``:
+  the API is fundamentally about v1 handles, factories, aliases, or legacy
+  bookkeeping and should continue to be implemented in v1 while relying on
+  shared tracking where needed
+- ``Intentionally unsupported``:
+  the combination is not a current migration target and should stay explicitly
+  documented rather than silently implied
+
+ResourceManager migration surface
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
++-----------------------------------------------------------+--------------------+-------------------------------------------------------------+
+| v1 entry point                                            | Classification     | Notes                                                       |
++===========================================================+====================+=============================================================+
+| ``getAllocator(name)``, ``getAllocator(id)``,             | Remain native v1   | Factory and handle lookup stay centered on the legacy       |
+| ``getAllocator(resource)``                                |                    | allocator registry. These are about v1 object identity, not |
+|                                                           |                    | v2 backend ownership.                                       |
++-----------------------------------------------------------+--------------------+-------------------------------------------------------------+
+| ``getAllocator(ptr)``                                     | Remain native v1   | Should keep using shared allocation tracking to resolve a   |
+|                                                           |                    | v1 handle for mixed code paths. The important requirement   |
+|                                                           |                    | is visibility of v2-backed allocations, not replacing the   |
+|                                                           |                    | returned type.                                              |
++-----------------------------------------------------------+--------------------+-------------------------------------------------------------+
+| ``hasAllocator(ptr)``, ``findAllocationRecord(ptr)``,     | Remain native v1   | These are legacy inspection APIs. They should continue to   |
+| ``getSize(ptr)``                                          |                    | work through the shared map and compatibility bridge.       |
++-----------------------------------------------------------+--------------------+-------------------------------------------------------------+
+| ``copy(dst, src, size)`` and async overload               | Remain native v1   | The v1 façade already dispatches through the shared         |
+|                                                           |                    | operation layer. Mixed v1/v2 host operation support is the  |
+|                                                           |                    | compatibility requirement, not replacement of the façade.   |
++-----------------------------------------------------------+--------------------+-------------------------------------------------------------+
+| ``memset(ptr, value, size)`` and async overload           | Remain native v1   | Same rationale as ``copy``. The critical migration outcome  |
+|                                                           |                    | is correct operation on v2-backed allocations.              |
++-----------------------------------------------------------+--------------------+-------------------------------------------------------------+
+| ``deallocate(ptr)``                                       | Delegate to API v2 | In the new-ops path, bridged v2 allocations already route   |
+|                                                           |                    | to the owning v2 strategy for deallocation.                 |
++-----------------------------------------------------------+--------------------+-------------------------------------------------------------+
+| ``reallocate(ptr, 0)`` and async zero-size overload       | Delegate to API v2 | Bridged host allocations already release through the v2     |
+|                                                           |                    | owner when the request becomes a deallocation.              |
++-----------------------------------------------------------+--------------------+-------------------------------------------------------------+
+| ``reallocate(ptr, size, HOST)`` and async overload        | Delegate to API v2 | Host-preserving reallocation on bridged host allocations    |
+|                                                           |                    | should continue to preserve v2 ownership semantics.         |
++-----------------------------------------------------------+--------------------+-------------------------------------------------------------+
+| ``move(ptr, HOST)``                                       | Delegate to API v2 | Host-preserving move already short-circuits and keeps the   |
+|                                                           |                    | v2 owner in place for bridged host allocations.             |
++-----------------------------------------------------------+--------------------+-------------------------------------------------------------+
+| ``move(ptr, distinct host allocator)``                    | Delegate to API v2 | The move flow already supports ownership transfer from a    |
+|                                                           |                    | bridged v2 host allocation into a distinct v1 allocator.    |
++-----------------------------------------------------------+--------------------+-------------------------------------------------------------+
+| ``reallocate(ptr, size, distinct allocator)``             | Intentionally      | This remains a semantic boundary today. For bridged host    |
+|                                                           | unsupported        | allocations the distinct-allocator path is rejected instead |
+|                                                           |                    | of silently changing ownership.                             |
++-----------------------------------------------------------+--------------------+-------------------------------------------------------------+
+| offset-pointer ownership-changing operations              | Intentionally      | Offset-pointer reallocate and move continue to error out.   |
+|                                                           | unsupported        | The correct behavior is explicit rejection, not implicit    |
+|                                                           |                    | ownership conversion.                                       |
++-----------------------------------------------------------+--------------------+-------------------------------------------------------------+
+| ``prefetch`` on non-host resources                        | Intentionally      | This is backend-specific and should be handled as a         |
+|                                                           | unsupported here   | separate follow-on migration task rather than inferred from |
+|                                                           |                    | host interoperability.                                      |
++-----------------------------------------------------------+--------------------+-------------------------------------------------------------+
+
+Allocator migration surface
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
++-----------------------------------------------+--------------------+-----------------------------------------------------------+
+| v1 entry point                                | Classification     | Notes                                                     |
++===============================================+====================+===========================================================+
+| ``Allocator::allocate`` / ``allocate(name)``  | Remain native v1   | These are still v1 handle operations and keep v1 tracking |
+| / ``allocate(resource)``                      |                    | and event semantics.                                      |
++-----------------------------------------------+--------------------+-----------------------------------------------------------+
+| ``Allocator::deallocate``                     | Remain native v1   | Pointer ownership is tied to the creating v1 allocator    |
+|                                               |                    | handle. Unknown-pointer deallocation should still go      |
+|                                               |                    | through ``ResourceManager::deallocate`` when mixed        |
+|                                               |                    | ownership is expected.                                    |
++-----------------------------------------------+--------------------+-----------------------------------------------------------+
+| ``Allocator::getSize``                        | Remain native v1   | Continues to rely on the shared allocation map.           |
++-----------------------------------------------+--------------------+-----------------------------------------------------------+
+| ``getHighWatermark`` / ``getCurrentSize`` /   | Remain native v1   | Introspection remains about the legacy allocator handle   |
+| ``getActualSize`` / ``getAllocationCount``    |                    | and its underlying strategy.                              |
++-----------------------------------------------+--------------------+-----------------------------------------------------------+
+| ``getName`` / ``getId`` / ``getStrategyName`` | Remain native v1   | These are allocator-handle identity APIs.                 |
++-----------------------------------------------+--------------------+-----------------------------------------------------------+
+| ``getParent`` / ``getAllocationStrategy`` /   | Remain native v1   | These expose v1 strategy structure and should stay        |
+| ``getPlatform``                               |                    | native.                                                   |
++-----------------------------------------------+--------------------+-----------------------------------------------------------+
+
+Prioritized Follow-On Delegation Work
+-------------------------------------
+
+The highest-value follow-on implementation work for the host-safe migration
+path is:
+
+1. preserve and expand the existing host-side ownership delegation paths in
+   ``ResourceManager`` where v2-backed allocations already have a clear owning
+   v2 strategy
+2. keep lookup, inspection, and factory APIs stable as native v1 façades over
+   shared tracking instead of forcing them through a synthetic v2 wrapper
+3. document and maintain the explicit rejection behavior for distinct-allocator
+   and offset-pointer cases unless a future design proves a safe ownership
+   model
+
+Deferred / Separate Follow-Up Areas
+-----------------------------------
+
+- replay validation for v2-backed allocations is tracked separately in
+  ``umpire-ifd.2``
+- introspection and leak-reporting validation for v2-backed allocations is
+  tracked separately in ``umpire-7uq``
+- host-side safe delegation implementation is tracked separately in
+  ``umpire-8zd``
+- representative workload signoff is tracked separately in ``umpire-ifd.4``,
+  ``umpire-v0s``, and ``umpire-ds5``
+- backend-specific non-host delegation semantics remain separate work because
+  they require backend-aware ownership and validation beyond this host-only
+  migration audit
+
 Recommended Migration Order
 ---------------------------
 
