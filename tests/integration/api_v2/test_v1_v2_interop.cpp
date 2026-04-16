@@ -283,6 +283,51 @@ TEST(ApiV1V2Interop, V1AllocatorSelectedReallocateWithHostPreservesV2Ownership)
   rm.deallocate(resized);
 }
 
+TEST(ApiV1V2Interop, V1AsyncReallocateWithHostPreservesV2Ownership)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto* ptr = static_cast<unsigned char*>(host().allocate(16));
+  for (int i = 0; i < 16; ++i) {
+    ptr[i] = static_cast<unsigned char>(0x40 + i);
+  }
+
+  camp::resources::Resource ctx{camp::resources::Host{}};
+  auto* resized = static_cast<unsigned char*>(rm.reallocate(ptr, 64, ctx));
+
+  ASSERT_NE(resized, nullptr);
+  ASSERT_TRUE(umpire::detail::registry::get().find_allocation(resized).has_value());
+  EXPECT_EQ(host().get_current_size(), 64u);
+
+  for (int i = 0; i < 16; ++i) {
+    EXPECT_EQ(resized[i], static_cast<unsigned char>(0x40 + i));
+  }
+
+  rm.deallocate(resized);
+}
+
+TEST(ApiV1V2Interop, V1AllocatorSelectedAsyncReallocateWithHostPreservesV2Ownership)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto host_allocator = rm.getAllocator("HOST");
+  auto* ptr = static_cast<unsigned char*>(host().allocate(16));
+  for (int i = 0; i < 16; ++i) {
+    ptr[i] = static_cast<unsigned char>(0x60 + i);
+  }
+
+  camp::resources::Resource ctx{camp::resources::Host{}};
+  auto* resized = static_cast<unsigned char*>(rm.reallocate(ptr, 64, host_allocator, ctx));
+
+  ASSERT_NE(resized, nullptr);
+  ASSERT_TRUE(umpire::detail::registry::get().find_allocation(resized).has_value());
+  EXPECT_EQ(host().get_current_size(), 64u);
+
+  for (int i = 0; i < 16; ++i) {
+    EXPECT_EQ(resized[i], static_cast<unsigned char>(0x60 + i));
+  }
+
+  rm.deallocate(resized);
+}
+
 TEST(ApiV1V2Interop, V1AllocatorSelectedZeroSizeReallocateWithHostReleasesV2Ownership)
 {
   auto& rm = umpire::ResourceManager::getInstance();
@@ -333,6 +378,20 @@ TEST(ApiV1V2Interop, V1AllocatorSelectedReallocateRejectsDistinctAllocator)
   EXPECT_THROW(static_cast<void>(rm.reallocate(ptr, 64, named_allocator)), umpire::runtime_error);
   EXPECT_TRUE(umpire::detail::registry::get().find_allocation(ptr).has_value());
   EXPECT_EQ(host().get_current_size(), 16u);
+
+  host().deallocate(ptr);
+}
+
+TEST(ApiV1V2Interop, V1ReallocateRejectsOffsetPointerForV2HostAllocation)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto* ptr = static_cast<unsigned char*>(host().allocate(32));
+  auto* offset_ptr = ptr + 4;
+
+  ASSERT_TRUE(umpire::detail::registry::get().find_allocation(ptr).has_value());
+  EXPECT_THROW(static_cast<void>(rm.reallocate(offset_ptr, 64)), umpire::runtime_error);
+  EXPECT_TRUE(umpire::detail::registry::get().find_allocation(ptr).has_value());
+  EXPECT_EQ(host().get_current_size(), 32u);
 
   host().deallocate(ptr);
 }
