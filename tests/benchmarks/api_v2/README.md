@@ -139,7 +139,7 @@ Run the host-safe benchmark bundle through the built benchmark binaries:
 
 The execution bead must then:
 - run the `host_interop_correctness` bundle from the built test targets
-- execute the explicit benchmark targets above using the same configured
+- execute the explicit benchmark binaries above using the same configured
   compiler and build settings as the host validation build
 - record exact commands, raw results, and the baseline used for comparison
 
