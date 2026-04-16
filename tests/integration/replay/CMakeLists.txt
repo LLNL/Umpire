@@ -52,6 +52,15 @@ blt_add_target_compile_flags(
   TO replay_tests
   FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
 
+blt_add_executable(
+  NAME replay_api_v2_host_audit
+  SOURCES replay_api_v2_host_audit.cpp
+  DEPENDS_ON ${replay_integration_tests_depends})
+
+blt_add_target_compile_flags(
+  TO replay_api_v2_host_audit
+  FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
+
 add_custom_target(
   regen_replay_output
   COMMAND  ${CMAKE_COMMAND} -E env UMPIRE_REPLAY=On $<TARGET_FILE:replay_tests> && mv *.stats ${CMAKE_CURRENT_SOURCE_DIR}/${replay_file} && rm -f *.stats)
@@ -76,6 +85,10 @@ if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${replay_file})
         NAME replay_tests
         COMMAND ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/replay_tests.bash ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
     endif()
+
+    add_test(
+      NAME replay_api_v2_host_audit
+      COMMAND ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/replay_api_v2_host_audit.bash ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
   else ()
 
