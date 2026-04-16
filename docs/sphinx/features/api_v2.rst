@@ -41,10 +41,31 @@ API v2 changes that by making the key decisions part of the type system:
 - tracking remains optional, so hot paths can opt out when appropriate
 
 The migration model is incremental, not disruptive. Host-side v1/v2
-interoperability is already validated on this branch for allocation visibility,
-``ResourceManager::memset()``, and ``ResourceManager::copy()``. Ownership-
-changing v1 operations on v2 allocations are deferred and tracked in Beads as
-``umpire-xco``.
+interoperability is already validated on this branch for allocation
+visibility, inspection/reporting, mixed host operations, and selected
+ownership-changing v1 calls on bridged host allocations. Direct tracked HOST
+allocation lifecycle replay is also validated. Broader legacy replay parity and
+non-host mixed API claims remain separate follow-up work.
+
+Transition Status
+-----------------
+
+The current branch supports an incremental migration model rather than a
+flag-day API replacement:
+
+- New host-only code can adopt ``resource::host_memory<>`` and
+  ``umpire::allocator<T, Memory>`` directly.
+- Existing v1 host code can interoperate with tracked v2 HOST allocations
+  through the validated ``ResourceManager`` inspection, operation, and
+  selected ownership-changing paths documented in the migration guide.
+- Replay support is currently published for direct tracked HOST allocation
+  lifecycle, not yet for every legacy v1 operation path acting on a v2-backed
+  allocation.
+- CUDA, HIP, SYCL, and OpenMP target mixed v1-on-v2 behavior remain
+  backend-specific and should not be inferred from host-safe results.
+
+Use :doc:`api_v2_migration` as the authoritative source for the current
+compatibility matrix, delegation matrix, and follow-up gaps.
 
 Core Concepts
 -------------

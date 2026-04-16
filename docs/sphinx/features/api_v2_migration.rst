@@ -219,9 +219,111 @@ The following remains deferred:
   allocation map for ownership or size lookup
 
 The host-safe implementation work is tracked separately as ``umpire-8zd``.
-Replay follow-up work is tracked separately as ``umpire-5ld``.
+Replay follow-up work is tracked separately as ``umpire-ifd.5``.
 Backend-capable non-host follow-up work is tracked separately as
 ``umpire-rhg``.
+
+Authoritative Compatibility Matrix
+----------------------------------
+
+The table below is the release-facing summary of the mixed v1/v2 support
+boundary on this branch.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Mixed API scenario
+     - Status
+     - Evidence
+     - Notes
+   * - v1 lookup, inspection, and leak-reporting on tracked v2 HOST allocations
+     - Supported
+     - ``api_v2_v1_interop_tests``, ``umpire-7uq``
+     - Covers allocation visibility, ``hasAllocator``, ``findAllocationRecord``,
+       ``getAllocator(ptr)``, allocator record reporting, and leak views.
+   * - v1 ``ResourceManager::copy()`` and ``memset()`` on tracked v2 HOST allocations
+     - Supported
+     - ``api_v2_v1_interop_tests``
+     - Published for host-safe mixed operation paths only.
+   * - v1 host-safe ownership-changing operations on tracked v2 HOST allocations
+     - Supported
+     - ``api_v2_v1_interop_tests``, ``umpire-8zd``
+     - Includes ``deallocate()``, zero-size ``reallocate()``, host-preserving
+       ``move()``, and host-preserving ``reallocate(..., HOST)`` including async
+       variants.
+   * - v1 distinct-allocator reallocate and offset-pointer ownership-changing
+       operations on tracked v2 HOST allocations
+     - Rejected by design
+     - ``api_v2_v1_interop_tests``, ``umpire-8zd``
+     - These cases fail explicitly instead of silently changing ownership.
+   * - Replay of direct tracked v2 HOST allocation/deallocation lifecycle
+     - Supported
+     - ``replay_tests``, ``replay_api_v2_host_audit``, ``umpire-ifd.2``
+     - Current replay guarantee is limited to allocation lifecycle recording and
+       replay for tracked HOST resources.
+   * - Replay of high-level legacy v1 copy, move, and reallocate events on
+       v2-backed HOST allocations
+     - Not yet published
+     - ``replay_api_v2_host_audit``, ``umpire-ifd.5``
+     - The current new-ops path emits auditable allocation lifecycle events, but
+       not full replay-parity high-level operation events.
+   * - API v2 operation templates on API v2 HOST allocations
+     - Supported
+     - ``api_v2_operations_tests``
+     - Host-side ``copy``, ``memset``, ``prefetch``, and ``reallocate`` are
+       covered for direct API v2 HOST usage.
+   * - API v2 operation templates acting on pointers originating from legacy v1
+       allocations
+     - No separate support claim
+     - none
+     - This branch does not publish dedicated validation for v2 operation APIs
+       acting on v1-owned pointers beyond the shared host backend behavior.
+   * - Legacy v1-on-v2 behavior on CUDA, HIP, SYCL, and OpenMP target
+       allocations
+     - Backend-specific, not yet published
+     - ``umpire-vc7``, ``umpire-rhg``
+     - Host-safe conclusions do not extend automatically to tracked non-host API
+       v2 allocations.
+
+Delegation Matrix Summary
+-------------------------
+
+The detailed audit below remains the implementation-facing source of truth.
+This summary captures the migration stance engineers and release notes should
+cite.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Legacy API surface
+     - Current stance
+     - Why
+   * - Factory, lookup-by-name/id/resource, and allocator identity APIs
+     - Remain native v1
+     - They are fundamentally about legacy allocator handles and registry
+       identity, not v2 ownership.
+   * - Pointer lookup and inspection APIs
+     - Remain native v1 over shared tracking
+     - The compatibility goal is visibility of tracked v2 HOST allocations
+       through existing tooling, not replacement of the v1 façade.
+   * - Host-side ``copy()`` and ``memset()``
+     - Remain native v1 façade over shared operation dispatch
+     - Mixed host correctness is what matters; forcing these calls through a
+       synthetic v2 wrapper does not add value.
+   * - Host-safe ownership-changing ``deallocate()``, zero-size
+       ``reallocate()``, host-preserving ``move()``, and host-preserving
+       ``reallocate(..., HOST)``
+     - Delegate to API v2-backed ownership
+     - Tracked v2 HOST allocations already have a clear owner in the shared v2
+       registry and preserve semantics under these paths.
+   * - Distinct-allocator and offset-pointer ownership-changing cases
+     - Intentionally unsupported
+     - The current branch rejects these explicitly rather than silently
+       changing ownership models.
+   * - Non-host legacy delegation
+     - Separate backend-specific work
+     - Shared tracking exists, but ownership lookup, operation dispatch, and
+       replay semantics are not yet published across device/offload backends.
 
 Legacy V1 Surface Audit
 -----------------------
@@ -380,7 +482,7 @@ Deferred / Separate Follow-Up Areas
 - replay validation for v2-backed allocations is tracked separately in
   ``umpire-ifd.2``; direct tracked HOST allocation/deallocation replay is now
   validated locally, while broader legacy v1-on-v2 replay semantics remain
-  separate follow-up work in ``umpire-5ld``
+  separate follow-up work in ``umpire-ifd.5``
 - introspection and leak-reporting validation for v2-backed allocations is
   tracked separately in ``umpire-7uq``
 - host-side safe delegation implementation is tracked separately in

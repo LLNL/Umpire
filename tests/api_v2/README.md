@@ -328,7 +328,7 @@ Current replay guarantee for tracked API v2 host allocations:
 - This does not yet publish replay support for legacy v1 operation paths acting
   on v2-backed allocations, such as legacy `ResourceManager` ownership-changing
   flows in the new-ops path.
-- Follow-up bead `umpire-5ld` tracks the missing legacy v1-on-v2 replay event
+- Follow-up bead `umpire-ifd.5` tracks the missing legacy v1-on-v2 replay event
   coverage separately from the validated direct HOST lifecycle.
 
 ## Non-Host Legacy Boundary
