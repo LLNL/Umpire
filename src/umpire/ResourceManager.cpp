@@ -101,7 +101,6 @@ ResourceManager& ResourceManager::getInstance()
 
 ResourceManager::ResourceManager()
     : m_allocations(),
-      m_exact_allocations(),
       m_allocators(),
       m_shared_allocator_names(),
       m_allocators_by_id(),
@@ -112,8 +111,7 @@ ResourceManager::ResourceManager()
       m_zero_byte_pool(nullptr),
       m_introspection_level{parse_introspection_level(std::getenv(s_introspection_level_env_name))},
       m_id(0),
-      m_mutex(),
-      m_exact_allocations_mutex()
+      m_mutex()
 {
   UMPIRE_LOG(Debug, "() entering");
 
@@ -133,7 +131,9 @@ ResourceManager::~ResourceManager()
     if (allocator->getCurrentSize() != 0) {
       std::stringstream ss;
 
-      printTrackedAllocationRecords(allocator.get(), ss);
+      if (getIntrospectionLevel() == IntrospectionLevel::On) {
+        printTrackedAllocationRecords(allocator.get(), ss);
+      }
 
       UMPIRE_LOG(Error, allocator->getName()
                             << " Allocator still has " << allocator->getCurrentSize() << " bytes allocated" << std::endl
@@ -184,9 +184,16 @@ void ResourceManager::initialize()
 
 void ResourceManager::setIntrospectionLevel(IntrospectionLevel level)
 {
-  if (m_allocations_exist) {
+  const auto current_level = getIntrospectionLevel();
+
+  // Only block lowering from On mode if tracked allocations exist in AllocationMap
+  // (can't switch to Basic/Off if we have tracked allocations)
+  if (current_level == IntrospectionLevel::On &&
+      static_cast<int>(level) < static_cast<int>(current_level) &&
+      m_allocations.size() > 0) {
     UMPIRE_ERROR(runtime_error,
-      "Cannot change introspection level after allocations have been made");
+      fmt::format("Cannot lower introspection level from \"on\" to \"{}\" while tracked allocations exist",
+                  to_string(level)));
   }
   m_introspection_level.store(level, std::memory_order_relaxed);
 }
@@ -554,8 +561,9 @@ Allocator ResourceManager::getAllocator(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   const auto level = getIntrospectionLevel();
-  if (!requires_full_introspection(level)) {
-    throw_requires_full_introspection("ResourceManager::getAllocator(void*)", level);
+  if (level == IntrospectionLevel::Off) {
+    UMPIRE_ERROR(runtime_error,
+      "ResourceManager::getAllocator(void*) requires introspection to be enabled (basic or on mode)");
   }
   return Allocator(findAllocatorForPointer(ptr));
 }
@@ -620,8 +628,6 @@ void ResourceManager::registerAllocation(void* ptr, util::AllocationRecord recor
   if (!ptr) {
     UMPIRE_ERROR(runtime_error, "Cannot register nullptr!");
   }
-
-  m_allocations_exist = true;  // Mark that allocations exist
 
   UMPIRE_LOG(Debug,
              "(ptr=" << ptr << ", size=" << record.size << ", strategy=" << record.strategy << ") with " << this);
@@ -1099,13 +1105,6 @@ void* ResourceManager::move(void* ptr, Allocator allocator)
     throw_requires_full_introspection("ResourceManager::move", level);
   }
 
-  const auto level = getIntrospectionLevel();
-
-  if (level != IntrospectionLevel::On) {
-    UMPIRE_ERROR(runtime_error,
-      "move() requires IntrospectionLevel::On");
-  }
-
   auto alloc_record = m_allocations.find(ptr);
 
   // short-circuit if ptr was allocated by 'allocator'
@@ -1185,13 +1184,6 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::prefetch
   const auto level = getIntrospectionLevel();
   if (!requires_full_introspection(level)) {
     throw_requires_full_introspection("ResourceManager::prefetch", level);
-  }
-
-  const auto level = getIntrospectionLevel();
-
-  if (level != IntrospectionLevel::On) {
-    UMPIRE_ERROR(runtime_error,
-      "prefetch() requires IntrospectionLevel::On");
   }
 
   auto& op_registry = op::MemoryOperationRegistry::getInstance();

@@ -7,25 +7,22 @@
 #include "gtest/gtest.h"
 #include "umpire/Umpire.hpp"
 #include "umpire/config.hpp"
+#include "umpire/strategy/QuickPool.hpp"
 
 namespace {
-class IntrospectionLevelGuard {
- public:
-  explicit IntrospectionLevelGuard(umpire::ResourceManager& rm) : m_rm(rm), m_prev(rm.getIntrospectionLevel()) {}
-  ~IntrospectionLevelGuard() { m_rm.setIntrospectionLevel(m_prev); }
-
-  IntrospectionLevelGuard(const IntrospectionLevelGuard&) = delete;
-  IntrospectionLevelGuard& operator=(const IntrospectionLevelGuard&) = delete;
-
- private:
-  umpire::ResourceManager& m_rm;
-  umpire::IntrospectionLevel m_prev;
-};
+umpire::IntrospectionLevel getCurrentLevel() {
+  return umpire::ResourceManager::getInstance().getIntrospectionLevel();
+}
 } // namespace
 
 TEST(IntrospectionTest, Overlaps)
 {
   auto& rm = umpire::ResourceManager::getInstance();
+
+  if (getCurrentLevel() != umpire::IntrospectionLevel::On) {
+    GTEST_SKIP() << "Overlaps test requires introspection level 'on'";
+  }
+
   umpire::Allocator allocator{rm.getAllocator("HOST")};
   umpire::strategy::AllocationStrategy* strategy{rm.getAllocator("HOST").getAllocationStrategy()};
 
@@ -85,6 +82,11 @@ TEST(IntrospectionTest, Overlaps)
 TEST(IntrospectionTest, Contains)
 {
   auto& rm = umpire::ResourceManager::getInstance();
+
+  if (getCurrentLevel() != umpire::IntrospectionLevel::On) {
+    GTEST_SKIP() << "Contains test requires introspection level 'on'";
+  }
+
   umpire::Allocator allocator{rm.getAllocator("HOST")};
   umpire::strategy::AllocationStrategy* strategy{rm.getAllocator("HOST").getAllocationStrategy()};
 
@@ -107,6 +109,10 @@ TEST(IntrospectionTest, RegisterNull)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
+  if (getCurrentLevel() != umpire::IntrospectionLevel::On) {
+    GTEST_SKIP() << "RegisterNull test requires introspection level 'on'";
+  }
+
   umpire::strategy::AllocationStrategy* strategy{rm.getAllocator("HOST").getAllocationStrategy()};
 
   auto record = umpire::util::AllocationRecord{nullptr, 0, strategy};
@@ -117,134 +123,123 @@ TEST(IntrospectionTest, RegisterNull)
 TEST(IntrospectionLevelTest, OnTracksNamedAllocationMetadata)
 {
   auto& rm = umpire::ResourceManager::getInstance();
-  IntrospectionLevelGuard guard{rm};
+
+  if (getCurrentLevel() != umpire::IntrospectionLevel::On) {
+    GTEST_SKIP() << "OnTracksNamedAllocationMetadata test requires introspection level 'on'";
+  }
 
   umpire::Allocator allocator{rm.getAllocator("HOST")};
 
   const std::string alloc_name{"my_named_alloc"};
   constexpr std::size_t size{64};
 
-  rm.setIntrospectionLevel(umpire::IntrospectionLevel::On);
-  {
-    void* p = allocator.allocate(alloc_name, size);
-    ASSERT_TRUE(rm.hasAllocator(p));
-    EXPECT_NO_THROW(rm.getAllocator(p));
-    EXPECT_EQ(rm.getSize(p), size);
-    EXPECT_EQ(rm.findAllocationRecord(p)->name, alloc_name);
-    allocator.deallocate(p);
-  }
+  void* p = allocator.allocate(alloc_name, size);
+  ASSERT_TRUE(rm.hasAllocator(p));
+  EXPECT_NO_THROW(rm.getAllocator(p));
+  EXPECT_EQ(rm.getSize(p), size);
+  EXPECT_EQ(rm.findAllocationRecord(p)->name, alloc_name);
+  allocator.deallocate(p);
 }
 
-TEST(IntrospectionLevelTest, BasicTracksExactPointerOwnershipOnly)
+TEST(IntrospectionLevelTest, AllocationQueries)
 {
   auto& rm = umpire::ResourceManager::getInstance();
-  IntrospectionLevelGuard guard{rm};
+  const auto level = getCurrentLevel();
 
   umpire::Allocator allocator{rm.getAllocator("HOST")};
-
   const std::string alloc_name{"my_named_alloc"};
   constexpr std::size_t size{64};
 
-  rm.setIntrospectionLevel(umpire::IntrospectionLevel::Basic);
+  void* p = allocator.allocate(alloc_name, size);
 
-  {
-    void* p = allocator.allocate(alloc_name, size);
-    ASSERT_TRUE(rm.hasAllocator(p));
-    EXPECT_FALSE(rm.hasAllocator(static_cast<char*>(p) + 1));
-    EXPECT_THROW(rm.findAllocationRecord(p), umpire::runtime_error);
-    EXPECT_NO_THROW(rm.getAllocator(p));  // Works via API inference
-    EXPECT_THROW(rm.getSize(p), umpire::runtime_error);
-    EXPECT_THROW(umpire::get_allocator_records(allocator), umpire::runtime_error);
-    allocator.deallocate(p);
-  }
-}
-
-TEST(IntrospectionLevelTest, OffDisablesPublicOwnershipQueries)
-{
-  auto& rm = umpire::ResourceManager::getInstance();
-  IntrospectionLevelGuard guard{rm};
-
-  umpire::Allocator allocator{rm.getAllocator("HOST")};
-  constexpr std::size_t size{64};
-
-  rm.setIntrospectionLevel(umpire::IntrospectionLevel::Off);
-
-  {
-    void* p = allocator.allocate(size);
+  if (level == umpire::IntrospectionLevel::Off) {
+    // Off mode: no introspection available
     EXPECT_FALSE(rm.hasAllocator(p));
     EXPECT_THROW(rm.findAllocationRecord(p), umpire::runtime_error);
     EXPECT_THROW(rm.getAllocator(p), umpire::runtime_error);
     EXPECT_THROW(rm.getSize(p), umpire::runtime_error);
-    allocator.deallocate(p);
+    EXPECT_THROW(umpire::get_allocator_records(allocator), umpire::runtime_error);
+
+  } else if (level == umpire::IntrospectionLevel::Basic) {
+    // Basic mode: API inference, no metadata
+    ASSERT_TRUE(rm.hasAllocator(p));
+    EXPECT_TRUE(rm.hasAllocator(static_cast<char*>(p) + 1));  // API can't track offsets
+    EXPECT_THROW(rm.findAllocationRecord(p), umpire::runtime_error);
+    EXPECT_NO_THROW(rm.getAllocator(p));  // Works via API inference
+    EXPECT_THROW(rm.getSize(p), umpire::runtime_error);
+    EXPECT_THROW(umpire::get_allocator_records(allocator), umpire::runtime_error);
+
+  } else {  // IntrospectionLevel::On
+    // On mode: full tracking with metadata
+    ASSERT_TRUE(rm.hasAllocator(p));
+    EXPECT_NO_THROW(rm.getAllocator(p));
+    EXPECT_EQ(rm.getSize(p), size);
+    EXPECT_EQ(rm.findAllocationRecord(p)->name, alloc_name);
+    EXPECT_NO_THROW(umpire::get_allocator_records(allocator));
   }
+
+  allocator.deallocate(p);
 }
+
+TEST(IntrospectionLevelTest, EdgeCaseStackPointer)
 {
   auto& rm = umpire::ResourceManager::getInstance();
-  IntrospectionLevelGuard guard{rm};
+  const auto level = getCurrentLevel();
 
   int stack_var = 42;
   void* stack_ptr = &stack_var;
 
-  // Off mode
-  rm.setIntrospectionLevel(umpire::IntrospectionLevel::Off);
-  EXPECT_FALSE(rm.hasAllocator(stack_ptr));
+  if (level == umpire::IntrospectionLevel::Off) {
+    EXPECT_FALSE(rm.hasAllocator(stack_ptr));
 
-  // Basic mode - runtime API will likely fail, fallback to HOST
-  rm.setIntrospectionLevel(umpire::IntrospectionLevel::Basic);
-  // May return true (infers HOST) or false (API fails)
-  // Either is acceptable for non-Umpire pointer
-  bool has_alloc = rm.hasAllocator(stack_ptr);
-  // Should not crash
-  (void)has_alloc; // Suppress unused warning
+  } else if (level == umpire::IntrospectionLevel::Basic) {
+    // May return true (infers HOST) or false (API fails)
+    // Either is acceptable for non-Umpire pointer
+    bool has_alloc = rm.hasAllocator(stack_ptr);
+    (void)has_alloc; // Should not crash
 
-  // On mode
-  rm.setIntrospectionLevel(umpire::IntrospectionLevel::On);
-  EXPECT_FALSE(rm.hasAllocator(stack_ptr));
-  EXPECT_THROW(rm.getAllocator(stack_ptr), umpire::runtime_error);
+  } else {  // On
+    EXPECT_FALSE(rm.hasAllocator(stack_ptr));
+    EXPECT_THROW(rm.getAllocator(stack_ptr), umpire::runtime_error);
+  }
 }
 
 TEST(IntrospectionLevelTest, EdgeCaseFreedPointer)
 {
   auto& rm = umpire::ResourceManager::getInstance();
-  IntrospectionLevelGuard guard{rm};
+  const auto level = getCurrentLevel();
+
+  if (level == umpire::IntrospectionLevel::Off) {
+    GTEST_SKIP() << "EdgeCaseFreedPointer test requires introspection (basic or on)";
+  }
 
   umpire::Allocator allocator{rm.getAllocator("HOST")};
+  void* ptr = allocator.allocate(256);
 
-  // Test On mode
-  rm.setIntrospectionLevel(umpire::IntrospectionLevel::On);
-  {
-    void* ptr = allocator.allocate(256);
+  if (level == umpire::IntrospectionLevel::On) {
     EXPECT_TRUE(rm.hasAllocator(ptr));
-
     allocator.deallocate(ptr);
-
     // After deallocation, should not be tracked
     EXPECT_FALSE(rm.hasAllocator(ptr));
     EXPECT_THROW(rm.getAllocator(ptr), umpire::runtime_error);
-  }
 
-  // Test Basic mode
-  rm.setIntrospectionLevel(umpire::IntrospectionLevel::Basic);
-  {
-    void* ptr = allocator.allocate(256);
-    // Note: In Basic mode, we don't track, so behavior after free is undefined
-    // but shouldn't crash
+  } else {  // Basic
     allocator.deallocate(ptr);
-
-    // Querying freed pointer may or may not work (depends on OS reuse)
-    // Just verify it doesn't crash
+    // Behavior after free is undefined in Basic mode but shouldn't crash
     bool has_alloc = rm.hasAllocator(ptr);
-    (void)has_alloc; // Suppress unused warning
+    (void)has_alloc;
   }
 }
 
 #if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
-TEST(IntrospectionLevelTest, BasicModeAsyncCopy)
+TEST(IntrospectionLevelTest, AsyncCopy)
 {
   auto& rm = umpire::ResourceManager::getInstance();
-  IntrospectionLevelGuard guard{rm};
+  const auto level = getCurrentLevel();
 
-  rm.setIntrospectionLevel(umpire::IntrospectionLevel::Basic);
+  if (level != umpire::IntrospectionLevel::Basic) {
+    GTEST_SKIP() << "AsyncCopy test specific to Basic mode";
+  }
 
   umpire::Allocator device_alloc{rm.getAllocator("DEVICE")};
   umpire::Allocator host_alloc{rm.getAllocator("HOST")};
@@ -271,12 +266,14 @@ TEST(IntrospectionLevelTest, BasicModeAsyncCopy)
 #endif
 
 #if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
-TEST(IntrospectionLevelTest, BasicModeAsyncMemset)
+TEST(IntrospectionLevelTest, AsyncMemset)
 {
   auto& rm = umpire::ResourceManager::getInstance();
-  IntrospectionLevelGuard guard{rm};
+  const auto level = getCurrentLevel();
 
-  rm.setIntrospectionLevel(umpire::IntrospectionLevel::Basic);
+  if (level != umpire::IntrospectionLevel::Basic) {
+    GTEST_SKIP() << "AsyncMemset test specific to Basic mode";
+  }
 
   umpire::Allocator device_alloc{rm.getAllocator("DEVICE")};
   void* device_ptr = device_alloc.allocate(256);
@@ -298,30 +295,26 @@ TEST(IntrospectionLevelTest, BasicModeAsyncMemset)
 }
 #endif
 
-TEST(IntrospectionLevelTest, BasicModePoolAllocatorIdentification)
+TEST(IntrospectionLevelTest, PoolAllocatorIdentification)
 {
   auto& rm = umpire::ResourceManager::getInstance();
-  IntrospectionLevelGuard guard{rm};
+  const auto level = getCurrentLevel();
 
-  umpire::Allocator host_alloc{rm.getAllocator("HOST")};
-
-  // Create a pool backed by HOST
-  auto pool = rm.makeAllocator<umpire::strategy::QuickPool>("TestPool", host_alloc);
-
-  void* pool_ptr = pool.allocate(256);
-
-  // Test On mode - should return the specific pool
-  rm.setIntrospectionLevel(umpire::IntrospectionLevel::On);
-  {
-    auto retrieved = rm.getAllocator(pool_ptr);
-    EXPECT_EQ(retrieved.getName(), "TestPool");
+  if (level == umpire::IntrospectionLevel::Off) {
+    GTEST_SKIP() << "PoolAllocatorIdentification requires introspection (basic or on)";
   }
 
-  // Test Basic mode - should return HOST (the backing resource)
-  rm.setIntrospectionLevel(umpire::IntrospectionLevel::Basic);
-  {
-    auto retrieved = rm.getAllocator(pool_ptr);
-    // Basic mode returns backing resource, not the pool
+  umpire::Allocator host_alloc{rm.getAllocator("HOST")};
+  auto pool = rm.makeAllocator<umpire::strategy::QuickPool>("TestPool", host_alloc);
+  void* pool_ptr = pool.allocate(256);
+
+  auto retrieved = rm.getAllocator(pool_ptr);
+
+  if (level == umpire::IntrospectionLevel::On) {
+    // On mode returns the specific pool
+    EXPECT_EQ(retrieved.getName(), "TestPool");
+  } else {  // Basic
+    // Basic mode returns backing resource
     EXPECT_EQ(retrieved.getName(), "HOST");
   }
 
@@ -331,33 +324,28 @@ TEST(IntrospectionLevelTest, BasicModePoolAllocatorIdentification)
 TEST(IntrospectionLevelTest, ErrorMessageQuality)
 {
   auto& rm = umpire::ResourceManager::getInstance();
-  IntrospectionLevelGuard guard{rm};
+  const auto level = getCurrentLevel();
 
   umpire::Allocator allocator{rm.getAllocator("HOST")};
 
-  // Basic mode size=0 error message
-  rm.setIntrospectionLevel(umpire::IntrospectionLevel::Basic);
-  {
+  if (level == umpire::IntrospectionLevel::Basic) {
+    // In Basic mode, test that operations requiring full introspection give clear error
     void* p1 = allocator.allocate(256);
-    void* p2 = allocator.allocate(256);
 
     try {
-      rm.copy(p2, p1, 0);
+      rm.copy(p1, p1, 0);
       FAIL() << "Expected runtime_error";
     } catch (const umpire::runtime_error& e) {
       std::string msg = e.what();
-      EXPECT_TRUE(msg.find("size=0") != std::string::npos ||
-                  msg.find("auto-sizing") != std::string::npos)
-        << "Error message should mention size=0 or auto-sizing: " << msg;
+      EXPECT_TRUE(msg.find("introspection") != std::string::npos &&
+                  (msg.find("on") != std::string::npos || msg.find("On") != std::string::npos))
+        << "Error message should mention introspection level: " << msg;
     }
 
     allocator.deallocate(p1);
-    allocator.deallocate(p2);
-  }
 
-  // Off mode operation error message
-  rm.setIntrospectionLevel(umpire::IntrospectionLevel::Off);
-  {
+  } else if (level == umpire::IntrospectionLevel::Off) {
+    // Test Off mode operation error
     void* p = allocator.allocate(256);
 
     try {
@@ -370,21 +358,34 @@ TEST(IntrospectionLevelTest, ErrorMessageQuality)
     }
 
     allocator.deallocate(p);
+
+  } else {  // On mode
+    // Test On mode size=0 auto-sizing error
+    void* p1 = allocator.allocate(256);
+    void* p2 = allocator.allocate(256);
+
+    // Size=0 with On mode should work (auto-sizing from allocation record)
+    EXPECT_NO_THROW(rm.copy(p2, p1, 0));
+
+    allocator.deallocate(p1);
+    allocator.deallocate(p2);
   }
 }
 
 #if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
-TEST(IntrospectionLevelTest, BasicModeMultiGPU)
+TEST(IntrospectionLevelTest, MultiGPU)
 {
   auto& rm = umpire::ResourceManager::getInstance();
-  IntrospectionLevelGuard guard{rm};
+  const auto level = getCurrentLevel();
 
   int num_devices = rm.getNumDevices();
   if (num_devices < 2) {
     GTEST_SKIP() << "Test requires multiple GPUs";
   }
 
-  rm.setIntrospectionLevel(umpire::IntrospectionLevel::Basic);
+  if (level != umpire::IntrospectionLevel::Basic) {
+    GTEST_SKIP() << "MultiGPU test specific to Basic mode";
+  }
 
   // Test device 0
   {

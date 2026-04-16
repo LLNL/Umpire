@@ -48,7 +48,8 @@ Inspector::deregisterAllocation(void* ptr, strategy::AllocationStrategy* s)
 {
   auto record = ResourceManager::getInstance().deregisterAllocation(ptr);
 
-  if (record.strategy == s) {
+  // In Basic/Off modes, record.strategy will be nullptr (no tracking)
+  if (record.strategy == nullptr || record.strategy == s) {
     s->m_current_size -= record.size;
     s->m_allocation_count--;
   } else {

@@ -412,8 +412,6 @@ class ResourceManager {
 
   util::AllocationMap m_allocations;
 
-  bool m_allocations_exist{false};  // Track if any allocations made
-
   std::list<std::unique_ptr<strategy::AllocationStrategy>> m_allocators;
   std::vector<std::string> m_shared_allocator_names;
 
