@@ -101,23 +101,45 @@ Pass criteria:
 
 The local host-safe execution bead is `umpire-v0s`.
 
-Use the LLVM 19 host configuration already documented in
-`tests/api_v2/README.md`:
+Build the explicit API v2 host workload benchmark targets with the LLVM 19
+host configuration:
 
 ```bash
 cmake -S . -B build \
   -DCMAKE_C_COMPILER=/opt/homebrew/opt/llvm@19/bin/clang \
   -DCMAKE_CXX_COMPILER=/opt/homebrew/opt/llvm@19/bin/clang++ \
+  -DCMAKE_AR=/opt/homebrew/opt/llvm@19/bin/llvm-ar \
+  -DCMAKE_RANLIB=/opt/homebrew/opt/llvm@19/bin/llvm-ranlib \
   -DCMAKE_CXX_FLAGS='-stdlib=libc++' \
   -DCMAKE_EXPORT_COMPILE_COMMANDS=On \
-  -DUMPIRE_ENABLE_TESTS=On
+  -DENABLE_BENCHMARKS=On \
+  -DUMPIRE_ENABLE_TESTS=On \
+  -DUMPIRE_ENABLE_BENCHMARKS=On
 
-cmake --build build --parallel
+cmake --build build \
+  --target api_v2_release_workload_host_benchmarks \
+  --parallel
+```
+
+The checked-in benchmark targets are:
+- `api_v2_dynamic_pool_list_benchmarks`
+- `api_v2_quick_pool_benchmarks`
+- `api_v2_release_workload_host_benchmarks` (aggregate target for the host-safe
+  release workload benchmarks)
+
+`UMPIRE_ENABLE_BENCHMARKS` is gated by BLT's top-level `ENABLE_BENCHMARKS`
+option, so both options must be enabled for these targets to appear.
+
+Run the host-safe benchmark bundle through the built benchmark binaries:
+
+```bash
+./build/bin/api_v2_dynamic_pool_list_benchmarks
+./build/bin/api_v2_quick_pool_benchmarks
 ```
 
 The execution bead must then:
 - run the `host_interop_correctness` bundle from the built test targets
-- execute the benchmark sources in this directory using the same configured
+- execute the explicit benchmark targets above using the same configured
   compiler and build settings as the host validation build
 - record exact commands, raw results, and the baseline used for comparison
 

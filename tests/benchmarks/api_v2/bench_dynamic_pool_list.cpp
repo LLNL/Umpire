@@ -21,6 +21,8 @@ namespace {
 // Test memory implementation for benchmarking
 class bench_memory : public umpire::memory {
 public:
+  using platform = umpire::host_platform;
+
   bench_memory() : umpire::memory{"bench_parent"} { }
 
   void* allocate(std::size_t size) override {
@@ -444,7 +446,7 @@ void benchmark_pool_growth() {
 // Main
 // ============================================================================
 
-int main(int argc, char** argv) {
+int main() {
   std::cout << "==================================================" << std::endl;
   std::cout << "  dynamic_pool_list Benchmark Suite" << std::endl;
   std::cout << "==================================================" << std::endl;

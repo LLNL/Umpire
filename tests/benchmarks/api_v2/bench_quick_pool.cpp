@@ -530,7 +530,7 @@ void benchmark_scalability() {
 // Main
 // ============================================================================
 
-int main(int argc, char** argv) {
+int main() {
   std::cout << "==================================================" << std::endl;
   std::cout << "  quick_pool Benchmark Suite" << std::endl;
   std::cout << "==================================================" << std::endl;
