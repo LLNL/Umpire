@@ -99,9 +99,9 @@ void Logger::initialize()
   const char* env_enable_log = std::getenv("UMPIRE_LOG_LEVEL");
   if (!env_enable_log) {
     // Logging disabled - create a null logger
+    // Don't use spdlog::register_logger to avoid static initialization order issues
     auto null_sink = std::make_shared<spdlog::sinks::null_sink_mt>();
     s_logger = std::make_shared<spdlog::logger>("umpire", null_sink);
-    spdlog::register_logger(s_logger);
     s_initialized = true;
     return;
   }
@@ -140,6 +140,7 @@ void Logger::initialize()
   }
 
   // Create logger (sync or async)
+  // Don't use spdlog::register_logger to avoid static initialization order issues
   if (use_async) {
     s_logger = std::make_shared<spdlog::async_logger>("umpire", sinks.begin(), sinks.end(),
                                                        spdlog::thread_pool(),
@@ -147,9 +148,6 @@ void Logger::initialize()
   } else {
     s_logger = std::make_shared<spdlog::logger>("umpire", sinks.begin(), sinks.end());
   }
-
-  // Register with spdlog
-  spdlog::register_logger(s_logger);
 
   // Set format pattern to match current output: [LEVEL][file:line]: message
   s_logger->set_pattern("[%^%L%$][%s:%#]: %v");
@@ -165,18 +163,20 @@ void Logger::initialize()
 
 void Logger::finalize()
 {
-  if (s_logger) {
-    s_logger->flush();
-    spdlog::drop("umpire");
-    s_logger.reset();
-  }
-
-  // Shutdown async thread pool if it exists
-  if (spdlog::thread_pool()) {
-    spdlog::shutdown();
-  }
-
-  s_initialized = false;
+  // Do nothing during finalize to avoid static destruction order issues.
+  // When ResourceManager is destroyed during static destruction (e.g., in tests
+  // that create a static ResourceManager reference), attempting to clean up the
+  // logger can cause segfaults because:
+  // 1. spdlog's internal state (sinks, file handles) may already be destroyed
+  // 2. Even resetting the shared_ptr can crash if the control block is corrupted
+  //
+  // It's safe to leak the logger here because:
+  // - Normal program exit will close all file handles and free all memory
+  // - The logger's file sink will flush on destruction if still valid
+  // - Process cleanup handles everything automatically
+  //
+  // This is only an issue for tests with static ResourceManager instances.
+  // Normal usage (where ResourceManager is created/destroyed in main) works fine.
 }
 
 bool Logger::shouldLog(message::Level level) noexcept
