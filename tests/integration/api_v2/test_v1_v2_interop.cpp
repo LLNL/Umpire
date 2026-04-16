@@ -17,7 +17,9 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <sstream>
 #include <string>
+#include <vector>
 
 namespace {
 
@@ -38,6 +40,13 @@ bool has_allocator_at(std::uintptr_t address)
 {
   // NOLINTNEXTLINE(clang-analyzer-unix.Malloc)
   return umpire::ResourceManager::getInstance().hasAllocator(reinterpret_cast<void*>(address));
+}
+
+bool contains_record(const std::vector<umpire::util::AllocationRecord>& records, void* ptr, std::size_t size)
+{
+  return std::any_of(records.begin(), records.end(), [ptr, size](const auto& record) {
+    return record.ptr == ptr && record.size == size;
+  });
 }
 
 } // namespace
@@ -115,6 +124,62 @@ TEST(ApiV1V2Interop, V1DeallocateUsesV2OwnerForHostAllocation)
   EXPECT_FALSE(rm.hasAllocator(ptr));
   EXPECT_FALSE(umpire::detail::registry::get().find_allocation(ptr).has_value());
   EXPECT_EQ(host().get_current_size(), 0u);
+}
+
+TEST(ApiV1V2Interop, V1IntrospectionReportsBridgedHostAllocationLifecycle)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto host_allocator = rm.getAllocator("HOST");
+  auto* ptr = static_cast<unsigned char*>(host().allocate(48));
+  auto* offset_ptr = ptr + 7;
+  auto ptr_value = reinterpret_cast<std::uintptr_t>(ptr);
+  auto offset_ptr_value = reinterpret_cast<std::uintptr_t>(offset_ptr);
+
+  EXPECT_TRUE(rm.hasAllocator(ptr));
+  EXPECT_TRUE(rm.hasAllocator(offset_ptr));
+  auto* base_record = rm.findAllocationRecord(ptr);
+  auto* offset_record = rm.findAllocationRecord(offset_ptr);
+
+  ASSERT_NE(base_record, nullptr);
+  ASSERT_NE(offset_record, nullptr);
+  EXPECT_EQ(base_record->ptr, ptr);
+  EXPECT_EQ(offset_record->ptr, ptr);
+  EXPECT_EQ(base_record->size, 48u);
+  EXPECT_EQ(offset_record->size, 48u);
+  EXPECT_EQ(rm.getAllocator(ptr).getId(), host_allocator.getId());
+  EXPECT_EQ(rm.getAllocator(offset_ptr).getId(), host_allocator.getId());
+
+  auto allocator_records = umpire::get_allocator_records(host_allocator);
+  auto leaked_records = umpire::get_leaked_allocations(host_allocator);
+
+  EXPECT_TRUE(contains_record(allocator_records, ptr, 48u));
+  EXPECT_TRUE(contains_record(leaked_records, ptr, 48u));
+
+  std::ostringstream report;
+  umpire::print_allocator_records(host_allocator, report);
+
+  std::ostringstream ptr_text;
+  ptr_text << static_cast<void*>(ptr);
+  EXPECT_NE(report.str().find("Allocations for HOST allocator:"), std::string::npos);
+  EXPECT_NE(report.str().find(ptr_text.str()), std::string::npos);
+
+  host().deallocate(ptr);
+
+  EXPECT_FALSE(has_allocator_at(ptr_value));
+  EXPECT_FALSE(has_allocator_at(offset_ptr_value));
+  EXPECT_THROW(rm.findAllocationRecord(reinterpret_cast<void*>(ptr_value)), umpire::unknown_allocation);
+  EXPECT_THROW(rm.findAllocationRecord(reinterpret_cast<void*>(offset_ptr_value)), umpire::unknown_allocation);
+  EXPECT_THROW(rm.getAllocator(reinterpret_cast<void*>(ptr_value)), umpire::unknown_allocation);
+  EXPECT_THROW(rm.getAllocator(reinterpret_cast<void*>(offset_ptr_value)), umpire::unknown_allocation);
+
+  allocator_records = umpire::get_allocator_records(host_allocator);
+  leaked_records = umpire::get_leaked_allocations(host_allocator);
+  EXPECT_FALSE(contains_record(allocator_records, ptr, 48u));
+  EXPECT_FALSE(contains_record(leaked_records, ptr, 48u));
+
+  std::ostringstream cleared_report;
+  umpire::print_allocator_records(host_allocator, cleared_report);
+  EXPECT_TRUE(cleared_report.str().empty());
 }
 
 TEST(ApiV1V2Interop, V1ZeroSizeReallocateReleasesV2HostAllocation)
