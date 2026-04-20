@@ -190,6 +190,57 @@ declarations:
             template_suffix: _resource_aware_pool
             function_suffix: ""
 
+      - decl: Allocator makeAllocator_list_pool_aligned(const std::string& name, Allocator allocator, size_t initial_size, size_t block, size_t alignment)
+        options:
+          F_C_name_template: c_resourcemanager_make_alloc_dynamic_p_list_a{function_suffix}{template_suffix}
+        format:
+          F_name_impl: make_alloc_dynamic_p_list_a
+        splicer:
+          c: |
+            const std::string SHC_name_cxx(name);
+            umpire::Allocator *SHC_allocator_cxx =
+                static_cast<umpire::Allocator *>(allocator.addr);
+            umpire::Allocator *SHC_rv_cxx = new umpire::Allocator;
+            *SHC_rv_cxx = SH_this->makeAllocator<umpire::strategy::DynamicPoolList>(
+                SHC_name_cxx, *SHC_allocator_cxx, initial_size, block, alignment);
+            SHC_rv->addr  = SHC_rv_cxx;
+            SHC_rv->idtor = 1;
+            return SHC_rv;
+
+      - decl: Allocator makeAllocator_quick_pool_aligned(const std::string& name, Allocator allocator, size_t initial_size, size_t block, size_t alignment)
+        options:
+          F_C_name_template: c_resourcemanager_make_alloc_quick_p_a{function_suffix}{template_suffix}
+        format:
+          F_name_impl: make_alloc_quick_p_a
+        splicer:
+          c: |
+            const std::string SHC_name_cxx(name);
+            umpire::Allocator *SHC_allocator_cxx =
+                static_cast<umpire::Allocator *>(allocator.addr);
+            umpire::Allocator *SHC_rv_cxx = new umpire::Allocator;
+            *SHC_rv_cxx = SH_this->makeAllocator<umpire::strategy::QuickPool>(
+                SHC_name_cxx, *SHC_allocator_cxx, initial_size, block, alignment);
+            SHC_rv->addr  = SHC_rv_cxx;
+            SHC_rv->idtor = 1;
+            return SHC_rv;
+
+      - decl: Allocator makeAllocator_resource_aware_pool_aligned(const std::string& name, Allocator allocator, size_t initial_size, size_t block, size_t alignment)
+        options:
+          F_C_name_template: c_resourcemanager_make_alloc_res_aware_p_a{function_suffix}{template_suffix}
+        format:
+          F_name_impl: make_alloc_res_aware_p_a
+        splicer:
+          c: |
+            const std::string SHC_name_cxx(name);
+            umpire::Allocator *SHC_allocator_cxx =
+                static_cast<umpire::Allocator *>(allocator.addr);
+            umpire::Allocator *SHC_rv_cxx = new umpire::Allocator;
+            *SHC_rv_cxx = SH_this->makeAllocator<umpire::strategy::ResourceAwarePool>(
+                SHC_name_cxx, *SHC_allocator_cxx, initial_size, block, alignment);
+            SHC_rv->addr  = SHC_rv_cxx;
+            SHC_rv->idtor = 1;
+            return SHC_rv;
+
       - decl: template <typename T> Allocator makeAllocator(const std::string& name, Allocator allocator, const std::string& advice_op, int device_id);
         options:
           F_create_generic: False
@@ -326,6 +377,57 @@ declarations:
             umpire::Allocator *SHC_rv_cxx = new umpire::Allocator;
             *SHC_rv_cxx = SH_this->makeAllocator<umpire::strategy::ResourceAwarePool, false>(
                 SHC_name_cxx, *SHC_allocator_cxx, initial_size, block);
+            SHC_rv->addr  = SHC_rv_cxx;
+            SHC_rv->idtor = 1;
+            return SHC_rv;
+
+      - decl: Allocator makeAllocator_list_pool_aligned_untracked(const std::string& name, Allocator allocator, size_t initial_size, size_t block, size_t alignment)
+        options:
+          F_C_name_template: c_resourcemanager_make_alloc_dynamic_p_list_au{function_suffix}{template_suffix}
+        format:
+          F_name_impl: make_alloc_dynamic_p_list_au
+        splicer:
+          c: |
+            const std::string SHC_name_cxx(name);
+            umpire::Allocator *SHC_allocator_cxx =
+                static_cast<umpire::Allocator *>(allocator.addr);
+            umpire::Allocator *SHC_rv_cxx = new umpire::Allocator;
+            *SHC_rv_cxx = SH_this->makeAllocator<umpire::strategy::DynamicPoolList, false>(
+                SHC_name_cxx, *SHC_allocator_cxx, initial_size, block, alignment);
+            SHC_rv->addr  = SHC_rv_cxx;
+            SHC_rv->idtor = 1;
+            return SHC_rv;
+
+      - decl: Allocator makeAllocator_quick_pool_aligned_untracked(const std::string& name, Allocator allocator, size_t initial_size, size_t block, size_t alignment)
+        options:
+          F_C_name_template: c_resourcemanager_make_alloc_quick_p_au{function_suffix}{template_suffix}
+        format:
+          F_name_impl: make_alloc_quick_p_au
+        splicer:
+          c: |
+            const std::string SHC_name_cxx(name);
+            umpire::Allocator *SHC_allocator_cxx =
+                static_cast<umpire::Allocator *>(allocator.addr);
+            umpire::Allocator *SHC_rv_cxx = new umpire::Allocator;
+            *SHC_rv_cxx = SH_this->makeAllocator<umpire::strategy::QuickPool, false>(
+                SHC_name_cxx, *SHC_allocator_cxx, initial_size, block, alignment);
+            SHC_rv->addr  = SHC_rv_cxx;
+            SHC_rv->idtor = 1;
+            return SHC_rv;
+
+      - decl: Allocator makeAllocator_resource_aware_pool_aligned_untracked(const std::string& name, Allocator allocator, size_t initial_size, size_t block, size_t alignment)
+        options:
+          F_C_name_template: c_resourcemanager_make_alloc_res_aware_p_au{function_suffix}{template_suffix}
+        format:
+          F_name_impl: make_alloc_res_aware_p_au
+        splicer:
+          c: |
+            const std::string SHC_name_cxx(name);
+            umpire::Allocator *SHC_allocator_cxx =
+                static_cast<umpire::Allocator *>(allocator.addr);
+            umpire::Allocator *SHC_rv_cxx = new umpire::Allocator;
+            *SHC_rv_cxx = SH_this->makeAllocator<umpire::strategy::ResourceAwarePool, false>(
+                SHC_name_cxx, *SHC_allocator_cxx, initial_size, block, alignment);
             SHC_rv->addr  = SHC_rv_cxx;
             SHC_rv->idtor = 1;
             return SHC_rv;
