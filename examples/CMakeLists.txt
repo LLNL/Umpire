@@ -92,7 +92,7 @@ list(APPEND umpire_examples resource_aware_pool_example)
 blt_add_executable(
   NAME allocator
   SOURCES allocator.cxx
-  DEPENDS_ON ${example_depends})
+  DEPENDS_ON ${example_depends} blt::hip)
 list(APPEND umpire_examples allocator)
 
 blt_add_executable(
