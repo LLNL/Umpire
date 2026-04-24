@@ -346,7 +346,6 @@ When adding allocators, strategies, or resources:
 ## Important Conventions
 
 - Memory sizes are in bytes
-- Allocator IDs are unique integers assigned by ResourceManager
 - Allocator names must be unique strings
 - AllocationStrategy objects form a hierarchy (strategies can wrap other strategies)
 - C++20 is the minimum required standard (enforced by CMake configuration)
