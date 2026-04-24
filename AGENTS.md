@@ -224,12 +224,14 @@ rm.memset(ptr, 0);           // Set memory to value
 ## Critical Constraints (HPC Performance Library)
 
 Umpire is a **performance-critical HPC library**. All changes must preserve performance, portability, and API stability.
+If you believe this is not possible, inform the user before proceeding.
 
 ### Architectural Invariants
 
 **Core concepts and their relationships:**
 - ResourceManager (singleton, thread-safe)
 - Allocator (lightweight handle, must remain O(1) operations)
+  - If this will not be the case, inform the user
 - MemoryResource (backend abstraction)
 - AllocationStrategy (composable, may have different complexity)
   - For example, you can apply a SizeLimiter strategy to a QuickPool to impose a strict upper bound on how much the QuickPool can grow.
@@ -297,10 +299,15 @@ When working with CUDA, HIP, SYCL, or device allocators:
 
 **All changes must:**
 - Build with host-only configuration
-- Build with CUDA enabled (if applicable)
-- Build with HIP enabled (if applicable)
 - Add or update unit tests if behavior changes
 - Avoid introducing nondeterminism in tests
+
+**Testing considerations:**
+- Ask the user if the test should build with CUDA enabled.
+- Ask the user if the test should build with HIP enabled.
+- Ask the user if the test should build with any other options enabled (e.g. sanitizer support, fortran enabled, etc.).
+- If you are trying to test IPC Shared Memory or MPI3 shared memory and you are working on a Apple or Windows environment:
+  - Tell the user that a test can't be run here - they will have to use LC resources to successfully build and run that test
 
 **Tests should:**
 - Avoid large allocations unless done by design as part of the test
@@ -322,9 +329,9 @@ When working with CUDA, HIP, SYCL, or device allocators:
 When adding allocators, strategies, or resources:
 - Update relevant documentation
 - Add usage examples
-- Document performance implications
-- Document backend constraints and requirements
-- Document thread-safety guarantees
+- Document performance implications if possible
+- Document backend constraints and requirements if possible
+- Document thread-safety guarantees if possible
 
 ### When Uncertain
 
