@@ -10,6 +10,7 @@
 #include "umpire/resource/MemoryResource.hpp"
 #include "umpire/util/MPI.hpp"
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/mpi_shared.hpp"
 #include "umpire/util/error.hpp"
 
 namespace umpire {
@@ -18,8 +19,7 @@ namespace resource {
 HostMpi3SharedMemoryResource::HostMpi3SharedMemoryResource(const std::string& name, int id, MemoryResourceTraits traits)
     : MemoryResource{name, id, traits}
 {
-  constexpr int IGNORE_KEY{0};
-  MPI_Comm_split_type(util::MPI::getCommunicator(), MPI_COMM_TYPE_SHARED, IGNORE_KEY, MPI_INFO_NULL, &m_shared_comm);
+  m_shared_comm = util::create_shared_communicator(util::MPI::getCommunicator(), traits.scope);
   MPI_Comm_rank(m_shared_comm, &m_local_rank);
 
   // Free the comm at exit during cleanup in MPI_Finalize. We pass the m_shared_comm
@@ -71,6 +71,11 @@ bool HostMpi3SharedMemoryResource::isAccessibleFrom(Platform p) noexcept
 Platform HostMpi3SharedMemoryResource::getPlatform() noexcept
 {
   return Platform::host;
+}
+
+MPI_Comm HostMpi3SharedMemoryResource::getSharedCommunicator() const noexcept
+{
+  return m_shared_comm;
 }
 
 int HostMpi3SharedMemoryResource::free_comm(MPI_Comm UMPIRE_UNUSED_ARG(comm), int UMPIRE_UNUSED_ARG(keyval),

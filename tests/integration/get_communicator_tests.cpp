@@ -38,6 +38,27 @@ TEST(GetCommunicator, SharedAndCached)
   ASSERT_EQ(result, MPI_IDENT);
 }
 
+#if defined(__linux__) || defined(UMPIRE_ENABLE_NUMA)
+TEST(GetCommunicator, SharedSocket)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto traits{umpire::get_default_resource_traits("SHARED::MPI3")};
+  traits.size = 4096;
+  traits.scope = umpire::MemoryResourceTraits::shared_scope::socket;
+
+  auto allocator = rm.makeResource("SHARED::MPI3::socket_allocator", traits);
+
+  auto comm = umpire::get_communicator_for_allocator(allocator, MPI_COMM_WORLD);
+  ASSERT_NE(comm, MPI_COMM_NULL);
+
+  auto repeated_comm = umpire::get_communicator_for_allocator(allocator, MPI_COMM_WORLD);
+  int result{MPI_UNEQUAL};
+  MPI_Comm_compare(comm, repeated_comm, &result);
+  ASSERT_EQ(result, MPI_IDENT);
+}
+#endif
+
 int main(int argc, char* argv[])
 {
   int result = 0;

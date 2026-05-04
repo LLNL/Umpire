@@ -21,7 +21,7 @@ int main(int argc, char** argv)
   auto traits = umpire::get_default_resource_traits("SHARED::MPI3");
   traits.size = 1 * 1024 * 1024; // 1 MB
 
-  // Node scope is required for mpi3 shared memory
+  // Node scope is the default for MPI3 shared memory; socket scope is also supported.
   traits.scope = umpire::MemoryResourceTraits::shared_scope::node;
 
   // Create allocator using MPI3 shared memory

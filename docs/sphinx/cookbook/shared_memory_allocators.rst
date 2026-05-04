@@ -79,6 +79,7 @@ To create an allocator with the MPI3 Shared Memory resource, you can do the foll
 .. code-block:: cpp
 
    auto traits{umpire::get_default_resource_traits("SHARED::MPI3")};
+   traits.scope = umpire::MemoryResourceTraits::shared_scope::socket; // or node
    auto node_allocator{rm.makeResource("SHARED::mpi3_alloc", traits)};
 
 See the bottom of this page for a full example of how to use MPI3 Shared Memory Allocators with Umpire.
@@ -131,4 +132,3 @@ when creating the MPI3 Shared Memory allocator, a name is not needed when alloca
 
 .. literalinclude:: ../../../examples/mpi3_shared_memory.cpp
    :language: cpp
-

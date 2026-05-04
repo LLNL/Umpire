@@ -4,8 +4,8 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#ifndef __Host_Shared_Memory_Resource_HPP
-#define __Host_Shared_Memory_Resource_HPP
+#ifndef UMPIRE_Host_Mpi3_Shared_Memory_Resource_HPP
+#define UMPIRE_Host_Mpi3_Shared_Memory_Resource_HPP
 
 #include <map>
 #include <memory>
@@ -32,6 +32,8 @@ class HostMpi3SharedMemoryResource : public MemoryResource {
 
   Platform getPlatform() noexcept override;
 
+  MPI_Comm getSharedCommunicator() const noexcept;
+
  private:
   static int free_comm(MPI_Comm comm, int keyval, void* attribute_val, void* extra_state);
 
@@ -42,4 +44,4 @@ class HostMpi3SharedMemoryResource : public MemoryResource {
 
 } // end of namespace resource
 } // end of namespace umpire
-#endif // __Host_Shared_Memory_Resource_HPP
+#endif // UMPIRE_Host_Mpi3_Shared_Memory_Resource_HPP

@@ -17,6 +17,9 @@
 
 #include "umpire/ResourceManager.hpp"
 #include "umpire/config.hpp"
+#if defined(UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
+#include "umpire/resource/HostMpi3SharedMemoryResource.hpp"
+#endif
 #include "umpire/resource/HostSharedMemoryResource.hpp"
 #include "umpire/resource/MemoryResource.hpp"
 #if defined(UMPIRE_ENABLE_MPI) && defined(UMPIRE_ENABLE_IPC_SHARED_MEMORY)
@@ -27,6 +30,7 @@
 #include "umpire/strategy/DynamicPoolList.hpp"
 #include "umpire/strategy/QuickPool.hpp"
 #include "umpire/strategy/ResourceAwarePool.hpp"
+#include "umpire/util/mpi_shared.hpp"
 #include "umpire/util/wrap_allocator.hpp"
 
 #if !defined(_MSC_VER)
@@ -318,6 +322,10 @@ MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm)
   if (auto alloc = dynamic_cast<strategy::DeviceIpcAllocator*>(a.getAllocationStrategy()))
     return alloc->get_scope_communicator();
 #endif
+#if defined(UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
+  if (auto resource = dynamic_cast<resource::HostMpi3SharedMemoryResource*>(a.getAllocationStrategy()))
+    return resource->getSharedCommunicator();
+#endif
 
   std::map<int, MPI_Comm>& cached_communicators = get_cached_communicators();
 
@@ -329,8 +337,8 @@ MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm)
   if (cached_comm != cached_communicators.end()) {
     c = cached_comm->second;
   } else {
-    if (scope == MemoryResourceTraits::shared_scope::node) {
-      MPI_Comm_split_type(comm, MPI_COMM_TYPE_SHARED, 0, MPI_INFO_NULL, &c);
+    if (scope == MemoryResourceTraits::shared_scope::node || scope == MemoryResourceTraits::shared_scope::socket) {
+      c = util::create_shared_communicator(comm, scope);
     } else {
       c = MPI_COMM_NULL;
     }
