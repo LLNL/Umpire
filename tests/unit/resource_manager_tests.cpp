@@ -65,7 +65,8 @@ TEST(ResourceManager, getAllocatorByNameErrorListsAvailableAllocators)
   } catch (const umpire::runtime_error& e) {
     const std::string message{e.what()};
     EXPECT_NE(message.find("Available allocators:"), std::string::npos);
-    EXPECT_NE(message.find("HOST"), std::string::npos);
+    EXPECT_NE(message.find("\n  - HOST"), std::string::npos);
+    EXPECT_EQ(message.find("__umpire_internal_null"), std::string::npos);
   }
 }
 
