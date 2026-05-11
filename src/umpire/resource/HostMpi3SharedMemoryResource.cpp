@@ -7,19 +7,174 @@
 
 #include "umpire/resource/HostMpi3SharedMemoryResource.hpp"
 
+#include <cerrno>
+#include <cstring>
+#include <fstream>
+#include <set>
+#include <sstream>
+#include <string>
+
+#if defined(__linux__)
+#include <sched.h>
+#include <unistd.h>
+#endif
+
 #include "umpire/resource/MemoryResource.hpp"
 #include "umpire/util/MPI.hpp"
 #include "umpire/util/Macros.hpp"
-#include "umpire/util/mpi_shared.hpp"
+#if defined(UMPIRE_ENABLE_NUMA)
+#include "umpire/util/numa.hpp"
+#endif
 #include "umpire/util/error.hpp"
 
 namespace umpire {
 namespace resource {
 
+namespace {
+
+constexpr int IGNORE_KEY{0};
+
+#if defined(__linux__)
+bool try_get_socket_color_for_cpu(int cpu, int& color)
+{
+  std::ifstream package_id_file{"/sys/devices/system/cpu/cpu" + std::to_string(cpu) + "/topology/physical_package_id"};
+  if (package_id_file) {
+    package_id_file >> color;
+    if (package_id_file) {
+      UMPIRE_LOG(Debug, "Using Linux physical_package_id " << color << " for cpu " << cpu);
+      return true;
+    }
+
+    UMPIRE_LOG(Debug, "Could not read physical_package_id for cpu " << cpu);
+  } else {
+    UMPIRE_LOG(Debug, "Could not open physical_package_id for cpu " << cpu);
+  }
+
+#if defined(UMPIRE_ENABLE_NUMA) && defined(__linux__)
+  try {
+    color = numa::node_of_cpu(cpu);
+    UMPIRE_LOG(Debug, "Using NUMA node " << color << " as socket color fallback for cpu " << cpu);
+    return true;
+  } catch (const std::exception& e) {
+    UMPIRE_LOG(Debug, "NUMA fallback failed for cpu " << cpu << ": " << e.what());
+  }
+#endif
+
+  UMPIRE_USE_VAR(cpu);
+  UMPIRE_USE_VAR(color);
+  return false;
+}
+
+std::string format_socket_colors(const std::set<int>& colors)
+{
+  std::ostringstream ss;
+
+  bool first = true;
+  for (int color : colors) {
+    if (!first) {
+      ss << ", ";
+    }
+    ss << color;
+    first = false;
+  }
+
+  return ss.str();
+}
+#endif
+
+int get_socket_color_from_affinity()
+{
+#if defined(__linux__)
+  const long cpu_count = sysconf(_SC_NPROCESSORS_CONF);
+  if (cpu_count <= 0) {
+    UMPIRE_ERROR(runtime_error, "Could not determine the number of configured CPUs for socket scope");
+  }
+
+  const auto set_size = CPU_ALLOC_SIZE(cpu_count);
+  cpu_set_t* cpu_set = CPU_ALLOC(cpu_count);
+  if (!cpu_set) {
+    UMPIRE_ERROR(runtime_error, "Failed to allocate a CPU affinity mask for socket scope");
+  }
+
+  CPU_ZERO_S(set_size, cpu_set);
+
+  if (sched_getaffinity(0, set_size, cpu_set) != 0) {
+    const std::string message =
+        fmt::format("sched_getaffinity failed while determining socket scope: {}", std::strerror(errno));
+    CPU_FREE(cpu_set);
+    UMPIRE_ERROR(runtime_error, message);
+  }
+
+  std::set<int> socket_colors;
+
+  for (int cpu = 0; cpu < cpu_count; ++cpu) {
+    if (!CPU_ISSET_S(cpu, set_size, cpu_set)) {
+      continue;
+    }
+
+    int color{-1};
+    if (!try_get_socket_color_for_cpu(cpu, color)) {
+      const std::string message =
+          fmt::format("Unable to determine a socket color for cpu {} in the rank affinity mask", cpu);
+      CPU_FREE(cpu_set);
+      UMPIRE_ERROR(runtime_error, message);
+    }
+
+    socket_colors.insert(color);
+  }
+
+  CPU_FREE(cpu_set);
+
+  if (socket_colors.empty()) {
+    UMPIRE_ERROR(runtime_error, "The rank CPU affinity mask is empty; cannot determine socket scope");
+  }
+
+  if (socket_colors.size() != 1) {
+    UMPIRE_ERROR(runtime_error,
+                 fmt::format("Socket-scoped MPI3 shared memory requires each MPI rank to be bound to exactly one "
+                             "socket. This rank's affinity mask spans socket colors: {}",
+                             format_socket_colors(socket_colors)));
+  }
+
+  return *socket_colors.begin();
+#else
+  UMPIRE_ERROR(runtime_error,
+               "shared_scope::socket for MPI3 shared memory requires Linux CPU affinity information");
+#endif
+}
+
+MPI_Comm create_shared_communicator(MPI_Comm comm, MemoryResourceTraits::shared_scope scope)
+{
+  MPI_Comm shared_comm{MPI_COMM_NULL};
+
+  if (scope == MemoryResourceTraits::shared_scope::node) {
+    MPI_Comm_split_type(comm, MPI_COMM_TYPE_SHARED, IGNORE_KEY, MPI_INFO_NULL, &shared_comm);
+    return shared_comm;
+  }
+
+  if (scope == MemoryResourceTraits::shared_scope::socket) {
+    const int color = get_socket_color_from_affinity();
+
+    MPI_Comm node_comm{MPI_COMM_NULL};
+    MPI_Comm_split_type(comm, MPI_COMM_TYPE_SHARED, IGNORE_KEY, MPI_INFO_NULL, &node_comm);
+    UMPIRE_LOG(Debug, "Creating socket-scoped shared communicator with color " << color);
+
+    MPI_Comm_split(node_comm, color, IGNORE_KEY, &shared_comm);
+    MPI_Comm_free(&node_comm);
+
+    return shared_comm;
+  }
+
+  UMPIRE_ERROR(runtime_error,
+               fmt::format("Unsupported shared communicator scope: {}", to_string(scope)));
+}
+
+} // end anonymous namespace
+
 HostMpi3SharedMemoryResource::HostMpi3SharedMemoryResource(const std::string& name, int id, MemoryResourceTraits traits)
     : MemoryResource{name, id, traits}
 {
-  m_shared_comm = util::create_shared_communicator(util::MPI::getCommunicator(), traits.scope);
+  m_shared_comm = create_shared_communicator(util::MPI::getCommunicator(), traits.scope);
   MPI_Comm_rank(m_shared_comm, &m_local_rank);
 
   // Free the comm at exit during cleanup in MPI_Finalize. We pass the m_shared_comm

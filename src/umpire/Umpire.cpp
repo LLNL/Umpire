@@ -30,7 +30,6 @@
 #include "umpire/strategy/DynamicPoolList.hpp"
 #include "umpire/strategy/QuickPool.hpp"
 #include "umpire/strategy/ResourceAwarePool.hpp"
-#include "umpire/util/mpi_shared.hpp"
 #include "umpire/util/wrap_allocator.hpp"
 
 #if !defined(_MSC_VER)
@@ -337,8 +336,8 @@ MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm)
   if (cached_comm != cached_communicators.end()) {
     c = cached_comm->second;
   } else {
-    if (scope == MemoryResourceTraits::shared_scope::node || scope == MemoryResourceTraits::shared_scope::socket) {
-      c = util::create_shared_communicator(comm, scope);
+    if (scope == MemoryResourceTraits::shared_scope::node) {
+      MPI_Comm_split_type(comm, MPI_COMM_TYPE_SHARED, 0, MPI_INFO_NULL, &c);
     } else {
       c = MPI_COMM_NULL;
     }
