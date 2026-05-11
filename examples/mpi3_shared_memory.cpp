@@ -25,7 +25,7 @@ int main(int argc, char** argv)
   traits.scope = umpire::MemoryResourceTraits::shared_scope::node;
 
   // Create allocator using MPI3 shared memory
-  auto mpi3_shm_allocator = rm.makeResource("SHARED::mpi3_alloc", traits);
+  auto mpi3_shm_allocator = rm.makeResource("SHARED::MPI3::mpi3_alloc", traits);
 
   // Get communicator for the allocator
   MPI_Comm shm_comm = umpire::get_communicator_for_allocator(mpi3_shm_allocator, MPI_COMM_WORLD);

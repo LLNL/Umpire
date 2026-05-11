@@ -88,7 +88,7 @@ TEST_F(MPISharedMemoryTest, SharedMemoryVisibility)
   MPI_Barrier(shared_allocator_comm);
 }
 
-#if defined(__linux__) || defined(UMPIRE_ENABLE_NUMA)
+#if defined(__linux__)
 TEST(MPISharedMemorySocket, SharedMemoryAllocationAndCommunicator)
 {
   auto& rm = umpire::ResourceManager::getInstance();
