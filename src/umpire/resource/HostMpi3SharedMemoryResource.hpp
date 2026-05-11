@@ -4,8 +4,8 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_Host_Mpi3_Shared_Memory_Resource_HPP
-#define UMPIRE_Host_Mpi3_Shared_Memory_Resource_HPP
+#ifndef __Host_Mpi3_Shared_Memory_Resource_HPP
+#define __Host_Mpi3_Shared_Memory_Resource_HPP
 
 #include <map>
 #include <memory>
@@ -44,4 +44,4 @@ class HostMpi3SharedMemoryResource : public MemoryResource {
 
 } // end of namespace resource
 } // end of namespace umpire
-#endif // UMPIRE_Host_Mpi3_Shared_Memory_Resource_HPP
+#endif // __Host_Mpi3_Shared_Memory_Resource_HPP
