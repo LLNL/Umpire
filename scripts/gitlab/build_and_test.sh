@@ -345,12 +345,14 @@ then
     fi
 
     section_start "cmake_config" "CMake Configuration" "collapsed"
-    if ! $cmake_exe \
+    if $cmake_exe \
       -C ${hostconfig_path} \
       ${cmake_options} \
       -DCMAKE_INSTALL_PREFIX=${install_dir} \
       ${project_dir}
-      then
+    then
+        section_end
+    else
         status=$?
         section_end ; print_error "CMake configuration failed, dumping output..."
 
@@ -362,11 +364,12 @@ then
 
         exit ${status}
     fi
-    section_end
 
     section_start "build" "Building Umpire" "collapsed"
-    if ! $cmake_exe --build . -j ${core_counts[$truehostname]}
+    if $cmake_exe --build . -j ${core_counts[$truehostname]}
     then
+        section_end
+    else
         status=$?
         section_end ; print_error "Compilation failed, building with verbose output..."
 
@@ -376,17 +379,10 @@ then
 
         exit ${status}
     fi
-    section_end
 
-    section_start "install" "Installing Umpire" "collapsed"
-    if ! $cmake_exe --install .
-    then
-        status=$?
-        section_end ; print_error "Installation failed."
-
-        exit ${status}
-    fi
-    section_end
+    run_section "install" "Installing Umpire" "collapsed" \
+      "Installation failed" \
+      $cmake_exe --install .
 fi
 
 # Test
