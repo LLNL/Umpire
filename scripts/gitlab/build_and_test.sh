@@ -69,6 +69,27 @@ print_info ()
     echo -e "[Information]: ${info_msg}"
 }
 
+# Portable UTC timestamp formatter for epoch seconds.
+format_utc_timestamp ()
+{
+    local timestamp="${1}"
+    # BSD/macOS date supports epoch conversion via: date -r <seconds>
+    if date -u -r "${timestamp}" "+%Y-%m-%dT%H:%M:%SZ" >/dev/null 2>&1
+    then
+        date -u -r "${timestamp}" "+%Y-%m-%dT%H:%M:%SZ"
+    else
+        # GNU date supports epoch conversion via: date -d "@<seconds>"
+        date -u -d "@${timestamp}" "+%Y-%m-%dT%H:%M:%SZ"
+    fi
+}
+
+# Portable elapsed time formatter (HH:MM:SS).
+format_elapsed_hms ()
+{
+    local elapsed="${1}"
+    printf '%02d:%02d:%02d' $((elapsed / 3600)) $(((elapsed % 3600) / 60)) $((elapsed % 60))
+}
+
 # GitLab CI collapsible section helpers with nesting support
 section_start ()
 {
@@ -87,9 +108,9 @@ section_start ()
     local section_id="${section_name}_${section_counter}"
 
     local timestamp=$(date +%s)
-    local current_time=$(date -d @${timestamp} --rfc-3339=seconds)
+    local current_time=$(format_utc_timestamp "${timestamp}")
     local total_elapsed=$((timestamp - script_start_time))
-    local total_elapsed_formatted=$(date -d @${total_elapsed} -u +%H:%M:%S)
+    local total_elapsed_formatted=$(format_elapsed_hms "${total_elapsed}")
 
     # Store section start time for later calculation
     section_start_times[${section_id}]=${timestamp}
@@ -122,14 +143,14 @@ section_end ()
     unset section_id_stack[$stack_index]
 
     local timestamp=$(date +%s)
-    local current_time=$(date -d @${timestamp} --rfc-3339=seconds)
+    local current_time=$(format_utc_timestamp "${timestamp}")
     local total_elapsed=$((timestamp - script_start_time))
-    local total_elapsed_formatted=$(date -d @${total_elapsed} -u +%H:%M:%S)
+    local total_elapsed_formatted=$(format_elapsed_hms "${total_elapsed}")
 
     # Calculate section elapsed time
     local section_start=${section_start_times[${section_id}]:-${timestamp}}
     local section_elapsed=$((timestamp - section_start))
-    local section_elapsed_formatted=$(date -d @${section_elapsed} -u +%H:%M:%S)
+    local section_elapsed_formatted=$(format_elapsed_hms "${section_elapsed}")
 
     echo -e "\e[0Ksection_end:${timestamp}:${section_id}\r\e[0K\033[0m"
     echo "\033[90m${section_indent}~ ${current_time} | ${total_elapsed_formatted} | ${section_elapsed_formatted}\033[0m"
