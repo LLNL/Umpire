@@ -148,11 +148,9 @@ run_section() {
     shift 4
 
     section_start "$id" "$title" "$collapsed"
-    "$@"
-    local status=$?
-    section_end
-
-    if [[ $status -ne 0 ]]; then
+    if ! "$@"; then
+        status=$?
+        section_end
         print_error "$err_msg"
         exit $status
     fi
@@ -260,7 +258,7 @@ if [[ -z ${hostconfig} ]]
 then
     # If no host config file was provided, we assume it was generated.
     # This means we are looking of a unique one in project dir.
-    hostconfigs=( $( ls "${project_dir}/"*.cmake ) )
+    shopt -s nullglob; hostconfigs=( "${project_dir}"/*.cmake ); shopt -u nullglob
     if [[ ${#hostconfigs[@]} == 1 ]]
     then
         hostconfig_path=${hostconfigs[0]}
@@ -386,9 +384,7 @@ then
     # If Developer benchmarks enabled, run the no-op benchmark and show output
     if [[ "${option}" != "--build-only" ]] && grep -q -i "UMPIRE_ENABLE_DEVELOPER_BENCHMARKS.*ON" ${hostconfig_path}
     then
-        date
         ctest --verbose -C Benchmark -R no-op_stress_test
-        date
     fi
 
     no_test_str="No tests were found!!!"
