@@ -175,6 +175,7 @@ run_section() {
         print_error "$err_msg"
         exit $status
     fi
+    section_end
 }
 
 if [[ ${debug_mode} == true ]]
