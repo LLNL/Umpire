@@ -118,9 +118,9 @@ section_start ()
     # Push section ID onto stack
     section_id_stack+=("${section_id}")
 
-    echo "\033[90m${section_indent}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\033[0m"
-    echo "\033[90m${section_indent}~ TIME                      | TOTAL    | SECTION  \033[0m"
-    echo "\033[90m${section_indent}~ ${current_time} | ${total_elapsed_formatted} | ${section_title}\033[0m"
+    echo -e "\e[1;30m${section_indent}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\e[0m"
+    echo -e "\e[1;30m${section_indent}~ TIME                      | TOTAL    | SECTION  \e[0m"
+    echo -e "\e[1;30m${section_indent}~ ${current_time} | ${total_elapsed_formatted} | ${section_title}\e[0m"
     echo -e "\e[0Ksection_start:${timestamp}:${section_id}[collapsed=${collapsed}]\r\e[0K${section_indent}~ ${section_title}"
 
     # Increase indentation for nested sections
@@ -152,9 +152,9 @@ section_end ()
     local section_elapsed=$((timestamp - section_start))
     local section_elapsed_formatted=$(format_elapsed_hms "${section_elapsed}")
 
-    echo -e "\e[0Ksection_end:${timestamp}:${section_id}\r\e[0K\033[0m"
-    echo "\033[90m${section_indent}~ ${current_time} | ${total_elapsed_formatted} | ${section_elapsed_formatted}\033[0m"
-    echo "\033[90m${section_indent}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    echo -e "\e[0Ksection_end:${timestamp}:${section_id}\r\e[0K\e[0m"
+    echo -e "\e[1;30m${section_indent}~ ${current_time} | ${total_elapsed_formatted} | ${section_elapsed_formatted}\e[0m"
+    echo -e "\e[1;30m${section_indent}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\e[0m"
 
     # Clean up stored time
     unset section_start_times[${section_id}]
