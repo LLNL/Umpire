@@ -139,6 +139,25 @@ section_end ()
     unset section_start_times[${section_id}]
 }
 
+# For convenience, a helper function to run a command within a section and handle errors
+run_section() {
+    local id="$1"
+    local title="$2"
+    local collapsed="$3"
+    local err_msg="$4"
+    shift 4
+
+    section_start "$id" "$title" "$collapsed"
+    "$@"
+    local status=$?
+    section_end
+
+    if [[ $status -ne 0 ]]; then
+        print_error "$err_msg"
+        exit $status
+    fi
+}
+
 if [[ ${debug_mode} == true ]]
 then
     print_info "Debug mode:"
@@ -196,8 +215,7 @@ then
 
     if [[ -z ${spec} ]]
     then
-        section_end
-        print_error "SPEC is undefined, aborting..."
+        section_end ; print_error "SPEC is undefined, aborting..."
         exit 1
     fi
 
@@ -212,26 +230,26 @@ then
     mkdir -p ${spack_user_cache}
 
     # generate cmake cache file with uberenv and radiuss spack package
-    section_start "spack_setup" "Spack setup and environment" "collapsed"
-    ${uberenv_cmd} --setup-and-env-only --spec="${spec}" ${prefix_opt}
-    section_end
+    run_section "spack_setup" "Spack setup and environment" "collapsed" \
+      "Spack environment setup failed (Uberenv)" \
+      ${uberenv_cmd} --setup-and-env-only --spec="${spec}" ${prefix_opt}
 
     if [[ -n ${ci_registry_token} ]]
     then
-        section_start "registry_setup" "GitLab registry as Spack Buildcache" "collapsed"
-        ${spack_cmd} -D ${spack_env_path} mirror add --unsigned --oci-username-variable ci_registry_user --oci-password-variable ci_registry_token gitlab_ci oci://${ci_registry_image}
-        section_end
+        run_section "registry_setup" "GitLab registry as Spack Buildcache" "collapsed" \
+          "Adding gitlab registry to spack environment failed" \
+          ${spack_cmd} -D ${spack_env_path} mirror add --unsigned --oci-username-variable ci_registry_user --oci-password-variable ci_registry_token gitlab_ci oci://${ci_registry_image}
     fi
 
-    section_start "spack_build" "Spack build of dependencies" "collapsed"
-    ${uberenv_cmd} --skip-setup-and-env --spec="${spec}" ${prefix_opt}
-    section_end
+    run_section "spack_build" "Spack build of dependencies" "collapsed" \
+      "Spack build of dependencies failed (Uberenv)" \
+      ${uberenv_cmd} --skip-setup-and-env --spec="${spec}" ${prefix_opt}
 
     if [[ -n ${ci_registry_token} && ${push_to_registry} == true ]]
     then
-        section_start "buildcache_push" "Push dependencies to buildcache" "collapsed"
-        ${spack_cmd} -D ${spack_env_path} buildcache push --only dependencies gitlab_ci
-        section_end
+        run_section "buildcache_push" "Push dependencies to buildcache" "collapsed" \
+          "Pushing dependencies to gitlab registry failed" \
+          ${spack_cmd} -D ${spack_env_path} buildcache push --only dependencies gitlab_ci
     fi
 
     section_end
@@ -312,8 +330,7 @@ then
       ${project_dir}
       then
         status=$?
-        section_end
-        print_error "CMake configuration failed, dumping output..."
+        section_end ; print_error "CMake configuration failed, dumping output..."
 
         $cmake_exe \
           -C ${hostconfig_path} \
@@ -329,8 +346,7 @@ then
     if ! $cmake_exe --build . -j ${core_counts[$truehostname]}
     then
         status=$?
-        section_end
-        print_error "Compilation failed, building with verbose output..."
+        section_end ; print_error "Compilation failed, building with verbose output..."
 
         section_start "build_verbose" "Verbose Rebuild"
         $cmake_exe --build . --verbose -j 1
@@ -344,8 +360,7 @@ then
     if ! $cmake_exe --install .
     then
         status=$?
-        section_end
-        print_error "Installation failed."
+        section_end ; print_error "Installation failed."
 
         exit ${status}
     fi
@@ -379,8 +394,7 @@ then
     no_test_str="No tests were found!!!"
     if [[ "$(tail -n 1 tests_output.txt)" == "${no_test_str}" ]]
     then
-        section_end
-        print_error "No tests were found"
+        section_end ; print_error "No tests were found"
         exit ${ctest_status}
     fi
 
@@ -390,8 +404,7 @@ then
 
     if grep -q "Errors while running CTest" ./tests_output.txt
     then
-        section_end
-        print_error "Failure(s) while running CTest"
+        section_end ; print_error "Failure(s) while running CTest"
         exit ${ctest_status}
     fi
     section_end
@@ -399,27 +412,23 @@ then
     section_start "install_test" "Testing Installed Examples" "collapsed"
     if grep -q -i "ENABLE_HIP.*ON" ${hostconfig_path}
     then
-        section_end
-        print_warning "Not testing install with HIP"
+        section_end ; print_warning "Not testing install with HIP"
     else
         if [[ ! -d ${install_dir} ]]
         then
-            section_end
-            print_error "Install directory not found : ${install_dir}"
+            section_end ; print_error "Install directory not found : ${install_dir}"
             exit 1
         fi
 
         cd ${install_dir}/examples/umpire/using-with-cmake
         mkdir build && cd build
         if ! $cmake_exe -C ../host-config.cmake ..; then
-            section_end
-            print_error "Running $cmake_exe for using-with-cmake test"
+            section_end ; print_error "Running $cmake_exe for using-with-cmake test"
             exit 1
         fi
 
         if ! make; then
-            section_end
-            print_error "Running make for using-with-cmake test"
+            section_end ; print_error "Running make for using-with-cmake test"
             exit 1
         fi
         section_end
