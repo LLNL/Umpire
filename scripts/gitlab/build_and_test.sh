@@ -110,7 +110,7 @@ section_end ()
 {
     # Pop section ID from stack
     if [[ ${#section_id_stack[@]} -eq 0 ]]; then
-        echo "[Warning]: section_end called with empty stack"
+        print_warning "section_end called with empty stack"
         return 1
     fi
 
@@ -400,7 +400,7 @@ then
     if grep -q -i "ENABLE_HIP.*ON" ${hostconfig_path}
     then
         section_end
-        echo "[Warning]: Not testing install with HIP"
+        print_warning "Not testing install with HIP"
     else
         if [[ ! -d ${install_dir} ]]
         then
