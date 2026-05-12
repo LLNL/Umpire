@@ -166,16 +166,18 @@ run_section() {
     local title="$2"
     local collapsed="$3"
     local err_msg="$4"
+    local status=0
     shift 4
 
     section_start "$id" "$title" "$collapsed"
-    if ! "$@"; then
+    if "$@"; then
+        section_end
+    else
         status=$?
         section_end
         print_error "$err_msg"
         exit $status
     fi
-    section_end
 }
 
 if [[ ${debug_mode} == true ]]
