@@ -70,6 +70,7 @@ class DeviceIpcAllocator : public AllocationStrategy {
   MPI_Comm m_scope_comm;
   bool m_is_scope_leader;
   int m_scope_color;
+  MemoryResourceTraits::shared_scope m_scope;
 
   void setup_shared_scope(MemoryResourceTraits::shared_scope scope);
   std::string generate_allocation_name(std::size_t size_in_bytes);
