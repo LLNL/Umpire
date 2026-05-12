@@ -74,12 +74,12 @@ format_utc_timestamp ()
 {
     local timestamp="${1}"
     # BSD/macOS date supports epoch conversion via: date -r <seconds>
-    if date -u -r "${timestamp}" "+%Y-%m-%dT%H:%M:%SZ" >/dev/null 2>&1
+    if date -u -r "${timestamp}" "+%Y-%m-%d %H:%M:%S UTC" >/dev/null 2>&1
     then
-        date -u -r "${timestamp}" "+%Y-%m-%dT%H:%M:%SZ"
+        date -u -r "${timestamp}" "+%Y-%m-%d %H:%M:%S UTC"
     else
         # GNU date supports epoch conversion via: date -d "@<seconds>"
-        date -u -d "@${timestamp}" "+%Y-%m-%dT%H:%M:%SZ"
+        date -u -d "@${timestamp}" "+%Y-%m-%d %H:%M:%S UTC"
     fi
 }
 
@@ -119,7 +119,7 @@ section_start ()
     section_id_stack+=("${section_id}")
 
     echo -e "\e[1;30m${section_indent}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\e[0m"
-    echo -e "\e[1;30m${section_indent}~ TIME                      | TOTAL    | SECTION  \e[0m"
+    echo -e "\e[1;30m${section_indent}~ TIME                    | TOTAL    | SECTION  \e[0m"
     echo -e "\e[1;30m${section_indent}~ ${current_time} | ${total_elapsed_formatted} | ${section_title}\e[0m"
     echo -e "\e[0Ksection_start:${timestamp}:${section_id}[collapsed=${collapsed}]\r\e[0K${section_indent}~ ${section_title}"
 
