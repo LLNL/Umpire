@@ -410,8 +410,8 @@ then
     no_test_str="No tests were found!!!"
     if [[ "$(tail -n 1 tests_output.txt)" == "${no_test_str}" ]]
     then
-        section_end ; print_error "No tests were found"
-        exit ${ctest_status}
+        section_end ; print_error "No tests were found (ctest status: ${ctest_status})"
+        exit 1
     fi
 
     tree Testing
@@ -420,8 +420,8 @@ then
 
     if grep -q "Errors while running CTest" ./tests_output.txt
     then
-        section_end ; print_error "Failure(s) while running CTest"
-        exit ${ctest_status}
+        section_end ; print_error "Failure(s) while running CTest (ctest status: ${ctest_status})"
+        exit 1
     fi
     section_end
 
