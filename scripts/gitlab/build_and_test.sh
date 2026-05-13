@@ -13,6 +13,19 @@ fi
 # SPDX-License-Identifier: (MIT)
 ###############################################################################
 
+# Navigation:
+# - VARIABLES
+# - HELPER FUNCTIONS
+# - SETUP
+# - BUILD DEPENDENCIES
+# - HOST CONFIG / CMAKE CACHE FILES
+# - BUILD PROJECT
+# - TEST PROJECT
+
+###############################################################################
+# VARIABLES
+###############################################################################
+
 set -o errexit
 set -o nounset
 
@@ -37,16 +50,9 @@ ci_registry_image=${CI_REGISTRY_IMAGE:-"czregistry.llnl.gov:5050/radiuss/umpire"
 export ci_registry_user=${CI_REGISTRY_USER:-"${USER}"}
 export ci_registry_token=${CI_JOB_TOKEN:-"${registry_token}"}
 
-# Track script start time for elapsed time calculations
-script_start_time=$(date +%s)
-
-# Storage for section start times (supports nesting)
-declare -A section_start_times
-
-# Section stack for tracking nested sections
-section_id_stack=()
-section_counter=0
-section_indent=""
+###############################################################################
+# HELPER FUNCTIONS
+###############################################################################
 
 # Helper function to print errors in red
 print_error ()
@@ -89,6 +95,17 @@ format_elapsed_hms ()
     local elapsed="${1}"
     printf '%02d:%02d:%02d' $((elapsed / 3600)) $(((elapsed % 3600) / 60)) $((elapsed % 60))
 }
+
+# Track script start time for elapsed time calculations
+script_start_time=$(date +%s)
+
+# Storage for section start times (supports nesting)
+declare -A section_start_times
+
+# Section stack for tracking nested sections
+section_id_stack=()
+section_counter=0
+section_indent=""
 
 # GitLab CI collapsible section helpers with nesting support
 section_start ()
@@ -180,6 +197,10 @@ run_section() {
     fi
 }
 
+###############################################################################
+# SETUP
+###############################################################################
+
 if [[ ${debug_mode} == true ]]
 then
     print_info "Debug mode:"
@@ -230,7 +251,9 @@ then
     uberenv_cmd="${uberenv_cmd} --spack-debug"
 fi
 
-# Dependencies
+###############################################################################
+# BUILD DEPENDENCIES
+###############################################################################
 if [[ "${option}" != "--build-only" && "${option}" != "--test-only" ]]
 then
     section_start "dependencies" "Building Dependencies"
@@ -277,7 +300,9 @@ then
     section_end
 fi
 
-# Find cmake cache file (hostconfig)
+###############################################################################
+# HOST CONFIG / CMAKE CACHE FILE
+###############################################################################
 if [[ -z ${hostconfig} ]]
 then
     # If no host config file was provided, we assume it was generated.
@@ -305,7 +330,9 @@ fi
 hostconfig=$(basename ${hostconfig_path})
 print_info "Found hostconfig ${hostconfig_path}"
 
-# Build Directory
+###############################################################################
+# BUILD PROJECT
+###############################################################################
 # When using /dev/shm, we use prefix for both spack builds and source build, unless BUILD_ROOT was defined
 build_root=${BUILD_ROOT:-"${prefix}"}
 
@@ -314,7 +341,6 @@ install_dir="${build_root}/install_${hostconfig//.cmake/}"
 
 cmake_exe=`grep 'CMake executable' ${hostconfig_path} | cut -d ':' -f 2 | xargs`
 
-# Build
 if [[ "${option}" != "--deps-only" && "${option}" != "--test-only" ]]
 then
     print_info "Prefix       ${prefix}"
@@ -385,7 +411,9 @@ then
       $cmake_exe --install .
 fi
 
-# Test
+###############################################################################
+# TEST PROJECT
+###############################################################################
 if [[ "${option}" != "--build-only" ]] && grep -q -i "ENABLE_TESTS.*ON" ${hostconfig_path}
 then
 
