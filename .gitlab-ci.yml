@@ -60,7 +60,7 @@ variables:
 stages:
   - prerequisites           # Required: machine availability checks
   - build-and-test          # Required: build and test jobs
-  - cross-project           # Manual: trigger testing in dependent project (e.g., CHAI)
+  - multi-project           # Manual: trigger testing in dependent project (e.g., CHAI)
   - radiuss-spack-testing   # TODO unused so far
 
 ###############################################################################
@@ -224,9 +224,9 @@ tuolumne-build-and-test:
       - artifact: 'tuolumne-jobs.yml'
         job: 'generate-job-lists'
 
-# CROSS-PROJECT PIPELINE
+# MULTI-PROJECT PIPELINE
 trigger-chai:
-  stage: cross-project
+  stage: multi-project
   rules:
     - if: $MULTI_PROJECT != "OFF"
       when: manual
@@ -234,7 +234,7 @@ trigger-chai:
   variables:
     UPDATE_UMPIRE: ${CI_COMMIT_SHA}
   trigger:
-    project: radiuss/cross-project/chai-trigger
+    project: radiuss/multi-project/chai-trigger
     branch: woptim/multi-project-ci
     forward:
       yaml_variables: false
