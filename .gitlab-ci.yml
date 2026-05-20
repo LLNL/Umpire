@@ -231,6 +231,7 @@ trigger-chai:
     - if: $MULTI_PROJECT != "OFF"
       when: manual
     - when: never
+  allow_failure: true
   variables:
     UPDATE_UMPIRE: ${CI_COMMIT_SHA}
   trigger:
