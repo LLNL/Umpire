@@ -40,9 +40,6 @@ variables:
   GIT_SUBMODULE_UPDATE_FLAGS: --jobs 2
   GIT_SUBMODULE_PATHS: scripts/radiuss-spack-configs scripts/uberenv
 
-# PROJECT VARIABLES
-  MP_BRANCH: "woptim/multi-project-ci"
-
 # SHARED_CI CONFIGURATION
 # Required information about GitHub repository
   GITHUB_PROJECT_NAME: "Umpire"
@@ -74,11 +71,11 @@ stages:
 trigger-chai:
   stage: multi-project
   rules:
-    - if: $CI_COMMIT_BRANCH == $MP_BRANCH && $MULTI_PROJECT != "OFF"
-      when: on_success
+    - if: $MULTI_PROJECT != "OFF"
+      when: manual
     - when: never
   variables:
-    UPDATE_UMPIRE: ${MP_BRANCH}
+    UPDATE_UMPIRE: ${CI_COMMIT_SHA}
   trigger:
     project: radiuss/chai
     branch: develop
