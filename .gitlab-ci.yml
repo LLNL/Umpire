@@ -236,6 +236,6 @@ trigger-chai:
     UPDATE_UMPIRE: ${CI_COMMIT_SHA}
   trigger:
     project: radiuss/multi-project/chai-trigger
-    branch: woptim/multi-project-ci
+    branch: develop
     forward:
       yaml_variables: false
