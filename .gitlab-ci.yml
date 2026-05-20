@@ -232,6 +232,8 @@ trigger-chai:
       when: manual
     - when: never
   allow_failure: true
+  inherit:
+    variables: false
   variables:
     UPDATE_UMPIRE: ${CI_COMMIT_SHA}
   trigger:
