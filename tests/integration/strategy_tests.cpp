@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -96,7 +96,7 @@ void StrategyTest<umpire::strategy::FixedPool>::SetUp()
   m_parent_name = "HOST";
 }
 
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
 template <>
 void StrategyTest<umpire::strategy::AllocationAdvisor>::SetUp()
 {
@@ -148,7 +148,7 @@ void StrategyTest<umpire::strategy::MonotonicAllocationStrategy>::SetUp()
 
 using Strategies =
     ::testing::Types<umpire::strategy::AlignedAllocator,
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
                      umpire::strategy::AllocationAdvisor,
 #endif
                      umpire::strategy::DynamicPoolList, umpire::strategy::FixedPool, umpire::strategy::MixedPool,
@@ -400,7 +400,7 @@ TEST(MonotonicStrategy, UM)
 }
 #endif // defined(UMPIRE_ENABLE_UM)
 
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
 TEST(AllocationAdvisor, Create)
 {
   auto& rm = umpire::ResourceManager::getInstance();
@@ -443,7 +443,7 @@ TEST(AllocationAdvisor, Host)
     read_only_alloc.deallocate(data);
   });
 }
-#endif // defined(UMPIRE_ENABLE_CUDA)
+#endif // defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
 
 TEST(FixedPool, Host)
 {
@@ -744,23 +744,42 @@ TEST(AlignedAllocator, BadAlignment)
       },
       umpire::runtime_error);
 }
-
 #if defined(UMPIRE_ENABLE_IPC_SHARED_MEMORY)
 TEST(NamingShimTests, TestAllocateDeallocate)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  auto traits{umpire::get_default_resource_traits("SHARED")};
+  auto traits{umpire::get_default_resource_traits("SHARED::POSIX")};
   traits.size = 1 * 1024 * 1024;
   traits.scope = umpire::MemoryResourceTraits::shared_scope::node;
 
-  auto node_allocator{rm.makeResource("SHARED::shim_allocator", traits)};
+  // NOTE: The name of the allocator MUST have "SHARED::POSIX:: prefix when both IPC and MPI3 enabled.
+  auto node_allocator{rm.makeResource("SHARED::POSIX::shim_allocator", traits)};
 
   auto shim{rm.makeAllocator<umpire::strategy::NamingShim>("shim", node_allocator)};
   {
     void* ptr = shim.allocate(1024);
     EXPECT_NE(ptr, nullptr);
     shim.deallocate(ptr);
+  }
+}
+
+TEST(NamedAllocatorTest, ForwardName)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto traits{umpire::get_default_resource_traits("SHARED::POSIX")};
+  traits.size = 1 * 1024 * 1024;
+  traits.scope = umpire::MemoryResourceTraits::shared_scope::node;
+
+  // NOTE: The name of the allocator MUST have "SHARED::POSIX:: prefix when both IPC and MPI3 enabled.
+  auto node_allocator{rm.makeResource("SHARED::POSIX::allocator_for_named_test", traits)};
+
+  auto allocator{rm.makeAllocator<umpire::strategy::NamedAllocationStrategy>("shared named alloc", node_allocator)};
+  {
+    void* ptr = allocator.allocate("test", 1024);
+    EXPECT_NE(ptr, nullptr);
+    allocator.deallocate(ptr);
   }
 }
 #endif

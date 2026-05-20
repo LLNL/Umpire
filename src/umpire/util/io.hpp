@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -41,7 +41,7 @@ void initialize_io(const bool enable_log);
  * \brief Counterpart of initialize_io that finalizes the streams and ensures that no live references to the buffers
  * of standard streams exist. Most users will not need to call this manually.
  */
-void finalize_io(const bool enable_log);
+void finalize_io();
 
 /*!
  * \brief Synchronize all stream buffers to their respective output sequences.

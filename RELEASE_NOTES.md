@@ -1,3 +1,73 @@
+# v2025.12.0
+
+## Improvements
+
+- Added `getInternalMemoryUsage` method to track Umpire's internal memory usage for metadata
+
+- Improved/Optimized how the ResourceAwarePool handles Pending chunks
+
+- Added Default Shared Memory resource clarifications in cmake and examples
+
+- Added CUDA 13 Support
+
+# v2025.09.0
+
+## Changes Impacting Builds
+
+This release of Umpire contains the following build requirement changes:
+
+- Umpire now requires C++17 or later.
+
+## New Features
+
+- Added `DeviceIpcAllocator` for GPU memory sharing between processes.
+
+- Added HIP support to `AllocationAdvisor`.
+
+- Added HIP support for `get_device_mem_usage` function.
+
+- Extended Fortran API support:
+  - Added `AlignedAllocator` to Fortran API.
+  - Added `SizeLimiter` to Fortran API.
+  - Added other strategies to Fortran API.
+  - Added logical allocation routines to Fortran API.
+  - Extended FORTRAN allocation support to 7D.
+  - Added 5D Fortran allocation routines.
+
+- Allow both shared memory implementations to be used at the same time.
+
+## Bug Fixes
+
+- Fixed a communicator leak in `HostMpi3SharedMemoryResource`.
+
+- Fixed handling of the CUDA language standard.
+
+- Fixed HIP constant memory implementation.
+
+# v2025.03.0
+
+## New Features
+
+- Added a ResourceAwarePool which allows memory from the same pool to be used (1) across multiple device streams and (2) in a single memory space environment without the potential to cause data races.
+
+- Added MPI3 Shared Memory Allocators which uses MPI3 capabilities for Shared Memory.
+
+- Added a `NamingShim` strategy to allow users to allocate IPC shared memory without providing a name.
+
+## Bug Fixes
+
+- Fixed a minor memory leak when using IPC Shared Memory Allocators.
+
+## Improvements
+
+- A `get_total_bytes_allocated` function was implemented which returns the total amount of bytes allocated with Umpire allocators.
+
+- The `NamedAllocationStrategy` can now be used with IPC Shared Memory Allocators.
+
+- Additional documentation for Shared Memory Allocators was created and reorganized.
+
+- Additional documentation on requirements for Windows builds was added to the cmake.
+
 # v2024.07.0
 
 ## Changes Impacting Builds

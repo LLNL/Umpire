@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -28,6 +28,7 @@ set (umpire_util_headers
   detect_vendor.hpp
   make_unique.hpp
   memory_sanitizers.hpp
+  shared_memory_helper.hpp
   wrap_allocator.hpp)
 
 if (UMPIRE_ENABLE_NUMA)

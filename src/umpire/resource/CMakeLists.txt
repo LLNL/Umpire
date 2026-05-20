@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -74,6 +74,22 @@ if(UMPIRE_ENABLE_IPC_SHARED_MEMORY)
   )
 endif()
 
+if(UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
+  set( umpire_resource_headers
+    ${umpire_resource_headers}
+    HostMpi3SharedMemoryResource.hpp
+    HostMpi3SharedMemoryResourceFactory.hpp)
+
+  set( umpire_resource_sources
+    ${umpire_resource_sources}
+    HostMpi3SharedMemoryResource.cpp
+    HostMpi3SharedMemoryResourceFactory.cpp)
+
+  set( umpire_resource_depends
+  ${umpire_resource_depends}
+    mpi)
+endif()
+
 if (UMPIRE_ENABLE_CUDA)
   set (umpire_resource_headers
     ${umpire_resource_headers}
@@ -134,6 +150,8 @@ if (UMPIRE_ENABLE_HIP)
       ${umpire_resource_sources}
       HipConstantMemoryResourceFactory.cpp
       HipConstantMemoryResource.cpp)
+
+    set_source_files_properties(HipConstantMemoryResource.cpp PROPERTIES LANGUAGE HIP)
   endif ()
 
   set(umpire_resource_depends ${umpire_resource_depends} blt::hip_runtime)

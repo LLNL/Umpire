@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -36,12 +36,13 @@ std::unique_ptr<resource::MemoryResource> SyclDeviceResourceFactory::create(cons
         std::rethrow_exception(e);
       } catch (sycl::exception const& ex) {
         std::cout << "Caught asynchronous SYCL exception:" << std::endl
-                  << ex.what() << ", OpenCL code: " << ex.get_cl_code() << std::endl;
+                  << ex.what() << ", OpenCL code: " << ex.code().value() << std::endl;
       }
     }
   };
 
-  sycl::platform platform(sycl::gpu_selector{});
+  sycl::queue queue{sycl::gpu_selector_v};
+  sycl::platform platform = queue.get_device().get_platform();
 
   int device_count = 0; // SYCL multi.device count
   auto const& devices = platform.get_devices();

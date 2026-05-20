@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -22,6 +22,7 @@
 #cmakedefine UMPIRE_ENABLE_HIP
 #cmakedefine UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY
 #cmakedefine UMPIRE_ENABLE_IPC_SHARED_MEMORY
+#cmakedefine UMPIRE_ENABLE_MPI3_SHARED_MEMORY
 #cmakedefine UMPIRE_ENABLE_INACCESSIBILITY_TESTS
 #cmakedefine UMPIRE_ENABLE_LOGGING
 #cmakedefine UMPIRE_ENABLE_MPI
@@ -40,6 +41,7 @@
 #define UMPIRE_VERSION_MINOR @Umpire_VERSION_MINOR@
 #define UMPIRE_VERSION_PATCH @Umpire_VERSION_PATCH@
 #define UMPIRE_VERSION_RC "@UMPIRE_VERSION_RC@"
+#define UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE "@UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE@"
 
 #ifdef __cplusplus
 
@@ -61,6 +63,7 @@ UMPIRE_EXPORT extern int    UMPIRE_VERSION_SYM;
 
 namespace umpire {
 constexpr int invalid_allocator_id = 0xDEADBEE;
+constexpr const char* default_shared_memory_resource = UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE;
 }
 
 #endif

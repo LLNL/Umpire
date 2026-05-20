@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -56,10 +56,10 @@ struct HipPinnedAllocator : HipAllocator {
     if (error != hipSuccess) {
       if (error == hipErrorMemoryAllocation) {
         UMPIRE_ERROR(out_of_memory_error,
-                     fmt::format("hipMallocHost( bytes = {} ) failed with error: {}", bytes, hipGetErrorString(error)));
+                     fmt::format("hipHostMalloc( bytes = {} ) failed with error: {}", bytes, hipGetErrorString(error)));
       } else {
         UMPIRE_ERROR(runtime_error,
-                     fmt::format("hipMallocHost( bytes = {} ) failed with error: {}", bytes, hipGetErrorString(error)));
+                     fmt::format("hipHostMalloc( bytes = {} ) failed with error: {}", bytes, hipGetErrorString(error)));
       }
     }
 
@@ -72,7 +72,7 @@ struct HipPinnedAllocator : HipAllocator {
     hipError_t error = ::hipHostFree(ptr);
     if (error != hipSuccess) {
       UMPIRE_ERROR(runtime_error,
-                   fmt::format("hipFreeHost( ptr = {} ) failed with error: {}", ptr, hipGetErrorString(error)));
+                   fmt::format("hipHostFree( ptr = {} ) failed with error: {}", ptr, hipGetErrorString(error)));
     }
   }
 

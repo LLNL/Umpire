@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -12,6 +12,8 @@
 #include <ostream>
 #include <string>
 
+#include "camp/camp.hpp"
+#include "camp/resource.hpp"
 #include "umpire/util/MemoryResourceTraits.hpp"
 #include "umpire/util/Platform.hpp"
 
@@ -155,6 +157,7 @@ class AllocationStrategy {
    * \return Pointer to start of allocated bytes.
    */
   virtual void* allocate(std::size_t bytes) = 0;
+  virtual void* allocate_resource(std::size_t bytes, camp::resources::Resource r);
   virtual void* allocate_named(const std::string& name, std::size_t bytes);
 
   /*!
@@ -163,6 +166,7 @@ class AllocationStrategy {
    * \param ptr Pointer to free.
    */
   virtual void deallocate(void* ptr, std::size_t size = 0) = 0;
+  virtual void deallocate_resource(void* ptr, camp::resources::Resource r, std::size_t size = 0);
 };
 
 } // end of namespace strategy

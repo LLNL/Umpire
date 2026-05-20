@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -53,10 +53,13 @@ struct HipMallocManagedAllocator : HipAllocator {
     if (m_granularity == MemoryResourceTraits::granularity_type::coarse_grained) {
       int device;
 
-      ::hipGetDevice(&device);
+      hipError_t error = ::hipGetDevice(&device);
+      if (error != hipSuccess) {
+        UMPIRE_ERROR(runtime_error, fmt::format("hipGetDevice failed with error: {}", hipGetErrorString(error)));
+      }
 
       UMPIRE_LOG(Debug, "::hipMemAdvise(hipMemAdviseSetCoarseGrain)");
-      auto error = ::hipMemAdvise(ptr, bytes, hipMemAdviseSetCoarseGrain, device);
+      error = ::hipMemAdvise(ptr, bytes, hipMemAdviseSetCoarseGrain, device);
 
       if (error != hipSuccess) {
         UMPIRE_ERROR(runtime_error,

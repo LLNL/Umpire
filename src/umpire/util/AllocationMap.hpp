@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -147,6 +147,8 @@ class AllocationMap {
 
   // Returns number of entries
   std::size_t size() const;
+
+  std::size_t internalMemoryUsage() const;
 
   // Print methods -- either matching a predicate or all records
   void print(const std::function<bool(const AllocationRecord&)>&& predicate, std::ostream& os = std::cout) const;

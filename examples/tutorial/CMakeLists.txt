@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -25,16 +25,16 @@ blt_add_executable(
 list(APPEND umpire_tutorials tut_resources)
 
 blt_add_executable(
-  NAME tut_dynamic_pool_1
-  SOURCES tut_dynamic_pool_1.cpp
+  NAME tut_quick_pool_1
+  SOURCES tut_quick_pool_1.cpp
   DEPENDS_ON ${tutorial_depends})
-list(APPEND umpire_tutorials tut_dynamic_pool_1)
+list(APPEND umpire_tutorials tut_quick_pool_1)
 
 blt_add_executable(
-  NAME tut_dynamic_pool_2
-  SOURCES tut_dynamic_pool_2.cpp
+  NAME tut_quick_pool_2
+  SOURCES tut_quick_pool_2.cpp
   DEPENDS_ON ${tutorial_depends})
-list(APPEND umpire_tutorials tut_dynamic_pool_2)
+list(APPEND umpire_tutorials tut_quick_pool_2)
 
 blt_add_executable(
   NAME tut_copy

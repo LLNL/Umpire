@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -19,8 +19,14 @@
 #include "umpire/config.hpp"
 #include "umpire/resource/HostSharedMemoryResource.hpp"
 #include "umpire/resource/MemoryResource.hpp"
+#if defined(UMPIRE_ENABLE_MPI) && defined(UMPIRE_ENABLE_IPC_SHARED_MEMORY)
+#if defined(UMPIRE_ENABLE_DEVICE)
+#include "umpire/strategy/DeviceIpcAllocator.hpp"
+#endif
+#endif
 #include "umpire/strategy/DynamicPoolList.hpp"
 #include "umpire/strategy/QuickPool.hpp"
+#include "umpire/strategy/ResourceAwarePool.hpp"
 #include "umpire/util/wrap_allocator.hpp"
 
 #if !defined(_MSC_VER)
@@ -166,10 +172,33 @@ std::size_t get_process_memory_usage()
 #endif
 }
 
+std::size_t get_internal_memory_usage()
+{
+  return umpire::ResourceManager::getInstance().getInternalMemoryUsage();
+}
+
 void mark_event(const std::string& event)
 {
   umpire::event::record(
       [&](auto& e) { e.name("event").category(event::category::metadata).arg("name", event).tag("replay", "true"); });
+}
+
+std::size_t get_total_bytes_allocated()
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  std::size_t total_memory{0};
+
+  for (auto s : rm.getResourceNames()) {
+    umpire::Allocator alloc = rm.getAllocator(s);
+    total_memory += alloc.getActualSize();
+  }
+
+  for (auto s : rm.getSharedAllocatorNames()) {
+    umpire::Allocator alloc = rm.getAllocator(s);
+    total_memory += alloc.getActualSize();
+  }
+
+  return total_memory;
 }
 
 std::size_t get_device_memory_usage(int device_id)
@@ -179,19 +208,58 @@ std::size_t get_device_memory_usage(int device_id)
   std::size_t mem_tot{0};
 
   int current_device;
-  cudaGetDevice(&current_device);
+  cudaError_t err = cudaGetDevice(&current_device);
+  if (err != cudaSuccess) {
+    UMPIRE_ERROR(umpire::runtime_error, fmt::format("cudaGetDevice failed with error: {}", cudaGetErrorString(err)));
+  }
 
-  cudaSetDevice(device_id);
+  err = cudaSetDevice(device_id);
+  if (err != cudaSuccess) {
+    UMPIRE_ERROR(umpire::runtime_error,
+                 fmt::format("Error when trying to set CUDA Device: {}", cudaGetErrorString(err)));
+  }
 
-  cudaMemGetInfo(&mem_free, &mem_tot);
+  err = cudaMemGetInfo(&mem_free, &mem_tot);
+  if (err != cudaSuccess) {
+    UMPIRE_ERROR(umpire::runtime_error, fmt::format("cudaMemGetInfo failed with error: {}", cudaGetErrorString(err)));
+  }
 
-  cudaSetDevice(current_device);
+  err = cudaSetDevice(current_device);
+  if (err != cudaSuccess) {
+    UMPIRE_ERROR(umpire::runtime_error,
+                 fmt::format("Error when trying to set CUDA Device: {}", cudaGetErrorString(err)));
+  }
 
   return std::size_t{mem_tot - mem_free};
-#else
+#elif defined(UMPIRE_ENABLE_HIP)
+  std::size_t mem_free{0};
+  std::size_t mem_tot{0};
+
+  int current_device;
+  hipError_t err = hipGetDevice(&current_device);
+  if (err != hipSuccess) {
+    UMPIRE_ERROR(umpire::runtime_error, fmt::format("hipGetDevice failed with error: {}", hipGetErrorString(err)));
+  }
+
+  err = hipSetDevice(device_id);
+  if (err != hipSuccess) {
+    UMPIRE_ERROR(umpire::runtime_error, fmt::format("Error when trying to set HIP Device: {}", hipGetErrorString(err)));
+  }
+
+  err = hipMemGetInfo(&mem_free, &mem_tot);
+  if (err != hipSuccess) {
+    UMPIRE_ERROR(umpire::runtime_error, fmt::format("hipMemGetInfo failed with error: {}", hipGetErrorString(err)));
+  }
+
+  err = hipSetDevice(current_device);
+  if (err != hipSuccess) {
+    UMPIRE_ERROR(umpire::runtime_error, fmt::format("Error when trying to set HIP Device: {}", hipGetErrorString(err)));
+  }
+
+  return std::size_t{mem_tot - mem_free};
+#endif
   UMPIRE_USE_VAR(device_id);
   return 0;
-#endif
 }
 
 std::vector<util::AllocationRecord> get_leaked_allocations(Allocator allocator)
@@ -236,9 +304,22 @@ void* find_pointer_from_name(Allocator allocator, const std::string& name)
 }
 
 #if defined(UMPIRE_ENABLE_MPI)
-MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm)
+namespace {
+std::map<int, MPI_Comm>& get_cached_communicators()
 {
   static std::map<int, MPI_Comm> cached_communicators{};
+  return cached_communicators;
+}
+} // namespace
+
+MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm)
+{
+#if defined(UMPIRE_ENABLE_IPC_SHARED_MEMORY) && defined(UMPIRE_ENABLE_DEVICE)
+  if (auto alloc = dynamic_cast<strategy::DeviceIpcAllocator*>(a.getAllocationStrategy()))
+    return alloc->get_scope_communicator();
+#endif
+
+  std::map<int, MPI_Comm>& cached_communicators = get_cached_communicators();
 
   MPI_Comm c;
   auto scope = a.getAllocationStrategy()->getTraits().scope;
@@ -257,6 +338,17 @@ MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm)
   }
 
   return c;
+}
+
+void cleanup_cached_communicators()
+{
+  std::map<int, MPI_Comm>& comm = get_cached_communicators();
+
+  for (auto c : comm) {
+    MPI_Comm_free(&c.second);
+  }
+
+  comm.clear();
 }
 #endif
 
@@ -284,6 +376,33 @@ util::AllocationRecord deregister_external_allocation(void* ptr)
 
   auto& rm = umpire::ResourceManager::getInstance();
   return rm.deregisterAllocation(ptr);
+}
+
+camp::resources::Resource get_resource(Allocator a, void* ptr)
+{
+  UMPIRE_LOG(Warning,
+             "This function will return a generic Camp resource which is not comparable to a specific Camp resource!");
+
+  auto s = a.getAllocationStrategy();
+  strategy::ResourceAwarePool* rap{dynamic_cast<strategy::ResourceAwarePool*>(s)};
+
+  if (!rap) {
+    UMPIRE_ERROR(runtime_error, fmt::format("Allocator \"{}\" is not a ResourceAwarePool!", a.getName()));
+  }
+
+  return rap->getResource(ptr);
+}
+
+std::size_t get_num_pending(Allocator a)
+{
+  auto s = a.getAllocationStrategy();
+  strategy::ResourceAwarePool* rap{dynamic_cast<strategy::ResourceAwarePool*>(s)};
+
+  if (!rap) {
+    UMPIRE_ERROR(runtime_error, fmt::format("Allocator \"{}\" is not a ResourceAwarePool!", a.getName()));
+  }
+
+  return rap->getNumPending();
 }
 
 bool try_coalesce(Allocator a)

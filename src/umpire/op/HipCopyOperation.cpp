@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -48,7 +48,7 @@ camp::resources::EventProxy<camp::resources::Resource> HipCopyOperation::transfo
   if (error != hipSuccess) {
     UMPIRE_ERROR(runtime_error, fmt::format("hipMemcpyAsync( dest_ptr = {}, src_ptr = {}, length = {}, "
                                             "stream = {}) failed with error: {}",
-                                            *dst_ptr, src_ptr, length, hipGetErrorString(error), (void*)stream));
+                                            *dst_ptr, src_ptr, length, (void*)stream, hipGetErrorString(error)));
   }
 
   return camp::resources::EventProxy<camp::resources::Resource>{ctx};

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -146,11 +146,22 @@ bool FileMemoryResource::isPageable() noexcept
 #if defined(UMPIRE_ENABLE_CUDA)
   int pageableMem = 0;
   int cdev = 0;
-  cudaGetDevice(&cdev);
+  cudaError_t err = cudaGetDevice(&cdev);
+  if (err != cudaSuccess) { // since it is noexcept, can't use UMPIRE_ERROR
+    UMPIRE_LOG(Debug, "Error when trying to get CUDA Device:" << cudaGetErrorString(err));
+    return false;
+  }
 
   // Device supports coherently accessing pageable memory
   // without calling cudaHostRegister on it
-  cudaDeviceGetAttribute(&pageableMem, cudaDevAttrPageableMemoryAccess, cdev);
+  err = cudaDeviceGetAttribute(&pageableMem, cudaDevAttrPageableMemoryAccess, cdev);
+  if (err != cudaSuccess) { // since it is noexcept, can't use UMPIRE_ERROR
+    UMPIRE_LOG(Debug, "Error: cudaDeviceGetAttribute(pageableMem = "
+                          << pageableMem
+                          << "cudaDevAttrPageableMemoryAccess = " << static_cast<int>(cudaDevAttrPageableMemoryAccess)
+                          << "cdev = " << cdev << ", failed with error:" << cudaGetErrorString(err));
+    return false;
+  }
   if (pageableMem)
     return true;
 #endif
@@ -163,7 +174,7 @@ bool FileMemoryResource::isAccessibleFrom(Platform p) noexcept
 {
   if (p == Platform::host)
     return true;
-  else if (p == Platform::cuda) // TODO: Implement omp_target specific test
+  else if (p == Platform::cuda)
     return isPageable();
   else
     return false;

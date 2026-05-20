@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -24,31 +24,57 @@ HipDeviceMemoryResource::HipDeviceMemoryResource(Platform platform, const std::s
 void* HipDeviceMemoryResource::allocate(std::size_t bytes)
 {
   int old_device;
-  hipGetDevice(&old_device);
-  if (old_device != m_traits.id)
-    hipSetDevice(m_traits.id);
+  hipError_t err = hipGetDevice(&old_device);
+  if (err != hipSuccess) {
+    UMPIRE_ERROR(runtime_error, fmt::format("hipGetDevice failed with error: {}", hipGetErrorString(err)));
+  }
+  if (old_device != m_traits.id) {
+    err = hipSetDevice(m_traits.id);
+    if (err != hipSuccess) {
+      UMPIRE_ERROR(runtime_error, fmt::format("hipSetDevice( device = {} ) failed with error: {}", m_traits.id,
+                                              hipGetErrorString(err)));
+    }
+  }
 
   void* ptr = m_allocator.allocate(bytes);
 
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
 
-  if (old_device != m_traits.id)
-    hipSetDevice(old_device);
+  if (old_device != m_traits.id) {
+    err = hipSetDevice(old_device);
+    if (err != hipSuccess) {
+      UMPIRE_ERROR(runtime_error, fmt::format("hipSetDevice( device = {} ) failed with error: {}", old_device,
+                                              hipGetErrorString(err)));
+    }
+  }
   return ptr;
 }
 
 void HipDeviceMemoryResource::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
 {
   int old_device;
-  hipGetDevice(&old_device);
-  if (old_device != m_traits.id)
-    hipSetDevice(m_traits.id);
+  hipError_t err = hipGetDevice(&old_device);
+  if (err != hipSuccess) {
+    UMPIRE_ERROR(runtime_error, fmt::format("hipGetDevice failed with error: {}", hipGetErrorString(err)));
+  }
+  if (old_device != m_traits.id) {
+    err = hipSetDevice(m_traits.id);
+    if (err != hipSuccess) {
+      UMPIRE_ERROR(runtime_error, fmt::format("hipSetDevice( device = {} ) failed with error: {}", m_traits.id,
+                                              hipGetErrorString(err)));
+    }
+  }
 
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
 
   m_allocator.deallocate(ptr);
-  if (old_device != m_traits.id)
-    hipSetDevice(old_device);
+  if (old_device != m_traits.id) {
+    err = hipSetDevice(old_device);
+    if (err != hipSuccess) {
+      UMPIRE_ERROR(runtime_error, fmt::format("hipSetDevice( device = {} ) failed with error: {}", old_device,
+                                              hipGetErrorString(err)));
+    }
+  }
 }
 
 bool HipDeviceMemoryResource::isAccessibleFrom(Platform p) noexcept

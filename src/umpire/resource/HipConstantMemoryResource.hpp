@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -23,20 +23,15 @@ class HipConstantMemoryResource : public MemoryResource {
   void* allocate(std::size_t bytes);
   void deallocate(void* ptr, std::size_t size);
 
-  std::size_t getCurrentSize() const noexcept;
-  std::size_t getHighWatermark() const noexcept;
-
   bool isAccessibleFrom(Platform p) noexcept;
   Platform getPlatform() noexcept;
 
  private:
-  std::size_t m_current_size;
-  std::size_t m_highwatermark;
-
   Platform m_platform;
 
   std::size_t m_offset;
   void* m_ptr;
+  bool m_initialized;
 
   std::mutex m_mutex;
 };

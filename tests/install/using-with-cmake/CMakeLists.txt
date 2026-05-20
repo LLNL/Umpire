@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -23,4 +23,4 @@ if(NOT TARGET fmt::fmt)
 endif()
 
 add_executable(using-with-cmake using-with-cmake.cpp)
-target_link_libraries(using-with-cmake umpire fmt::fmt)
+target_link_libraries(using-with-cmake umpire::umpire fmt::fmt)

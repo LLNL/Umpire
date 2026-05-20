@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -23,19 +23,28 @@ void CudaMemPrefetchOperation::apply(void* src_ptr, util::AllocationRecord* UMPI
 
   // Use current device for properties if device is CPU
   int current_device;
-  cudaGetDevice(&current_device);
+  error = cudaGetDevice(&current_device);
+  if (error != cudaSuccess) {
+    UMPIRE_ERROR(runtime_error, fmt::format("cudaGetDevice failed with error: {}", cudaGetErrorString(error)));
+  }
   int gpu = (device != cudaCpuDeviceId) ? device : current_device;
+#if CUDART_VERSION >= 13000
+  cudaMemLocation loc = {(device == cudaCpuDeviceId) ? cudaMemLocationTypeHost : cudaMemLocationTypeDevice, device};
+#endif
 
   cudaDeviceProp properties;
   error = ::cudaGetDeviceProperties(&properties, gpu);
-
   if (error != cudaSuccess) {
-    UMPIRE_ERROR(runtime_error, fmt::format("cudaGetDeviceProperties( device = {} ) failed with error: {}", device,
+    UMPIRE_ERROR(runtime_error, fmt::format("cudaGetDeviceProperties( device = {} ) failed with error: {}", gpu,
                                             cudaGetErrorString(error)));
   }
 
   if (properties.managedMemory == 1 && properties.concurrentManagedAccess == 1) {
+#if CUDART_VERSION >= 13000
+    error = ::cudaMemPrefetchAsync(src_ptr, length, loc, 0);
+#else
     error = ::cudaMemPrefetchAsync(src_ptr, length, device);
+#endif
 
     if (error != cudaSuccess) {
       UMPIRE_ERROR(runtime_error,
@@ -54,11 +63,21 @@ camp::resources::EventProxy<camp::resources::Resource> CudaMemPrefetchOperation:
 
   // Use current device for properties if device is CPU
   int current_device;
-  cudaGetDevice(&current_device);
+  error = cudaGetDevice(&current_device);
+  if (error != cudaSuccess) {
+    UMPIRE_ERROR(runtime_error, fmt::format("cudaGetDevice failed with error: {}", cudaGetErrorString(error)));
+  }
   int gpu = (device != cudaCpuDeviceId) ? device : current_device;
+#if CUDART_VERSION >= 13000
+  cudaMemLocation loc = {(device == cudaCpuDeviceId) ? cudaMemLocationTypeHost : cudaMemLocationTypeDevice, device};
+#endif
 
   cudaDeviceProp properties;
   error = ::cudaGetDeviceProperties(&properties, gpu);
+  if (error != cudaSuccess) {
+    UMPIRE_ERROR(runtime_error, fmt::format("cudaGetDeviceProperties( device = {} ) failed with error: {}", gpu,
+                                            cudaGetErrorString(error)));
+  }
 
   auto resource = ctx.try_get<camp::resources::Cuda>();
   if (!resource) {
@@ -67,20 +86,19 @@ camp::resources::EventProxy<camp::resources::Resource> CudaMemPrefetchOperation:
   }
   auto stream = resource->get_stream();
 
-  if (error != cudaSuccess) {
-    UMPIRE_ERROR(runtime_error, fmt::format("cudaGetDeviceProperties( device = {} ) failed with error: {}", device,
-                                            cudaGetErrorString(error)));
-  }
-
   if (properties.managedMemory == 1 && properties.concurrentManagedAccess == 1) {
+#if CUDART_VERSION >= 13000
+    error = ::cudaMemPrefetchAsync(src_ptr, length, loc, 0, stream);
+#else
     error = ::cudaMemPrefetchAsync(src_ptr, length, device, stream);
+#endif
 
     if (error != cudaSuccess) {
       UMPIRE_ERROR(
           runtime_error,
           fmt::format(
               "cudaMemPrefetchAsync( src_ptr = {}, length = {}, device = {}, stream = {}) failed with error: {}",
-              src_ptr, length, device, cudaGetErrorString(error), (void*)stream));
+              src_ptr, length, device, (void*)stream, cudaGetErrorString(error)));
     }
   }
 

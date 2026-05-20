@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -14,6 +14,10 @@
 #include "umpire/config.hpp"
 #include "umpire/strategy/QuickPool.hpp"
 #include "umpire/util/MemoryResourceTraits.hpp"
+
+#if defined(UMPIRE_ENABLE_MPI)
+#include <mpi.h>
+#endif
 
 namespace {
 const size_t allocation_size = 42;
@@ -78,7 +82,10 @@ struct allocate_and_use<cuda_platform> {
   {
     size_t* data{do_allocate(alloc, size * sizeof(size_t))};
     tester<<<1, 16>>>(data, size);
-    cudaDeviceSynchronize();
+    cudaError_t err = cudaDeviceSynchronize();
+    if (err != cudaSuccess) {
+      UMPIRE_ERROR(umpire::runtime_error, fmt::format("Error when trying to sync device: {}", cudaGetErrorString(err)));
+    }
     alloc->deallocate(data);
   }
 };
@@ -94,7 +101,10 @@ struct allocate_and_use<hip_platform> {
   {
     size_t* data{do_allocate(alloc, size * sizeof(size_t))};
     hipLaunchKernelGGL(tester, dim3(1), dim3(16), 0, 0, data, size);
-    hipDeviceSynchronize();
+    hipError_t err = hipDeviceSynchronize();
+    if (err != hipSuccess) {
+      UMPIRE_ERROR(umpire::runtime_error, fmt::format("Error when trying to sync device: {}", hipGetErrorString(err)));
+    }
     alloc->deallocate(data);
   }
 };
@@ -131,7 +141,7 @@ class AllocatorAccessibilityTest : public ::testing::TestWithParam<std::string> 
 
     if (rm.getAllocator(GetParam()).getAllocationStrategy()->getTraits().resource ==
         umpire::MemoryResourceTraits::resource_type::shared) {
-      umpire::MemoryResourceTraits traits(umpire::get_default_resource_traits("SHARED"));
+      umpire::MemoryResourceTraits traits{umpire::get_default_resource_traits("SHARED")};
 
       traits.size = 1 * 1024 * 1024; // Maximum size of this Allocator
 
@@ -221,9 +231,8 @@ void run_access_test(umpire::Allocator* alloc, size_t size)
 #if defined(UMPIRE_ENABLE_INACCESSIBILITY_TESTS)
   else if (alloc->getAllocationStrategy()->getTraits().resource == umpire::MemoryResourceTraits::resource_type::file) {
     //////////////////////////////////////////////////////////////////////
-    // TODO: Implement a more robust omp_target + file accessibility check;
-    // Currently, never allowing omp_target to access FILE memory is a
-    // placeholder until an appropriate OpenMP check is determined.
+    // Note: omp_target + file accessibility currently treats FILE memory as
+    // inaccessible until an appropriate OpenMP-based check is determined.
     //////////////////////////////////////////////////////////////////////
     SUCCEED();
   } else {
@@ -276,5 +285,22 @@ std::vector<std::string> get_allocators(bool ignore_shared_memory)
 
 INSTANTIATE_TEST_SUITE_P(Allocators, AllocatorAccessibilityTest, ::testing::ValuesIn(get_allocators(false)));
 INSTANTIATE_TEST_SUITE_P(Pools, PoolAccessibilityTest, ::testing::ValuesIn(get_allocators(true)));
+
+#if defined(UMPIRE_ENABLE_MPI)
+int main(int argc, char* argv[])
+{
+  int result = 0;
+
+  ::testing::InitGoogleTest(&argc, argv);
+
+  MPI_Init(&argc, &argv);
+
+  result = RUN_ALL_TESTS();
+
+  MPI_Finalize();
+
+  return result;
+}
+#endif
 
 // END gtest

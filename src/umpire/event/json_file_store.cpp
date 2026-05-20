@@ -17,6 +17,7 @@
 #include "fmt/format.h"
 #include "umpire/event/event_json.hpp"
 #include "umpire/json/json.hpp"
+#include "umpire/util/Macros.hpp"
 #include "umpire/util/error.hpp"
 
 namespace umpire {
@@ -25,11 +26,26 @@ namespace event {
 json_file_store::json_file_store(const std::string& filename, bool read_only)
     : m_filename{filename}, m_read_only{read_only}
 {
+  m_fstream = fopen(m_filename.c_str(), m_read_only ? "r" : "w");
+
+  if (m_fstream == NULL) {
+    UMPIRE_ERROR(umpire::runtime_error, fmt::format("Failed to open {}", m_filename));
+  }
+}
+
+json_file_store::~json_file_store()
+{
+  if (m_fstream != nullptr) {
+    if (!m_read_only) {
+      fflush(m_fstream); // Flush buffered writes before close.
+    }
+    fclose(m_fstream); // Close the file
+    m_fstream = nullptr;
+  }
 }
 
 void json_file_store::insert(const event& e)
 {
-  open_store();
   nlohmann::json json_event = e;
   std::stringstream ss;
   ss << json_event;
@@ -64,6 +80,20 @@ void json_file_store::insert(const named_allocate& e)
               std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count()));
 }
 
+void json_file_store::insert(const allocate_resource& e)
+{
+  fprintf(m_fstream,
+          R"({"category":"operation","name":"allocate_resource")"
+          R"(,"numeric_args":{"size":%ld})"
+          R"(,"string_args":{"allocator_ref":"%p","pointer":"%p","resource":"%s"})"
+          R"(,"tags":{"replay":"true"})"
+          R"(,"timestamp":%lld})"
+          "\n",
+          e.size, e.ref, e.ptr, e.res.c_str(),
+          static_cast<long long>(
+              std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count()));
+}
+
 void json_file_store::insert(const deallocate& e)
 {
   fprintf(m_fstream,
@@ -77,6 +107,19 @@ void json_file_store::insert(const deallocate& e)
               std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count()));
 }
 
+void json_file_store::insert(const deallocate_resource& e)
+{
+  fprintf(m_fstream,
+          R"({"category":"operation","name":"deallocate_resource")"
+          R"(,"string_args":{"allocator_ref":"%p","pointer":"%p", "resource":"%s"})"
+          R"(,"tags":{"replay":"true"})"
+          R"(,"timestamp":%lld})"
+          "\n",
+          e.ref, e.ptr, e.res.c_str(),
+          static_cast<long long>(
+              std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count()));
+}
+
 std::vector<event> json_file_store::get_events()
 #if !defined(_MSC_VER)
 {
@@ -85,7 +128,6 @@ std::vector<event> json_file_store::get_events()
   std::vector<event> events;
   std::size_t line_number{1};
 
-  open_store();
   while (getline(&line, &len, m_fstream) != -1) {
     nlohmann::json json_event;
     event e;
@@ -139,17 +181,5 @@ std::vector<event> json_file_store::get_events()
   return events;
 }
 #endif
-
-void json_file_store::open_store()
-{
-  if (m_fstream == NULL) {
-    m_fstream = fopen(m_filename.c_str(), m_read_only ? "r" : "w");
-
-    if (m_fstream == NULL) {
-      UMPIRE_ERROR(umpire::runtime_error, fmt::format("Failed to open {}", m_filename));
-    }
-  }
-}
-
 } // namespace event
 } // namespace umpire

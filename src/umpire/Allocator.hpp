@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -13,6 +13,8 @@
 #include <ostream>
 #include <string>
 
+#include "camp/camp.hpp"
+#include "camp/resource.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/mixins/AllocateNull.hpp"
 #include "umpire/strategy/mixins/Inspector.hpp"
@@ -64,6 +66,8 @@ class Allocator : private strategy::mixins::Inspector, strategy::mixins::Allocat
    */
   inline void* allocate(std::size_t bytes);
 
+  inline void* allocate(std::size_t bytes, camp::resources::Resource const& r);
+
   inline void* allocate(const std::string& name, std::size_t bytes);
 
   /*!
@@ -78,6 +82,8 @@ class Allocator : private strategy::mixins::Inspector, strategy::mixins::Allocat
    * \param ptr Pointer to free (If nullptr, it will be ignored.)
    */
   inline void deallocate(void* ptr);
+
+  inline void deallocate(void* ptr, camp::resources::Resource const& r);
 
   /*!
    * \brief Release any and all unused memory held by this Allocator.
@@ -208,16 +214,21 @@ class Allocator : private strategy::mixins::Inspector, strategy::mixins::Allocat
    * allocation sequence including zero-byte-allocation check, allocation,
    * and tracking bookkeeping.
    *
-   * TODO: This is a temporary workaround until we update the Allocator API to
-   * automatically do this based upon type and/or policy information.
+   * This implementation relies on an explicit thread-safe flag and may be
+   * extended in the future to select synchronization based on allocator type
+   * or policy information.
    */
   inline void* thread_safe_allocate(std::size_t bytes);
   inline void* thread_safe_named_allocate(const std::string& name, std::size_t bytes);
+  inline void* thread_safe_resource_allocate(std::size_t bytes, camp::resources::Resource const& r);
   inline void thread_safe_deallocate(void* ptr);
+  inline void thread_safe_resource_deallocate(void* ptr, camp::resources::Resource const& r);
 
   inline void* do_allocate(std::size_t bytes);
+  inline void* do_resource_allocate(std::size_t bytes, camp::resources::Resource const& r);
   inline void* do_named_allocate(const std::string& name, std::size_t bytes);
   inline void do_deallocate(void* ptr);
+  inline void do_resource_deallocate(void* ptr, camp::resources::Resource const& r);
 
   bool m_thread_safe{false};
   std::mutex* m_thread_safe_mutex{nullptr};

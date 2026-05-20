@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -41,7 +41,7 @@ bool backtrace_enabled()
   static bool initialized{false};
 
   if (!initialized) {
-    const char* enval{getenv("UMPIRE_BACKTRACE")};
+    const char* enval{std::getenv("UMPIRE_BACKTRACE")};
     if (enval) {
       std::string env_str{enval};
       std::transform(env_str.begin(), env_str.end(), env_str.begin(), ::toupper);

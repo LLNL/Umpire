@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -29,7 +29,7 @@ void CudaCopyOperation::transform(void* src_ptr, void** dst_ptr,
     UMPIRE_ERROR(
         runtime_error,
         fmt::format(
-            "CudaMemmcpy( dest_ptr = {}, src_ptr = {}, length = {}, cudaMemcpyDeviceToDevice) failed with error: {}",
+            "cudaMemcpy( dest_ptr = {}, src_ptr = {}, length = {}, cudaMemcpyDeviceToDevice) failed with error: {}",
             *dst_ptr, src_ptr, length, cudaGetErrorString(error)));
   }
 }
@@ -50,7 +50,7 @@ camp::resources::EventProxy<camp::resources::Resource> CudaCopyOperation::transf
   if (error != cudaSuccess) {
     UMPIRE_ERROR(runtime_error, fmt::format("cudaMemcpyAsync( dest_ptr = {}, src_ptr = {}, length = {}, "
                                             "cudaMemcpyDeviceToDevice, stream = {}) failed with error: {}",
-                                            *dst_ptr, src_ptr, length, cudaGetErrorString(error), (void*)stream));
+                                            *dst_ptr, src_ptr, length, (void*)stream, cudaGetErrorString(error)));
   }
 
   return camp::resources::EventProxy<camp::resources::Resource>{ctx};

@@ -1,13 +1,13 @@
 # Contributing to Umpire
 
-This document is intented for developers who want to add new features or
+This document is intended for developers who want to add new features or
 bugfixes to Umpire. It assumes you have some familiarity with git and GitHub.
 It will discuss what a good pull request (PR) looks like, and the tests that
 your PR must pass before it can be merged into Umpire.
 
 ## Forking Umpire
 
-If you aren't a Umpire deveolper at LLNL, then you won't have permission to push
+If you aren't a Umpire developer at LLNL, then you won't have permission to push
 new branches to the repository. First, you should create a fork. This will
 create a copy of the Umpire repository that you own, and will ensure you can
 push your changes up to GitHub and create pull requests.

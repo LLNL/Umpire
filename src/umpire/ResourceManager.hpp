@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -101,6 +101,17 @@ class ResourceManager {
   std::vector<std::string> getResourceNames();
 
   /*!
+   * \brief Get the names for existing SHARED Allocator names, if any.
+   *
+   * The SHARED memory resource only indicates whether or not these SHARED allocators
+   * exist. Since SHARED allocators are made at runtime, this function will actually
+   * find the specific name of each SHARED allocator and return it.
+   *
+   * \return A vector of strings with the available SHARED allocator names.
+   */
+  std::vector<std::string> getSharedAllocatorNames();
+
+  /*!
    * \brief Set the default Allocator.
    *
    * The default Allocator is used whenever an Allocator is required and one
@@ -149,6 +160,48 @@ class ResourceManager {
    * \param allocator Allocator to deregister.
    */
   void removeAlias(const std::string& name, Allocator allocator);
+
+  /*!
+   * \brief Destroy an allocator by name.
+   *
+   * Removes the allocator from the ResourceManager and frees associated
+   * resources. Core resource allocators (HOST, DEVICE, etc.) cannot be
+   * destroyed.
+   *
+   * Behavior is controlled by the UMPIRE_STRICT_DESTRUCTION environment variable:
+   *
+   * If UMPIRE_STRICT_DESTRUCTION is set (to any value):
+   * - Throws error if allocator has active allocations and free_allocations=false
+   * - Throws error if allocator is a parent of other allocators
+   *
+   * If UMPIRE_STRICT_DESTRUCTION is not set (default):
+   * - Logs warning but proceeds if allocator has active allocations
+   * - Logs warning but proceeds if allocator is a parent
+   *
+   * Example:
+   *   export UMPIRE_STRICT_DESTRUCTION=1  // Enable strict mode
+   *   unset UMPIRE_STRICT_DESTRUCTION     // Disable strict mode (default)
+   *
+   * \param name Name of the allocator to destroy
+   * \param free_allocations If true, deallocates all active allocations
+   *                         before destroying. Defaults to false.
+   *
+   * \throw runtime_error if allocator is a core resource or not found
+   */
+  void destroyAllocator(const std::string& name, bool free_allocations = false);
+
+  /*!
+   * \brief Destroy an allocator by ID.
+   *
+   * See destroyAllocator(const std::string&, bool) for detailed behavior.
+   *
+   * \param id ID of the allocator to destroy
+   * \param free_allocations If true, deallocates all active allocations
+   *                         before destroying. Defaults to false.
+   *
+   * \throw runtime_error if allocator is a core resource or not found
+   */
+  void destroyAllocator(int id, bool free_allocations = false);
 
   /*!
    * \brief Get the Allocator used to allocate ptr.
@@ -299,6 +352,8 @@ class ResourceManager {
    */
   std::size_t getSize(void* ptr) const;
 
+  std::size_t getInternalMemoryUsage() const;
+
   std::shared_ptr<op::MemoryOperation> getOperation(const std::string& operation_name, Allocator src_allocator,
                                                     Allocator dst_allocator);
 
@@ -315,6 +370,19 @@ class ResourceManager {
   strategy::AllocationStrategy* findAllocatorForId(int id);
   strategy::AllocationStrategy* getAllocationStrategy(const std::string& name);
 
+  bool isBuiltinAllocator(strategy::AllocationStrategy* strategy);
+
+  /*!
+   * \brief Check if strict destruction mode is enabled via environment variable.
+   *
+   * Checks the UMPIRE_STRICT_DESTRUCTION environment variable. If set to any
+   * value, strict mode is enabled (errors thrown). If unset, non-strict mode
+   * is used (warnings logged). The check is cached on first call.
+   *
+   * \return true if UMPIRE_STRICT_DESTRUCTION is set, false otherwise
+   */
+  bool isStrictDestructionMode() const noexcept;
+
   int getNextId() noexcept;
 
   std::string getAllocatorInformation() const noexcept;
@@ -328,6 +396,7 @@ class ResourceManager {
   util::AllocationMap m_allocations;
 
   std::list<std::unique_ptr<strategy::AllocationStrategy>> m_allocators;
+  std::vector<std::string> m_shared_allocator_names;
 
   std::unordered_map<int, strategy::AllocationStrategy*> m_allocators_by_id;
   std::unordered_map<std::string, strategy::AllocationStrategy*> m_allocators_by_name;

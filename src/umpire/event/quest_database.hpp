@@ -21,7 +21,9 @@ namespace event {
 struct event;
 struct allocate;
 struct named_allocate;
+struct allocate_resource;
 struct deallocate;
+struct deallocate_resource;
 
 class quest_database : public event_store {
  public:
@@ -30,7 +32,9 @@ class quest_database : public event_store {
   void insert(const event& e) override final;
   void insert(const allocate& e) override final;
   void insert(const named_allocate& e) override final;
+  void insert(const allocate_resource& e) override final;
   void insert(const deallocate& e) override final;
+  void insert(const deallocate_resource& e) override final;
 
   std::vector<event> get_events() override final;
 

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -64,7 +64,7 @@ ResourceManager::ResourceManager()
 {
   UMPIRE_LOG(Debug, "() entering");
 
-  const char* env_enable_log{getenv("UMPIRE_LOG_LEVEL")};
+  const char* env_enable_log{std::getenv("UMPIRE_LOG_LEVEL")};
   const bool enable_log{env_enable_log != nullptr};
 
   util::initialize_io(enable_log);
@@ -153,6 +153,10 @@ Allocator ResourceManager::makeResource(const std::string& name, MemoryResourceT
 
   if (name.find("::FINE") != std::string::npos) {
     traits.granularity = MemoryResourceTraits::granularity_type::fine_grained;
+  }
+
+  if (name.find("SHARED") != std::string::npos) {
+    m_shared_allocator_names.push_back(name);
   }
 
   std::unique_ptr<strategy::AllocationStrategy> allocator{registry.makeMemoryResource(name, getNextId(), traits)};
@@ -268,6 +272,16 @@ std::vector<std::string> ResourceManager::getResourceNames()
   return registry.getResourceNames();
 }
 
+std::vector<std::string> ResourceManager::getSharedAllocatorNames()
+{
+  if (m_shared_allocator_names.size() == 0) {
+    UMPIRE_LOG(Debug, "Called getSharedAllocatorNames, but there are none. Returning empty vector.");
+    return std::vector<std::string>(); // Return an empty vector of strings
+  }
+
+  return m_shared_allocator_names;
+}
+
 void ResourceManager::setDefaultAllocator(Allocator allocator) noexcept
 {
   UMPIRE_LOG(Debug, "(\"" << allocator.getName() << "\")");
@@ -310,6 +324,162 @@ void ResourceManager::removeAlias(const std::string& name, Allocator allocator)
   }
 
   m_allocators_by_name.erase(a);
+}
+
+bool ResourceManager::isBuiltinAllocator(strategy::AllocationStrategy* strategy)
+{
+  for (const auto& entry : m_memory_resources) {
+    if (entry.second == strategy) {
+      return true;
+    }
+  }
+
+  std::string name = strategy->getName();
+  if (name == "__umpire_internal_null" || name == "__umpire_internal_0_byte_pool") {
+    return true;
+  }
+
+  return false;
+}
+
+void ResourceManager::destroyAllocator(const std::string& name, bool free_allocations)
+{
+  std::lock_guard<std::mutex> lock(m_mutex);
+
+  UMPIRE_LOG(Debug, "(name=\"" << name << "\", free_allocations=" << free_allocations << ")");
+
+  auto it = m_allocators_by_name.find(name);
+  if (it == m_allocators_by_name.end()) {
+    UMPIRE_ERROR(runtime_error, fmt::format("Allocator \"{}\" not found", name));
+  }
+
+  strategy::AllocationStrategy* strategy = it->second;
+  int id = strategy->getId();
+
+  const std::string& strategy_name = strategy->getName();
+  const bool is_shared_resource =
+      (strategy_name == "SHARED") || (strategy_name.rfind("SHARED::", 0) == 0);
+
+  if (isBuiltinAllocator(strategy) && !is_shared_resource) {
+    UMPIRE_ERROR(runtime_error,
+                 fmt::format("Cannot destroy builtin allocator \"{}\"", name));
+  }
+
+  auto records = umpire::get_allocator_records(Allocator(strategy));
+
+  if (isStrictDestructionMode()) {
+    if (!records.empty() && !free_allocations) {
+      UMPIRE_ERROR(runtime_error,
+                   fmt::format("Allocator \"{}\" has {} active allocations. "
+                              "Use free_allocations=true or deallocate them first.",
+                              name, records.size()));
+    }
+  } else if (!free_allocations && !records.empty()) {
+    UMPIRE_LOG(Warning, "Allocator \"" << name << "\" may have active allocations. "
+                        << "Destroying anyway (non-strict mode).");
+  }
+
+
+  if (isStrictDestructionMode()) {
+    std::vector<std::string> child_names;
+    for (const auto& alloc : m_allocators) {
+      if (alloc.get() != strategy && alloc->getParent() == strategy) {
+        child_names.push_back(alloc->getName());
+      }
+    }
+
+    if (!child_names.empty()) {
+      std::string children_str;
+      for (size_t i = 0; i < child_names.size(); ++i) {
+        if (i > 0) children_str += ", ";
+        children_str += child_names[i];
+      }
+
+      UMPIRE_ERROR(runtime_error,
+                   fmt::format("Allocator \"{}\" is a parent of other allocators: {}. "
+                              "Destroy children first.",
+                              name, children_str));
+    }
+  } else {
+    UMPIRE_LOG(Warning, "Allocator \"" << name << "\" may be a parent of other allocators. "
+                        << "Destroying anyway (non-strict mode).");
+  }
+
+  if (free_allocations) {
+    UMPIRE_LOG(Debug, "Freeing " << records.size() << " allocations");
+    Allocator allocator{strategy};
+    for (const auto& record : records) {
+      allocator.deallocate(record.ptr);
+    }
+  } else if (!records.empty()) {
+    //
+    // In non-strict mode, destroying an allocator with active allocations
+    // intentionally "leaks" those allocations. Ensure we remove their records
+    // so we don't retain dangling strategy pointers that could later collide
+    // with a new allocator at the same address.
+    //
+    UMPIRE_LOG(Warning, "Untracking " << records.size() << " active allocations for allocator \"" << name
+                                     << "\" (allocator destroyed without freeing allocations).");
+    for (const auto& record : records) {
+      deregisterAllocation(record.ptr);
+    }
+  }
+
+  std::vector<std::string> names_to_remove;
+  for (const auto& entry : m_allocators_by_name) {
+    if (entry.second == strategy) {
+      names_to_remove.push_back(entry.first);
+    }
+  }
+
+  for (const auto& n : names_to_remove) {
+    m_allocators_by_name.erase(n);
+  }
+
+  m_allocators_by_id.erase(id);
+
+  for (auto it_mem = m_memory_resources.begin(); it_mem != m_memory_resources.end();) {
+    if (it_mem->second == strategy) {
+      it_mem = m_memory_resources.erase(it_mem);
+    } else {
+      ++it_mem;
+    }
+  }
+
+  auto shared_it = std::find(m_shared_allocator_names.begin(), m_shared_allocator_names.end(), name);
+  if (shared_it != m_shared_allocator_names.end()) {
+    m_shared_allocator_names.erase(shared_it);
+  }
+
+  for (auto it_alloc = m_allocators.begin(); it_alloc != m_allocators.end(); ++it_alloc) {
+    if (it_alloc->get() == strategy) {
+      m_allocators.erase(it_alloc);
+      break;
+    }
+  }
+
+  umpire::event::record([&](auto& event) {
+    event.name("destroy_allocator")
+        .category(event::category::operation)
+        .arg("allocator_name", name)
+        .arg("allocator_id", id)
+        .arg("freed_allocations", free_allocations)
+        .tag("replay", "true");
+  });
+
+  UMPIRE_LOG(Debug, "Allocator \"" << name << "\" destroyed successfully");
+}
+
+void ResourceManager::destroyAllocator(int id, bool free_allocations)
+{
+  UMPIRE_LOG(Debug, "(id=" << id << ", free_allocations=" << free_allocations << ")");
+
+  auto it = m_allocators_by_id.find(id);
+  if (it == m_allocators_by_id.end()) {
+    UMPIRE_ERROR(runtime_error, fmt::format("Allocator with id {} not found", id));
+  }
+
+  destroyAllocator(it->second->getName(), free_allocations);
 }
 
 Allocator ResourceManager::getAllocator(void* ptr)
@@ -865,6 +1035,11 @@ std::size_t ResourceManager::getSize(void* ptr) const
   return record->size;
 }
 
+std::size_t ResourceManager::getInternalMemoryUsage() const
+{
+  return m_allocations.internalMemoryUsage();
+}
+
 strategy::AllocationStrategy* ResourceManager::findAllocatorForId(int id)
 {
   auto allocator_i = m_allocators_by_id.find(id);
@@ -939,15 +1114,28 @@ std::shared_ptr<op::MemoryOperation> ResourceManager::getOperation(const std::st
   return op_registry.find(operation_name, src_allocator.getAllocationStrategy(), dst_allocator.getAllocationStrategy());
 }
 
+bool ResourceManager::isStrictDestructionMode() const noexcept
+{
+  static const char* env_value = std::getenv("UMPIRE_STRICT_DESTRUCTION");
+  return (env_value != nullptr);
+}
+
 int ResourceManager::getNumDevices() const
 {
   int device_count{0};
 #if defined(UMPIRE_ENABLE_CUDA)
-  ::cudaGetDeviceCount(&device_count);
+  cudaError_t err = ::cudaGetDeviceCount(&device_count);
+  if (err != cudaSuccess) {
+    UMPIRE_ERROR(runtime_error, fmt::format("cudaGetDeviceCount failed with error: {}", cudaGetErrorString(err)));
+  }
 #elif defined(UMPIRE_ENABLE_HIP)
-  hipGetDeviceCount(&device_count);
+  hipError_t err = hipGetDeviceCount(&device_count);
+  if (err != hipSuccess) {
+    UMPIRE_ERROR(runtime_error, fmt::format("hipGetDeviceCount failed with error: {}", hipGetErrorString(err)));
+  }
 #elif defined(UMPIRE_ENABLE_SYCL)
-  sycl::platform platform(sycl::gpu_selector{});
+  sycl::queue queue{sycl::gpu_selector_v};
+  sycl::platform platform = queue.get_device().get_platform();
 
   auto devices = platform.get_devices();
   for (auto& device : devices) {

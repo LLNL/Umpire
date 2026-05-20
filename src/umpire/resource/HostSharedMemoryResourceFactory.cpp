@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -10,17 +10,14 @@
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/error.hpp"
 #include "umpire/util/make_unique.hpp"
+#include "umpire/util/shared_memory_helper.hpp"
 
 namespace umpire {
 namespace resource {
 
 bool HostSharedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name) noexcept
 {
-  if (name.find("SHARED") != std::string::npos) {
-    return true;
-  } else {
-    return false;
-  }
+  return umpire::util::matchesSharedMemoryResource(name, "POSIX");
 }
 
 std::unique_ptr<resource::MemoryResource> HostSharedMemoryResourceFactory::create(const std::string& name, int id)

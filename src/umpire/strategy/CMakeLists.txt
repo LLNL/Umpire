@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -19,10 +19,17 @@ set (umpire_strategy_headers
   NamingShim.hpp
   PoolCoalesceHeuristic.hpp
   QuickPool.hpp
+  ResourceAwarePool.hpp
   SizeLimiter.hpp
   SlotPool.hpp
   StdAllocator.hpp
   ThreadSafeAllocator.hpp)
+
+if (UMPIRE_ENABLE_MPI AND UMPIRE_ENABLE_IPC_SHARED_MEMORY AND (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP))
+  set (umpire_strategy_headers
+    ${umpire_strategy_headers}
+    DeviceIpcAllocator.hpp)
+endif()
 
 if (UMPIRE_ENABLE_NUMA)
   set (umpire_strategy_headers
@@ -51,9 +58,16 @@ set (umpire_strategy_sources
   NamedAllocationStrategy.cpp
   NamingShim.cpp
   QuickPool.cpp
+  ResourceAwarePool.cpp
   SizeLimiter.cpp
   SlotPool.cpp
   ThreadSafeAllocator.cpp)
+
+if (UMPIRE_ENABLE_MPI AND UMPIRE_ENABLE_IPC_SHARED_MEMORY AND (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP))
+  set (umpire_strategy_sources
+    ${umpire_strategy_sources}
+    DeviceIpcAllocator.cpp)
+endif()
 
 if (UMPIRE_ENABLE_NUMA)
   set (umpire_strategy_sources

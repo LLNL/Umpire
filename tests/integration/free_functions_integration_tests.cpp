@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -13,7 +13,7 @@ class FreeFunctionsTest : public ::testing::TestWithParam<std::string> {
 
 TEST_P(FreeFunctionsTest, DefaultMallocFree)
 {
-  double* test_alloc;
+  double* test_alloc = nullptr;
 
   ASSERT_NO_THROW(test_alloc = static_cast<double*>(umpire::malloc(100 * sizeof(double))));
 
@@ -28,7 +28,7 @@ TEST_P(FreeFunctionsTest, SetDefaultAndMallocFree)
 
   ASSERT_NO_THROW(rm.setDefaultAllocator(rm.getAllocator(GetParam())));
 
-  double* test_alloc;
+  double* test_alloc = nullptr;
 
   ASSERT_NO_THROW(test_alloc = static_cast<double*>(umpire::malloc(100 * sizeof(double))));
 

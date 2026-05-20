@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -43,8 +43,8 @@ static int s_counter{0};
 struct NullStrategy {
 };
 
-// TODO: memset & reallocate test needs teh complete source list, and only a
-// single dest
+// Note: memset & reallocate tests currently require the complete source list
+// and only support a single destination.
 using HostAccessibleResources = camp::list<host_resource_tag
 #if defined(UMPIRE_ENABLE_UM)
                                            ,
@@ -834,5 +834,31 @@ TEST(AsyncTest, Prefetch)
   event.wait();
 
   alloc.deallocate(array);
+}
+#endif
+
+#if (defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)) && defined(UMPIRE_ENABLE_CONST)
+TEST(ConstDeviceMemoryTest, SetConstDeviceMemory)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto const_allocator = rm.getAllocator("DEVICE_CONST");
+
+  static constexpr int N = 4;
+  static constexpr int BYTESIZE = N * sizeof(int);
+  static constexpr int TEST_VAL = 42;
+
+  auto host_allocator = rm.getAllocator("HOST");
+  int* HOST_DATA = static_cast<int*>(host_allocator.allocate(BYTESIZE));
+
+  for (int i = 0; i < N; ++i) {
+    HOST_DATA[i] = TEST_VAL;
+  }
+
+  int* A_d = static_cast<int*>(const_allocator.allocate(BYTESIZE));
+  EXPECT_TRUE(A_d != nullptr);
+  rm.copy(A_d, HOST_DATA, BYTESIZE);
+
+  host_allocator.deallocate(HOST_DATA);
+  const_allocator.deallocate(A_d);
 }
 #endif

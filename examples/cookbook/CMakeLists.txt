@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -33,6 +33,20 @@ if (UMPIRE_ENABLE_IPC_SHARED_MEMORY)
       SOURCES recipe_shared_memory.cpp
       DEPENDS_ON ${cookbook_depends})
     list(APPEND umpire_cookbooks recipe_shared_memory)
+
+    if (UMPIRE_ENABLE_CUDA)
+        blt_add_executable(
+          NAME recipe_device_ipc
+          SOURCES recipe_device_ipc.cpp
+          DEPENDS_ON ${cookbook_depends} cuda_runtime)
+        list(APPEND umpire_cookbooks recipe_device_ipc)
+    elseif (UMPIRE_ENABLE_HIP)
+        blt_add_executable(
+          NAME recipe_device_ipc
+          SOURCES recipe_device_ipc.cpp
+          DEPENDS_ON ${cookbook_depends} blt::hip_runtime)
+        list(APPEND umpire_cookbooks recipe_device_ipc)
+    endif()
   endif()
 
   blt_add_executable(
@@ -163,12 +177,11 @@ if (UMPIRE_ENABLE_HIP)
   endif ()
 endif ()
 
-
 blt_add_executable(
-  NAME recipe_dynamic_pool_heuristic
-  SOURCES recipe_dynamic_pool_heuristic.cpp
+  NAME recipe_quick_pool_heuristic
+  SOURCES recipe_quick_pool_heuristic.cpp
   DEPENDS_ON ${cookbook_depends})
-list(APPEND umpire_cookbooks recipe_dynamic_pool_heuristic)
+list(APPEND umpire_cookbooks recipe_quick_pool_heuristic)
 
 blt_add_executable(
   NAME recipe_coalesce_pool

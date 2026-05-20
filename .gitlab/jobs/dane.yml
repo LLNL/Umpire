@@ -6,7 +6,7 @@
 ###############################################################################
 
 # Override reproducer section to define Umpire specific variables.
-.poodle_reproducer_vars:
+.dane_reproducer_vars:
   script:
     - !reference [.reproducer_vars, script]
 
@@ -24,28 +24,33 @@
 # ${PROJECT_<MACHINE>_DEPS} in the extra jobs. There is not reason not to fully
 # describe the spec here.
 
-gcc_10_3_1_numa:
+gcc_11_2_1_numa:
   variables:
-    SPEC: "~shared +fortran +numa +tools tests=basic %gcc@=10.3.1"
-  extends: .job_on_poodle
+    SPEC: "~shared +fortran +numa +tools tests=basic %gcc@=11.2.1"
+  extends: .job_on_dane
 
-clang_14_0_6_gcc_10_3_1_sqlite_experimental:
+clang_14_0_6_gcc_11_2_1_sqlite_experimental:
   variables:
-    SPEC: "~shared +sqlite_experimental +tools tests=basic %clang@=14.0.6.gcc.10.3.1"
-  extends: .job_on_poodle
+    SPEC: "~shared +sqlite_experimental +tools tests=basic %clang-14-gcc-11"
+  extends: .job_on_dane
 
 # Develop builds against specific tpl version.
-clang_14_0_6_gcc_10_3_1_tpls:
+clang_14_0_6_gcc_11_2_1_tpls:
   variables:
-    SPEC: "~shared +fortran +tools tests=basic %clang@=14.0.6.gcc.10.3.1"
-  extends: .job_on_poodle
+    SPEC: "~shared +fortran +tools tests=basic %clang-14-gcc-11"
+  extends: .job_on_dane
 
-gcc_10_3_1_tpls:
+gcc_11_2_1_tpls:
   variables:
-    SPEC: "~shared +fortran +tools tests=basic %gcc@=10.3.1"
-  extends: .job_on_poodle
+    SPEC: "~shared +fortran +tools tests=basic %gcc@=11.2.1"
+  extends: .job_on_dane
 
-gcc_10_3_1_ipc_no_mpi:
+gcc_11_2_1_ipc_no_mpi:
   variables:
-    SPEC: "~shared +ipc_shmem tests=basic %gcc@=10.3.1"
-  extends: .job_on_poodle
+    SPEC: "~shared +ipc_shmem tests=basic %gcc@=11.2.1"
+  extends: .job_on_dane
+
+gcc_10_3_1_mpi3_and_ipc_shmem:
+  variables:
+    SPEC: "~shared +mpi3_shmem +ipc_shmem +mpi tests=basic %gcc@=10.3.1 ^mvapich2"
+  extends: .job_on_dane

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -114,6 +114,16 @@ bool MPI::isInitialized()
 {
   return s_initialized;
 }
+
+#if defined(UMPIRE_ENABLE_MPI)
+MPI_Comm MPI::getCommunicator()
+{
+  if (s_initialized && s_communicator != MPI_COMM_NULL) {
+    return s_communicator;
+  }
+  return MPI_COMM_WORLD;
+}
+#endif
 
 } // end of namespace util
 } // end of namespace umpire

@@ -1,40 +1,67 @@
 ##############################################################################
-# Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
+cmake_minimum_required(VERSION 3.23)
 
 cmake_policy(SET CMP0025 NEW)
 cmake_policy(SET CMP0048 NEW)
 cmake_policy(SET CMP0057 NEW)
 cmake_policy(SET CMP0054 NEW)
+cmake_policy(SET CMP0096 OLD)
 
 include(CMakeDependentOption)
 include(CMakePackageConfigHelpers)
 
+file(READ "${CMAKE_CURRENT_SOURCE_DIR}/VERSION" VERSION_STRING)
+string(STRIP "${VERSION_STRING}" VERSION_STRING)
+
 project(Umpire
   LANGUAGES CXX C
-  VERSION 2024.07.0)
-
-cmake_minimum_required(VERSION 3.23)
+  VERSION ${VERSION_STRING})
 
 set(UMPIRE_VERSION_RC "")
 
 include(cmake/SetupUmpireOptions.cmake)
 
+# Default to C++20 if not specified by the user.
+set(BLT_CXX_STD "c++20" CACHE STRING "Version of C++ standard")
+
+# If BLT_CXX_STD is set by the user, check that it is at least 20.
+if("${BLT_CXX_STD}" STREQUAL "c++98" OR
+   "${BLT_CXX_STD}" STREQUAL "c++03" OR
+   "${BLT_CXX_STD}" STREQUAL "c++11" OR
+   "${BLT_CXX_STD}" STREQUAL "c++14" OR
+   "${BLT_CXX_STD}" STREQUAL "c++17")
+  message(FATAL_ERROR "Umpire requires a minimum C++ standard of c++20. Please set BLT_CXX_STD accordingly.")
+endif()
+
+# If CMAKE_CUDA_STANDARD is set by the user, check that it is at least 20.
+# If it is not set, it will be set later by BLT to match BLT_CXX_STD.
+if ("${CMAKE_CUDA_STANDARD}" STREQUAL "98" OR
+    "${CMAKE_CUDA_STANDARD}" STREQUAL "03" OR
+    "${CMAKE_CUDA_STANDARD}" STREQUAL "11" OR
+    "${CMAKE_CUDA_STANDARD}" STREQUAL "14" OR
+    "${CMAKE_CUDA_STANDARD}" STREQUAL "17")
+  message(FATAL_ERROR "Umpire requires a minimum CUDA standard of 20. Please set BLT_CXX_STD and/or CMAKE_CUDA_STANDARD accordingly.")
+endif()
+
+# If CMAKE_HIP_STANDARD is set by the user, check that it is at least 20
+# If it is not set, it will be set later by BLT to match BLT_CXX_STD
+if ("${CMAKE_HIP_STANDARD}" STREQUAL "98" OR
+    "${CMAKE_HIP_STANDARD}" STREQUAL "03" OR
+    "${CMAKE_HIP_STANDARD}" STREQUAL "11" OR
+    "${CMAKE_HIP_STANDARD}" STREQUAL "14" OR
+    "${CMAKE_HIP_STANDARD}" STREQUAL "17")
+  message(FATAL_ERROR "Umpire requires a minimum HIP standard of 20. Please set BLT_CXX_STD and/or CMAKE_HIP_STANDARD accordingly.")
+endif()
+
 if (UMPIRE_ENABLE_SYCL)
-  set(BLT_CXX_STD "c++17" CACHE STRING "Version of C++ standard")
    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsycl")
    endif()
-else()
-  set(BLT_CXX_STD "c++14" CACHE STRING "Version of C++ standard")
-  set(CMAKE_CUDA_STANDARD 14)
-endif()
-
-if("${BLT_CXX_STD}" STREQUAL "c++98" OR "${BLT_CXX_STD}" STREQUAL "c++11" )
-    message(FATAL_ERROR "Umpire requires minimum C++ standard of c++14. Please set BLT_CXX_STD appropriately.")
 endif()
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "PGI")
@@ -88,12 +115,28 @@ cmake_dependent_option( UMPIRE_ENABLE_OPENMP "Build Umpire with OpenMP" On
                        "ENABLE_OPENMP" Off )
 cmake_dependent_option( UMPIRE_ENABLE_MPI "Build Umpire with MPI" On
                        "ENABLE_MPI" Off )
-#
-# NOTE: The following option depends upon UMPIRE_ENABLE_MPI being defined first
-#
-cmake_dependent_option( UMPIRE_ENABLE_IPC_SHARED_MEMORY "Enable Host Shared Memory Resource" ${UMPIRE_ENABLE_MPI}
-                       "NOT WIN32;NOT APPLE" Off )
 
+########
+# Shared Memory Options
+########
+
+cmake_dependent_option( UMPIRE_ENABLE_IPC_SHARED_MEMORY "Enable Host IPC Shared Memory Resource" ${UMPIRE_ENABLE_MPI}
+                        "NOT WIN32;NOT APPLE" Off )
+cmake_dependent_option( UMPIRE_ENABLE_MPI3_SHARED_MEMORY "Enable MPI3 Shared Memory Resource" Off "${ENABLE_MPI}" Off)
+
+if(UMPIRE_ENABLE_IPC_SHARED_MEMORY AND NOT UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
+  set(UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE "POSIX" CACHE STRING "Default implementation for SHARED memory resource (POSIX)")
+elseif(UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
+  set(UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE "MPI3" CACHE STRING "Default implementation for SHARED memory resource (MPI3)")
+else()
+  set (UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE "" CACHE STRING "")
+endif()
+
+if(UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE)
+  message(STATUS "Default Shared Memory Resource is ${UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE}")
+endif()
+
+########
 
 cmake_dependent_option( UMPIRE_ENABLE_TESTS "Build Umpire tests" On
                        "ENABLE_TESTS" Off )
@@ -154,7 +197,7 @@ install(FILES
   "${PROJECT_BINARY_DIR}/umpire-config-version.cmake"
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/umpire)
 
-install(EXPORT umpire-targets DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/umpire)
+install(EXPORT umpire-targets NAMESPACE umpire:: DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/umpire)
 
 if (UMPIRE_ENABLE_TESTS)
   add_subdirectory(tests)

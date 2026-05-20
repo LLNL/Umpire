@@ -1,16 +1,16 @@
 ##############################################################################
-# Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
-if (UMPIRE_ENABLE_CUDA)
+if (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP)
   blt_add_executable(
-    NAME cuda_mem_advise_op_tests
-    SOURCES cuda_mem_advise_op_tests.cpp
-    DEPENDS_ON umpire cuda_runtime gtest gmock)
+    NAME mem_advise_op_tests
+    SOURCES mem_advise_op_tests.cpp
+    DEPENDS_ON umpire gtest gmock)
 
   blt_add_test(
-    NAME cuda_mem_advise_op_tests
-    COMMAND cuda_mem_advise_op_tests)
+    NAME mem_advise_op_tests
+    COMMAND mem_advise_op_tests)
 endif ()

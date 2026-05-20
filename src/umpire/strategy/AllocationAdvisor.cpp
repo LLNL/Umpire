@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -12,6 +12,9 @@
 
 #if defined(UMPIRE_ENABLE_CUDA)
 #include <cuda_runtime_api.h>
+#endif
+#if defined(UMPIRE_ENABLE_HIP)
+#include <hip/hip_runtime_api.h>
 #endif
 
 namespace umpire {
@@ -36,6 +39,10 @@ AllocationAdvisor::AllocationAdvisor(const std::string& name, int id, Allocator 
 #if defined(UMPIRE_ENABLE_CUDA)
   if (accessing_allocator.getPlatform() == Platform::host) {
     m_device = cudaCpuDeviceId;
+  }
+#elif defined(UMPIRE_ENABLE_HIP)
+  if (accessing_allocator.getPlatform() == Platform::host) {
+    m_device = hipCpuDeviceId;
   }
 #else
   UMPIRE_USE_VAR(accessing_allocator);

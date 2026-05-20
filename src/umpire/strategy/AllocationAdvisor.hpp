@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -26,6 +26,7 @@ namespace strategy {
  * - op::CudaAdviseAccessedByOperation
  * - op::CudaAdvisePreferredLocationOperation
  * - op::CudaAdviseReadMostlyOperation
+ * - op::HipAdviseOperation
  *
  * Using this AllocationStrategy when combined with a pool like DynamicPoolList is
  * a good way to mitigate the overhead of applying the memory advice.

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-24, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -33,8 +33,9 @@ bool CudaGetAttributeOperation<ATTRIBUTE>::check_apply(void* src_ptr, umpire::ut
     error = ::cudaMemRangeGetAttribute(&result, sizeof(result), ATTRIBUTE, src_ptr, length);
 
     if (error != cudaSuccess) {
-      UMPIRE_ERROR(runtime_error, "cudaMemRangeGetAtribute( src_ptr = {}, length = {} ) failed with error: {}", src_ptr,
-                   length, cudaGetErrorString(error));
+      UMPIRE_ERROR(runtime_error,
+                   fmt::format("cudaMemRangeGetAttribute( src_ptr = {}, length = {} ) failed with error: {}", src_ptr,
+                               length, cudaGetErrorString(error)));
     }
   }
 }
