@@ -235,4 +235,4 @@ trigger-chai:
     UPDATE_UMPIRE: ${CI_COMMIT_SHA}
   trigger:
     project: radiuss/cross-project/chai-trigger
-    branch: develop
+    branch: woptim/multi-project-ci
