@@ -236,3 +236,5 @@ trigger-chai:
   trigger:
     project: radiuss/cross-project/chai-trigger
     branch: woptim/multi-project-ci
+    forward:
+      yaml_variables: false
