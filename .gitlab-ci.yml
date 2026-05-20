@@ -236,4 +236,3 @@ trigger-chai:
   trigger:
     project: radiuss/cross-project/chai-trigger
     branch: develop
-    strategy: depend
