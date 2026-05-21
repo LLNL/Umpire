@@ -29,6 +29,8 @@ fi
 set -o errexit
 set -o nounset
 
+exec 2>&1
+
 option=${1:-""}
 hostname="$(hostname)"
 truehostname=${hostname//[0-9]/}
@@ -339,7 +341,7 @@ build_root=${BUILD_ROOT:-"${prefix}"}
 build_dir="${build_root}/build_${hostconfig//.cmake/}"
 install_dir="${build_root}/install_${hostconfig//.cmake/}"
 
-cmake_exe=`grep 'CMake executable' ${hostconfig_path} | cut -d ':' -f 2 | xargs`
+cmake_exe=$(grep 'CMake executable' ${hostconfig_path} | cut -d ':' -f 2 | xargs 2>/dev/null)
 
 if [[ "${option}" != "--deps-only" && "${option}" != "--test-only" ]]
 then
