@@ -239,6 +239,3 @@ trigger-chai:
   trigger:
     project: radiuss/multi-project/chai-trigger
     branch: develop
-    forward:
-      yaml_variables: true
-      pipeline_variables: false
