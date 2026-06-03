@@ -34,7 +34,40 @@ namespace {
 
 constexpr int IGNORE_KEY{0};
 
+std::string get_mpi_error_message(int error_code)
+{
+  char buffer[MPI_MAX_ERROR_STRING];
+  int length{0};
+  const int status = MPI_Error_string(error_code, buffer, &length);
+
+  if (status != MPI_SUCCESS) {
+    return fmt::format("MPI error code {} (MPI_Error_string failed with code {})", error_code, status);
+  }
+
+  return std::string{buffer, static_cast<std::size_t>(length)};
+}
+
+void check_mpi_call(int error_code, const char* call_name)
+{
+  if (error_code != MPI_SUCCESS) {
+    UMPIRE_ERROR(runtime_error, fmt::format("{} failed: {}", call_name, get_mpi_error_message(error_code)));
+  }
+}
+
 #if defined(__linux__)
+/*!
+ * \brief Map an operating-system CPU index to the socket color used for
+ * communicator splitting.
+ *
+ * The helper first reads Linux topology information and then falls back to the
+ * NUMA helper when available.
+ *
+ * \param cpu CPU index from the current rank's affinity mask.
+ * \param color Output socket identifier used as the MPI_Comm_split color when
+ *        the lookup succeeds.
+ *
+ * \return true when a socket identifier was found for \p cpu, false otherwise.
+ */
 bool try_get_socket_color_for_cpu(int cpu, int& color)
 {
   std::ifstream package_id_file{"/sys/devices/system/cpu/cpu" + std::to_string(cpu) + "/topology/physical_package_id"};
@@ -50,7 +83,7 @@ bool try_get_socket_color_for_cpu(int cpu, int& color)
     UMPIRE_LOG(Debug, "Could not open physical_package_id for cpu " << cpu);
   }
 
-#if defined(UMPIRE_ENABLE_NUMA) && defined(__linux__)
+#if defined(UMPIRE_ENABLE_NUMA)
   try {
     color = numa::node_of_cpu(cpu);
     UMPIRE_LOG(Debug, "Using NUMA node " << color << " as socket color fallback for cpu " << cpu);
@@ -65,6 +98,14 @@ bool try_get_socket_color_for_cpu(int cpu, int& color)
   return false;
 }
 
+/*!
+ * \brief Format the set of socket colors found in a rank's affinity mask.
+ *
+ * \param colors Socket identifiers collected while inspecting the affinity
+ *        mask.
+ *
+ * \return Comma-separated list used in diagnostic messages.
+ */
 std::string format_socket_colors(const std::set<int>& colors)
 {
   std::ostringstream ss;
@@ -82,6 +123,16 @@ std::string format_socket_colors(const std::set<int>& colors)
 }
 #endif
 
+/*!
+ * \brief Determine the single socket color implied by the current rank's CPU
+ * affinity.
+ *
+ * Socket-scoped shared memory requires each rank to be pinned to exactly one
+ * socket so that all ranks with the same socket color can be grouped into one
+ * shared-memory communicator.
+ *
+ * \return Socket color used to split the node-local communicator.
+ */
 int get_socket_color_from_affinity()
 {
 #if defined(__linux__)
@@ -143,12 +194,25 @@ int get_socket_color_from_affinity()
 #endif
 }
 
+/*!
+ * \brief Build the communicator that defines which ranks share allocations.
+ *
+ * \param comm Parent communicator used to discover ranks that may share host
+ *        memory.
+ * \param scope Requested sharing scope from MemoryResourceTraits. Node scope
+ *        keeps one communicator per node, while socket scope further splits the
+ *        node-local communicator using socket affinity.
+ *
+ * \return Communicator containing exactly the ranks that participate in each
+ * shared-memory allocation for the resource.
+ */
 MPI_Comm create_shared_communicator(MPI_Comm comm, MemoryResourceTraits::shared_scope scope)
 {
   MPI_Comm shared_comm{MPI_COMM_NULL};
 
   if (scope == MemoryResourceTraits::shared_scope::node) {
-    MPI_Comm_split_type(comm, MPI_COMM_TYPE_SHARED, IGNORE_KEY, MPI_INFO_NULL, &shared_comm);
+    check_mpi_call(MPI_Comm_split_type(comm, MPI_COMM_TYPE_SHARED, IGNORE_KEY, MPI_INFO_NULL, &shared_comm),
+                   "MPI_Comm_split_type");
     return shared_comm;
   }
 
@@ -156,11 +220,19 @@ MPI_Comm create_shared_communicator(MPI_Comm comm, MemoryResourceTraits::shared_
     const int color = get_socket_color_from_affinity();
 
     MPI_Comm node_comm{MPI_COMM_NULL};
-    MPI_Comm_split_type(comm, MPI_COMM_TYPE_SHARED, IGNORE_KEY, MPI_INFO_NULL, &node_comm);
+    check_mpi_call(MPI_Comm_split_type(comm, MPI_COMM_TYPE_SHARED, IGNORE_KEY, MPI_INFO_NULL, &node_comm),
+                   "MPI_Comm_split_type");
     UMPIRE_LOG(Debug, "Creating socket-scoped shared communicator with color " << color);
 
-    MPI_Comm_split(node_comm, color, IGNORE_KEY, &shared_comm);
-    MPI_Comm_free(&node_comm);
+    const int split_status = MPI_Comm_split(node_comm, color, IGNORE_KEY, &shared_comm);
+    if (split_status != MPI_SUCCESS) {
+      if (node_comm != MPI_COMM_NULL) {
+        MPI_Comm_free(&node_comm);
+      }
+      check_mpi_call(split_status, "MPI_Comm_split");
+    }
+
+    check_mpi_call(MPI_Comm_free(&node_comm), "MPI_Comm_free");
 
     return shared_comm;
   }
@@ -175,13 +247,14 @@ HostMpi3SharedMemoryResource::HostMpi3SharedMemoryResource(const std::string& na
     : MemoryResource{name, id, traits}
 {
   m_shared_comm = create_shared_communicator(util::MPI::getCommunicator(), traits.scope);
-  MPI_Comm_rank(m_shared_comm, &m_local_rank);
+  check_mpi_call(MPI_Comm_rank(m_shared_comm, &m_local_rank), "MPI_Comm_rank");
 
   // Free the comm at exit during cleanup in MPI_Finalize. We pass the m_shared_comm
   // by turning it into an int (as for Fortran) and then decoding that in the callback.
   int keyval = 0;
-  MPI_Comm_create_keyval(MPI_COMM_NULL_COPY_FN, free_comm, &keyval, nullptr);
-  MPI_Comm_set_attr(MPI_COMM_SELF, keyval, (void*)(intptr_t)MPI_Comm_c2f(m_shared_comm));
+  check_mpi_call(MPI_Comm_create_keyval(MPI_COMM_NULL_COPY_FN, free_comm, &keyval, nullptr), "MPI_Comm_create_keyval");
+  check_mpi_call(MPI_Comm_set_attr(MPI_COMM_SELF, keyval, (void*)(intptr_t)MPI_Comm_c2f(m_shared_comm)),
+                 "MPI_Comm_set_attr");
 }
 
 HostMpi3SharedMemoryResource::~HostMpi3SharedMemoryResource()
@@ -191,14 +264,15 @@ HostMpi3SharedMemoryResource::~HostMpi3SharedMemoryResource()
 
 void* HostMpi3SharedMemoryResource::allocate(std::size_t bytes)
 {
-  void* ptr;
-  MPI_Win win;
+  void* ptr{nullptr};
+  MPI_Win win{MPI_WIN_NULL};
   MPI_Aint local_size = (m_local_rank != 0) ? 0 : bytes;
   MPI_Aint size = bytes;
   int disp{sizeof(unsigned char)};
 
-  MPI_Win_allocate_shared(local_size, disp, MPI_INFO_NULL, m_shared_comm, &ptr, &win);
-  MPI_Win_shared_query(win, 0, &size, &disp, &ptr);
+  check_mpi_call(MPI_Win_allocate_shared(local_size, disp, MPI_INFO_NULL, m_shared_comm, &ptr, &win),
+                 "MPI_Win_allocate_shared");
+  check_mpi_call(MPI_Win_shared_query(win, 0, &size, &disp, &ptr), "MPI_Win_shared_query");
   m_shared_windows[ptr] = win;
 
   return ptr;
@@ -208,7 +282,7 @@ void HostMpi3SharedMemoryResource::deallocate(void* ptr, std::size_t)
 {
   auto window = m_shared_windows.find(ptr);
   if (window != m_shared_windows.end()) {
-    MPI_Win_free(&(window->second));
+    check_mpi_call(MPI_Win_free(&(window->second)), "MPI_Win_free");
     m_shared_windows.erase(window);
   } else {
     UMPIRE_ERROR(umpire::unknown_pointer_error, "");
@@ -239,8 +313,7 @@ int HostMpi3SharedMemoryResource::free_comm(MPI_Comm UMPIRE_UNUSED_ARG(comm), in
   // Interpret attribute_val as a MPI_Fint comm number.
   const auto comm_number = (MPI_Fint)(intptr_t)(attribute_val);
   MPI_Comm comm_to_free = MPI_Comm_f2c(comm_number);
-  MPI_Comm_free(&comm_to_free);
-  return MPI_SUCCESS;
+  return MPI_Comm_free(&comm_to_free);
 }
 
 } // end of namespace resource
