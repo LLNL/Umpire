@@ -60,8 +60,8 @@ variables:
 stages:
   - prerequisites           # Required: machine availability checks
   - build-and-test          # Required: build and test jobs
-  - multi-project           #TODO unused so far
-  - radiuss-spack-testing   #TODO unused so far
+  - multi-project           # Manual: trigger testing in dependent project (e.g., CHAI)
+  - radiuss-spack-testing   # TODO unused so far
 
 ###############################################################################
 # INCLUDES
@@ -224,16 +224,18 @@ tuolumne-build-and-test:
       - artifact: 'tuolumne-jobs.yml'
         job: 'generate-job-lists'
 
-## If testing develop branch, trigger CHAI pipeline with this version of Umpire.
-## TODO: Once Spack allows to clone a specific commit on demand, then point to
-## the exact commit. This will prevent from sticking to a branch (here develop).
-# trigger-chai:
-#  stage: multi-project
-#  rules:
-#    - if: '$CI_COMMIT_BRANCH == "develop" || $MULTI_PROJECT == "ON"' #run only if ...
-#  variables:
-#    UPDATE_UMPIRE: develop
-#  trigger:
-#    project: radiuss/chai
-#    branch: develop
-#    strategy: depend
+# MULTI-PROJECT PIPELINE
+trigger-chai:
+  stage: multi-project
+  rules:
+    - if: $MULTI_PROJECT != "OFF"
+      when: manual
+    - when: never
+  allow_failure: true
+  inherit:
+    variables: false
+  variables:
+    UPDATE_UMPIRE: ${CI_COMMIT_SHA}
+  trigger:
+    project: radiuss/multi-project/chai-trigger
+    branch: develop
