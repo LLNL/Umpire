@@ -8,7 +8,6 @@
 #define __Host_Mpi3_Shared_Memory_Resource_HPP
 
 #include <map>
-#include <memory>
 #include <string>
 
 #include "mpi.h"
@@ -17,6 +16,22 @@
 
 namespace umpire {
 namespace resource {
+
+/*!
+ * \brief Determine whether the calling rank's CPU affinity mask spans exactly
+ * one socket.
+ *
+ * Socket-scoped MPI3 shared memory requires each rank pinned to exactly one
+ * socket so that ranks can be grouped into socket-local communicators.
+ *
+ * On non-Linux platforms this function returns false because the MPI3 socket
+ * scope implementation relies on Linux CPU affinity information.
+ *
+ * \param reason Diagnostic message describing why the check failed.
+ *
+ * \return true when the affinity mask is non-empty and maps to a single socket.
+ */
+bool affinity_maps_to_single_socket(std::string& reason);
 
 /*!
  * \brief MemoryResource that exposes MPI-3 shared-memory windows on the host.
