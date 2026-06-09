@@ -18,9 +18,9 @@
 #if defined(__linux__)
 #include <sched.h>
 #include <unistd.h>
-const bool is_linux = true;
+constexpr bool is_linux = true;
 #else
-const bool is_linux = false;
+constexpr bool is_linux = false;
 #endif
 
 #include "umpire/resource/MemoryResource.hpp"
@@ -229,7 +229,7 @@ int get_socket_color_from_affinity()
   }
 
   if (scope == MemoryResourceTraits::shared_scope::socket) {
-    if(!is_linux) {
+    if constexpr (!is_linux) {
       UMPIRE_ERROR(runtime_error,
                "shared_scope::socket for MPI3 shared memory requires Linux CPU affinity information");
     }
