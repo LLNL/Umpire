@@ -45,10 +45,10 @@ void touch_one_byte_per_page(std::uint8_t* buffer, std::size_t bytes)
 {
   const std::size_t ps = page_size();
   for (std::size_t i = 0; i < bytes; i += ps) {
-    buffer[i] = static_cast<std::uint8_t>(buffer[i] + 1);
+    ++buffer[i];
   }
   if (bytes > 0) {
-    buffer[bytes - 1] = static_cast<std::uint8_t>(buffer[bytes - 1] + 1);
+    ++buffer[bytes - 1];
   }
 }
 
@@ -105,7 +105,7 @@ int main(int, char**)
   allocator.release();
 
   const std::size_t rss_after_release = umpire::get_process_memory_usage();
-  std::cout << "RSS after allocator.release(): " << format_bytes(rss_after_release) << "\n";
+  std::cout << "RSS after release: " << format_bytes(rss_after_release) << "\n";
 
   const std::size_t shm_rss_after_release = umpire::get_mapping_memory_usage(allocator_name);
   if (shm_rss_after_release > 0) {

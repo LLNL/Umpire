@@ -182,11 +182,11 @@ class SharedMemoryTest : public ::testing::Test {
     const std::size_t ps = page_size();
 
     for (std::size_t i = 0; i < bytes; i += ps) {
-      buffer[i] = static_cast<std::uint8_t>(buffer[i] + 1);
+      ++buffer[i];
     }
 
     if (bytes > 0) {
-      buffer[bytes - 1] = static_cast<std::uint8_t>(buffer[bytes - 1] + 1);
+      ++buffer[bytes - 1];
     }
   }
 
