@@ -68,6 +68,7 @@ int main(int argc, char** argv)
 
   mpi3_shm_allocator.deallocate(data);
 
+  // Since we called get_communicator_for_allocator...
   umpire::cleanup_cached_communicators();
   MPI_Finalize();
 
