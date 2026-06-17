@@ -6,8 +6,23 @@ Introspection
 
 When writing code to run on computers with a complex memory hierarchy, one of
 the most difficult things can be keeping track of where each pointer has been
-allocated. Umpire's instrospection capability keeps track of this information,
+allocated. Umpire's introspection capability keeps track of this information,
 as well as other useful bits and pieces you might want to know.
+
+Umpire supports multiple *introspection levels* that control both the overhead
+and tracking strategy used for allocations:
+
+- ``off``: disable public introspection queries
+- ``basic``: track only exact allocation-pointer ownership
+- ``on``: track full allocation metadata and backtraces (if enabled via ``UMPIRE_BACKTRACE``)
+
+The level can be set via the ``UMPIRE_INTROSPECTION_LEVEL`` environment
+variable, or programmatically with ``umpire::ResourceManager::setIntrospectionLevel()``.
+
+.. note::
+   The introspection level is **locked after the first allocation**. You cannot
+   change the level once any allocation has been made. This ensures consistency
+   in tracking behavior throughout the program's lifetime.
 
 The :class:`umpire::ResourceManager` can be used to find the allocator
 associated with an address: 
@@ -33,7 +48,8 @@ You can also find out how big the allocation is, in case you forgot:
    :end-before: _sphinx_tag_tut_getsize_end
    :language: C++
 
-Remember that these functions will work on any allocation made using an
-Allocator or :class:`umpire::TypedAllocator`.
+These functions require the global introspection level to be ``on``. With
+``basic``, only exact-pointer ownership checks such as
+``umpire::ResourceManager::hasAllocator`` remain available.
 
 .. literalinclude:: ../../../examples/tutorial/tut_introspection.cpp

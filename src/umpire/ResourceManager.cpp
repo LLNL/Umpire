@@ -6,6 +6,8 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/ResourceManager.hpp"
 
+#include <algorithm>
+#include <cctype>
 #include <iterator>
 #include <memory>
 #include <sstream>
@@ -23,6 +25,7 @@
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/io.hpp"
 #include "umpire/util/make_unique.hpp"
+#include "umpire/util/pointer_utils.hpp"
 #include "umpire/util/wrap_allocator.hpp"
 
 #if defined(UMPIRE_ENABLE_CUDA)
@@ -42,8 +45,51 @@
 
 static const char* s_null_resource_name{"__umpire_internal_null"};
 static const char* s_zero_byte_pool_name{"__umpire_internal_0_byte_pool"};
+static const char* s_introspection_level_env_name{"UMPIRE_INTROSPECTION_LEVEL"};
 
 namespace umpire {
+
+namespace {
+bool case_insensitive_match(const std::string& s1, const std::string& s2)
+{
+  return (s1.size() == s2.size()) && std::equal(s1.begin(), s1.end(), s2.begin(), [](char c1, char c2) {
+           return (std::toupper(c1) == std::toupper(c2));
+         });
+}
+
+IntrospectionLevel parse_introspection_level(const char* enval)
+{
+  if (!enval) {
+    return IntrospectionLevel::On;
+  }
+
+  const std::string val{enval};
+  if (case_insensitive_match(val, "OFF")) {
+    return IntrospectionLevel::Off;
+  } else if (case_insensitive_match(val, "BASIC")) {
+    return IntrospectionLevel::Basic;
+  } else if (case_insensitive_match(val, "ON")) {
+    return IntrospectionLevel::On;
+  }
+
+  UMPIRE_ERROR(runtime_error,
+               fmt::format("Invalid value \"{}\" for {}. Expected one of: on, basic, off.", val,
+                           s_introspection_level_env_name));
+  return IntrospectionLevel::On;
+}
+
+bool requires_full_introspection(IntrospectionLevel level) noexcept
+{
+  return level == IntrospectionLevel::On;
+}
+
+void throw_requires_full_introspection(const char* operation, IntrospectionLevel level)
+{
+  UMPIRE_ERROR(runtime_error,
+               fmt::format("{} requires introspection level \"on\". Current level is \"{}\".", operation,
+                           to_string(level)));
+}
+} // namespace
 
 ResourceManager& ResourceManager::getInstance()
 {
@@ -56,9 +102,14 @@ ResourceManager& ResourceManager::getInstance()
 ResourceManager::ResourceManager()
     : m_allocations(),
       m_allocators(),
+      m_shared_allocator_names(),
       m_allocators_by_id(),
       m_allocators_by_name(),
       m_memory_resources(),
+      m_default_allocator(nullptr),
+      m_null_allocator(nullptr),
+      m_zero_byte_pool(nullptr),
+      m_introspection_level{parse_introspection_level(std::getenv(s_introspection_level_env_name))},
       m_id(0),
       m_mutex()
 {
@@ -80,7 +131,9 @@ ResourceManager::~ResourceManager()
     if (allocator->getCurrentSize() != 0) {
       std::stringstream ss;
 
-      umpire::print_allocator_records(Allocator{allocator.get()}, ss);
+      if (getIntrospectionLevel() == IntrospectionLevel::On) {
+        printTrackedAllocationRecords(allocator.get(), ss);
+      }
 
       UMPIRE_LOG(Error, allocator->getName()
                             << " Allocator still has " << allocator->getCurrentSize() << " bytes allocated" << std::endl
@@ -129,6 +182,27 @@ void ResourceManager::initialize()
   UMPIRE_LOG(Debug, "() leaving");
 }
 
+void ResourceManager::setIntrospectionLevel(IntrospectionLevel level)
+{
+  const auto current_level = getIntrospectionLevel();
+
+  // Only block lowering from On mode if tracked allocations exist in AllocationMap
+  // (can't switch to Basic/Off if we have tracked allocations)
+  if (current_level == IntrospectionLevel::On &&
+      static_cast<int>(level) < static_cast<int>(current_level) &&
+      m_allocations.size() > 0) {
+    UMPIRE_ERROR(runtime_error,
+      fmt::format("Cannot lower introspection level from \"on\" to \"{}\" while tracked allocations exist",
+                  to_string(level)));
+  }
+  m_introspection_level.store(level, std::memory_order_relaxed);
+}
+
+IntrospectionLevel ResourceManager::getIntrospectionLevel() const noexcept
+{
+  return m_introspection_level.load(std::memory_order_relaxed);
+}
+
 Allocator ResourceManager::makeResource(const std::string& name)
 {
   resource::MemoryResourceRegistry& registry{resource::MemoryResourceRegistry::getInstance()};
@@ -167,6 +241,7 @@ Allocator ResourceManager::makeResource(const std::string& name, MemoryResourceT
         .category(event::category::operation)
         .arg("allocator_ref", (void*)allocator.get())
         .arg("introspection", traits.tracking)
+        .arg("introspection_level", to_string(getIntrospectionLevel()))
         .tag("allocator_name", name)
         .tag("replay", "true");
   });
@@ -365,7 +440,7 @@ void ResourceManager::destroyAllocator(const std::string& name, bool free_alloca
                  fmt::format("Cannot destroy builtin allocator \"{}\"", name));
   }
 
-  auto records = umpire::get_allocator_records(Allocator(strategy));
+  auto records = getTrackedAllocationRecords(strategy);
 
   if (isStrictDestructionMode()) {
     if (!records.empty() && !free_allocations) {
@@ -485,6 +560,11 @@ void ResourceManager::destroyAllocator(int id, bool free_allocations)
 Allocator ResourceManager::getAllocator(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
+  const auto level = getIntrospectionLevel();
+  if (level == IntrospectionLevel::Off) {
+    UMPIRE_ERROR(runtime_error,
+      "ResourceManager::getAllocator(void*) requires introspection to be enabled (basic or on mode)");
+  }
   return Allocator(findAllocatorForPointer(ptr));
 }
 
@@ -506,7 +586,41 @@ bool ResourceManager::hasAllocator(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
 
-  return m_allocations.contains(ptr);
+  const auto level = getIntrospectionLevel();
+  if (level == IntrospectionLevel::On) {
+    return m_allocations.contains(ptr);
+  }
+  if (level == IntrospectionLevel::Basic) {
+    return util::inferAllocatorFromPointer(ptr, *this) != nullptr;
+  }
+
+  return false;  // Off mode
+}
+
+std::vector<util::AllocationRecord>
+ResourceManager::getTrackedAllocationRecords(strategy::AllocationStrategy* strategy) const
+{
+  if (getIntrospectionLevel() != IntrospectionLevel::On) {
+    UMPIRE_ERROR(runtime_error,
+      "getTrackedAllocationRecords() requires IntrospectionLevel::On");
+  }
+
+  std::vector<util::AllocationRecord> records;
+  std::copy_if(m_allocations.begin(), m_allocations.end(), std::back_inserter(records),
+               [strategy](const util::AllocationRecord& rec) { return rec.strategy == strategy; });
+  return records;
+}
+
+void ResourceManager::printTrackedAllocationRecords(strategy::AllocationStrategy* strategy, std::ostream& os) const
+{
+  if (getIntrospectionLevel() != IntrospectionLevel::On) {
+    UMPIRE_ERROR(runtime_error,
+      "printTrackedAllocationRecords() requires IntrospectionLevel::On");
+  }
+
+  m_allocations.print([strategy](const util::AllocationRecord& rec) {
+    return rec.strategy == strategy;
+  }, os);
 }
 
 void ResourceManager::registerAllocation(void* ptr, util::AllocationRecord record)
@@ -518,19 +632,33 @@ void ResourceManager::registerAllocation(void* ptr, util::AllocationRecord recor
   UMPIRE_LOG(Debug,
              "(ptr=" << ptr << ", size=" << record.size << ", strategy=" << record.strategy << ") with " << this);
 
-  UMPIRE_RECORD_BACKTRACE(record);
-
-  m_allocations.insert(ptr, record);
+  const auto level = getIntrospectionLevel();
+  if (level == IntrospectionLevel::On) {
+    UMPIRE_RECORD_BACKTRACE(record);
+    m_allocations.insert(ptr, record);
+  }
+  // Off/Basic modes: no storage, just stats updated by caller
 }
 
 util::AllocationRecord ResourceManager::deregisterAllocation(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
-  return m_allocations.remove(ptr);
+  const auto level = getIntrospectionLevel();
+  if (level == IntrospectionLevel::On) {
+    return m_allocations.remove(ptr);
+  }
+
+  // Basic/Off modes: return empty record (caller must infer strategy if needed)
+  return util::AllocationRecord{};
 }
 
 const util::AllocationRecord* ResourceManager::findAllocationRecord(void* ptr) const
 {
+  const auto level = getIntrospectionLevel();
+  if (!requires_full_introspection(level)) {
+    throw_requires_full_introspection("ResourceManager::findAllocationRecord(void*)", level);
+  }
+
   auto alloc_record = m_allocations.find(ptr);
 
   if (!alloc_record->strategy) {
@@ -545,6 +673,10 @@ const util::AllocationRecord* ResourceManager::findAllocationRecord(void* ptr) c
 void ResourceManager::copy(void* dst_ptr, void* src_ptr, std::size_t size)
 {
   UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", dst_ptr=" << dst_ptr << ", size=" << size << ")");
+  const auto level = getIntrospectionLevel();
+  if (!requires_full_introspection(level)) {
+    throw_requires_full_introspection("ResourceManager::copy", level);
+  }
 
   auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
@@ -590,6 +722,10 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::copy(voi
                                                                              std::size_t size)
 {
   UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", dst_ptr=" << dst_ptr << ", size=" << size << ")");
+  const auto level = getIntrospectionLevel();
+  if (!requires_full_introspection(level)) {
+    throw_requires_full_introspection("ResourceManager::copy", level);
+  }
 
   auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
@@ -633,6 +769,10 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::copy(voi
 void ResourceManager::memset(void* ptr, int value, std::size_t length)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ", value=" << value << ", length=" << length << ")");
+  const auto level = getIntrospectionLevel();
+  if (!requires_full_introspection(level)) {
+    throw_requires_full_introspection("ResourceManager::memset", level);
+  }
 
   auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
@@ -670,6 +810,10 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::memset(v
                                                                                std::size_t length)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ", value=" << value << ", length=" << length << ")");
+  const auto level = getIntrospectionLevel();
+  if (!requires_full_introspection(level)) {
+    throw_requires_full_introspection("ResourceManager::memset", level);
+  }
 
   auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
@@ -705,6 +849,11 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::memset(v
 
 void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size)
 {
+  const auto level = getIntrospectionLevel();
+  if (!requires_full_introspection(level)) {
+    throw_requires_full_introspection("ResourceManager::reallocate", level);
+  }
+
   strategy::AllocationStrategy* strategy;
 
   if (current_ptr != nullptr) {
@@ -739,6 +888,11 @@ void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size)
 
 void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size, camp::resources::Resource& ctx)
 {
+  const auto level = getIntrospectionLevel();
+  if (!requires_full_introspection(level)) {
+    throw_requires_full_introspection("ResourceManager::reallocate", level);
+  }
+
   strategy::AllocationStrategy* strategy;
 
   if (current_ptr != nullptr) {
@@ -774,6 +928,11 @@ void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size, camp:
 
 void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size, Allocator alloc)
 {
+  const auto level = getIntrospectionLevel();
+  if (!requires_full_introspection(level)) {
+    throw_requires_full_introspection("ResourceManager::reallocate", level);
+  }
+
   umpire::event::record([&](auto& event) {
     event.name("reallocate")
         .category(event::category::operation)
@@ -800,6 +959,11 @@ void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size, Alloc
 void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size, Allocator alloc,
                                   camp::resources::Resource& ctx)
 {
+  const auto level = getIntrospectionLevel();
+  if (!requires_full_introspection(level)) {
+    throw_requires_full_introspection("ResourceManager::reallocate", level);
+  }
+
   umpire::event::record([&](auto& event) {
     event.name("reallocate")
         .category(event::category::operation)
@@ -828,6 +992,10 @@ void* ResourceManager::reallocate_impl(void* current_ptr, std::size_t new_size, 
 {
   UMPIRE_LOG(Debug, "(current_ptr=" << current_ptr << ", new_size=" << new_size << ", with Allocator "
                                     << allocator.getName() << ")");
+  const auto level = getIntrospectionLevel();
+  if (!requires_full_introspection(level)) {
+    throw_requires_full_introspection("ResourceManager::reallocate", level);
+  }
 
   void* new_ptr;
 
@@ -879,6 +1047,10 @@ void* ResourceManager::reallocate_impl(void* current_ptr, std::size_t new_size, 
 {
   UMPIRE_LOG(Debug, "(current_ptr=" << current_ptr << ", new_size=" << new_size << ", with Allocator "
                                     << allocator.getName() << ")");
+  const auto level = getIntrospectionLevel();
+  if (!requires_full_introspection(level)) {
+    throw_requires_full_introspection("ResourceManager::reallocate", level);
+  }
 
   void* new_ptr;
 
@@ -928,6 +1100,10 @@ void* ResourceManager::reallocate_impl(void* current_ptr, std::size_t new_size, 
 void* ResourceManager::move(void* ptr, Allocator allocator)
 {
   UMPIRE_LOG(Debug, "(src_ptr=" << ptr << ", allocator=" << allocator.getName() << ")");
+  const auto level = getIntrospectionLevel();
+  if (!requires_full_introspection(level)) {
+    throw_requires_full_introspection("ResourceManager::move", level);
+  }
 
   auto alloc_record = m_allocations.find(ptr);
 
@@ -1005,6 +1181,10 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::prefetch
                                                                                  camp::resources::Resource& ctx)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ", device=" << device << ")");
+  const auto level = getIntrospectionLevel();
+  if (!requires_full_introspection(level)) {
+    throw_requires_full_introspection("ResourceManager::prefetch", level);
+  }
 
   auto& op_registry = op::MemoryOperationRegistry::getInstance();
   auto alloc_record = m_allocations.find(ptr);
@@ -1030,6 +1210,11 @@ void ResourceManager::deallocate(void* ptr)
 
 std::size_t ResourceManager::getSize(void* ptr) const
 {
+  const auto level = getIntrospectionLevel();
+  if (!requires_full_introspection(level)) {
+    throw_requires_full_introspection("ResourceManager::getSize(void*)", level);
+  }
+
   auto record = m_allocations.find(ptr);
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ") returning " << record->size);
   return record->size;
@@ -1054,12 +1239,27 @@ strategy::AllocationStrategy* ResourceManager::findAllocatorForId(int id)
 
 strategy::AllocationStrategy* ResourceManager::findAllocatorForPointer(void* ptr)
 {
-  auto allocation_record = m_allocations.find(ptr);
+  const auto level = getIntrospectionLevel();
 
+  if (level == IntrospectionLevel::Off) {
+    UMPIRE_ERROR(runtime_error,
+      "findAllocatorForPointer() requires introspection to be enabled");
+  }
+
+  if (level == IntrospectionLevel::Basic) {
+    auto* strategy = util::inferAllocatorFromPointer(ptr, *this);
+    if (!strategy) {
+      UMPIRE_ERROR(runtime_error, fmt::format("Cannot infer allocator for pointer: {}", ptr));
+    }
+    UMPIRE_LOG(Debug, "(ptr=" << ptr << ") returning " << strategy);
+    return strategy;
+  }
+
+  // IntrospectionLevel::On
+  auto allocation_record = m_allocations.find(ptr);
   if (!allocation_record->strategy) {
     UMPIRE_ERROR(runtime_error, fmt::format("Cannot find allocator for pointer: {}", ptr));
   }
-
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ") returning " << allocation_record->strategy);
   return allocation_record->strategy;
 }

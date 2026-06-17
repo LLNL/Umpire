@@ -1,17 +1,55 @@
 .. _no_introspection::
 
-=====================
-Disable Introspection
-=====================
+====================================
+Introspection Control and Performance
+====================================
 
-If you know that you won't be using any of Umpire's introspection capabalities
-for allocations that come from a particular :class:`umpire::Allocator`, you can
-turn off the introspection and avoid the overhead of tracking the associated
-metadata.
+Umpire provides multiple ways to control introspection overhead, both globally
+and per-allocator.
+
+Global Introspection Levels
+----------------------------
+
+The simplest way to control introspection is via the global introspection level,
+which affects all allocations. Set the ``UMPIRE_INTROSPECTION_LEVEL`` environment
+variable to one of:
+
+- ``off``: No tracking at all (maximum performance, zero overhead)
+- ``basic``: Lightweight range tracking (fast, but unsafe operations)
+- ``on``: Full tracking with safety checks (default)
+
+For example:
+
+.. code-block:: bash
+
+   export UMPIRE_INTROSPECTION_LEVEL=basic
+   ./my_application
+
+Or programmatically (must be set before any allocations):
+
+.. code-block:: cpp
+
+   auto& rm = umpire::ResourceManager::getInstance();
+   rm.setIntrospectionLevel(umpire::IntrospectionLevel::Basic);
+
+See the :ref:`introspection` tutorial for detailed information on each level.
+
+Per-Allocator Introspection Control
+------------------------------------
+
+If you need finer-grained control, you can disable introspection for specific
+allocators while keeping it enabled globally. This is useful when you have
+one hot path that needs maximum performance but still want introspection elsewhere.
+
+.. note::
+    Disabling introspection turns off *all* allocation metadata tracking for
+    that Allocator. If you still need exact-pointer ownership tracking but want
+    to reduce overhead, consider using the global ``basic`` introspection level via
+    ``UMPIRE_INTROSPECTION_LEVEL``.
 
 .. warning::
-    Disabling introspection means that allocations from this Allocator cannot
-    be used for operations, or size and location queries.
+    Allocations from an allocator with introspection disabled cannot be used
+    for operations like ``copy()``, or size and location queries.
 
 In this recipe, we look at disabling introspection for a pool. To turn off
 introspection, you pass a boolean as the second template parameter to the

@@ -73,7 +73,13 @@ std::string stringify(const std::vector<void*>& frames)
 {
   std::ostringstream backtrace_stream;
 #if !defined(_MSC_VER)
-  int num_frames = frames.size();
+  const int num_frames = static_cast<int>(frames.size());
+
+  if (num_frames == 0) {
+    backtrace_stream << "    Backtrace: 0 frames" << std::endl;
+    return backtrace_stream.str();
+  }
+
   char** symbols = ::backtrace_symbols(&frames[0], num_frames);
 
   backtrace_stream << "    Backtrace: " << num_frames << " frames" << std::endl;

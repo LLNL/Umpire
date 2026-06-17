@@ -35,7 +35,12 @@ void Inspector::registerAllocation(void* ptr, std::size_t size, strategy::Alloca
     s->m_high_watermark = s->m_current_size;
   }
 
-  ResourceManager::getInstance().registerAllocation(ptr, {ptr, size, s, name});
+  auto& rm = ResourceManager::getInstance();
+  if (rm.getIntrospectionLevel() == IntrospectionLevel::On) {
+    rm.registerAllocation(ptr, {ptr, size, s, name});
+  } else {
+    rm.registerAllocation(ptr, {ptr, size, s});
+  }
 }
 
 util::AllocationRecord
@@ -43,7 +48,8 @@ Inspector::deregisterAllocation(void* ptr, strategy::AllocationStrategy* s)
 {
   auto record = ResourceManager::getInstance().deregisterAllocation(ptr);
 
-  if (record.strategy == s) {
+  // In Basic/Off modes, record.strategy will be nullptr (no tracking)
+  if (record.strategy == nullptr || record.strategy == s) {
     s->m_current_size -= record.size;
     s->m_allocation_count--;
   } else {

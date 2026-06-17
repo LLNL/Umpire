@@ -148,4 +148,13 @@ if (UMPIRE_ENABLE_BENCHMARKS)
   blt_add_benchmark(
     NAME inspector_benchmarks
     COMMAND inspector_benchmarks)
+
+  blt_add_executable(
+    NAME introspection_level_benchmarks
+    SOURCES introspection_level_benchmarks.cpp
+    DEPENDS_ON ${benchmark_depends})
+
+  blt_add_benchmark(
+    NAME introspection_level_benchmarks
+    COMMAND introspection_level_benchmarks)
 endif()

@@ -43,6 +43,7 @@ Allocator ResourceManager::makeAllocator(const std::string& name, Tracking track
         .arg("allocator_ref", (void*)allocator.get())
         .arg("type", typeid(Strategy).name())
         .arg("introspection", is_tracked)
+        .arg("introspection_level", to_string(getIntrospectionLevel()))
         .args(args...)
         .tag("allocator_name", allocator->getName())
         .tag("replay", "true");

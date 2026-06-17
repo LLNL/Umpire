@@ -21,6 +21,7 @@ endif()
 set (umpire_headers
   Allocator.hpp
   Allocator.inl
+  Introspection.hpp
   ResourceManager.hpp
   ResourceManager.inl
   Tracking.hpp

@@ -239,9 +239,29 @@ blt_add_executable(
   SOURCES introspection_tests.cpp
   DEPENDS_ON ${integration_tests_depends})
 
+# Run introspection tests with Off mode
 blt_add_test(
-  NAME introspection_tests
+  NAME introspection_tests_off
   COMMAND introspection_tests)
+
+set_property(TEST introspection_tests_off
+  PROPERTY ENVIRONMENT "UMPIRE_INTROSPECTION_LEVEL=off")
+
+# Run introspection tests with Basic mode
+blt_add_test(
+  NAME introspection_tests_basic
+  COMMAND introspection_tests)
+
+set_property(TEST introspection_tests_basic
+  PROPERTY ENVIRONMENT "UMPIRE_INTROSPECTION_LEVEL=basic")
+
+# Run introspection tests with On mode
+blt_add_test(
+  NAME introspection_tests_on
+  COMMAND introspection_tests)
+
+set_property(TEST introspection_tests_on
+  PROPERTY ENVIRONMENT "UMPIRE_INTROSPECTION_LEVEL=on")
 
 blt_add_executable(
   NAME destroy_allocator_tests
