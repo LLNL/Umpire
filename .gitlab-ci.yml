@@ -39,6 +39,8 @@ variables:
   GIT_SUBMODULE_DEPTH: 1
   GIT_SUBMODULE_UPDATE_FLAGS: --jobs 2
   GIT_SUBMODULE_PATHS: scripts/radiuss-spack-configs scripts/uberenv
+# Force export of timing reports by setting to "ON"
+  REPORT_TIMINGS: "OFF"
 
 # SHARED_CI CONFIGURATION
 # Required information about GitHub repository
