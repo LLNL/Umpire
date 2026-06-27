@@ -63,7 +63,7 @@ stages:
   - prerequisites           # Required: machine availability checks
   - build-and-test          # Required: build and test jobs
   - multi-project           # Manual: trigger testing in dependent project (e.g., CHAI)
-  - radiuss-spack-testing   # TODO unused so far
+  - finalizing
 
 ###############################################################################
 # INCLUDES
@@ -234,7 +234,7 @@ tuolumne-build-and-test:
 # default-branch pipeline is reused as the persistent store (relies on GitLab's
 # "keep artifacts from the most recent successful pipelines" setting).
 pages:
-  stage: radiuss-spack-testing
+  stage: finalizing
   tags: [shell, oslic]
   # `optional: true` keeps this job runnable when a machine block is commented
   # out or its availability check fails; it then charts whatever data exists.
