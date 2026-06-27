@@ -229,30 +229,22 @@ tuolumne-build-and-test:
 # CI TIMING TRENDS
 # Collect the per-job section timings produced by build_and_test.sh across all
 # child pipelines, merge them into an accumulating history, and publish trend
-# charts to GitLab Pages. Runs only on the default branch so the published
-# series tracks the mainline. The history.jsonl artifact of the latest
-# default-branch pipeline is reused as the persistent store (relies on GitLab's
-# "keep artifacts from the most recent successful pipelines" setting).
+# charts to GitLab Pages. Runs only on the default branch (or when REPORT_TIMINGS
+# is "ON") so the published series tracks the mainline. The history.jsonl
+# artifact of the latest default-branch pipeline is reused as the persistent
+# store (relies on GitLab's "keep artifacts from the most recent successful
+# pipelines" setting).
+#
+# No `needs:` on purpose: this job relies on stage ordering. The build-and-test
+# trigger jobs inherit `trigger:strategy: depend` from the shared-CI
+# `.build-and-test` template, so the build-and-test stage completes only once all
+# child pipelines finish; this job, in the last stage, therefore runs after them.
+# (The per-job timings.json are fetched via the GitLab API, not via needs, so no
+# artifact dependency is required here.) `when: always` keeps it running -- and
+# charting partial data -- even when a child pipeline fails.
 pages:
   stage: finalizing
   tags: [shell, oslic]
-  # `optional: true` keeps this job runnable when a machine block is commented
-  # out or its availability check fails; it then charts whatever data exists.
-  # NOTE: this relies on the build-and-test trigger jobs propagating child
-  # pipeline completion (GitLab `trigger:strategy: depend`). The RADIUSS shared
-  # `.build-and-test` template is expected to set this; if child artifacts are
-  # missing here, add `strategy: depend` to the trigger blocks above.
-  needs:
-    - job: dane-build-and-test
-      optional: true
-    - job: matrix-build-and-test
-      optional: true
-    - job: corona-build-and-test
-      optional: true
-    - job: tioga-build-and-test
-      optional: true
-    - job: tuolumne-build-and-test
-      optional: true
   rules:
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH || $REPORT_TIMINGS == "ON"'
       when: always
