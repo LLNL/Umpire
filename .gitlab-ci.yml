@@ -252,7 +252,9 @@ pages:
     - job: tuolumne-build-and-test
       optional: true
   rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH || $REPORT_TIMINGS == "ON"'
+      when: always
+    - when: never
   script:
     - python3 -m venv .venv
     - .venv/bin/pip install --quiet matplotlib
