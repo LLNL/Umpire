@@ -58,17 +58,40 @@ void FixedMallocPool::newPool()
 
 void* FixedMallocPool::allocInPool(Pool& p) noexcept
 {
-  if (p.num_initialized < m_obj_per_pool) {
-    unsigned int* ptr = reinterpret_cast<unsigned int*>(addr_from_index(p, p.num_initialized));
-    *ptr = p.num_initialized + 1;
-    p.num_initialized++;
-  }
-
   void* ret = nullptr;
   if (p.num_free > 0) {
-    ret = static_cast<void*>(p.next);
+    unsigned char* next = p.next;
+    const unsigned int next_index = index_from_addr(p, next);
+    const bool using_uninitialized_tail = next_index == p.num_initialized;
+
+    ret = static_cast<void*>(next);
     --p.num_free;
-    p.next = (p.num_free != 0) ? addr_from_index(p, *reinterpret_cast<unsigned int*>(p.next)) : nullptr;
+
+    if (using_uninitialized_tail) {
+      /*
+       * The freelist is a mix of initialized slots returned by deallocate()
+       * and an uninitialized tail that has never been handed out.  The old
+       * implementation eagerly wrote the freelist link for the next tail slot
+       * on every allocation, even when this allocation was reusing a slot that
+       * had already been freed.  For large FixedMallocPool backing allocations,
+       * those eager writes faulted in one physical page after another while the
+       * virtual allocation stayed constant.
+       *
+       * If p.next points at the uninitialized tail, advance the tail pointer
+       * without touching that memory.  The slot becomes initialized only when it
+       * is actually returned to the caller.  Recycled slots continue to store
+       * their next-link in the object storage, as before.
+       */
+      ++p.num_initialized;
+    }
+
+    if (p.num_free == 0) {
+      p.next = nullptr;
+    } else if (using_uninitialized_tail) {
+      p.next = (p.num_initialized < m_obj_per_pool) ? addr_from_index(p, p.num_initialized) : nullptr;
+    } else {
+      p.next = addr_from_index(p, *reinterpret_cast<unsigned int*>(next));
+    }
   }
 
   return ret;
