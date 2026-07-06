@@ -61,57 +61,18 @@ include("${CMAKE_CURRENT_LIST_DIR}/BLTSetupTargets.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/umpire-targets.cmake")
 
 # Provide backwards-compatible non-namespaced targets unless explicitly disabled
-# These are INTERFACE IMPORTED targets (not ALIAS) to support tools like blt_convert_to_system_includes
 if (NOT @UMPIRE_DISABLE_ALIAS_TARGETS@)
   if (NOT TARGET umpire)
     add_library(umpire INTERFACE IMPORTED)
-
-    # Copy interface properties to ensure they're available directly on this target
-    get_target_property(_include_dirs umpire::umpire INTERFACE_INCLUDE_DIRECTORIES)
-    get_target_property(_compile_defs umpire::umpire INTERFACE_COMPILE_DEFINITIONS)
-    get_target_property(_compile_opts umpire::umpire INTERFACE_COMPILE_OPTIONS)
-    get_target_property(_link_libs umpire::umpire INTERFACE_LINK_LIBRARIES)
-
-    if(_include_dirs)
-      set_target_properties(umpire PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${_include_dirs}")
-    endif()
-    if(_compile_defs)
-      set_target_properties(umpire PROPERTIES INTERFACE_COMPILE_DEFINITIONS "${_compile_defs}")
-    endif()
-    if(_compile_opts)
-      set_target_properties(umpire PROPERTIES INTERFACE_COMPILE_OPTIONS "${_compile_opts}")
-    endif()
-    if(_link_libs)
-      set_target_properties(umpire PROPERTIES INTERFACE_LINK_LIBRARIES "${_link_libs}")
-    endif()
-
     set_target_properties(umpire PROPERTIES
+      INTERFACE_LINK_LIBRARIES umpire::umpire
       DEPRECATION "Target 'umpire' is deprecated. Please use 'umpire::umpire' instead. To disable this warning and backwards-compatible targets, set UMPIRE_DISABLE_ALIAS_TARGETS=ON when configuring Umpire.")
   endif()
 
   if (TARGET umpire::umpire_device AND NOT TARGET umpire_device)
     add_library(umpire_device INTERFACE IMPORTED)
-
-    # Copy interface properties to ensure they're available directly on this target
-    get_target_property(_include_dirs umpire::umpire_device INTERFACE_INCLUDE_DIRECTORIES)
-    get_target_property(_compile_defs umpire::umpire_device INTERFACE_COMPILE_DEFINITIONS)
-    get_target_property(_compile_opts umpire::umpire_device INTERFACE_COMPILE_OPTIONS)
-    get_target_property(_link_libs umpire::umpire_device INTERFACE_LINK_LIBRARIES)
-
-    if(_include_dirs)
-      set_target_properties(umpire_device PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${_include_dirs}")
-    endif()
-    if(_compile_defs)
-      set_target_properties(umpire_device PROPERTIES INTERFACE_COMPILE_DEFINITIONS "${_compile_defs}")
-    endif()
-    if(_compile_opts)
-      set_target_properties(umpire_device PROPERTIES INTERFACE_COMPILE_OPTIONS "${_compile_opts}")
-    endif()
-    if(_link_libs)
-      set_target_properties(umpire_device PROPERTIES INTERFACE_LINK_LIBRARIES "${_link_libs}")
-    endif()
-
     set_target_properties(umpire_device PROPERTIES
+      INTERFACE_LINK_LIBRARIES umpire::umpire_device
       DEPRECATION "Target 'umpire_device' is deprecated. Please use 'umpire::umpire_device' instead.")
   endif()
 endif()
