@@ -5,6 +5,9 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 
+#include <exception>
+#include <string>
+
 #include "gtest/gtest.h"
 #include "mpi.h"
 #include "umpire/ResourceManager.hpp"
@@ -55,7 +58,17 @@ TEST(GetCommunicator, SharedSocket)
   traits.size = 4096;
   traits.scope = umpire::MemoryResourceTraits::shared_scope::socket;
 
-  auto allocator = rm.makeResource("SHARED::MPI3::socket_allocator", traits);
+  std::string reason;
+  if (!umpire::affinity_maps_to_single_socket(reason)) {
+    GTEST_SKIP() << reason;
+  }
+
+  umpire::Allocator allocator;
+  try {
+    allocator = rm.makeResource("SHARED::MPI3::socket_allocator", traits);
+  } catch (const std::exception& e) {
+    GTEST_SKIP() << "Socket-scoped MPI3 shared memory requires ranks bound to a single socket (" << e.what() << ")";
+  }
 
   auto comm = umpire::get_communicator_for_allocator(allocator, MPI_COMM_WORLD);
   ASSERT_NE(comm, MPI_COMM_NULL);

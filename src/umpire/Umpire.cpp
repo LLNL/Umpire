@@ -359,6 +359,16 @@ void cleanup_cached_communicators()
 }
 #endif
 
+bool affinity_maps_to_single_socket(std::string& reason)
+{
+#if defined(UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
+  return resource::affinity_maps_to_single_socket(reason);
+#else
+  reason = "MPI3 shared memory support is disabled";
+  return false;
+#endif
+}
+
 void register_external_allocation(void* ptr, util::AllocationRecord record)
 {
   umpire::event::record([&](auto& event) {

@@ -10,6 +10,7 @@
 #include <cerrno>
 #include <cstring>
 #include <fstream>
+#include <limits>
 #include <set>
 #include <sstream>
 #include <string>
@@ -17,6 +18,9 @@
 #if defined(__linux__)
 #include <sched.h>
 #include <unistd.h>
+constexpr bool is_linux = true;
+#else
+constexpr bool is_linux = false;
 #endif
 
 #include "umpire/resource/MemoryResource.hpp"
@@ -54,6 +58,10 @@ void check_mpi_call(int error_code, const char* call_name)
   }
 }
 
+//////////
+// Start of linux defined Socket support
+//////////
+
 #if defined(__linux__)
 /*!
  * \brief Map an operating-system CPU index to the socket color used for
@@ -78,7 +86,7 @@ bool try_get_socket_color_for_cpu(int cpu, int& color)
       return true;
     }
 
-    UMPIRE_LOG(Debug, "Could not read physical_package_id for cpu " << cpu);
+    UMPIRE_LOG(Debug, "Read package ID for file but could not read physical_package_id for cpu " << cpu);
   } else {
     UMPIRE_LOG(Debug, "Could not open physical_package_id for cpu " << cpu);
   }
@@ -121,7 +129,6 @@ std::string format_socket_colors(const std::set<int>& colors)
 
   return ss.str();
 }
-#endif
 
 /*!
  * \brief Determine the single socket color implied by the current rank's CPU
@@ -135,11 +142,16 @@ std::string format_socket_colors(const std::set<int>& colors)
  */
 int get_socket_color_from_affinity()
 {
-#if defined(__linux__)
-  const long cpu_count = sysconf(_SC_NPROCESSORS_CONF);
-  if (cpu_count <= 0) {
+  const long cpu_count_long = sysconf(_SC_NPROCESSORS_CONF);
+  if (cpu_count_long <= 0) {
     UMPIRE_ERROR(runtime_error, "Could not determine the number of configured CPUs for socket scope");
   }
+
+  if (cpu_count_long > std::numeric_limits<int>::max()) {
+    UMPIRE_ERROR(runtime_error, "Configured CPU count exceeds supported range for socket scope");
+  }
+
+  const int cpu_count = static_cast<int>(cpu_count_long);
 
   const auto set_size = CPU_ALLOC_SIZE(cpu_count);
   cpu_set_t* cpu_set = CPU_ALLOC(cpu_count);
@@ -188,11 +200,11 @@ int get_socket_color_from_affinity()
   }
 
   return *socket_colors.begin();
-#else
-  UMPIRE_ERROR(runtime_error,
-               "shared_scope::socket for MPI3 shared memory requires Linux CPU affinity information");
-#endif
 }
+#endif
+//////////
+// End of linux defined Socket support
+//////////
 
 /*!
  * \brief Build the communicator that defines which ranks share allocations.
@@ -206,9 +218,9 @@ int get_socket_color_from_affinity()
  * \return Communicator containing exactly the ranks that participate in each
  * shared-memory allocation for the resource.
  */
-MPI_Comm create_shared_communicator(MPI_Comm comm, MemoryResourceTraits::shared_scope scope)
-{
-  MPI_Comm shared_comm{MPI_COMM_NULL};
+	MPI_Comm create_shared_communicator(MPI_Comm comm, MemoryResourceTraits::shared_scope scope)
+	{
+	  MPI_Comm shared_comm{MPI_COMM_NULL};
 
   if (scope == MemoryResourceTraits::shared_scope::node) {
     check_mpi_call(MPI_Comm_split_type(comm, MPI_COMM_TYPE_SHARED, IGNORE_KEY, MPI_INFO_NULL, &shared_comm),
@@ -217,6 +229,11 @@ MPI_Comm create_shared_communicator(MPI_Comm comm, MemoryResourceTraits::shared_
   }
 
   if (scope == MemoryResourceTraits::shared_scope::socket) {
+    if constexpr (!is_linux) {
+      UMPIRE_ERROR(runtime_error,
+               "shared_scope::socket for MPI3 shared memory requires Linux CPU affinity information");
+    }
+
     const int color = get_socket_color_from_affinity();
 
     MPI_Comm node_comm{MPI_COMM_NULL};
@@ -242,6 +259,81 @@ MPI_Comm create_shared_communicator(MPI_Comm comm, MemoryResourceTraits::shared_
 }
 
 } // end anonymous namespace
+
+bool affinity_maps_to_single_socket(std::string& reason)
+{
+#if defined(__linux__)
+  const long cpu_count_long = sysconf(_SC_NPROCESSORS_CONF);
+  if (cpu_count_long <= 0) {
+    reason = "Could not determine configured CPU count (sysconf(_SC_NPROCESSORS_CONF) failed)";
+    return false;
+  }
+
+  if (cpu_count_long > std::numeric_limits<int>::max()) {
+    reason = "Configured CPU count exceeds supported range";
+    return false;
+  }
+
+  const int cpu_count = static_cast<int>(cpu_count_long);
+  const auto set_size = CPU_ALLOC_SIZE(cpu_count);
+  cpu_set_t* cpu_set = CPU_ALLOC(cpu_count);
+  if (!cpu_set) {
+    reason = "Failed to allocate CPU affinity mask";
+    return false;
+  }
+
+  CPU_ZERO_S(set_size, cpu_set);
+
+  if (sched_getaffinity(0, set_size, cpu_set) != 0) {
+    reason = fmt::format("sched_getaffinity failed: {}", std::strerror(errno));
+    CPU_FREE(cpu_set);
+    return false;
+  }
+
+  std::set<int> socket_colors;
+  bool saw_cpu = false;
+  for (int cpu = 0; cpu < cpu_count; ++cpu) {
+    if (!CPU_ISSET_S(cpu, set_size, cpu_set)) {
+      continue;
+    }
+    saw_cpu = true;
+
+    int color{-1};
+    if (!try_get_socket_color_for_cpu(cpu, color)) {
+      reason = "Unable to determine socket identifier for a CPU in this rank's affinity mask";
+      CPU_FREE(cpu_set);
+      return false;
+    }
+
+    socket_colors.insert(color);
+    if (socket_colors.size() > 1) {
+      reason =
+          fmt::format("Socket-scoped MPI3 shared memory requires each rank pinned to exactly one socket; this rank spans "
+                      "multiple sockets ({})",
+                      format_socket_colors(socket_colors));
+      CPU_FREE(cpu_set);
+      return false;
+    }
+  }
+
+  CPU_FREE(cpu_set);
+
+  if (!saw_cpu) {
+    reason = "Rank CPU affinity mask is empty";
+    return false;
+  }
+
+  if (socket_colors.empty()) {
+    reason = "No socket identifiers found in affinity mask";
+    return false;
+  }
+
+  return true;
+#else
+  reason = "Socket-scoped MPI3 shared memory requires Linux CPU affinity information";
+  return false;
+#endif
+}
 
 HostMpi3SharedMemoryResource::HostMpi3SharedMemoryResource(const std::string& name, int id, MemoryResourceTraits traits)
     : MemoryResource{name, id, traits}

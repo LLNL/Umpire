@@ -101,9 +101,9 @@ To create these Shared Memory allocators, you can do the following:
    auto ipc_traits{umpire::get_default_resource_traits("SHARED::POSIX")};
 
    // then create an allocator:
-   auto mpi3_node_allocator{rm.makeResource("SHARED::mpi3_alloc", mpi3_traits)};
+   auto mpi3_node_allocator{rm.makeResource("SHARED::MPI3::mpi3_alloc", mpi3_traits)};
    // or
-   auto ipc_node_allocator{rm.makeResource("SHARED::ipc_alloc", ipc_traits)};
+   auto ipc_node_allocator{rm.makeResource("SHARED::POSIX::ipc_alloc", ipc_traits)};
 
    // and allocate with
    mpi3_node_allocator.allocate(1024 * sizeof(double));
