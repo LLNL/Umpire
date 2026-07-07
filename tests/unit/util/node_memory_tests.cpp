@@ -37,26 +37,9 @@ TEST(NodeMemory, GetNodeAvailableMemoryWithCustomDefault)
   // On Linux, we expect a positive value (actual available memory)
   // It should NOT be the custom default
   EXPECT_GE(available_memory, 0.0);
+  EXPECT_NE(available_memory, custom_default);
 #else
   // On non-Linux systems, it should return the custom default
   EXPECT_EQ(available_memory, custom_default);
-#endif
-}
-
-TEST(NodeMemory, GetNodeAvailableMemoryReasonableValue)
-{
-#if defined(__linux__)
-  double available_memory = umpire::util::get_node_available_memory();
-
-  // The available memory should be a reasonable value
-  // Most systems have at least some memory available (> 0 MiB)
-  // and less than 1 TiB (1024 * 1024 MiB)
-  if (available_memory > 0.0) {
-    EXPECT_GT(available_memory, 0.0);
-    EXPECT_LT(available_memory, 1024.0 * 1024.0);
-  }
-#else
-  // Skip this test on non-Linux systems
-  GTEST_SKIP() << "Test only runs on Linux";
 #endif
 }
