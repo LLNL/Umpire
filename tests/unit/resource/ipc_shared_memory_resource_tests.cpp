@@ -75,7 +75,7 @@ class SharedMemoryTest : public ::testing::Test {
 
     if (m_rank == 0) {
       shmem_state->initial_size = shmem_resource->getActualSize();
-      std::cout << "Initialial size is: " << shmem_state->initial_size << std::endl;
+      std::cout << "Initial size is: " << shmem_state->initial_size << std::endl;
       shmem_state->largest_allocation_size = find_largest_allocation_size();
 
       std::random_device rd;
@@ -278,6 +278,8 @@ TEST_F(SharedMemoryTest, UnitTests)
     ASSERT_EQ(shmem_resource->getActualSize(), shmem_state->initial_size);
 
     MPI_Barrier(MPI_COMM_WORLD);
+    // `release()` is expected to be safe to call multiple times (idempotent) even
+    // when there is nothing left to reclaim from the segment.
     ASSERT_NO_THROW(allocator.release(););
     MPI_Barrier(MPI_COMM_WORLD);
     ASSERT_EQ(shmem_resource->getActualSize(), shmem_state->initial_size);
