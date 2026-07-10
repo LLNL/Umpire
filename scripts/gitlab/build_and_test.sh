@@ -322,21 +322,25 @@ try_cached_hostconfig ()
 
 configure_spack_storage ()
 {
+    local common_config
+    local upstream_config
     local main_install_tree
+    common_config="${project_dir}/scripts/gitlab/umpire-ci-cache-common.yaml"
+    upstream_config="${project_dir}/scripts/gitlab/umpire-ci-cache-upstream.yaml"
     main_install_tree="${umpire_ci_storage_root}/${SYS_TYPE:-unknown}/${CI_MACHINE:-${truehostname}}/main/install"
+
+    export UMPIRE_CI_INSTALL_TREE="${cache_install_tree}"
+    export UMPIRE_CI_BUILDCACHE="${cache_buildcache}"
+    export UMPIRE_CI_MAIN_INSTALL_TREE="${main_install_tree}"
+    export UMPIRE_CI_STORAGE_GROUP="${umpire_ci_storage_group}"
 
     run_section "spack_filesystem_cache" "Filesystem Spack cache configuration" "collapsed" \
       "Configuring filesystem Spack cache failed" \
-      ${spack_cmd} -D "${spack_env_path}" config add "config:install_tree:root:${cache_install_tree}"
-
-    ${spack_cmd} -D "${spack_env_path}" mirror add --unsigned umpire_ci_buildcache "file://${cache_buildcache}"
-    ${spack_cmd} -D "${spack_env_path}" config add "packages:all:permissions:read:world"
-    ${spack_cmd} -D "${spack_env_path}" config add "packages:all:permissions:write:group"
-    ${spack_cmd} -D "${spack_env_path}" config add "packages:all:permissions:group:${umpire_ci_storage_group}"
+      ${spack_cmd} -D "${spack_env_path}" config add "include:${common_config}"
 
     if [[ "${cache_target}" != "main" ]] && install_tree_is_usable "${main_install_tree}"
     then
-        ${spack_cmd} -D "${spack_env_path}" config add "upstreams:umpire_ci_main:install_tree:${main_install_tree}"
+        ${spack_cmd} -D "${spack_env_path}" config add "include:${upstream_config}"
         print_info "Using main install tree as Spack upstream: ${main_install_tree}"
     fi
 }

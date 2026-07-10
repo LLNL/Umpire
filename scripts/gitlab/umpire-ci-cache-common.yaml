@@ -1,0 +1,17 @@
+config:
+  install_tree:
+    root: "${UMPIRE_CI_INSTALL_TREE}"
+
+mirrors:
+  umpire_ci_buildcache:
+    url: "file://${UMPIRE_CI_BUILDCACHE}"
+    signed: false
+    binary: true
+    source: false
+
+packages:
+  all:
+    permissions:
+      read: world
+      write: group
+      group: "${UMPIRE_CI_STORAGE_GROUP}"
