@@ -9,10 +9,6 @@
 # It is included in CHILD pipelines (via trigger: include:) to provide
 # templates that your jobs can extend.
 
-
-workflow:
-  name: "${CI_MACHINE}"
-  
 ###############################################################################
 # JOB CUSTOMIZATION TEMPLATES
 ###############################################################################
