@@ -73,11 +73,20 @@ include:
     file: 'id_tokens.yml'
 
   # Base pipeline templates and utilities
-  - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/base-pipeline@v2026.02.0
+  - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/base-pipeline@2026.6.0
     inputs:
       github_project_name: $GITHUB_PROJECT_NAME
       github_project_org: $GITHUB_PROJECT_ORG
       github_token: $RSCI_GITHUB_STATUS_TOKEN
+
+  # Job override checker
+  - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/utility-job-override-check@woptim/ci-job-override-check
+    inputs:
+      submodule_path: "scripts/radiuss-spack-configs"
+      shared_jobs_path: "gitlab/radiuss-jobs"
+      local_jobs_path: ".gitlab/jobs"
+      machine_files: "dane.yml matrix.yml corona.yml tioga.yml tuolumne.yml"
+      ref_branch: "develop"
 
   # Local custom variables (used for component inputs and forwarded to child pipelines)
   - local: '.gitlab/custom-variables.yml'
@@ -125,7 +134,7 @@ dane-build-and-test:
   needs: [dane-up-check, generate-job-lists]
   trigger:
     include:
-      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/dane-pipeline@v2026.02.0
+      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/dane-pipeline@2026.6.0
         inputs:
           job_cmd: $JOB_CMD
           shared_alloc: $DANE_SHARED_ALLOC
@@ -147,7 +156,7 @@ matrix-build-and-test:
   needs: [matrix-up-check, generate-job-lists]
   trigger:
     include:
-      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/matrix-pipeline@v2026.02.0
+      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/matrix-pipeline@2026.6.0
         inputs:
           job_cmd: $JOB_CMD
           shared_alloc: $MATRIX_SHARED_ALLOC
@@ -169,7 +178,7 @@ corona-build-and-test:
   needs: [corona-up-check, generate-job-lists]
   trigger:
     include:
-      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/corona-pipeline@v2026.02.0
+      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/corona-pipeline@2026.6.0
         inputs:
           job_cmd: $JOB_CMD
           shared_alloc: $CORONA_SHARED_ALLOC
@@ -191,7 +200,7 @@ tioga-build-and-test:
   needs: [tioga-up-check, generate-job-lists]
   trigger:
     include:
-      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/tioga-pipeline@v2026.02.0
+      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/tioga-pipeline@2026.6.0
         inputs:
           job_cmd: $JOB_CMD
           shared_alloc: $TIOGA_SHARED_ALLOC
@@ -213,7 +222,7 @@ tuolumne-build-and-test:
   needs: [tuolumne-up-check, generate-job-lists]
   trigger:
     include:
-      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/tuolumne-pipeline@v2026.02.0
+      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/tuolumne-pipeline@2026.6.0
         inputs:
           job_cmd: $JOB_CMD
           shared_alloc: $TUOLUMNE_SHARED_ALLOC
