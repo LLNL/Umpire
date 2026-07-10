@@ -7,6 +7,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <iomanip>
 #include <iostream>
 #include <string>
 
@@ -15,6 +16,7 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/Umpire.hpp"
+#include "umpire/util/node_memory.hpp"
 
 namespace {
 std::size_t page_size()
@@ -66,6 +68,12 @@ int main(int, char**)
   const std::string allocator_name = "SHARED::POSIX::release_example";
   umpire::Allocator allocator = rm.makeResource(allocator_name, traits);
 
+  const double node_available_before_MiB = umpire::util::get_node_available_memory();
+  if (node_available_before_MiB >= 0.0) {
+    std::cout << std::fixed << std::setprecision(1)
+              << "Node available memory before: " << node_available_before_MiB << " MiB\n";
+  }
+
   const std::size_t rss_before = umpire::get_process_memory_usage();
   std::cout << "RSS before: " << format_bytes(rss_before) << "\n";
 
@@ -106,6 +114,14 @@ int main(int, char**)
 
   const std::size_t rss_after_release = umpire::get_process_memory_usage();
   std::cout << "RSS after release: " << format_bytes(rss_after_release) << "\n";
+
+  const double node_available_after_MiB = umpire::util::get_node_available_memory();
+  if (node_available_before_MiB >= 0.0 && node_available_after_MiB >= 0.0) {
+    std::cout << std::fixed << std::setprecision(1)
+              << "Node available memory after:  " << node_available_after_MiB << " MiB\n"
+              << "Node available delta:         " << (node_available_after_MiB - node_available_before_MiB)
+              << " MiB\n";
+  }
 
   const std::size_t shm_rss_after_release = umpire::get_mapping_memory_usage(allocator_name);
   if (shm_rss_after_release > 0) {
