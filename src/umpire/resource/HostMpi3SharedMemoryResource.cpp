@@ -218,9 +218,8 @@ int get_socket_color_from_affinity()
  * \return Communicator containing exactly the ranks that participate in each
  * shared-memory allocation for the resource.
  */
-	MPI_Comm create_shared_communicator(MPI_Comm comm, MemoryResourceTraits::shared_scope scope)
-	{
-	  MPI_Comm shared_comm{MPI_COMM_NULL};
+MPI_Comm create_shared_communicator(MPI_Comm comm, MemoryResourceTraits::shared_scope scope) {
+  MPI_Comm shared_comm{MPI_COMM_NULL};
 
   if (scope == MemoryResourceTraits::shared_scope::node) {
     check_mpi_call(MPI_Comm_split_type(comm, MPI_COMM_TYPE_SHARED, IGNORE_KEY, MPI_INFO_NULL, &shared_comm),
