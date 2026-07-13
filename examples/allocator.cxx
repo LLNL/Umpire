@@ -5,7 +5,6 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/ResourceManager.hpp"
-#include "umpire/strategy/QuickPool.hpp"
 #include "umpire/Allocator.hpp"
 
 #include <iostream>
@@ -13,8 +12,6 @@
 int main() {
   auto& rm = umpire::ResourceManager::getInstance();
   umpire::Allocator alloc = rm.getAllocator("HOST");
-  umpire::Allocator alloc2 = rm.makeAllocator<umpire::strategy::QuickPool>("pool", rm.getAllocator("DEVICE"));
-  umpire::Allocator alloc3 = rm.getAllocator("BANANAS");
 
   std::cout << "Got allocator: " << alloc.getName() << std::endl;
 
@@ -22,9 +19,7 @@ int main() {
   for (auto s : rm.getAllocatorNames()){
     std::cout << s << "  ";
   }
-  std::cout << "TEST: " << alloc3.getName() << std::endl;
   std::cout << std::endl;
 
   return 0;
 }
-
