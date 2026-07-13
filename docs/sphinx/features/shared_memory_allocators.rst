@@ -26,7 +26,7 @@ which set it apart from other Umpire allocators.
 4. Although Umpire does not need to have MPI enabled in order to provide IPC Shared Memory, if users wish to associate shared memory with MPI communicators, Umpire will need to be built with MPI enabled. Of course for the MPI3 Shared Memory, MPI is required.
 5. It most likely won't make sense to use memory pools with a shared memory allocator. The way shared memory allocators are implemented makes them already kind of pool-like. Since you have to give them a size when you create them, that is basically the "chunk" of memory you have to work with. Then, the shared memory allocator will manage that chunk for you. Therefore, we *do not* recommend that you use pools on top of shared memory allocators.
 6. For some LC machines, running Shared Memory Allocators on the login node may produce runtime errors because the login node may not have access to the correct files. If you get an error on the login node, try a compute node instead.
-7. MPI3 Shared Memory Allocators only support a `shared_scope` trait of `node`. For IPC Shared Memory, there is an option for either `node` or `socket`.
+7. MPI3 Shared Memory Allocators support `shared_scope` traits of `node` and `socket`. Socket scope requires Linux and MPI ranks bound such that each rank's CPU affinity mask maps to a single socket. IPC Shared Memory Allocators support `node` scope.
 8. MPI3 Shared Memory Allocators do not need an explicit name during creation like IPC Shared Memory Allocators do.
 
 Enabling Both Shared Memory Allocators
