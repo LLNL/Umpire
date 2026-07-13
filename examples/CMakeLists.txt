@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -20,6 +20,14 @@ if (UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
       DEPENDS_ON ${example_depends})
     list(APPEND umpire_examples mpi3_shared_memory)
   endif()
+endif()
+
+if (UMPIRE_ENABLE_IPC_SHARED_MEMORY)
+  blt_add_executable(
+    NAME ipc_shared_memory_release
+    SOURCES ipc_shared_memory_release.cpp
+    DEPENDS_ON ${example_depends})
+  list(APPEND umpire_examples ipc_shared_memory_release)
 endif()
 
 blt_add_executable(

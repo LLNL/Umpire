@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -72,6 +72,50 @@
 namespace umpire {
 namespace resource {
 
+namespace {
+
+std::string shared_resource_selector_name(const std::string& name)
+{
+  if (name == "SHARED") {
+#if defined(UMPIRE_ENABLE_IPC_SHARED_MEMORY) && !defined(UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
+    return "SHARED::POSIX";
+#elif !defined(UMPIRE_ENABLE_IPC_SHARED_MEMORY) && defined(UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
+    return "SHARED::MPI3";
+#elif defined(UMPIRE_ENABLE_IPC_SHARED_MEMORY) && defined(UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
+    if (std::string(UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE) == "MPI3") {
+      return "SHARED::MPI3";
+    }
+    return "SHARED::POSIX";
+#else
+    return name;
+#endif
+  }
+
+  // Treat "SHARED::<user_name>" as an alias for the selected implementation.
+  if (name.rfind("SHARED::", 0) == 0) {
+    if (name.rfind("SHARED::POSIX", 0) == 0 || name.rfind("SHARED::MPI3", 0) == 0) {
+      return name;
+    }
+
+#if defined(UMPIRE_ENABLE_IPC_SHARED_MEMORY) && !defined(UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
+    return "SHARED::POSIX";
+#elif !defined(UMPIRE_ENABLE_IPC_SHARED_MEMORY) && defined(UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
+    return "SHARED::MPI3";
+#elif defined(UMPIRE_ENABLE_IPC_SHARED_MEMORY) && defined(UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
+    if (std::string(UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE) == "MPI3") {
+      return "SHARED::MPI3";
+    }
+    return "SHARED::POSIX";
+#else
+    return name;
+#endif
+  }
+
+  return name;
+}
+
+} // namespace
+
 MemoryResourceRegistry& MemoryResourceRegistry::getInstance()
 {
   static MemoryResourceRegistry resource_registry;
@@ -99,17 +143,16 @@ MemoryResourceRegistry::MemoryResourceRegistry() : m_allocator_factories()
 #if defined(UMPIRE_ENABLE_IPC_SHARED_MEMORY)
   registerMemoryResource(util::make_unique<resource::HostSharedMemoryResourceFactory>());
   m_resource_names.push_back("SHARED::POSIX");
-  if (std::string(UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE) == "POSIX") {
-    m_resource_names.push_back("SHARED");
-  }
 #endif
 
 #if defined(UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
   registerMemoryResource(util::make_unique<resource::HostMpi3SharedMemoryResourceFactory>());
   m_resource_names.push_back("SHARED::MPI3");
-  if (std::string(UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE) == "MPI3") {
-    m_resource_names.push_back("SHARED");
-  }
+#endif
+
+#if defined(UMPIRE_ENABLE_IPC_SHARED_MEMORY) || defined(UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
+  // Always advertise "SHARED" as an alias for whichever shared-memory implementation is selected.
+  m_resource_names.push_back("SHARED");
 #endif
 
 #if defined(UMPIRE_ENABLE_FILE_RESOURCE)
@@ -267,8 +310,9 @@ void MemoryResourceRegistry::registerMemoryResource(std::unique_ptr<MemoryResour
 
 std::unique_ptr<resource::MemoryResource> MemoryResourceRegistry::makeMemoryResource(const std::string& name, int id)
 {
+  const auto selector_name = shared_resource_selector_name(name);
   for (auto const& allocator_factory : m_allocator_factories) {
-    if (allocator_factory->isValidMemoryResourceFor(name)) {
+    if (allocator_factory->isValidMemoryResourceFor(selector_name)) {
       auto a = allocator_factory->create(name, id);
       return a;
     }
@@ -280,8 +324,9 @@ std::unique_ptr<resource::MemoryResource> MemoryResourceRegistry::makeMemoryReso
 std::unique_ptr<resource::MemoryResource> MemoryResourceRegistry::makeMemoryResource(const std::string& name, int id,
                                                                                      MemoryResourceTraits traits)
 {
+  const auto selector_name = shared_resource_selector_name(name);
   for (auto const& allocator_factory : m_allocator_factories) {
-    if (allocator_factory->isValidMemoryResourceFor(name)) {
+    if (allocator_factory->isValidMemoryResourceFor(selector_name)) {
       auto a = allocator_factory->create(name, id, traits);
       return a;
     }
@@ -292,8 +337,9 @@ std::unique_ptr<resource::MemoryResource> MemoryResourceRegistry::makeMemoryReso
 
 MemoryResourceTraits MemoryResourceRegistry::getDefaultTraitsForResource(const std::string& name)
 {
+  const auto selector_name = shared_resource_selector_name(name);
   for (auto const& allocator_factory : m_allocator_factories) {
-    if (allocator_factory->isValidMemoryResourceFor(name)) {
+    if (allocator_factory->isValidMemoryResourceFor(selector_name)) {
       return allocator_factory->getDefaultTraits();
     }
   }

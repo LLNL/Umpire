@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -242,6 +242,44 @@ blt_add_executable(
 blt_add_test(
   NAME introspection_tests
   COMMAND introspection_tests)
+
+blt_add_executable(
+  NAME destroy_allocator_tests
+  SOURCES destroy_allocator_tests.cpp
+  DEPENDS_ON ${integration_tests_depends})
+
+target_include_directories(
+  destroy_allocator_tests
+  PRIVATE
+  ${PROJECT_BINARY_DIR}/include)
+
+if (UMPIRE_ENABLE_MPI AND (UMPIRE_ENABLE_IPC_SHARED_MEMORY OR UMPIRE_ENABLE_MPI3_SHARED_MEMORY))
+  umpire_add_test_with_mpi(
+    NAME destroy_allocator_tests
+    COMMAND destroy_allocator_tests
+    NUM_MPI_TASKS 1)
+else ()
+  blt_add_test(
+    NAME destroy_allocator_tests
+    COMMAND destroy_allocator_tests)
+endif ()
+
+blt_add_executable(
+  NAME destroy_allocator_strict_mode_tests
+  SOURCES destroy_allocator_strict_mode_tests.cpp
+  DEPENDS_ON ${integration_tests_depends})
+
+target_include_directories(
+  destroy_allocator_strict_mode_tests
+  PRIVATE
+  ${PROJECT_BINARY_DIR}/include)
+
+blt_add_test(
+  NAME destroy_allocator_strict_mode_tests
+  COMMAND destroy_allocator_strict_mode_tests)
+
+set_property(TEST destroy_allocator_strict_mode_tests
+  PROPERTY ENVIRONMENT "UMPIRE_STRICT_DESTRUCTION=1")
 
 if (UMPIRE_ENABLE_IPC_SHARED_MEMORY AND UMPIRE_ENABLE_MPI)
   blt_add_executable(

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -46,6 +46,11 @@ void HostSharedMemoryResource::deallocate(void* ptr, std::size_t)
   return pimpl->deallocate(ptr);
 }
 
+void HostSharedMemoryResource::release()
+{
+  return pimpl->release();
+}
+
 bool HostSharedMemoryResource::isPageable() noexcept
 {
 #if defined(UMPIRE_ENABLE_CUDA)
@@ -80,7 +85,7 @@ bool HostSharedMemoryResource::isAccessibleFrom(Platform p) noexcept
 {
   if (p == Platform::host)
     return true;
-  else if (p == Platform::cuda) // TODO: Implement omp_target specific test
+  else if (p == Platform::cuda)
     return isPageable();
   else
     return false;

@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -26,33 +26,36 @@ set(UMPIRE_VERSION_RC "")
 
 include(cmake/SetupUmpireOptions.cmake)
 
-# Default to c++17 if not specified by the user.
-set(BLT_CXX_STD "c++17" CACHE STRING "Version of C++ standard")
+# Default to C++20 if not specified by the user.
+set(BLT_CXX_STD "c++20" CACHE STRING "Version of C++ standard")
 
-# If BLT_CXX_STD is set by the user, check that it is at least 17.
+# If BLT_CXX_STD is set by the user, check that it is at least 20.
 if("${BLT_CXX_STD}" STREQUAL "c++98" OR
    "${BLT_CXX_STD}" STREQUAL "c++03" OR
    "${BLT_CXX_STD}" STREQUAL "c++11" OR
-   "${BLT_CXX_STD}" STREQUAL "c++14")
-  message(FATAL_ERROR "Umpire requires a minimum C++ standard of c++17. Please set BLT_CXX_STD accordingly.")
+   "${BLT_CXX_STD}" STREQUAL "c++14" OR
+   "${BLT_CXX_STD}" STREQUAL "c++17")
+  message(FATAL_ERROR "Umpire requires a minimum C++ standard of c++20. Please set BLT_CXX_STD accordingly.")
 endif()
 
-# If CMAKE_CUDA_STANDARD is set by the user, check that it is at least 17.
+# If CMAKE_CUDA_STANDARD is set by the user, check that it is at least 20.
 # If it is not set, it will be set later by BLT to match BLT_CXX_STD.
 if ("${CMAKE_CUDA_STANDARD}" STREQUAL "98" OR
     "${CMAKE_CUDA_STANDARD}" STREQUAL "03" OR
     "${CMAKE_CUDA_STANDARD}" STREQUAL "11" OR
-    "${CMAKE_CUDA_STANDARD}" STREQUAL "14")
-  message(FATAL_ERROR "Umpire requires a minimum CUDA standard of 17. Please set BLT_CXX_STD and/or CMAKE_CUDA_STANDARD accordingly.")
+    "${CMAKE_CUDA_STANDARD}" STREQUAL "14" OR
+    "${CMAKE_CUDA_STANDARD}" STREQUAL "17")
+  message(FATAL_ERROR "Umpire requires a minimum CUDA standard of 20. Please set BLT_CXX_STD and/or CMAKE_CUDA_STANDARD accordingly.")
 endif()
 
-# If CMAKE_HIP_STANDARD is set by the user, check that it is at least 17.
-# If it is not set, it will be set later by BLT to match BLT_CXX_STD.
+# If CMAKE_HIP_STANDARD is set by the user, check that it is at least 20
+# If it is not set, it will be set later by BLT to match BLT_CXX_STD
 if ("${CMAKE_HIP_STANDARD}" STREQUAL "98" OR
     "${CMAKE_HIP_STANDARD}" STREQUAL "03" OR
     "${CMAKE_HIP_STANDARD}" STREQUAL "11" OR
-    "${CMAKE_HIP_STANDARD}" STREQUAL "14")
-  message(FATAL_ERROR "Umpire requires a minimum HIP standard of 17. Please set BLT_CXX_STD and/or CMAKE_HIP_STANDARD accordingly.")
+    "${CMAKE_HIP_STANDARD}" STREQUAL "14" OR
+    "${CMAKE_HIP_STANDARD}" STREQUAL "17")
+  message(FATAL_ERROR "Umpire requires a minimum HIP standard of 20. Please set BLT_CXX_STD and/or CMAKE_HIP_STANDARD accordingly.")
 endif()
 
 if (UMPIRE_ENABLE_SYCL)
@@ -174,16 +177,6 @@ include(cmake/SetupCMakeBasics.cmake)
 include(cmake/SetupCompilerFlags.cmake)
 include(cmake/SetupUmpireThirdParty.cmake)
 
-if (WIN32)
-  if ((NOT UMPIRE_ENABLE_FILESYSTEM) OR (CMAKE_CXX_STANDARD LESS 17))
-    message(FATAL_ERROR "\
-    Windows builds require the FileSystem to be enabled \
-    and the C/C++ standard to be set to 17 or higher. \
-    Please re-configure with UMPIRE_ENABLE_FILESYSTEM=ON, \
-    with BLT_CXX_STD=c++17 or greater.")
-  endif()
-endif()
-
 add_subdirectory(src)
 
 configure_package_config_file(
@@ -204,7 +197,7 @@ install(FILES
   "${PROJECT_BINARY_DIR}/umpire-config-version.cmake"
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/umpire)
 
-install(EXPORT umpire-targets DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/umpire)
+install(EXPORT umpire-targets NAMESPACE umpire:: DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/umpire)
 
 if (UMPIRE_ENABLE_TESTS)
   add_subdirectory(tests)

@@ -13,7 +13,7 @@ In this example, we will look at creating a pool that can fulfill requests for
 allocations of any size. To create a new ``umpire_allocator`` using the pooling
 algorithm:
 
-.. literalinclude:: ../../../examples/tutorial/c/tut_pool.c
+.. literalinclude:: ../../../../examples/tutorial/c/tut_pool.c
    :start-after: _sphinx_tag_tut_pool_create_start
    :end-before: _sphinx_tag_tut_pool_create_end
    :language: C
@@ -27,7 +27,7 @@ Once you have the allocator, you can allocate and deallocate memory as
 before, without needing to worry about the underlying algorithm used for the
 allocations:
 
-.. literalinclude:: ../../../examples/tutorial/c/tut_pool.c
+.. literalinclude:: ../../../../examples/tutorial/c/tut_pool.c
    :start-after: _sphinx_tag_tut_allocate_start
    :end-before: _sphinx_tag_tut_allocate_end
    :language: C

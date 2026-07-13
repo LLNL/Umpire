@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -22,6 +22,7 @@ set (umpire_util_headers
   MemoryResourceTraits.hpp
   MemoryMap.hpp
   MemoryMap.inl
+  node_memory.hpp
   OutputBuffer.hpp
   Platform.hpp
   allocation_statistics.hpp
@@ -43,6 +44,7 @@ set (umpire_util_sources
   io.cpp
   Logger.cpp
   MPI.cpp
+  node_memory.cpp
   OutputBuffer.cpp
   allocation_statistics.cpp
   detect_vendor.cpp)

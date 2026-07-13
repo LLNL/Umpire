@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -63,3 +63,21 @@ blt_add_executable(
 blt_add_test(
   NAME find_first_set_tests
   COMMAND find_first_set_tests)
+
+blt_add_executable(
+  NAME memory_resource_traits_to_string_tests
+  SOURCES test_memory_resource_traits_to_string.cpp
+  DEPENDS_ON umpire gtest)
+
+blt_add_test(
+  NAME memory_resource_traits_to_string_tests
+  COMMAND memory_resource_traits_to_string_tests)
+
+blt_add_executable(
+  NAME node_memory_tests
+  SOURCES node_memory_tests.cpp
+  DEPENDS_ON umpire gtest)
+
+blt_add_test(
+  NAME node_memory_tests
+  COMMAND node_memory_tests)

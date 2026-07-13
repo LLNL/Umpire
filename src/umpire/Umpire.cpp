@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -8,6 +8,8 @@
 #include "umpire/Umpire.hpp"
 
 #include <algorithm>
+#include <cctype>
+#include <cstdio>
 #include <iostream>
 #include <iterator>
 #include <limits>
@@ -17,7 +19,9 @@
 
 #include "umpire/ResourceManager.hpp"
 #include "umpire/config.hpp"
+#if defined(UMPIRE_ENABLE_IPC_SHARED_MEMORY)
 #include "umpire/resource/HostSharedMemoryResource.hpp"
+#endif
 #include "umpire/resource/MemoryResource.hpp"
 #if defined(UMPIRE_ENABLE_MPI) && defined(UMPIRE_ENABLE_IPC_SHARED_MEMORY)
 #if defined(UMPIRE_ENABLE_DEVICE)
@@ -169,6 +173,45 @@ std::size_t get_process_memory_usage()
   statm.close();
   long page_size{::sysconf(_SC_PAGE_SIZE)};
   return std::size_t{resident * page_size};
+#endif
+}
+
+std::size_t get_mapping_memory_usage(const std::string& mapping_name)
+{
+#if defined(__linux__)
+  std::ifstream smaps{"/proc/self/smaps"};
+  if (!smaps) {
+    return 0;
+  }
+
+  std::size_t rss_kb{0};
+  bool in_target_mapping{false};
+  std::string line;
+
+  while (std::getline(smaps, line)) {
+    // Memory mapping header lines follow the format: "address-address perms ..."
+    // Check if line starts with hex digits and contains a hyphen in the first field
+    const bool is_header = (!line.empty() && std::isxdigit(static_cast<unsigned char>(line[0])) &&
+                            line.find('-') != std::string::npos && line.find('-') < 20);
+
+    if (is_header) {
+      in_target_mapping = (line.find(mapping_name) != std::string::npos);
+      continue;
+    }
+
+    if (!in_target_mapping || line.rfind("Rss:", 0) != 0) {
+      continue;
+    }
+
+    std::size_t value_kb{0};
+    std::sscanf(line.c_str(), "Rss: %zu kB", &value_kb);
+    rss_kb += value_kb;
+  }
+
+  return rss_kb * 1024;
+#else
+  UMPIRE_USE_VAR(mapping_name);
+  return 0;
 #endif
 }
 

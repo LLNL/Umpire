@@ -41,15 +41,20 @@ To enable Umpire replay, one may execute as follows:
 
 .. code-block:: bash
 
-   UMPIRE_REPLAY="On" ./my_umpire_using_program > replay_log.json
+   UMPIRE_REPLAY="On" ./my_umpire_using_program
 
-will write Umpire replay events to the file ``replay_log.json`` that will
-contain the following kinds of information:
+will write Umpire replay events to a file with a name like
+``umpire.<pid>.<uid>.stats`` in the directory specified by
+``UMPIRE_OUTPUT_DIR`` (or in the current directory if it is not set). The
+resulting ``.stats`` file contains JSON-formatted lines with the following
+kinds of information:
 
 Interpretting Results - Version Event
 -------------------------------------
 The first event captured is the **version** event which shows the version
-information as follows:
+information. The example below is taken from the file
+``examples/tutorial/tut_replay_log.json``, which contains the contents of a
+replay ``.stats`` file in JSON format:
 
 .. literalinclude:: ../../../examples/tutorial/tut_replay_log.json
    :start-after: _sphinx_tag_doc_version_start
@@ -141,9 +146,10 @@ to the allocated memory that is to be freed.
 
 Replaying the session
 ---------------------
-Loading this file with the ``replay`` program will replay this sequence of
-:class:`umpire::Allocator` creation, allocations, and deallocations:
+Loading the ``.stats`` file with the ``replay`` program will replay this
+sequence of :class:`umpire::Allocator` creation, allocations, and
+deallocations:
 
 .. code-block:: bash
 
-   ./bin/replay -i replay_log.json
+   ./bin/replay -i umpire.<pid>.<uid>.stats

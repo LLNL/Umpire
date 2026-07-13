@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-25, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-26, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -64,6 +64,9 @@ if (UMPIRE_ENABLE_DEVICE_ALLOCATOR AND (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP)
     HEADERS ${umpire_device_headers}
     SOURCES ${umpire_device_sources}
     DEPENDS_ON ${umpire_device_depends})
+
+  # Create namespaced alias for build tree
+  add_library(umpire::umpire_device ALIAS umpire_device)
 
   target_include_directories(
     umpire_device
@@ -138,6 +141,9 @@ blt_add_library(
   SOURCES ${umpire_sources}
   DEPENDS_ON ${umpire_depends}
   DEFINES ${umpire_defines})
+
+# Create namespaced alias for build tree
+add_library(umpire::umpire ALIAS umpire)
 
 if (NOT WIN32 AND NOT ${CMAKE_VERSION} VERSION_LESS 3.18)
   target_link_options(
