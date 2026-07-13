@@ -209,6 +209,29 @@ strategy::AllocationStrategy* ResourceManager::getAllocationStrategy(const std::
   return m_allocators_by_name[name];
 }
 
+std::optional<Allocator> ResourceManager::tryGetAllocator(const std::string& name)
+{
+  UMPIRE_LOG(Debug, "(\"" << name << "\")");
+
+  resource::MemoryResourceRegistry& registry{resource::MemoryResourceRegistry::getInstance()};
+  auto resource_names = registry.getResourceNames();
+
+  auto allocator = m_allocators_by_name.find(name);
+  if (allocator == m_allocators_by_name.end()) {
+    auto resource_name = std::find(resource_names.begin(), resource_names.end(), name);
+    if (resource_name != std::end(resource_names)) {
+      makeResource(name);
+      allocator = m_allocators_by_name.find(name);
+    }
+  }
+
+  if (allocator == m_allocators_by_name.end()) {
+    return std::nullopt;
+  }
+
+  return Allocator{allocator->second};
+}
+
 Allocator ResourceManager::getAllocator(const std::string& name)
 {
   UMPIRE_LOG(Debug, "(\"" << name << "\")");
