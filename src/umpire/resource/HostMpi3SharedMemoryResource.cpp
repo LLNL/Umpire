@@ -18,9 +18,6 @@
 #if defined(__linux__)
 #include <sched.h>
 #include <unistd.h>
-constexpr bool is_linux = true;
-#else
-constexpr bool is_linux = false;
 #endif
 
 #include "umpire/resource/MemoryResource.hpp"
@@ -130,138 +127,8 @@ std::string format_socket_colors(const std::set<int>& colors)
   return ss.str();
 }
 
-/*!
- * \brief Determine the single socket color implied by the current rank's CPU
- * affinity.
- *
- * Socket-scoped shared memory requires each rank to be pinned to exactly one
- * socket so that all ranks with the same socket color can be grouped into one
- * shared-memory communicator.
- *
- * \return Socket color used to split the node-local communicator.
- */
-int get_socket_color_from_affinity()
+bool try_get_socket_color_from_affinity(int& socket_color, std::string& reason)
 {
-  const long cpu_count_long = sysconf(_SC_NPROCESSORS_CONF);
-  if (cpu_count_long <= 0) {
-    UMPIRE_ERROR(runtime_error, "Could not determine the number of configured CPUs for socket scope");
-  }
-
-  if (cpu_count_long > std::numeric_limits<int>::max()) {
-    UMPIRE_ERROR(runtime_error, "Configured CPU count exceeds supported range for socket scope");
-  }
-
-  const int cpu_count = static_cast<int>(cpu_count_long);
-
-  const auto set_size = CPU_ALLOC_SIZE(cpu_count);
-  cpu_set_t* cpu_set = CPU_ALLOC(cpu_count);
-  if (!cpu_set) {
-    UMPIRE_ERROR(runtime_error, "Failed to allocate a CPU affinity mask for socket scope");
-  }
-
-  CPU_ZERO_S(set_size, cpu_set);
-
-  if (sched_getaffinity(0, set_size, cpu_set) != 0) {
-    const std::string message =
-        fmt::format("sched_getaffinity failed while determining socket scope: {}", std::strerror(errno));
-    CPU_FREE(cpu_set);
-    UMPIRE_ERROR(runtime_error, message);
-  }
-
-  std::set<int> socket_colors;
-
-  for (int cpu = 0; cpu < cpu_count; ++cpu) {
-    if (!CPU_ISSET_S(cpu, set_size, cpu_set)) {
-      continue;
-    }
-
-    int color{-1};
-    if (!try_get_socket_color_for_cpu(cpu, color)) {
-      const std::string message =
-          fmt::format("Unable to determine a socket color for cpu {} in the rank affinity mask", cpu);
-      CPU_FREE(cpu_set);
-      UMPIRE_ERROR(runtime_error, message);
-    }
-
-    socket_colors.insert(color);
-  }
-
-  CPU_FREE(cpu_set);
-
-  if (socket_colors.empty()) {
-    UMPIRE_ERROR(runtime_error, "The rank CPU affinity mask is empty; cannot determine socket scope");
-  }
-
-  if (socket_colors.size() != 1) {
-    UMPIRE_ERROR(runtime_error,
-                 fmt::format("Socket-scoped MPI3 shared memory requires each MPI rank to be bound to exactly one "
-                             "socket. This rank's affinity mask spans socket colors: {}",
-                             format_socket_colors(socket_colors)));
-  }
-
-  return *socket_colors.begin();
-}
-#endif
-//////////
-// End of linux defined Socket support
-//////////
-
-/*!
- * \brief Build the communicator that defines which ranks share allocations.
- *
- * \param comm Parent communicator used to discover ranks that may share host
- *        memory.
- * \param scope Requested sharing scope from MemoryResourceTraits. Node scope
- *        keeps one communicator per node, while socket scope further splits the
- *        node-local communicator using socket affinity.
- *
- * \return Communicator containing exactly the ranks that participate in each
- * shared-memory allocation for the resource.
- */
-MPI_Comm create_shared_communicator(MPI_Comm comm, MemoryResourceTraits::shared_scope scope) {
-  MPI_Comm shared_comm{MPI_COMM_NULL};
-
-  if (scope == MemoryResourceTraits::shared_scope::node) {
-    check_mpi_call(MPI_Comm_split_type(comm, MPI_COMM_TYPE_SHARED, IGNORE_KEY, MPI_INFO_NULL, &shared_comm),
-                   "MPI_Comm_split_type");
-    return shared_comm;
-  }
-
-  if (scope == MemoryResourceTraits::shared_scope::socket) {
-    if constexpr (!is_linux) {
-      UMPIRE_ERROR(runtime_error,
-               "shared_scope::socket for MPI3 shared memory requires Linux CPU affinity information");
-    }
-
-    const int color = get_socket_color_from_affinity();
-
-    MPI_Comm node_comm{MPI_COMM_NULL};
-    check_mpi_call(MPI_Comm_split_type(comm, MPI_COMM_TYPE_SHARED, IGNORE_KEY, MPI_INFO_NULL, &node_comm),
-                   "MPI_Comm_split_type");
-    UMPIRE_LOG(Debug, "Creating socket-scoped shared communicator with color " << color);
-
-    const int split_status = MPI_Comm_split(node_comm, color, IGNORE_KEY, &shared_comm);
-    if (split_status != MPI_SUCCESS) {
-      if (node_comm != MPI_COMM_NULL) {
-        MPI_Comm_free(&node_comm);
-      }
-      check_mpi_call(split_status, "MPI_Comm_split");
-    }
-
-    check_mpi_call(MPI_Comm_free(&node_comm), "MPI_Comm_free");
-
-    return shared_comm;
-  }
-
-  UMPIRE_ERROR(runtime_error,
-               fmt::format("Unsupported shared communicator scope: {}", to_string(scope)));
-}
-
-} // end anonymous namespace
-
-bool affinity_maps_to_single_socket(std::string& reason)
-{
-#if defined(__linux__)
   const long cpu_count_long = sysconf(_SC_NPROCESSORS_CONF);
   if (cpu_count_long <= 0) {
     reason = "Could not determine configured CPU count (sysconf(_SC_NPROCESSORS_CONF) failed)";
@@ -274,6 +141,7 @@ bool affinity_maps_to_single_socket(std::string& reason)
   }
 
   const int cpu_count = static_cast<int>(cpu_count_long);
+
   const auto set_size = CPU_ALLOC_SIZE(cpu_count);
   cpu_set_t* cpu_set = CPU_ALLOC(cpu_count);
   if (!cpu_set) {
@@ -291,6 +159,7 @@ bool affinity_maps_to_single_socket(std::string& reason)
 
   std::set<int> socket_colors;
   bool saw_cpu = false;
+
   for (int cpu = 0; cpu < cpu_count; ++cpu) {
     if (!CPU_ISSET_S(cpu, set_size, cpu_set)) {
       continue;
@@ -327,11 +196,92 @@ bool affinity_maps_to_single_socket(std::string& reason)
     return false;
   }
 
+  socket_color = *socket_colors.begin();
   return true;
+}
 #else
+bool try_get_socket_color_from_affinity(int& socket_color, std::string& reason)
+{
+  UMPIRE_USE_VAR(socket_color);
   reason = "Socket-scoped MPI3 shared memory requires Linux CPU affinity information";
   return false;
+}
 #endif
+//////////
+// End of linux defined Socket support
+//////////
+
+/*!
+ * \brief Build the communicator that defines which ranks share allocations.
+ *
+ * \param comm Parent communicator used to discover ranks that may share host
+ *        memory.
+ * \param scope Requested sharing scope from MemoryResourceTraits. Node scope
+ *        keeps one communicator per node, while socket scope further splits the
+ *        node-local communicator using socket affinity.
+ *
+ * \return Communicator containing exactly the ranks that participate in each
+ * shared-memory allocation for the resource.
+ */
+MPI_Comm create_shared_communicator(MPI_Comm comm, MemoryResourceTraits::shared_scope scope)
+{
+  MPI_Comm shared_comm{MPI_COMM_NULL};
+
+  if (scope == MemoryResourceTraits::shared_scope::node) {
+    check_mpi_call(MPI_Comm_split_type(comm, MPI_COMM_TYPE_SHARED, IGNORE_KEY, MPI_INFO_NULL, &shared_comm),
+                   "MPI_Comm_split_type");
+    return shared_comm;
+  }
+
+  if (scope == MemoryResourceTraits::shared_scope::socket) {
+    MPI_Comm node_comm{MPI_COMM_NULL};
+    check_mpi_call(MPI_Comm_split_type(comm, MPI_COMM_TYPE_SHARED, IGNORE_KEY, MPI_INFO_NULL, &node_comm),
+                   "MPI_Comm_split_type");
+
+    int color{-1};
+    std::string reason;
+    const int local_affinity_valid = try_get_socket_color_from_affinity(color, reason) ? 1 : 0;
+    int all_affinity_valid{0};
+
+    const int allreduce_status = MPI_Allreduce(&local_affinity_valid, &all_affinity_valid, 1, MPI_INT, MPI_MIN, comm);
+    if (allreduce_status != MPI_SUCCESS) {
+      MPI_Comm_free(&node_comm);
+      check_mpi_call(allreduce_status, "MPI_Allreduce");
+    }
+
+    if (!all_affinity_valid) {
+      check_mpi_call(MPI_Comm_free(&node_comm), "MPI_Comm_free");
+      if (local_affinity_valid) {
+        reason = "Another rank in the parent communicator could not determine a single socket affinity";
+      }
+      UMPIRE_ERROR(runtime_error, reason);
+    }
+
+    UMPIRE_LOG(Debug, "Creating socket-scoped shared communicator with color " << color);
+
+    const int split_status = MPI_Comm_split(node_comm, color, IGNORE_KEY, &shared_comm);
+    if (split_status != MPI_SUCCESS) {
+      if (node_comm != MPI_COMM_NULL) {
+        MPI_Comm_free(&node_comm);
+      }
+      check_mpi_call(split_status, "MPI_Comm_split");
+    }
+
+    check_mpi_call(MPI_Comm_free(&node_comm), "MPI_Comm_free");
+
+    return shared_comm;
+  }
+
+  UMPIRE_ERROR(runtime_error,
+               fmt::format("Unsupported shared communicator scope: {}", to_string(scope)));
+}
+
+} // end anonymous namespace
+
+bool affinity_maps_to_single_socket(std::string& reason)
+{
+  int socket_color{-1};
+  return try_get_socket_color_from_affinity(socket_color, reason);
 }
 
 HostMpi3SharedMemoryResource::HostMpi3SharedMemoryResource(const std::string& name, int id, MemoryResourceTraits traits)

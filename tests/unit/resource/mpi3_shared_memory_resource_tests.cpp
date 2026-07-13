@@ -11,6 +11,25 @@
 #include "mpi.h"
 #include "umpire/Umpire.hpp"
 
+#if defined(__linux__)
+namespace {
+
+bool all_ranks_affinity_maps_to_single_socket(std::string& reason)
+{
+  const int local_affinity_valid = umpire::affinity_maps_to_single_socket(reason) ? 1 : 0;
+  int all_affinity_valid{0};
+  MPI_Allreduce(&local_affinity_valid, &all_affinity_valid, 1, MPI_INT, MPI_MIN, MPI_COMM_WORLD);
+
+  if (!all_affinity_valid && local_affinity_valid) {
+    reason = "Another rank in MPI_COMM_WORLD does not map to a single socket";
+  }
+
+  return all_affinity_valid != 0;
+}
+
+} // namespace
+#endif
+
 class MPISharedMemoryTest : public ::testing::Test {
  protected:
   static int shared_rank;
@@ -99,7 +118,7 @@ TEST(MPISharedMemorySocket, SharedMemoryAllocationAndCommunicator)
   traits.size = 1 * 1024 * 1024;
 
   std::string reason;
-  if (!umpire::affinity_maps_to_single_socket(reason)) {
+  if (!all_ranks_affinity_maps_to_single_socket(reason)) {
     GTEST_SKIP() << reason;
   }
 
