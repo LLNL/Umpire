@@ -209,36 +209,36 @@ umpire::MemoryResourceTraits get_default_resource_traits(const std::string& name
  */
 void* find_pointer_from_name(Allocator allocator, const std::string& name);
 
-	#if defined(UMPIRE_ENABLE_MPI)
-	/*!
-	 * \brief Return the MPI communicator for a shared memory allocator.
-	 *
+#if defined(UMPIRE_ENABLE_MPI)
+/*!
+ * \brief Return the MPI communicator for a shared memory allocator.
+ *
  * NOTE: Using this function will REQUIRE users to call the
  * cleanup_cached_communicators() function to avoid memory leaks.
  */
-	MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm);
-	void cleanup_cached_communicators();
-	#endif
+MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm);
+void cleanup_cached_communicators();
+#endif
 
-	/*!
-	 * \brief Determine whether the calling rank's CPU affinity mask spans exactly
-	 * one socket.
-	 *
-	 * Socket-scoped MPI3 shared memory requires each rank pinned to exactly one
-	 * socket so that ranks can be grouped into socket-local communicators.
-	 *
-	 * When MPI3 shared memory support is disabled (or the platform does not
-	 * provide the required affinity information), this function returns false and
-	 * populates \p reason with a diagnostic message.
-	 *
-	 * \param reason Diagnostic message describing why the check failed.
-	 *
-	 * \return true when the affinity mask is non-empty and maps to a single socket.
-	 */
-	bool affinity_maps_to_single_socket(std::string& reason);
+/*!
+ * \brief Determine whether the calling rank's CPU affinity mask spans exactly
+ * one socket.
+ *
+ * Socket-scoped MPI3 shared memory requires each rank pinned to exactly one
+ * socket so that ranks can be grouped into socket-local communicators.
+ *
+ * When MPI3 shared memory support is disabled (or the platform does not
+ * provide the required affinity information), this function returns false and
+ * populates \p reason with a diagnostic message.
+ *
+ * \param reason Diagnostic message describing why the check failed.
+ *
+ * \return true when the affinity mask is non-empty and maps to a single socket.
+ */
+bool affinity_maps_to_single_socket(std::string& reason);
 
-	void register_external_allocation(void* ptr, util::AllocationRecord record);
-	util::AllocationRecord deregister_external_allocation(void* ptr);
+void register_external_allocation(void* ptr, util::AllocationRecord record);
+util::AllocationRecord deregister_external_allocation(void* ptr);
 
 /*!
  * \brief Returns the Camp resource associated with a particular allocation

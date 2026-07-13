@@ -32,7 +32,7 @@ int main(int argc, char** argv)
 
   if (traits.scope == umpire::MemoryResourceTraits::shared_scope::socket) {
     std::string reason;
-	  if (!umpire::affinity_maps_to_single_socket(reason)) {
+    if (!umpire::affinity_maps_to_single_socket(reason)) {
       if (world_rank == 0) {
         std::cerr << "Requested socket-scoped MPI3 shared memory, but CPU affinity does not map to a single socket: "
                   << reason << "\nFalling back to node-scoped shared memory.\n";
@@ -68,7 +68,7 @@ int main(int argc, char** argv)
 
   mpi3_shm_allocator.deallocate(data);
 
-  // Since we called get_communicator_for_allocator...
+  // Since we called get_communicator_for_allocator(), clean up is needed
   umpire::cleanup_cached_communicators();
   MPI_Finalize();
 
