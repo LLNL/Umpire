@@ -190,7 +190,23 @@ declarations:
             template_suffix: _resource_aware_pool
             function_suffix: ""
 
+      # Pool allocators with custom alignment control. These functions allow
+      # users to specify memory alignment (must be a power of 2) when creating
+      # pool allocators. Alignment controls the byte boundary for allocations
+      # (e.g., alignment=64 ensures allocations are aligned to 64-byte boundaries).
+      # Default alignment is 16 bytes if not specified.
       - decl: Allocator makeAllocator_list_pool_aligned(const std::string& name, Allocator allocator, size_t initial_size, size_t block, size_t alignment)
+        doxygen:
+          brief: Create a DynamicPoolList allocator with custom alignment
+          description: |
+            Creates a tracked DynamicPoolList allocator with specified alignment.
+            The alignment parameter must be a power of 2 (e.g., 16, 32, 64, 128).
+          param:
+            name: Name for the new allocator
+            allocator: Underlying allocator to use for memory
+            initial_size: Initial pool size in bytes
+            block: Minimum block size for future allocations
+            alignment: Memory alignment in bytes (must be power of 2)
         options:
           F_C_name_template: c_resourcemanager_make_alloc_dynamic_p_list_a{function_suffix}{template_suffix}
         format:
@@ -208,6 +224,17 @@ declarations:
             return SHC_rv;
 
       - decl: Allocator makeAllocator_quick_pool_aligned(const std::string& name, Allocator allocator, size_t initial_size, size_t block, size_t alignment)
+        doxygen:
+          brief: Create a QuickPool allocator with custom alignment
+          description: |
+            Creates a tracked QuickPool allocator with specified alignment.
+            The alignment parameter must be a power of 2 (e.g., 16, 32, 64, 128).
+          param:
+            name: Name for the new allocator
+            allocator: Underlying allocator to use for memory
+            initial_size: Initial pool size in bytes
+            block: Minimum block size for future allocations
+            alignment: Memory alignment in bytes (must be power of 2)
         options:
           F_C_name_template: c_resourcemanager_make_alloc_quick_p_a{function_suffix}{template_suffix}
         format:
@@ -225,6 +252,17 @@ declarations:
             return SHC_rv;
 
       - decl: Allocator makeAllocator_resource_aware_pool_aligned(const std::string& name, Allocator allocator, size_t initial_size, size_t block, size_t alignment)
+        doxygen:
+          brief: Create a ResourceAwarePool allocator with custom alignment
+          description: |
+            Creates a tracked ResourceAwarePool allocator with specified alignment.
+            The alignment parameter must be a power of 2 (e.g., 16, 32, 64, 128).
+          param:
+            name: Name for the new allocator
+            allocator: Underlying allocator to use for memory
+            initial_size: Initial pool size in bytes
+            block: Minimum block size for future allocations
+            alignment: Memory alignment in bytes (must be power of 2)
         options:
           F_C_name_template: c_resourcemanager_make_alloc_res_aware_p_a{function_suffix}{template_suffix}
         format:
@@ -381,7 +419,22 @@ declarations:
             SHC_rv->idtor = 1;
             return SHC_rv;
 
+      # Untracked pool allocators with custom alignment control. These functions
+      # create untracked pools (memory usage not tracked by Umpire) with custom
+      # alignment. The alignment parameter must be a power of 2.
       - decl: Allocator makeAllocator_list_pool_aligned_untracked(const std::string& name, Allocator allocator, size_t initial_size, size_t block, size_t alignment)
+        doxygen:
+          brief: Create an untracked DynamicPoolList allocator with custom alignment
+          description: |
+            Creates an untracked DynamicPoolList allocator with specified alignment.
+            Untracked allocators do not track individual allocations for reduced overhead.
+            The alignment parameter must be a power of 2 (e.g., 16, 32, 64, 128).
+          param:
+            name: Name for the new allocator
+            allocator: Underlying allocator to use for memory
+            initial_size: Initial pool size in bytes
+            block: Minimum block size for future allocations
+            alignment: Memory alignment in bytes (must be power of 2)
         options:
           F_C_name_template: c_resourcemanager_make_alloc_dynamic_p_list_au{function_suffix}{template_suffix}
         format:
@@ -399,6 +452,18 @@ declarations:
             return SHC_rv;
 
       - decl: Allocator makeAllocator_quick_pool_aligned_untracked(const std::string& name, Allocator allocator, size_t initial_size, size_t block, size_t alignment)
+        doxygen:
+          brief: Create an untracked QuickPool allocator with custom alignment
+          description: |
+            Creates an untracked QuickPool allocator with specified alignment.
+            Untracked allocators do not track individual allocations for reduced overhead.
+            The alignment parameter must be a power of 2 (e.g., 16, 32, 64, 128).
+          param:
+            name: Name for the new allocator
+            allocator: Underlying allocator to use for memory
+            initial_size: Initial pool size in bytes
+            block: Minimum block size for future allocations
+            alignment: Memory alignment in bytes (must be power of 2)
         options:
           F_C_name_template: c_resourcemanager_make_alloc_quick_p_au{function_suffix}{template_suffix}
         format:
@@ -416,6 +481,18 @@ declarations:
             return SHC_rv;
 
       - decl: Allocator makeAllocator_resource_aware_pool_aligned_untracked(const std::string& name, Allocator allocator, size_t initial_size, size_t block, size_t alignment)
+        doxygen:
+          brief: Create an untracked ResourceAwarePool allocator with custom alignment
+          description: |
+            Creates an untracked ResourceAwarePool allocator with specified alignment.
+            Untracked allocators do not track individual allocations for reduced overhead.
+            The alignment parameter must be a power of 2 (e.g., 16, 32, 64, 128).
+          param:
+            name: Name for the new allocator
+            allocator: Underlying allocator to use for memory
+            initial_size: Initial pool size in bytes
+            block: Minimum block size for future allocations
+            alignment: Memory alignment in bytes (must be power of 2)
         options:
           F_C_name_template: c_resourcemanager_make_alloc_res_aware_p_au{function_suffix}{template_suffix}
         format:
