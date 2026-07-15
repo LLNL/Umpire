@@ -215,6 +215,12 @@ umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_resource_awar
     // splicer end class.ResourceManager.method.make_allocator_bufferify_resource_aware_pool
 }
 
+/**
+ * \brief Create a DynamicPoolList allocator with custom alignment
+ *
+ * Creates a tracked DynamicPoolList allocator with specified alignment.
+ * The alignment parameter must be a power of 2 (e.g., 16, 32, 64, 128).
+ */
 umpire_allocator * umpire_resourcemanager_make_allocator_list_pool_aligned(
     umpire_resourcemanager * self, const char * name,
     umpire_allocator allocator, size_t initial_size, size_t block,
@@ -235,6 +241,12 @@ umpire_allocator * umpire_resourcemanager_make_allocator_list_pool_aligned(
     // splicer end class.ResourceManager.method.make_allocator_list_pool_aligned
 }
 
+/**
+ * \brief Create a DynamicPoolList allocator with custom alignment
+ *
+ * Creates a tracked DynamicPoolList allocator with specified alignment.
+ * The alignment parameter must be a power of 2 (e.g., 16, 32, 64, 128).
+ */
 umpire_allocator * umpire_resourcemanager_make_allocator_list_pool_aligned_bufferify(
     umpire_resourcemanager * self, const char * name, int Lname,
     umpire_allocator allocator, size_t initial_size, size_t block,
@@ -255,6 +267,12 @@ umpire_allocator * umpire_resourcemanager_make_allocator_list_pool_aligned_buffe
     // splicer end class.ResourceManager.method.make_allocator_list_pool_aligned_bufferify
 }
 
+/**
+ * \brief Create a QuickPool allocator with custom alignment
+ *
+ * Creates a tracked QuickPool allocator with specified alignment.
+ * The alignment parameter must be a power of 2 (e.g., 16, 32, 64, 128).
+ */
 umpire_allocator * umpire_resourcemanager_make_allocator_quick_pool_aligned(
     umpire_resourcemanager * self, const char * name,
     umpire_allocator allocator, size_t initial_size, size_t block,
@@ -275,6 +293,12 @@ umpire_allocator * umpire_resourcemanager_make_allocator_quick_pool_aligned(
     // splicer end class.ResourceManager.method.make_allocator_quick_pool_aligned
 }
 
+/**
+ * \brief Create a QuickPool allocator with custom alignment
+ *
+ * Creates a tracked QuickPool allocator with specified alignment.
+ * The alignment parameter must be a power of 2 (e.g., 16, 32, 64, 128).
+ */
 umpire_allocator * umpire_resourcemanager_make_allocator_quick_pool_aligned_bufferify(
     umpire_resourcemanager * self, const char * name, int Lname,
     umpire_allocator allocator, size_t initial_size, size_t block,
@@ -295,6 +319,12 @@ umpire_allocator * umpire_resourcemanager_make_allocator_quick_pool_aligned_buff
     // splicer end class.ResourceManager.method.make_allocator_quick_pool_aligned_bufferify
 }
 
+/**
+ * \brief Create a ResourceAwarePool allocator with custom alignment
+ *
+ * Creates a tracked ResourceAwarePool allocator with specified alignment.
+ * The alignment parameter must be a power of 2 (e.g., 16, 32, 64, 128).
+ */
 umpire_allocator * umpire_resourcemanager_make_allocator_resource_aware_pool_aligned(
     umpire_resourcemanager * self, const char * name,
     umpire_allocator allocator, size_t initial_size, size_t block,
@@ -315,6 +345,12 @@ umpire_allocator * umpire_resourcemanager_make_allocator_resource_aware_pool_ali
     // splicer end class.ResourceManager.method.make_allocator_resource_aware_pool_aligned
 }
 
+/**
+ * \brief Create a ResourceAwarePool allocator with custom alignment
+ *
+ * Creates a tracked ResourceAwarePool allocator with specified alignment.
+ * The alignment parameter must be a power of 2 (e.g., 16, 32, 64, 128).
+ */
 umpire_allocator * umpire_resourcemanager_make_allocator_resource_aware_pool_aligned_bufferify(
     umpire_resourcemanager * self, const char * name, int Lname,
     umpire_allocator allocator, size_t initial_size, size_t block,
@@ -915,6 +951,13 @@ umpire_allocator * umpire_resourcemanager_make_allocator_resource_aware_pool_unt
     // splicer end class.ResourceManager.method.make_allocator_resource_aware_pool_untracked_bufferify
 }
 
+/**
+ * \brief Create an untracked DynamicPoolList allocator with custom alignment
+ *
+ * Creates an untracked DynamicPoolList allocator with specified alignment.
+ * Untracked allocators do not track individual allocations for reduced overhead.
+ * The alignment parameter must be a power of 2 (e.g., 16, 32, 64, 128).
+ */
 umpire_allocator * umpire_resourcemanager_make_allocator_list_pool_aligned_untracked(
     umpire_resourcemanager * self, const char * name,
     umpire_allocator allocator, size_t initial_size, size_t block,
@@ -935,6 +978,13 @@ umpire_allocator * umpire_resourcemanager_make_allocator_list_pool_aligned_untra
     // splicer end class.ResourceManager.method.make_allocator_list_pool_aligned_untracked
 }
 
+/**
+ * \brief Create an untracked DynamicPoolList allocator with custom alignment
+ *
+ * Creates an untracked DynamicPoolList allocator with specified alignment.
+ * Untracked allocators do not track individual allocations for reduced overhead.
+ * The alignment parameter must be a power of 2 (e.g., 16, 32, 64, 128).
+ */
 umpire_allocator * umpire_resourcemanager_make_allocator_list_pool_aligned_untracked_bufferify(
     umpire_resourcemanager * self, const char * name, int Lname,
     umpire_allocator allocator, size_t initial_size, size_t block,
@@ -955,6 +1005,13 @@ umpire_allocator * umpire_resourcemanager_make_allocator_list_pool_aligned_untra
     // splicer end class.ResourceManager.method.make_allocator_list_pool_aligned_untracked_bufferify
 }
 
+/**
+ * \brief Create an untracked QuickPool allocator with custom alignment
+ *
+ * Creates an untracked QuickPool allocator with specified alignment.
+ * Untracked allocators do not track individual allocations for reduced overhead.
+ * The alignment parameter must be a power of 2 (e.g., 16, 32, 64, 128).
+ */
 umpire_allocator * umpire_resourcemanager_make_allocator_quick_pool_aligned_untracked(
     umpire_resourcemanager * self, const char * name,
     umpire_allocator allocator, size_t initial_size, size_t block,
@@ -975,6 +1032,13 @@ umpire_allocator * umpire_resourcemanager_make_allocator_quick_pool_aligned_untr
     // splicer end class.ResourceManager.method.make_allocator_quick_pool_aligned_untracked
 }
 
+/**
+ * \brief Create an untracked QuickPool allocator with custom alignment
+ *
+ * Creates an untracked QuickPool allocator with specified alignment.
+ * Untracked allocators do not track individual allocations for reduced overhead.
+ * The alignment parameter must be a power of 2 (e.g., 16, 32, 64, 128).
+ */
 umpire_allocator * umpire_resourcemanager_make_allocator_quick_pool_aligned_untracked_bufferify(
     umpire_resourcemanager * self, const char * name, int Lname,
     umpire_allocator allocator, size_t initial_size, size_t block,
@@ -995,6 +1059,13 @@ umpire_allocator * umpire_resourcemanager_make_allocator_quick_pool_aligned_untr
     // splicer end class.ResourceManager.method.make_allocator_quick_pool_aligned_untracked_bufferify
 }
 
+/**
+ * \brief Create an untracked ResourceAwarePool allocator with custom alignment
+ *
+ * Creates an untracked ResourceAwarePool allocator with specified alignment.
+ * Untracked allocators do not track individual allocations for reduced overhead.
+ * The alignment parameter must be a power of 2 (e.g., 16, 32, 64, 128).
+ */
 umpire_allocator * umpire_resourcemanager_make_allocator_resource_aware_pool_aligned_untracked(
     umpire_resourcemanager * self, const char * name,
     umpire_allocator allocator, size_t initial_size, size_t block,
@@ -1015,6 +1086,13 @@ umpire_allocator * umpire_resourcemanager_make_allocator_resource_aware_pool_ali
     // splicer end class.ResourceManager.method.make_allocator_resource_aware_pool_aligned_untracked
 }
 
+/**
+ * \brief Create an untracked ResourceAwarePool allocator with custom alignment
+ *
+ * Creates an untracked ResourceAwarePool allocator with specified alignment.
+ * Untracked allocators do not track individual allocations for reduced overhead.
+ * The alignment parameter must be a power of 2 (e.g., 16, 32, 64, 128).
+ */
 umpire_allocator * umpire_resourcemanager_make_allocator_resource_aware_pool_aligned_untracked_bufferify(
     umpire_resourcemanager * self, const char * name, int Lname,
     umpire_allocator allocator, size_t initial_size, size_t block,
