@@ -183,7 +183,6 @@ if (NOT TARGET spdlog::spdlog)
     else ()
       # Configure spdlog to use external fmt (if available)
       if (TARGET ${UMPIRE_FMT_TARGET})
-        set(SPDLOG_FMT_EXTERNAL ON CACHE BOOL "Use external fmt library")
         message(STATUS "Configuring spdlog to use external fmt library: ${UMPIRE_FMT_TARGET}")
 
         # Help spdlog find the fmt package by setting fmt_DIR
@@ -193,27 +192,34 @@ if (NOT TARGET spdlog::spdlog)
           message(STATUS "Using external fmt from: ${fmt_DIR}")
           set(fmt_DIR ${fmt_DIR} CACHE PATH "Path to fmt")
 
-          # Check if the external fmt is header-only and warn user if needed
+          # Check if the external fmt is header-only
+          # Note: SPDLOG_FMT_EXTERNAL and SPDLOG_FMT_EXTERNAL_HO are mutually exclusive
           get_target_property(fmt_type ${UMPIRE_FMT_TARGET} TYPE)
           if (fmt_type STREQUAL "INTERFACE_LIBRARY")
-            message(STATUS "External fmt appears to be header-only, setting SPDLOG_FMT_EXTERNAL_HO")
+            message(STATUS "External fmt is header-only, setting SPDLOG_FMT_EXTERNAL_HO=ON")
             set(SPDLOG_FMT_EXTERNAL_HO ON CACHE BOOL "Use external fmt header-only library")
+            set(SPDLOG_FMT_EXTERNAL OFF CACHE BOOL "Use external fmt library")
           else()
+            message(STATUS "External fmt is compiled library, setting SPDLOG_FMT_EXTERNAL=ON")
+            set(SPDLOG_FMT_EXTERNAL ON CACHE BOOL "Use external fmt library")
+            set(SPDLOG_FMT_EXTERNAL_HO OFF CACHE BOOL "Use external fmt header-only library")
             if (NOT DEFINED SPDLOG_FMT_EXTERNAL_HO)
-              message(STATUS "External fmt is not header-only. If you encounter linking issues, set SPDLOG_FMT_EXTERNAL_HO=ON")
+              message(STATUS "If you encounter linking issues, you may need to set SPDLOG_FMT_EXTERNAL_HO=ON")
             endif()
           endif()
         else ()
           # Submodule fmt case - point to build directory where fmt exports its config
-          # We built fmt as header-only, so tell spdlog
+          # We built fmt as header-only (FMT_HEADER_ONLY=ON above), so use SPDLOG_FMT_EXTERNAL_HO
           message(STATUS "Using Umpire's bundled fmt submodule (header-only mode)")
           set(SPDLOG_FMT_EXTERNAL_HO ON CACHE BOOL "Use external fmt header-only library")
+          set(SPDLOG_FMT_EXTERNAL OFF CACHE BOOL "Use external fmt library")
           set(fmt_DIR ${CMAKE_BINARY_DIR}/src/tpl/umpire/fmt CACHE PATH "Path to fmt")
         endif ()
       else ()
         # No fmt available, let spdlog use its bundled fmt
         message(STATUS "No external fmt found, spdlog will use its bundled fmt")
         set(SPDLOG_FMT_EXTERNAL OFF CACHE BOOL "Use external fmt library")
+        set(SPDLOG_FMT_EXTERNAL_HO OFF CACHE BOOL "Use external fmt header-only library")
       endif ()
 
       # Disable unnecessary spdlog features
