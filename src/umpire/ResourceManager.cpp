@@ -415,14 +415,22 @@ void ResourceManager::destroyAllocator(const std::string& name, bool free_alloca
   }
 
   auto records = umpire::get_allocator_records(Allocator(strategy));
+  std::vector<void*> statistics_only_ptrs;
+  if (strategy->isStatisticsOnlyTracked()) {
+    statistics_only_ptrs.reserve(strategy->m_statistics_allocations.size());
+    for (const auto& record : strategy->m_statistics_allocations) {
+      statistics_only_ptrs.push_back(record.first);
+    }
+  }
+  const std::size_t active_allocation_count = records.size() + statistics_only_ptrs.size();
 
   if (isStrictDestructionMode()) {
-    if (!records.empty() && !free_allocations) {
+    if (active_allocation_count != 0 && !free_allocations) {
       UMPIRE_ERROR(runtime_error, fmt::format("Allocator \"{}\" has {} active allocations. "
                                               "Use free_allocations=true or deallocate them first.",
-                                              name, records.size()));
+                                              name, active_allocation_count));
     }
-  } else if (!free_allocations && !records.empty()) {
+  } else if (!free_allocations && active_allocation_count != 0) {
     UMPIRE_LOG(Warning, "Allocator \"" << name << "\" may have active allocations. "
                                        << "Destroying anyway (non-strict mode).");
   }
@@ -453,10 +461,13 @@ void ResourceManager::destroyAllocator(const std::string& name, bool free_alloca
   }
 
   if (free_allocations) {
-    UMPIRE_LOG(Debug, "Freeing " << records.size() << " allocations");
+    UMPIRE_LOG(Debug, "Freeing " << active_allocation_count << " allocations");
     Allocator allocator{strategy};
     for (const auto& record : records) {
       allocator.deallocate(record.ptr);
+    }
+    for (void* ptr : statistics_only_ptrs) {
+      allocator.deallocate(ptr);
     }
   } else if (!records.empty()) {
     //

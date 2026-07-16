@@ -91,6 +91,23 @@ TEST(ResourceManager, makeStatisticsOnlyHostResource)
   EXPECT_EQ(alloc.getAllocationCount(), 0);
 }
 
+TEST(ResourceManager, destroyStatisticsOnlyHostResourceFreesAllocations)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto alloc = rm.makeResource("HOST_STATS_DESTROY_FREE", umpire::Tracking::StatisticsOnly);
+
+  void* ptr1 = alloc.allocate(128);
+  void* ptr2 = alloc.allocate(256);
+  EXPECT_EQ(alloc.getAllocationCount(), 2);
+
+  EXPECT_NO_THROW(rm.destroyAllocator("HOST_STATS_DESTROY_FREE", true));
+  EXPECT_FALSE(rm.isAllocator("HOST_STATS_DESTROY_FREE"));
+
+  UMPIRE_USE_VAR(ptr1);
+  UMPIRE_USE_VAR(ptr2);
+}
+
 TEST(ResourceManager, getAllocatorById)
 {
   auto& rm = umpire::ResourceManager::getInstance();
