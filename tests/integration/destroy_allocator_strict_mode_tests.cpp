@@ -30,6 +30,19 @@ TEST(DestroyAllocatorStrictModeTest, ActiveAllocations)
   rm.destroyAllocator("test_pool_strict");
 }
 
+TEST(DestroyAllocatorStrictModeTest, StatisticsOnlyActiveAllocations)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto alloc = rm.makeResource("HOST_STATS_ONLY_STRICT", umpire::Tracking::StatisticsOnly);
+  void* ptr = alloc.allocate(100);
+  ASSERT_NE(nullptr, ptr);
+
+  ASSERT_THROW(rm.destroyAllocator("HOST_STATS_ONLY_STRICT", false), umpire::runtime_error);
+
+  alloc.deallocate(ptr);
+  rm.destroyAllocator("HOST_STATS_ONLY_STRICT");
+}
+
 TEST(DestroyAllocatorStrictModeTest, ParentChildWarning)
 {
   auto& rm = umpire::ResourceManager::getInstance();

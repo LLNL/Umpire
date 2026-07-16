@@ -23,7 +23,7 @@ Allocator ResourceManager::makeAllocator(const std::string& name, Tracking track
 {
   std::lock_guard<std::mutex> lock(m_mutex);
   std::unique_ptr<strategy::AllocationStrategy> allocator;
-  bool is_tracked = (tracked == Tracking::Tracked) ? true : false;
+  const bool is_tracked = (tracked == Tracking::Tracked);
 
   if (m_id + 1 == umpire::invalid_allocator_id) {
     UMPIRE_ERROR(runtime_error, "Maximum number of concurrent allocators exceeded! Please email umpire-dev@llnl.gov");
@@ -35,7 +35,7 @@ Allocator ResourceManager::makeAllocator(const std::string& name, Tracking track
   }
 
   allocator = util::make_unique<Strategy>(name, getNextId(), std::forward<Args>(args)...);
-  allocator->setTracking(is_tracked);
+  allocator->setTracking(tracked);
 
   umpire::event::record([&](auto& event) {
     event.name("make_allocator")

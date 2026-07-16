@@ -55,6 +55,59 @@ TEST(ResourceManager, getAllocatorByName)
   ASSERT_THROW(rm.getAllocator("BANANA"), umpire::runtime_error);
 }
 
+TEST(ResourceManager, getHostFastAllocator)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto alloc = rm.getAllocator("HOST_FAST");
+
+  EXPECT_EQ(alloc.getTracking(), umpire::Tracking::Untracked);
+  EXPECT_FALSE(alloc.isTracked());
+
+  void* ptr = alloc.allocate(128);
+  EXPECT_EQ(alloc.getCurrentSize(), 0);
+  EXPECT_THROW(rm.findAllocationRecord(ptr), umpire::runtime_error);
+  alloc.deallocate(ptr);
+}
+
+TEST(ResourceManager, makeStatisticsOnlyHostResource)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto alloc = rm.makeResource("HOST_STATS_ONLY", umpire::Tracking::StatisticsOnly);
+
+  EXPECT_EQ(alloc.getTracking(), umpire::Tracking::StatisticsOnly);
+  EXPECT_FALSE(alloc.isTracked());
+
+  void* ptr = alloc.allocate(256);
+  EXPECT_EQ(alloc.getCurrentSize(), 256);
+  EXPECT_EQ(alloc.getHighWatermark(), 256);
+  EXPECT_EQ(alloc.getAllocationCount(), 1);
+  EXPECT_THROW(rm.findAllocationRecord(ptr), umpire::runtime_error);
+
+  alloc.deallocate(ptr);
+  EXPECT_EQ(alloc.getCurrentSize(), 0);
+  EXPECT_EQ(alloc.getHighWatermark(), 256);
+  EXPECT_EQ(alloc.getAllocationCount(), 0);
+}
+
+TEST(ResourceManager, destroyStatisticsOnlyHostResourceFreesAllocations)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto alloc = rm.makeResource("HOST_STATS_DESTROY_FREE", umpire::Tracking::StatisticsOnly);
+
+  void* ptr1 = alloc.allocate(128);
+  void* ptr2 = alloc.allocate(256);
+  EXPECT_EQ(alloc.getAllocationCount(), 2);
+
+  EXPECT_NO_THROW(rm.destroyAllocator("HOST_STATS_DESTROY_FREE", true));
+  EXPECT_FALSE(rm.isAllocator("HOST_STATS_DESTROY_FREE"));
+
+  UMPIRE_USE_VAR(ptr1);
+  UMPIRE_USE_VAR(ptr2);
+}
+
 TEST(ResourceManager, getAllocatorById)
 {
   auto& rm = umpire::ResourceManager::getInstance();

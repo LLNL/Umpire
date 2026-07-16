@@ -7,6 +7,7 @@
 #include "umpire/strategy/AllocationStrategy.hpp"
 
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/error.hpp"
 
 namespace umpire {
 namespace strategy {
@@ -124,12 +125,59 @@ bool AllocationStrategy::tracksMemoryUse() const noexcept
 
 void AllocationStrategy::setTracking(bool tracking) noexcept
 {
-  m_tracked = tracking;
+  m_tracking = tracking ? Tracking::Tracked : Tracking::Untracked;
+}
+
+void AllocationStrategy::setTracking(Tracking tracking) noexcept
+{
+  m_tracking = tracking;
 }
 
 bool AllocationStrategy::isTracked() const noexcept
 {
-  return m_tracked;
+  return m_tracking == Tracking::Tracked;
+}
+
+bool AllocationStrategy::isStatisticsOnlyTracked() const noexcept
+{
+  return m_tracking == Tracking::StatisticsOnly;
+}
+
+Tracking AllocationStrategy::getTracking() const noexcept
+{
+  return m_tracking;
+}
+
+void AllocationStrategy::registerAllocationStatistics(void* ptr, std::size_t size)
+{
+  if (!ptr) {
+    UMPIRE_ERROR(runtime_error, "Cannot register nullptr!");
+  }
+
+  m_current_size += size;
+  m_allocation_count++;
+
+  if (m_current_size > m_high_watermark) {
+    m_high_watermark = m_current_size;
+  }
+
+  m_statistics_allocations[ptr] = size;
+}
+
+std::size_t AllocationStrategy::deregisterAllocationStatistics(void* ptr)
+{
+  auto record = m_statistics_allocations.find(ptr);
+  if (record == m_statistics_allocations.end()) {
+    UMPIRE_ERROR(unknown_pointer_error, fmt::format("Allocation not mapped: {}", ptr));
+  }
+
+  const std::size_t size = record->second;
+  m_statistics_allocations.erase(record);
+
+  m_current_size -= size;
+  m_allocation_count--;
+
+  return size;
 }
 
 std::ostream& operator<<(std::ostream& os, const AllocationStrategy& strategy)

@@ -201,6 +201,11 @@ const AllocationRecord* AllocationMap::doFindRecord(void* ptr) const noexcept
 {
   const AllocationRecord* alloc_record = nullptr;
 
+  Map::ConstIterator exact = m_map.find(ptr);
+  if (exact->second) {
+    return exact->second->back();
+  }
+
   Map::ConstIterator iter = m_map.findOrBefore(ptr);
 
   // faster, equivalent way of checking iter != m_map->end()
@@ -249,8 +254,9 @@ AllocationRecord AllocationMap::remove(void* ptr)
   if (iter->second) {
     // faster, equivalent way of checking iter != m_map->end()
     ret = iter->second->pop_back();
-    if (iter->second->empty())
+    if (iter->second->empty()) {
       m_map.removeLast();
+    }
   } else {
     UMPIRE_ERROR(runtime_error, fmt::format("Cannot remove {}", ptr));
   }

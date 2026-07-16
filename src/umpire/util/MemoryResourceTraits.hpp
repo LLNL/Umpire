@@ -10,6 +10,7 @@
 #include <cstddef>
 #include <string>
 
+#include "umpire/Tracking.hpp"
 #include "umpire/config.hpp"
 
 #if defined(UMPIRE_ENABLE_SYCL)
@@ -19,7 +20,7 @@
 namespace umpire {
 
 struct MemoryResourceTraits {
-  MemoryResourceTraits(){};
+  MemoryResourceTraits() {};
 
   enum class optimized_for { any, latency, bandwidth, access };
 
@@ -52,6 +53,7 @@ struct MemoryResourceTraits {
   shared_scope scope = shared_scope::unknown;
   granularity_type granularity = granularity_type::unknown;
   bool tracking{true};
+  Tracking tracking_policy{Tracking::Tracked};
 };
 
 inline std::string to_string(const MemoryResourceTraits::shared_scope& scope)

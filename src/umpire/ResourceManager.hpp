@@ -141,6 +141,8 @@ class ResourceManager {
 
   Allocator makeResource(const std::string& name);
 
+  Allocator makeResource(const std::string& name, Tracking tracked);
+
   Allocator makeResource(const std::string& name, MemoryResourceTraits traits);
 
   /*!

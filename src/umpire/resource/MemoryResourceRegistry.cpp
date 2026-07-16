@@ -132,6 +132,7 @@ MemoryResourceRegistry::MemoryResourceRegistry() : m_allocator_factories()
 {
   registerMemoryResource(util::make_unique<resource::HostResourceFactory>());
   m_resource_names.push_back("HOST");
+  m_resource_names.push_back("HOST_FAST");
 
 #if defined(UMPIRE_ENABLE_DEVELOPER_BENCHMARKS)
   registerMemoryResource(util::make_unique<resource::NoOpResourceFactory>());
@@ -340,7 +341,12 @@ MemoryResourceTraits MemoryResourceRegistry::getDefaultTraitsForResource(const s
   const auto selector_name = shared_resource_selector_name(name);
   for (auto const& allocator_factory : m_allocator_factories) {
     if (allocator_factory->isValidMemoryResourceFor(selector_name)) {
-      return allocator_factory->getDefaultTraits();
+      auto traits = allocator_factory->getDefaultTraits();
+      if (name == "HOST_FAST") {
+        traits.tracking = false;
+        traits.tracking_policy = Tracking::Untracked;
+      }
+      return traits;
     }
   }
 
