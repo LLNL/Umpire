@@ -23,7 +23,6 @@ set (umpire_util_headers
   MemoryMap.hpp
   MemoryMap.inl
   node_memory.hpp
-  OutputBuffer.hpp
   Platform.hpp
   allocation_statistics.hpp
   detect_vendor.hpp
@@ -45,7 +44,6 @@ set (umpire_util_sources
   Logger.cpp
   MPI.cpp
   node_memory.cpp
-  OutputBuffer.cpp
   allocation_statistics.cpp
   detect_vendor.cpp)
 
