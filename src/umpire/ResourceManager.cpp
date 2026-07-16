@@ -45,6 +45,21 @@ static const char* s_zero_byte_pool_name{"__umpire_internal_0_byte_pool"};
 
 namespace umpire {
 
+namespace {
+
+Tracking resolveTrackingPolicy(const MemoryResourceTraits& traits) noexcept
+{
+  return traits.tracking ? traits.tracking_policy : Tracking::Untracked;
+}
+
+bool isDefaultMemoryResourceName(const std::string& name) noexcept
+{
+  return name == "HOST" || name == "DEVICE" || name == "UM" || name == "PINNED" || name == "DEVICE_CONST" ||
+         name == "FILE" || name == "NO_OP" || name == "SHARED";
+}
+
+} // namespace
+
 ResourceManager& ResourceManager::getInstance()
 {
   static ResourceManager resource_manager;
@@ -135,6 +150,15 @@ Allocator ResourceManager::makeResource(const std::string& name)
   return makeResource(name, registry.getDefaultTraitsForResource(name));
 }
 
+Allocator ResourceManager::makeResource(const std::string& name, Tracking tracked)
+{
+  resource::MemoryResourceRegistry& registry{resource::MemoryResourceRegistry::getInstance()};
+  auto traits = registry.getDefaultTraitsForResource(name);
+  traits.tracking = tracked != Tracking::Untracked;
+  traits.tracking_policy = tracked;
+  return makeResource(name, traits);
+}
+
 Allocator ResourceManager::makeResource(const std::string& name, MemoryResourceTraits traits)
 {
   if (m_allocators_by_name.find(name) != m_allocators_by_name.end()) {
@@ -159,14 +183,18 @@ Allocator ResourceManager::makeResource(const std::string& name, MemoryResourceT
     m_shared_allocator_names.push_back(name);
   }
 
+  const Tracking tracking_policy = resolveTrackingPolicy(traits);
+  traits.tracking = tracking_policy != Tracking::Untracked;
+  traits.tracking_policy = tracking_policy;
+
   std::unique_ptr<strategy::AllocationStrategy> allocator{registry.makeMemoryResource(name, getNextId(), traits)};
-  allocator->setTracking(traits.tracking);
+  allocator->setTracking(tracking_policy);
 
   umpire::event::record([&](auto& event) {
     event.name("make_memory_resource")
         .category(event::category::operation)
         .arg("allocator_ref", (void*)allocator.get())
-        .arg("introspection", traits.tracking)
+        .arg("introspection", tracking_policy != Tracking::Untracked)
         .tag("allocator_name", name)
         .tag("replay", "true");
   });
@@ -180,7 +208,7 @@ Allocator ResourceManager::makeResource(const std::string& name, MemoryResourceT
     std::string base_name{name.substr(0, name.find("::") - 1)};
     m_allocators_by_name[base_name] = allocator.get();
   }
-  if (name.find("::") == std::string::npos) {
+  if (name.find("::") == std::string::npos && isDefaultMemoryResourceName(name)) {
     m_memory_resources[resource::string_to_resource(name)] = allocator.get();
   }
   m_allocators_by_id[id] = allocator.get();
@@ -380,28 +408,24 @@ void ResourceManager::destroyAllocator(const std::string& name, bool free_alloca
   int id = strategy->getId();
 
   const std::string& strategy_name = strategy->getName();
-  const bool is_shared_resource =
-      (strategy_name == "SHARED") || (strategy_name.rfind("SHARED::", 0) == 0);
+  const bool is_shared_resource = (strategy_name == "SHARED") || (strategy_name.rfind("SHARED::", 0) == 0);
 
   if (isBuiltinAllocator(strategy) && !is_shared_resource) {
-    UMPIRE_ERROR(runtime_error,
-                 fmt::format("Cannot destroy builtin allocator \"{}\"", name));
+    UMPIRE_ERROR(runtime_error, fmt::format("Cannot destroy builtin allocator \"{}\"", name));
   }
 
   auto records = umpire::get_allocator_records(Allocator(strategy));
 
   if (isStrictDestructionMode()) {
     if (!records.empty() && !free_allocations) {
-      UMPIRE_ERROR(runtime_error,
-                   fmt::format("Allocator \"{}\" has {} active allocations. "
-                              "Use free_allocations=true or deallocate them first.",
-                              name, records.size()));
+      UMPIRE_ERROR(runtime_error, fmt::format("Allocator \"{}\" has {} active allocations. "
+                                              "Use free_allocations=true or deallocate them first.",
+                                              name, records.size()));
     }
   } else if (!free_allocations && !records.empty()) {
     UMPIRE_LOG(Warning, "Allocator \"" << name << "\" may have active allocations. "
-                        << "Destroying anyway (non-strict mode).");
+                                       << "Destroying anyway (non-strict mode).");
   }
-
 
   if (isStrictDestructionMode()) {
     std::vector<std::string> child_names;
@@ -414,18 +438,18 @@ void ResourceManager::destroyAllocator(const std::string& name, bool free_alloca
     if (!child_names.empty()) {
       std::string children_str;
       for (size_t i = 0; i < child_names.size(); ++i) {
-        if (i > 0) children_str += ", ";
+        if (i > 0)
+          children_str += ", ";
         children_str += child_names[i];
       }
 
-      UMPIRE_ERROR(runtime_error,
-                   fmt::format("Allocator \"{}\" is a parent of other allocators: {}. "
-                              "Destroy children first.",
-                              name, children_str));
+      UMPIRE_ERROR(runtime_error, fmt::format("Allocator \"{}\" is a parent of other allocators: {}. "
+                                              "Destroy children first.",
+                                              name, children_str));
     }
   } else {
     UMPIRE_LOG(Warning, "Allocator \"" << name << "\" may be a parent of other allocators. "
-                        << "Destroying anyway (non-strict mode).");
+                                       << "Destroying anyway (non-strict mode).");
   }
 
   if (free_allocations) {
@@ -442,7 +466,7 @@ void ResourceManager::destroyAllocator(const std::string& name, bool free_alloca
     // with a new allocator at the same address.
     //
     UMPIRE_LOG(Warning, "Untracking " << records.size() << " active allocations for allocator \"" << name
-                                     << "\" (allocator destroyed without freeing allocations).");
+                                      << "\" (allocator destroyed without freeing allocations).");
     for (const auto& record : records) {
       deregisterAllocation(record.ptr);
     }

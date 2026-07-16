@@ -39,6 +39,8 @@ inline void* Allocator::do_allocate(std::size_t bytes)
 
   if (m_tracking) {
     registerAllocation(ret, bytes, m_allocator);
+  } else if (m_statistics_tracking) {
+    m_allocator->registerAllocationStatistics(ret, bytes);
   }
 
   umpire::event::record<umpire::event::allocate>(
@@ -93,6 +95,8 @@ inline void* Allocator::do_named_allocate(const std::string& name, std::size_t b
 
   if (m_tracking) {
     registerAllocation(ret, bytes, m_allocator, name);
+  } else if (m_statistics_tracking) {
+    m_allocator->registerAllocationStatistics(ret, bytes);
   }
 
   umpire::event::record<umpire::event::named_allocate>(
@@ -116,6 +120,8 @@ inline void* Allocator::do_resource_allocate(std::size_t bytes, camp::resources:
 
   if (m_tracking) {
     registerAllocation(ret, bytes, m_allocator);
+  } else if (m_statistics_tracking) {
+    m_allocator->registerAllocationStatistics(ret, bytes);
   }
 
   umpire::event::record<umpire::event::allocate_resource>(
@@ -137,6 +143,11 @@ inline void Allocator::do_deallocate(void* ptr)
       auto record = deregisterAllocation(ptr, m_allocator);
       if (!deallocateNull(ptr)) {
         m_allocator->deallocate(ptr, record.size);
+      }
+    } else if (m_statistics_tracking) {
+      const auto size = m_allocator->deregisterAllocationStatistics(ptr);
+      if (!deallocateNull(ptr)) {
+        m_allocator->deallocate(ptr, size);
       }
     } else {
       if (!deallocateNull(ptr)) {
@@ -161,6 +172,11 @@ inline void Allocator::do_resource_deallocate(void* ptr, camp::resources::Resour
       auto record = deregisterAllocation(ptr, m_allocator);
       if (!deallocateNull(ptr)) {
         m_allocator->deallocate_resource(ptr, r, record.size);
+      }
+    } else if (m_statistics_tracking) {
+      const auto size = m_allocator->deregisterAllocationStatistics(ptr);
+      if (!deallocateNull(ptr)) {
+        m_allocator->deallocate_resource(ptr, r, size);
       }
     } else {
       if (!deallocateNull(ptr)) {

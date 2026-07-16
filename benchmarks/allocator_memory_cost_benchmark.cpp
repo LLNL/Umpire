@@ -16,24 +16,18 @@
 #include <vector>
 
 #include "umpire/Allocator.hpp"
+#include "umpire/CLI11/CLI11.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/Umpire.hpp"
 #include "umpire/resource/MemoryResourceRegistry.hpp"
 #include "umpire/strategy/QuickPool.hpp"
-#include "umpire/CLI11/CLI11.hpp"
 
 namespace {
 const std::string hwm_name{"Memory Usage HSM"};
 
 std::string pretty(std::size_t n)
 {
-  const char* scale[] = {
-    " bytes",
-    " kilobytes",
-    " megabytes",
-    " gigabytes",
-    " terabytes"
-  };
+  const char* scale[] = {" bytes", " kilobytes", " megabytes", " gigabytes", " terabytes"};
 
   int suffix{0};
   double count{static_cast<double>(n)};
@@ -71,7 +65,7 @@ std::size_t get_memory_stat(const std::string& name)
   return rval;
 }
 
-};
+}; // namespace
 
 struct MemoryStatSnapshot {
   void take_snapshot()
@@ -92,11 +86,14 @@ struct MemoryStatSnapshot {
 };
 
 class AllocatorCostBenchmark {
-public:
+ public:
   friend std::ostream& operator<<(std::ostream& os, const AllocatorCostBenchmark& acb);
 
-  AllocatorCostBenchmark(const std::string& a, std::size_t n, bool no_intro, bool _show_process_mem_info) :
-    allocator_to_use{a}, number_of_allocs{n}, no_introspection{no_intro}, show_process_mem_info{_show_process_mem_info}
+  AllocatorCostBenchmark(const std::string& a, std::size_t n, bool no_intro, bool _show_process_mem_info)
+      : allocator_to_use{a},
+        number_of_allocs{n},
+        no_introspection{no_intro},
+        show_process_mem_info{_show_process_mem_info}
   {
     is_umpire_allocator = (allocator_to_use != "malloc");
 
@@ -108,15 +105,18 @@ public:
 
       if (allocator_to_use == "Host") {
         umpire_allocator = resource_allocator;
-      }
-      else if (allocator_to_use == "Quick") {
+      } else if (allocator_to_use == "HostFast") {
+        umpire_allocator = umpire::ResourceManager::getInstance().getAllocator("HOST_FAST");
+      } else if (allocator_to_use == "HostStats") {
+        umpire_allocator = umpire::ResourceManager::getInstance().makeResource("HOST_STATS_BENCHMARK",
+                                                                               umpire::Tracking::StatisticsOnly);
+      } else if (allocator_to_use == "Quick") {
         if (no_introspection) {
-          umpire_allocator = umpire::ResourceManager::getInstance().makeAllocator<umpire::strategy::QuickPool, false>
-            ("QUICK_POOL", resource_allocator);
-        }
-        else {
-          umpire_allocator = umpire::ResourceManager::getInstance().makeAllocator<umpire::strategy::QuickPool, true>
-            ("QUICK_POOL", resource_allocator);
+          umpire_allocator = umpire::ResourceManager::getInstance().makeAllocator<umpire::strategy::QuickPool, false>(
+              "QUICK_POOL", resource_allocator);
+        } else {
+          umpire_allocator = umpire::ResourceManager::getInstance().makeAllocator<umpire::strategy::QuickPool, true>(
+              "QUICK_POOL", resource_allocator);
         }
       }
     }
@@ -143,7 +143,6 @@ public:
 
     for (std::size_t i = 0; i < number_of_allocs; ++i)
       deallocate(slots[i]);
-
   }
 
   void run_time_benchmark()
@@ -155,16 +154,16 @@ public:
   struct AllocatorValidator : public CLI::Validator {
     AllocatorValidator()
     {
-      func_ = [](const std::string &str) {
-        if (str != "Quick" && str != "Host" && str != "malloc") {
-          return std::string("Invalid Allocator name, must be Host, Quick, or malloc");
+      func_ = [](const std::string& str) {
+        if (str != "Quick" && str != "Host" && str != "HostFast" && str != "HostStats" && str != "malloc") {
+          return std::string("Invalid Allocator name, must be Host, HostFast, HostStats, Quick, or malloc");
         } else
           return std::string();
       };
     }
   };
 
-private:
+ private:
   const std::string allocator_to_use;
   const std::size_t number_of_allocs;
   const bool no_introspection;
@@ -184,8 +183,7 @@ private:
 
     if (is_umpire_allocator) {
       ptr = umpire_allocator.allocate(n);
-    }
-    else {
+    } else {
       ptr = ::malloc(n);
     }
 
@@ -196,48 +194,49 @@ private:
   {
     if (is_umpire_allocator) {
       umpire_allocator.deallocate(ptr);
-    }
-    else {
+    } else {
       ::free(ptr);
     }
   }
-
 };
 
 std::ostream& operator<<(std::ostream& os, const AllocatorCostBenchmark& acb)
 {
   os << acb.number_of_allocs << " 4-byte allocs from " << acb.allocator_to_use;
-  if (acb.is_umpire_allocator)
-    os << (acb.no_introspection ? std::string{"{Intro OFF}"} : std::string{"{Intro ON}"});
+  if (acb.is_umpire_allocator) {
+    if (acb.allocator_to_use == "HostFast") {
+      os << "{Untracked}";
+    } else if (acb.allocator_to_use == "HostStats") {
+      os << "{StatsOnly}";
+    } else {
+      os << (acb.no_introspection ? std::string{"{Intro OFF}"} : std::string{"{Intro ON}"});
+    }
+  }
 
   if (acb.show_process_mem_info) {
     os << std::endl;
-    for ( auto& m : acb.mstat.stat ) {
+    for (auto& m : acb.mstat.stat) {
       const std::size_t total{m.second};
-      std::unordered_map<std::string,std::size_t>::const_iterator base_it = acb.mstat_baseline.stat.find(m.first);
+      std::unordered_map<std::string, std::size_t>::const_iterator base_it = acb.mstat_baseline.stat.find(m.first);
       const std::size_t baseline{base_it->second};
       const std::size_t cost{total - baseline};
 
-      os
-        << m.first << " "
-        << "Total{" << pretty(total) << "}, "
-        << "Baseline{" << pretty(baseline) << "}, "
-        << "Cost{" << pretty(cost) << "}, "
-        << "or {" << pretty(cost / acb.number_of_allocs) << "}/allocation"
-        << std::endl;
+      os << m.first << " "
+         << "Total{" << pretty(total) << "}, "
+         << "Baseline{" << pretty(baseline) << "}, "
+         << "Cost{" << pretty(cost) << "}, "
+         << "or {" << pretty(cost / acb.number_of_allocs) << "}/allocation" << std::endl;
     }
-  }
-  else {
-    std::unordered_map<std::string,std::size_t>::const_iterator total_it = acb.mstat.stat.find(hwm_name);
-    std::unordered_map<std::string,std::size_t>::const_iterator base_it = acb.mstat_baseline.stat.find(hwm_name);
+  } else {
+    std::unordered_map<std::string, std::size_t>::const_iterator total_it = acb.mstat.stat.find(hwm_name);
+    std::unordered_map<std::string, std::size_t>::const_iterator base_it = acb.mstat_baseline.stat.find(hwm_name);
     const std::size_t total{total_it->second};
     const std::size_t baseline{base_it->second};
     const std::size_t cost{total - baseline};
     double allocs = static_cast<double>(acb.number_of_allocs);
-    os << " uses " << pretty(cost) << " of memory, costing "
-      << pretty(cost / acb.number_of_allocs) << ", and "
-      << std::chrono::duration_cast<std::chrono::nanoseconds>(acb.elapsed_time).count() / allocs << " nanoseconds per allocation"
-      << std::endl;
+    os << " uses " << pretty(cost) << " of memory, costing " << pretty(cost / acb.number_of_allocs) << ", and "
+       << std::chrono::duration_cast<std::chrono::nanoseconds>(acb.elapsed_time).count() / allocs
+       << " nanoseconds per allocation" << std::endl;
   }
 
   return os;
@@ -251,18 +250,19 @@ int main(int argc, char* argv[])
 
   std::string allocator;
   app.add_option("-a,--use-allocator", allocator,
-      "Specify Allocator to use: 'Host', 'Quick', or 'malloc'.\n"
-      "When 'malloc' is specified, use the raw system call (no Umpire).\n"
-      "When 'Host' is specified, use HOST Umpire resource allocator.\n"
-      "When 'Quick' is specified, use the Umpire Quickpool allocator.\n"
-      )
-    ->required()
-    ->check(valid_allocator);
+                 "Specify Allocator to use: 'Host', 'Quick', or 'malloc'.\n"
+                 "When 'malloc' is specified, use the raw system call (no Umpire).\n"
+                 "When 'Host' is specified, use HOST Umpire resource allocator.\n"
+                 "When 'HostFast' is specified, use the untracked HOST_FAST allocator.\n"
+                 "When 'HostStats' is specified, use a statistics-only HOST resource allocator.\n"
+                 "When 'Quick' is specified, use the Umpire Quickpool allocator.\n")
+      ->required()
+      ->check(valid_allocator);
 
   std::size_t allocations;
   app.add_option("-n,--num-allocations", allocations, "Specify number of allocations to perform")
-    ->required()
-    ->check(CLI::Range(0, 100000000));
+      ->required()
+      ->check(CLI::Range(0, 100000000));
 
   bool no_introspection{false};
   app.add_flag("--no_introspection", no_introspection, "Disable introspection");
@@ -281,11 +281,10 @@ int main(int argc, char* argv[])
   AllocatorCostBenchmark bm{allocator, allocations, no_introspection, show_process_mem_info};
 
   if (measure_time_overhead) {
-     bm.run_time_benchmark();
-  }
-  else if (measure_space_overhead) {
-     bm.run_space_benchmark();
-     std::cout << bm;
+    bm.run_time_benchmark();
+  } else if (measure_space_overhead) {
+    bm.run_space_benchmark();
+    std::cout << bm;
   }
 
   return 0;

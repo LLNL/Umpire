@@ -19,6 +19,7 @@ Allocator::Allocator(strategy::AllocationStrategy* allocator) noexcept
       strategy::mixins::AllocateNull{},
       m_allocator{allocator},
       m_tracking{allocator->isTracked()},
+      m_statistics_tracking{allocator->isStatisticsOnlyTracked()},
       m_thread_safe{(dynamic_cast<umpire::strategy::ThreadSafeAllocator*>(allocator) != nullptr)}
 {
   m_thread_safe_mutex =
@@ -95,6 +96,11 @@ Platform Allocator::getPlatform() noexcept
 bool Allocator::isTracked() const noexcept
 {
   return m_allocator->isTracked();
+}
+
+Tracking Allocator::getTracking() const noexcept
+{
+  return m_allocator->getTracking();
 }
 
 const std::string& Allocator::getStrategyName() const noexcept

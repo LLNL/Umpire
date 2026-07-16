@@ -11,9 +11,11 @@
 #include <memory>
 #include <ostream>
 #include <string>
+#include <unordered_map>
 
 #include "camp/camp.hpp"
 #include "camp/resource.hpp"
+#include "umpire/Tracking.hpp"
 #include "umpire/util/MemoryResourceTraits.hpp"
 #include "umpire/util/Platform.hpp"
 
@@ -133,6 +135,8 @@ class AllocationStrategy {
   virtual bool tracksMemoryUse() const noexcept;
 
   bool isTracked() const noexcept;
+  bool isStatisticsOnlyTracked() const noexcept;
+  Tracking getTracking() const noexcept;
 
   std::size_t m_current_size{0};
   std::size_t m_high_watermark{0};
@@ -140,13 +144,18 @@ class AllocationStrategy {
 
  protected:
   void setTracking(bool) noexcept;
+  void setTracking(Tracking) noexcept;
+
+  void registerAllocationStatistics(void* ptr, std::size_t size);
+  std::size_t deregisterAllocationStatistics(void* ptr);
 
   std::string m_name;
   std::string m_strategy_name;
   int m_id;
-  bool m_tracked{true};
+  Tracking m_tracking{Tracking::Tracked};
 
   AllocationStrategy* m_parent;
+  std::unordered_map<void*, std::size_t> m_statistics_allocations;
 
  private:
   /*!

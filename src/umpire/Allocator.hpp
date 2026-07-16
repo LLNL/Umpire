@@ -15,6 +15,7 @@
 
 #include "camp/camp.hpp"
 #include "camp/resource.hpp"
+#include "umpire/Tracking.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/mixins/AllocateNull.hpp"
 #include "umpire/strategy/mixins/Inspector.hpp"
@@ -181,6 +182,7 @@ class Allocator : private strategy::mixins::Inspector, strategy::mixins::Allocat
   Platform getPlatform() noexcept;
 
   bool isTracked() const noexcept;
+  Tracking getTracking() const noexcept;
 
   const std::string& getStrategyName() const noexcept;
 
@@ -206,6 +208,7 @@ class Allocator : private strategy::mixins::Inspector, strategy::mixins::Allocat
   umpire::strategy::AllocationStrategy* m_allocator;
 
   bool m_tracking{true};
+  bool m_statistics_tracking{false};
 
   /*!
    * \brief Implementation to conditionally make Allocator thread-safe
