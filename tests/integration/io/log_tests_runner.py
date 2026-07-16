@@ -49,6 +49,8 @@ def run_test():
     import subprocess
     import os
 
+    # Test 1: Basic logging with Debug level
+    print("\n{BLUE}Test 1: Basic logging with Debug level{END}".format(**formatters))
     test_env = {"UMPIRE_LOG_LEVEL" : "Debug"}
     cmd_args = ['./log_tests']
     test_program = subprocess.Popen(cmd_args,
@@ -67,7 +69,56 @@ def run_test():
 
     check_file_exists(output_filename)
     with open(output_filename) as output_file:
-        check_output(output_filename, output_file, 'initialize Umpire')
+        check_output(output_filename, output_file, 'Test log message from log_tests')
+
+    # Test 2: Async logging
+    print("\n{BLUE}Test 2: Async logging{END}".format(**formatters))
+    test_env = {
+        "UMPIRE_LOG_LEVEL": "Info",
+        "UMPIRE_LOG_ASYNC": "on",
+        "UMPIRE_LOG_QUEUE_SIZE": "4096"
+    }
+    test_program = subprocess.Popen(cmd_args,
+            env=dict(os.environ, **test_env),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            shell=False)
+    pid = test_program.pid
+    test_program.wait()
+
+    output_filename = 'umpire.{pid}.{uid}.log'.format(uid=file_uid, pid=pid)
+    check_file_exists(output_filename)
+    with open(output_filename) as output_file:
+        check_output(output_filename, output_file, 'Test log message from log_tests')
+
+    # Test 3: Console disabled
+    print("\n{BLUE}Test 3: Console output disabled{END}".format(**formatters))
+    test_env = {
+        "UMPIRE_LOG_LEVEL": "Info",
+        "UMPIRE_LOG_TO_CONSOLE": "off"
+    }
+    test_program = subprocess.Popen(cmd_args,
+            env=dict(os.environ, **test_env),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            shell=False)
+    pid = test_program.pid
+    test_program.wait()
+
+    # stderr should be empty when console is disabled
+    stderr_output = test_program.stderr.read().decode('utf-8')
+    if 'Test log message from log_tests' in stderr_output:
+        print("{RED}[   ERROR]{END} Found log message in stderr when console should be disabled".format(**formatters))
+        global errors
+        errors += 1
+    else:
+        print("{BLUE}[      OK]{END} Console output correctly disabled".format(**formatters))
+
+    # File should still have the log
+    output_filename = 'umpire.{pid}.{uid}.log'.format(uid=file_uid, pid=pid)
+    check_file_exists(output_filename)
+    with open(output_filename) as output_file:
+        check_output(output_filename, output_file, 'Test log message from log_tests')
 
 if __name__ == '__main__':
     import sys

@@ -112,9 +112,14 @@ void Logger::initialize()
                                         case_insensitive_match(env_async, "true") ||
                                         case_insensitive_match(env_async, "on")));
 
-  // Get queue size for async logging
+  // Get queue size for async logging (default 8192, minimum 1024)
   const char* env_queue_size = std::getenv("UMPIRE_LOG_QUEUE_SIZE");
-  const size_t queue_size = env_queue_size ? std::atoi(env_queue_size) : 8192;
+  size_t queue_size = 8192;
+  if (env_queue_size) {
+    const int parsed_size = std::atoi(env_queue_size);
+    // Validate: must be positive and at least 1024 to avoid performance issues
+    queue_size = (parsed_size > 0) ? std::max(1024, parsed_size) : 8192;
+  }
 
   // Initialize async thread pool if needed
   if (use_async && !spdlog::thread_pool()) {
@@ -129,11 +134,18 @@ void Logger::initialize()
   auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(log_filename, false);
   sinks.push_back(file_sink);
 
-  // Optional console sink
+  // Console sink - enabled by default for backward compatibility
+  // Users can disable with UMPIRE_LOG_TO_CONSOLE=0 or UMPIRE_LOG_TO_CONSOLE=off
   const char* env_console = std::getenv("UMPIRE_LOG_TO_CONSOLE");
-  const bool log_to_console = (env_console && (std::string(env_console) == "1" ||
-                                                case_insensitive_match(env_console, "true") ||
-                                                case_insensitive_match(env_console, "on")));
+  bool log_to_console = true; // default to true for backward compatibility
+  if (env_console) {
+    const std::string console_val(env_console);
+    // Explicitly check for disabled values
+    if (console_val == "0" || case_insensitive_match(console_val, "false") ||
+        case_insensitive_match(console_val, "off")) {
+      log_to_console = false;
+    }
+  }
   if (log_to_console) {
     auto console_sink = std::make_shared<spdlog::sinks::stderr_color_sink_mt>();
     sinks.push_back(console_sink);
@@ -163,20 +175,23 @@ void Logger::initialize()
 
 void Logger::finalize()
 {
-  // Do nothing during finalize to avoid static destruction order issues.
+  // Attempt to flush the logger to ensure all messages are written.
+  // We don't reset the logger or destroy it to avoid static destruction order issues.
   // When ResourceManager is destroyed during static destruction (e.g., in tests
   // that create a static ResourceManager reference), attempting to clean up the
   // logger can cause segfaults because:
   // 1. spdlog's internal state (sinks, file handles) may already be destroyed
   // 2. Even resetting the shared_ptr can crash if the control block is corrupted
   //
-  // It's safe to leak the logger here because:
-  // - Normal program exit will close all file handles and free all memory
-  // - The logger's file sink will flush on destruction if still valid
-  // - Process cleanup handles everything automatically
-  //
-  // This is only an issue for tests with static ResourceManager instances.
-  // Normal usage (where ResourceManager is created/destroyed in main) works fine.
+  // By only flushing (not destroying), we ensure logs are written while avoiding
+  // the static destruction order problem.
+  if (s_logger) {
+    try {
+      s_logger->flush();
+    } catch (...) {
+      // Ignore any errors during shutdown - spdlog internals may already be destroyed
+    }
+  }
 }
 
 bool Logger::shouldLog(message::Level level) noexcept

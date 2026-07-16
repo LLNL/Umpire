@@ -184,21 +184,35 @@ if (NOT TARGET spdlog::spdlog)
       # Configure spdlog to use external fmt (if available)
       if (TARGET ${UMPIRE_FMT_TARGET})
         set(SPDLOG_FMT_EXTERNAL ON CACHE BOOL "Use external fmt library")
+        message(STATUS "Configuring spdlog to use external fmt library: ${UMPIRE_FMT_TARGET}")
 
         # Help spdlog find the fmt package by setting fmt_DIR
         # This works whether fmt is external or from our submodule
         if (DEFINED fmt_DIR)
           # External fmt case - use the user-provided path
-          # User must set SPDLOG_FMT_EXTERNAL_HO themselves if their fmt is header-only
+          message(STATUS "Using external fmt from: ${fmt_DIR}")
           set(fmt_DIR ${fmt_DIR} CACHE PATH "Path to fmt")
+
+          # Check if the external fmt is header-only and warn user if needed
+          get_target_property(fmt_type ${UMPIRE_FMT_TARGET} TYPE)
+          if (fmt_type STREQUAL "INTERFACE_LIBRARY")
+            message(STATUS "External fmt appears to be header-only, setting SPDLOG_FMT_EXTERNAL_HO")
+            set(SPDLOG_FMT_EXTERNAL_HO ON CACHE BOOL "Use external fmt header-only library")
+          else()
+            if (NOT DEFINED SPDLOG_FMT_EXTERNAL_HO)
+              message(STATUS "External fmt is not header-only. If you encounter linking issues, set SPDLOG_FMT_EXTERNAL_HO=ON")
+            endif()
+          endif()
         else ()
           # Submodule fmt case - point to build directory where fmt exports its config
           # We built fmt as header-only, so tell spdlog
+          message(STATUS "Using Umpire's bundled fmt submodule (header-only mode)")
           set(SPDLOG_FMT_EXTERNAL_HO ON CACHE BOOL "Use external fmt header-only library")
           set(fmt_DIR ${CMAKE_BINARY_DIR}/src/tpl/umpire/fmt CACHE PATH "Path to fmt")
         endif ()
       else ()
         # No fmt available, let spdlog use its bundled fmt
+        message(STATUS "No external fmt found, spdlog will use its bundled fmt")
         set(SPDLOG_FMT_EXTERNAL OFF CACHE BOOL "Use external fmt library")
       endif ()
 
