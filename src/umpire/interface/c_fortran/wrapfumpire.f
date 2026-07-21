@@ -3443,6 +3443,12 @@ contains
         ! splicer end class.ResourceManager.method.make_allocator_resource_aware_pool
     end function resourcemanager_make_allocator_resource_aware_pool
 
+    !>
+    !! \brief Create a DynamicPoolList allocator with custom alignment
+    !!
+    !! Creates a tracked DynamicPoolList allocator with specified alignment.
+    !! The alignment parameter must be a power of 2 (e.g., 16, 32, 64, 128).
+    !<
     function make_alloc_dynamic_p_list_a(obj, name, allocator, &
             initial_size, block, alignment) &
             result(SHT_rv)
@@ -3462,6 +3468,12 @@ contains
         ! splicer end class.ResourceManager.method.make_allocator_list_pool_aligned
     end function make_alloc_dynamic_p_list_a
 
+    !>
+    !! \brief Create a QuickPool allocator with custom alignment
+    !!
+    !! Creates a tracked QuickPool allocator with specified alignment.
+    !! The alignment parameter must be a power of 2 (e.g., 16, 32, 64, 128).
+    !<
     function make_alloc_quick_p_a(obj, name, allocator, initial_size, &
             block, alignment) &
             result(SHT_rv)
@@ -3481,6 +3493,12 @@ contains
         ! splicer end class.ResourceManager.method.make_allocator_quick_pool_aligned
     end function make_alloc_quick_p_a
 
+    !>
+    !! \brief Create a ResourceAwarePool allocator with custom alignment
+    !!
+    !! Creates a tracked ResourceAwarePool allocator with specified alignment.
+    !! The alignment parameter must be a power of 2 (e.g., 16, 32, 64, 128).
+    !<
     function make_alloc_res_aware_p_a(obj, name, allocator, &
             initial_size, block, alignment) &
             result(SHT_rv)
@@ -3751,6 +3769,13 @@ contains
         ! splicer end class.ResourceManager.method.make_allocator_resource_aware_pool_untracked
     end function make_alloc_res_aware_p_u
 
+    !>
+    !! \brief Create an untracked DynamicPoolList allocator with custom alignment
+    !!
+    !! Creates an untracked DynamicPoolList allocator with specified alignment.
+    !! Untracked allocators do not track individual allocations for reduced overhead.
+    !! The alignment parameter must be a power of 2 (e.g., 16, 32, 64, 128).
+    !<
     function make_alloc_dynamic_p_list_au(obj, name, allocator, &
             initial_size, block, alignment) &
             result(SHT_rv)
@@ -3770,6 +3795,13 @@ contains
         ! splicer end class.ResourceManager.method.make_allocator_list_pool_aligned_untracked
     end function make_alloc_dynamic_p_list_au
 
+    !>
+    !! \brief Create an untracked QuickPool allocator with custom alignment
+    !!
+    !! Creates an untracked QuickPool allocator with specified alignment.
+    !! Untracked allocators do not track individual allocations for reduced overhead.
+    !! The alignment parameter must be a power of 2 (e.g., 16, 32, 64, 128).
+    !<
     function make_alloc_quick_p_au(obj, name, allocator, initial_size, &
             block, alignment) &
             result(SHT_rv)
@@ -3789,6 +3821,13 @@ contains
         ! splicer end class.ResourceManager.method.make_allocator_quick_pool_aligned_untracked
     end function make_alloc_quick_p_au
 
+    !>
+    !! \brief Create an untracked ResourceAwarePool allocator with custom alignment
+    !!
+    !! Creates an untracked ResourceAwarePool allocator with specified alignment.
+    !! Untracked allocators do not track individual allocations for reduced overhead.
+    !! The alignment parameter must be a power of 2 (e.g., 16, 32, 64, 128).
+    !<
     function make_alloc_res_aware_p_au(obj, name, allocator, &
             initial_size, block, alignment) &
             result(SHT_rv)
