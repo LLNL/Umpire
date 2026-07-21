@@ -61,16 +61,39 @@ include("${CMAKE_CURRENT_LIST_DIR}/BLTSetupTargets.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/umpire-targets.cmake")
 
 # Provide backwards-compatible non-namespaced targets unless explicitly disabled
-if (NOT @UMPIRE_DISABLE_ALIAS_TARGETS@)
+if (@UMPIRE_ENABLE_ALIAS_TARGETS@)
   if (NOT TARGET umpire)
-    add_library(umpire ALIAS umpire::umpire)
-    message(DEPRECATION
-      "Targets without namespace are deprecated, please use targets in the umpire:: namespace (e.g. umpire::umpire). "
-      "To disable this warning and backwards-compatible targets, set UMPIRE_DISABLE_ALIAS_TARGETS=ON when configuring Umpire.")
+    add_library(umpire INTERFACE IMPORTED)
+
+    # Get properties from the namespaced target to forward them
+    get_target_property(_umpire_include_dirs umpire::umpire INTERFACE_INCLUDE_DIRECTORIES)
+    get_target_property(_umpire_compile_defs umpire::umpire INTERFACE_COMPILE_DEFINITIONS)
+
+    set_target_properties(umpire PROPERTIES
+      INTERFACE_LINK_LIBRARIES umpire::umpire
+      INTERFACE_INCLUDE_DIRECTORIES "${_umpire_include_dirs}"
+      INTERFACE_COMPILE_DEFINITIONS "${_umpire_compile_defs}"
+      DEPRECATION "Target 'umpire' is deprecated. Please use 'umpire::umpire' instead. To disable this warning and backwards-compatible targets, set UMPIRE_ENABLE_ALIAS_TARGETS=OFF when configuring Umpire.")
+
+    unset(_umpire_include_dirs)
+    unset(_umpire_compile_defs)
   endif()
 
   if (TARGET umpire::umpire_device AND NOT TARGET umpire_device)
-    add_library(umpire_device ALIAS umpire::umpire_device)
+    add_library(umpire_device INTERFACE IMPORTED)
+
+    # Get properties from the namespaced target to forward them
+    get_target_property(_umpire_device_include_dirs umpire::umpire_device INTERFACE_INCLUDE_DIRECTORIES)
+    get_target_property(_umpire_device_compile_defs umpire::umpire_device INTERFACE_COMPILE_DEFINITIONS)
+
+    set_target_properties(umpire_device PROPERTIES
+      INTERFACE_LINK_LIBRARIES umpire::umpire_device
+      INTERFACE_INCLUDE_DIRECTORIES "${_umpire_device_include_dirs}"
+      INTERFACE_COMPILE_DEFINITIONS "${_umpire_device_compile_defs}"
+      DEPRECATION "Target 'umpire_device' is deprecated. Please use 'umpire::umpire_device' instead. To disable this warning and backwards-compatible targets, set UMPIRE_ENABLE_ALIAS_TARGETS=OFF when configuring Umpire.")
+
+    unset(_umpire_device_include_dirs)
+    unset(_umpire_device_compile_defs)
   endif()
 endif()
 
