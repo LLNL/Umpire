@@ -281,18 +281,6 @@ ensure_storage_dir ()
       print_warning "Unable to set group writable permissions on ${dir_path}"
 }
 
-set_storage_file_permissions ()
-{
-    local file_path="${1}"
-    if [[ -n "${umpire_ci_storage_group}" ]]
-    then
-        chgrp "${umpire_ci_storage_group}" "${file_path}" 2>/dev/null || \
-          print_warning "Unable to set group ${umpire_ci_storage_group} on ${file_path}"
-    fi
-    chmod g+rw "${file_path}" 2>/dev/null || \
-      print_warning "Unable to set group writable permissions on ${file_path}"
-}
-
 prepare_cache_storage ()
 {
     cache_target="$(resolve_cache_target)"
@@ -342,51 +330,6 @@ try_cached_hostconfig ()
     done
 
     return 1
-}
-
-configure_spack_storage ()
-{
-    local common_config upstream_config cache_root cache_install_tree cache_buildcache upstream_install_tree
-    common_config="${project_dir}/scripts/gitlab/umpire-ci-cache-common.yaml"
-    upstream_config="${project_dir}/scripts/gitlab/umpire-ci-cache-upstream.yaml"
-    cache_root="$(cache_root_for "${cache_target}")"
-    cache_install_tree="${cache_root}/install"
-    cache_buildcache="${cache_root}/buildcache"
-    upstream_install_tree="$(cache_root_for "${umpire_ci_upstream_target}")/install"
-
-    export UMPIRE_CI_INSTALL_TREE="${cache_install_tree}"
-    export UMPIRE_CI_BUILDCACHE="${cache_buildcache}"
-    export UMPIRE_CI_UPSTREAM_INSTALL_TREE="${upstream_install_tree}"
-    export UMPIRE_CI_UPSTREAM_TARGET="${umpire_ci_upstream_target}"
-    export UMPIRE_CI_STORAGE_GROUP="${umpire_ci_storage_group}"
-
-    run_section "spack_filesystem_cache" "Filesystem Spack cache configuration" "collapsed" \
-      "Configuring filesystem Spack cache failed" \
-      ${spack_cmd} -D "${spack_env_path}" config add "include:${common_config}"
-
-    if [[ "${cache_target}" != "${umpire_ci_upstream_target}" ]] && \
-       [[ -d "${upstream_install_tree}" && -d "${upstream_install_tree}/.spack-db" ]]
-    then
-        ${spack_cmd} -D "${spack_env_path}" config add "include:${upstream_config}"
-        print_info "Using ${umpire_ci_upstream_target} install tree as Spack upstream: ${upstream_install_tree}"
-    fi
-}
-
-publish_cached_hostconfig ()
-{
-    local generated_hostconfig="${1}"
-    local cache_root cache_hostconfigs_dir target_hostconfig tmp_hostconfig
-    cache_root="$(cache_root_for "${cache_target}")"
-    cache_hostconfigs_dir="${cache_root}/host-configs"
-    target_hostconfig="${cache_hostconfigs_dir}/${cache_key}.cmake"
-    tmp_hostconfig="${target_hostconfig}.tmp.$$"
-
-    cp "${generated_hostconfig}" "${tmp_hostconfig}"
-    mv "${tmp_hostconfig}" "${target_hostconfig}"
-    set_storage_file_permissions "${target_hostconfig}"
-    cp "${target_hostconfig}" "${generated_hostconfig}"
-
-    print_info "Published cached host-config: ${target_hostconfig}"
 }
 
 find_project_hostconfig ()
@@ -458,15 +401,6 @@ print_info "project_dir: ${project_dir}"
 
 mkdir -p ${prefix}
 
-spack_cmd="${prefix}/spack/bin/spack"
-spack_env_path="${prefix}/spack_env"
-uberenv_cmd="${project_dir}/scripts/uberenv/uberenv.py"
-if [[ ${spack_debug} == true ]]
-then
-    spack_cmd="${spack_cmd} --debug --stacktrace"
-    uberenv_cmd="${uberenv_cmd} --spack-debug"
-fi
-
 ###############################################################################
 # BUILD DEPENDENCIES
 ###############################################################################
@@ -490,53 +424,24 @@ then
 
     if [[ "${cache_hit}" != true ]]
     then
-        prefix_opt="--prefix=${prefix}"
+        export PROJECT_DIR="${project_dir}"
+        export PREFIX="${prefix}"
+        export SPEC="${spec}"
+        export SPACK_DEBUG="${spack_debug}"
+        export CACHE_TARGET="${cache_target}"
+        export CACHE_KEY="${cache_key}"
+        export UMPIRE_CI_STORAGE_ROOT="${umpire_ci_storage_root}"
+        export UMPIRE_CI_STORAGE_GROUP="${umpire_ci_storage_group}"
+        export UMPIRE_CI_STORAGE_UMASK="${umpire_ci_storage_umask}"
+        export UMPIRE_CI_UPSTREAM_TARGET="${umpire_ci_upstream_target}"
+        export PUSH_TO_REGISTRY="${push_to_registry}"
+        export CI_REGISTRY_IMAGE="${ci_registry_image}"
+        export CI_REGISTRY_USER="${ci_registry_user}"
+        export CI_REGISTRY_TOKEN="${ci_registry_token}"
 
-        # We force Spack to put all generated files (cache and configuration of
-        # all sorts) in a unique location so that there can be no collision
-        # with existing or concurrent Spack.
-        spack_user_cache="${prefix}/spack-user-cache"
-        export SPACK_DISABLE_LOCAL_CONFIG=""
-        export SPACK_USER_CACHE_PATH="${spack_user_cache}"
-        mkdir -p ${spack_user_cache}
-
-        # generate cmake cache file with uberenv and radiuss spack package
-        run_section "spack_setup" "Spack setup and environment" "collapsed" \
-          "Spack environment setup failed (Uberenv)" \
-          ${uberenv_cmd} --setup-and-env-only --spec="${spec}" ${prefix_opt}
-
-        if [[ -z "${hostconfig}" ]]
-        then
-            configure_spack_storage
-        fi
-
-        if [[ -n ${ci_registry_token} && ${push_to_registry} == true ]]
-        then
-            run_section "registry_setup" "GitLab registry as Spack Buildcache" "collapsed" \
-              "Adding gitlab registry to spack environment failed" \
-              ${spack_cmd} -D ${spack_env_path} mirror add --unsigned --oci-username-variable ci_registry_user --oci-password-variable ci_registry_token gitlab_ci oci://${ci_registry_image}
-        fi
-
-        run_section "spack_build" "Spack build of dependencies" "collapsed" \
-          "Spack build of dependencies failed (Uberenv)" \
-          ${uberenv_cmd} --skip-setup-and-env --spec="${spec}" ${prefix_opt}
-
-        if [[ -z "${hostconfig}" ]]
-        then
-            run_section "filesystem_buildcache_push" "Push dependencies to filesystem buildcache" "collapsed" \
-              "Pushing dependencies to filesystem buildcache failed" \
-              ${spack_cmd} -D ${spack_env_path} buildcache push --only dependencies --unsigned --update-index umpire_ci_buildcache
-
-            find_project_hostconfig || exit 1
-            publish_cached_hostconfig "${project_hostconfig_result}"
-        fi
-
-        if [[ -n ${ci_registry_token} && ${push_to_registry} == true ]]
-        then
-            run_section "registry_buildcache_push" "Push dependencies to GitLab registry buildcache" "collapsed" \
-              "Pushing dependencies to gitlab registry failed" \
-              ${spack_cmd} -D ${spack_env_path} buildcache push --only dependencies gitlab_ci
-        fi
+        run_section "cache_miss" "Building dependencies on cache miss" "collapsed" \
+          "Spack dependency build failed" \
+          bash "${project_dir}/scripts/gitlab/build_deps_on_cache_miss.sh"
     fi
 
     section_end
