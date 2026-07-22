@@ -61,11 +61,6 @@ export ci_registry_token=${CI_JOB_TOKEN:-"${registry_token}"}
 cache_hit=false
 cache_key=""
 cache_target=""
-cache_root=""
-cache_hostconfig_path=""
-cache_install_tree=""
-cache_buildcache=""
-cache_hostconfigs_dir=""
 project_hostconfig_result=""
 
 ###############################################################################
@@ -139,6 +134,16 @@ resolve_cache_key ()
       "uberenv-commit=$(git_commit "${project_dir}/scripts/uberenv")" \
       "radiuss-spack-configs-commit=$(git_commit "${project_dir}/scripts/radiuss-spack-configs")" | \
       sha256_hex
+}
+
+cache_root_for ()
+{
+    local target="${1}"
+    printf '%s/%s/%s/%s' \
+      "${umpire_ci_storage_root}" \
+      "${SYS_TYPE:-unknown}" \
+      "${CI_MACHINE:-${truehostname}}" \
+      "${target}"
 }
 
 # Portable UTC timestamp formatter for epoch seconds.
@@ -288,28 +293,15 @@ set_storage_file_permissions ()
       print_warning "Unable to set group writable permissions on ${file_path}"
 }
 
-set_cache_paths ()
-{
-    local target="${1}"
-    cache_root="${umpire_ci_storage_root}/${SYS_TYPE:-unknown}/${CI_MACHINE:-${truehostname}}/${target}"
-    cache_install_tree="${cache_root}/install"
-    cache_buildcache="${cache_root}/buildcache"
-    cache_hostconfigs_dir="${cache_root}/host-configs"
-    cache_hostconfig_path="${cache_hostconfigs_dir}/${cache_key}.cmake"
-}
-
-cache_has_hostconfig ()
-{
-    [[ -f "${cache_hostconfig_path}" ]] || return 1
-    [[ -d "${cache_install_tree}" && -d "${cache_install_tree}/.spack-db" ]] || return 1
-    return 0
-}
-
 prepare_cache_storage ()
 {
     cache_target="$(resolve_cache_target)"
     cache_key="$(resolve_cache_key)"
-    set_cache_paths "${cache_target}"
+    local cache_root cache_install_tree cache_buildcache cache_hostconfigs_dir
+    cache_root="$(cache_root_for "${cache_target}")"
+    cache_install_tree="${cache_root}/install"
+    cache_buildcache="${cache_root}/buildcache"
+    cache_hostconfigs_dir="${cache_root}/host-configs"
 
     umask "${umpire_ci_storage_umask}"
     ensure_storage_dir "${cache_install_tree}"
@@ -329,10 +321,17 @@ try_cached_hostconfig ()
         targets+=("${umpire_ci_upstream_target}")
     fi
 
+    local target cache_root cache_install_tree cache_hostconfigs_dir cache_hostconfig_path
     for target in "${targets[@]}"
     do
-        set_cache_paths "${target}"
-        if [[ "${umpire_ci_force_spack}" != true ]] && cache_has_hostconfig
+        cache_root="$(cache_root_for "${target}")"
+        cache_install_tree="${cache_root}/install"
+        cache_hostconfigs_dir="${cache_root}/host-configs"
+        cache_hostconfig_path="${cache_hostconfigs_dir}/${cache_key}.cmake"
+
+        if [[ "${umpire_ci_force_spack}" != true ]] && \
+           [[ -f "${cache_hostconfig_path}" ]] && \
+           [[ -d "${cache_install_tree}" && -d "${cache_install_tree}/.spack-db" ]]
         then
             cp "${cache_hostconfig_path}" "${project_dir}/$(basename "${cache_hostconfig_path}")"
             hostconfig="$(basename "${cache_hostconfig_path}")"
@@ -342,18 +341,18 @@ try_cached_hostconfig ()
         fi
     done
 
-    set_cache_paths "${cache_target}"
     return 1
 }
 
 configure_spack_storage ()
 {
-    local common_config
-    local upstream_config
-    local upstream_install_tree
+    local common_config upstream_config cache_root cache_install_tree cache_buildcache upstream_install_tree
     common_config="${project_dir}/scripts/gitlab/umpire-ci-cache-common.yaml"
     upstream_config="${project_dir}/scripts/gitlab/umpire-ci-cache-upstream.yaml"
-    upstream_install_tree="${umpire_ci_storage_root}/${SYS_TYPE:-unknown}/${CI_MACHINE:-${truehostname}}/${umpire_ci_upstream_target}/install"
+    cache_root="$(cache_root_for "${cache_target}")"
+    cache_install_tree="${cache_root}/install"
+    cache_buildcache="${cache_root}/buildcache"
+    upstream_install_tree="$(cache_root_for "${umpire_ci_upstream_target}")/install"
 
     export UMPIRE_CI_INSTALL_TREE="${cache_install_tree}"
     export UMPIRE_CI_BUILDCACHE="${cache_buildcache}"
@@ -365,7 +364,8 @@ configure_spack_storage ()
       "Configuring filesystem Spack cache failed" \
       ${spack_cmd} -D "${spack_env_path}" config add "include:${common_config}"
 
-    if [[ "${cache_target}" != "${umpire_ci_upstream_target}" ]] && [[ -d "${upstream_install_tree}" && -d "${upstream_install_tree}/.spack-db" ]]
+    if [[ "${cache_target}" != "${umpire_ci_upstream_target}" ]] && \
+       [[ -d "${upstream_install_tree}" && -d "${upstream_install_tree}/.spack-db" ]]
     then
         ${spack_cmd} -D "${spack_env_path}" config add "include:${upstream_config}"
         print_info "Using ${umpire_ci_upstream_target} install tree as Spack upstream: ${upstream_install_tree}"
@@ -375,8 +375,11 @@ configure_spack_storage ()
 publish_cached_hostconfig ()
 {
     local generated_hostconfig="${1}"
-    local target_hostconfig="${cache_hostconfigs_dir}/${cache_key}.cmake"
-    local tmp_hostconfig="${target_hostconfig}.tmp.$$"
+    local cache_root cache_hostconfigs_dir target_hostconfig tmp_hostconfig
+    cache_root="$(cache_root_for "${cache_target}")"
+    cache_hostconfigs_dir="${cache_root}/host-configs"
+    target_hostconfig="${cache_hostconfigs_dir}/${cache_key}.cmake"
+    tmp_hostconfig="${target_hostconfig}.tmp.$$"
 
     cp "${generated_hostconfig}" "${tmp_hostconfig}"
     mv "${tmp_hostconfig}" "${target_hostconfig}"
