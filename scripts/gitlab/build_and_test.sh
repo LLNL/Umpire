@@ -103,12 +103,6 @@ sha256_hex ()
     fi
 }
 
-file_sha256 ()
-{
-    local file_path="${1}"
-    sha256_hex < "${file_path}"
-}
-
 git_commit ()
 {
     local repo_path="${1}"
@@ -141,7 +135,7 @@ resolve_cache_key ()
       "module-list=${module_list}" \
       "sys-type=${SYS_TYPE:-unknown}" \
       "machine=${CI_MACHINE:-${truehostname}}" \
-      "uberenv-config-hash=$(file_sha256 "${project_dir}/.uberenv_config.json")" \
+      "uberenv-config-hash=$(sha256_hex < "${project_dir}/.uberenv_config.json")" \
       "uberenv-commit=$(git_commit "${project_dir}/scripts/uberenv")" \
       "radiuss-spack-configs-commit=$(git_commit "${project_dir}/scripts/radiuss-spack-configs")" | \
       sha256_hex
@@ -294,12 +288,6 @@ set_storage_file_permissions ()
       print_warning "Unable to set group writable permissions on ${file_path}"
 }
 
-install_tree_is_usable ()
-{
-    local install_tree="${1}"
-    [[ -d "${install_tree}" && -d "${install_tree}/.spack-db" ]]
-}
-
 set_cache_paths ()
 {
     local target="${1}"
@@ -313,7 +301,7 @@ set_cache_paths ()
 cache_has_hostconfig ()
 {
     [[ -f "${cache_hostconfig_path}" ]] || return 1
-    install_tree_is_usable "${cache_install_tree}" || return 1
+    [[ -d "${cache_install_tree}" && -d "${cache_install_tree}/.spack-db" ]] || return 1
     return 0
 }
 
@@ -377,7 +365,7 @@ configure_spack_storage ()
       "Configuring filesystem Spack cache failed" \
       ${spack_cmd} -D "${spack_env_path}" config add "include:${common_config}"
 
-    if [[ "${cache_target}" != "${umpire_ci_upstream_target}" ]] && install_tree_is_usable "${upstream_install_tree}"
+    if [[ "${cache_target}" != "${umpire_ci_upstream_target}" ]] && [[ -d "${upstream_install_tree}" && -d "${upstream_install_tree}/.spack-db" ]]
     then
         ${spack_cmd} -D "${spack_env_path}" config add "include:${upstream_config}"
         print_info "Using ${umpire_ci_upstream_target} install tree as Spack upstream: ${upstream_install_tree}"
