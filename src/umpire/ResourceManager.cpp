@@ -9,6 +9,8 @@
 #include <iterator>
 #include <memory>
 #include <sstream>
+#include <unordered_set>
+#include <algorithm>
 
 #include "umpire/Umpire.hpp"
 #include "umpire/config.hpp"
@@ -1116,9 +1118,38 @@ int ResourceManager::getNextId() noexcept
 std::string ResourceManager::getAllocatorInformation() const noexcept
 {
   std::ostringstream info;
+  std::unordered_set<std::string> seen_names;
+  bool has_names{false};
 
-  for (auto& it : m_allocators_by_name) {
-    info << *it.second << " ";
+  const auto append_name = [&](const std::string& name) {
+    if (name == s_null_resource_name || name == s_zero_byte_pool_name) {
+      return;
+    }
+
+    if (seen_names.insert(name).second) {
+      info << "\n  - " << name;
+      has_names = true;
+    }
+  };
+
+  for (const auto& name : resource::MemoryResourceRegistry::getInstance().getResourceNames()) {
+    append_name(name);
+  }
+
+  std::vector<std::string> extra_names;
+  extra_names.reserve(m_allocators_by_name.size());
+
+  for (const auto& it : m_allocators_by_name) {
+    extra_names.push_back(it.first);
+  }
+
+  std::sort(extra_names.begin(), extra_names.end());
+  for (const auto& name : extra_names) {
+    append_name(name);
+  }
+
+  if (!has_names) {
+    info << " (none)";
   }
 
   return info.str();
