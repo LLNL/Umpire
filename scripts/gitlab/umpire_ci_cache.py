@@ -46,13 +46,14 @@ def uberenv_config(project_dir):
 
 
 def cache_target():
+    upstream_target = env("UMPIRE_CI_UPSTREAM_TARGET_VALUE", "develop")
     target = env("UMPIRE_CI_CACHE_TARGET_VALUE")
     if target:
         return target
     if env("CI_MERGE_REQUEST_IID_VALUE"):
         return "mr-" + env("CI_MERGE_REQUEST_IID_VALUE")
-    if env("CI_COMMIT_BRANCH_VALUE") == env("CI_DEFAULT_BRANCH_VALUE", "main"):
-        return "main"
+    if env("CI_COMMIT_BRANCH_VALUE") == env("CI_DEFAULT_BRANCH_VALUE", upstream_target):
+        return upstream_target
     if env("CI_COMMIT_REF_SLUG_VALUE"):
         return "ref-" + env("CI_COMMIT_REF_SLUG_VALUE")
     return "manual"

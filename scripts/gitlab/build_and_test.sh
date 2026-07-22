@@ -49,6 +49,7 @@ umpire_ci_storage_group=${UMPIRE_CI_STORAGE_GROUP:-umpire}
 umpire_ci_storage_umask=${UMPIRE_CI_STORAGE_UMASK:-0002}
 umpire_ci_force_spack=${UMPIRE_CI_FORCE_SPACK:-false}
 umpire_ci_cache_target=${UMPIRE_CI_CACHE_TARGET:-""}
+umpire_ci_upstream_target=${UMPIRE_CI_UPSTREAM_TARGET:-develop}
 
 # REGISTRY_TOKEN allows you to provide your own personal access token to the CI
 # registry. Be sure to set the token with at least read access to the registry.
@@ -276,9 +277,10 @@ prepare_cache_storage ()
       SYS_TYPE_VALUE="${SYS_TYPE:-unknown}" \
       MACHINE_VALUE="${CI_MACHINE:-${truehostname}}" \
       UMPIRE_CI_CACHE_TARGET_VALUE="${umpire_ci_cache_target}" \
+      UMPIRE_CI_UPSTREAM_TARGET_VALUE="${umpire_ci_upstream_target}" \
       CI_MERGE_REQUEST_IID_VALUE="${CI_MERGE_REQUEST_IID:-}" \
       CI_COMMIT_BRANCH_VALUE="${CI_COMMIT_BRANCH:-}" \
-      CI_DEFAULT_BRANCH_VALUE="${CI_DEFAULT_BRANCH:-main}" \
+      CI_DEFAULT_BRANCH_VALUE="${CI_DEFAULT_BRANCH:-${umpire_ci_upstream_target}}" \
       CI_COMMIT_REF_SLUG_VALUE="${CI_COMMIT_REF_SLUG:-}" \
       python3 "${cache_helper}" prepare
     )"
@@ -298,9 +300,9 @@ prepare_cache_storage ()
 try_cached_hostconfig ()
 {
     local targets=("${cache_target}")
-    if [[ "${cache_target}" != "main" ]]
+    if [[ "${cache_target}" != "${umpire_ci_upstream_target}" ]]
     then
-        targets+=("main")
+        targets+=("${umpire_ci_upstream_target}")
     fi
 
     for target in "${targets[@]}"
@@ -324,24 +326,25 @@ configure_spack_storage ()
 {
     local common_config
     local upstream_config
-    local main_install_tree
+    local upstream_install_tree
     common_config="${project_dir}/scripts/gitlab/umpire-ci-cache-common.yaml"
     upstream_config="${project_dir}/scripts/gitlab/umpire-ci-cache-upstream.yaml"
-    main_install_tree="${umpire_ci_storage_root}/${SYS_TYPE:-unknown}/${CI_MACHINE:-${truehostname}}/main/install"
+    upstream_install_tree="${umpire_ci_storage_root}/${SYS_TYPE:-unknown}/${CI_MACHINE:-${truehostname}}/${umpire_ci_upstream_target}/install"
 
     export UMPIRE_CI_INSTALL_TREE="${cache_install_tree}"
     export UMPIRE_CI_BUILDCACHE="${cache_buildcache}"
-    export UMPIRE_CI_MAIN_INSTALL_TREE="${main_install_tree}"
+    export UMPIRE_CI_UPSTREAM_INSTALL_TREE="${upstream_install_tree}"
+    export UMPIRE_CI_UPSTREAM_TARGET="${umpire_ci_upstream_target}"
     export UMPIRE_CI_STORAGE_GROUP="${umpire_ci_storage_group}"
 
     run_section "spack_filesystem_cache" "Filesystem Spack cache configuration" "collapsed" \
       "Configuring filesystem Spack cache failed" \
       ${spack_cmd} -D "${spack_env_path}" config add "include:${common_config}"
 
-    if [[ "${cache_target}" != "main" ]] && install_tree_is_usable "${main_install_tree}"
+    if [[ "${cache_target}" != "${umpire_ci_upstream_target}" ]] && install_tree_is_usable "${upstream_install_tree}"
     then
         ${spack_cmd} -D "${spack_env_path}" config add "include:${upstream_config}"
-        print_info "Using main install tree as Spack upstream: ${main_install_tree}"
+        print_info "Using ${umpire_ci_upstream_target} install tree as Spack upstream: ${upstream_install_tree}"
     fi
 }
 
