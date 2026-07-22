@@ -63,11 +63,9 @@ cache_key=""
 cache_target=""
 cache_root=""
 cache_hostconfig_path=""
-cache_metadata_path=""
 cache_install_tree=""
 cache_buildcache=""
 cache_hostconfigs_dir=""
-cache_metadata_dir=""
 project_hostconfig_result=""
 
 ###############################################################################
@@ -255,17 +253,14 @@ set_cache_paths ()
     cache_install_tree="${cache_root}/install"
     cache_buildcache="${cache_root}/buildcache"
     cache_hostconfigs_dir="${cache_root}/host-configs"
-    cache_metadata_dir="${cache_root}/metadata"
     cache_hostconfig_path="${cache_hostconfigs_dir}/${cache_key}.cmake"
-    cache_metadata_path="${cache_metadata_dir}/${cache_key}.json"
 }
 
 cache_has_hostconfig ()
 {
     [[ -f "${cache_hostconfig_path}" ]] || return 1
-    [[ -f "${cache_metadata_path}" ]] || return 1
     install_tree_is_usable "${cache_install_tree}" || return 1
-    grep -q "\"cache_key\": \"${cache_key}\"" "${cache_metadata_path}"
+    return 0
 }
 
 prepare_cache_storage ()
@@ -290,7 +285,6 @@ prepare_cache_storage ()
     ensure_storage_dir "${cache_install_tree}"
     ensure_storage_dir "${cache_buildcache}"
     ensure_storage_dir "${cache_hostconfigs_dir}"
-    ensure_storage_dir "${cache_metadata_dir}"
 
     print_info "Umpire CI cache target: ${cache_target}"
     print_info "Umpire CI cache key: ${cache_key}"
@@ -348,41 +342,18 @@ configure_spack_storage ()
     fi
 }
 
-write_cache_metadata ()
-{
-    local metadata_path="${1}"
-    CACHE_KEY="${cache_key}" \
-    CACHE_TARGET="${cache_target}" \
-    SPEC_VALUE="${spec}" \
-    MODULE_LIST_VALUE="${module_list}" \
-    SYS_TYPE_VALUE="${SYS_TYPE:-unknown}" \
-    MACHINE_VALUE="${CI_MACHINE:-${truehostname}}" \
-    INSTALL_TREE="${cache_install_tree}" \
-    BUILDCACHE="${cache_buildcache}" \
-    PROJECT_DIR="${project_dir}" \
-    PREFIX="${prefix}" \
-    SPACK_ENV_PATH="${spack_env_path}" \
-    python3 "${cache_helper}" metadata "${metadata_path}"
-}
-
 publish_cached_hostconfig ()
 {
     local generated_hostconfig="${1}"
     local target_hostconfig="${cache_hostconfigs_dir}/${cache_key}.cmake"
-    local target_metadata="${cache_metadata_dir}/${cache_key}.json"
     local tmp_hostconfig="${target_hostconfig}.tmp.$$"
-    local tmp_metadata="${target_metadata}.tmp.$$"
 
     cp "${generated_hostconfig}" "${tmp_hostconfig}"
-    write_cache_metadata "${tmp_metadata}"
     mv "${tmp_hostconfig}" "${target_hostconfig}"
-    mv "${tmp_metadata}" "${target_metadata}"
     set_storage_file_permissions "${target_hostconfig}"
-    set_storage_file_permissions "${target_metadata}"
     cp "${target_hostconfig}" "${generated_hostconfig}"
 
     print_info "Published cached host-config: ${target_hostconfig}"
-    print_info "Published cache metadata: ${target_metadata}"
 }
 
 find_project_hostconfig ()

@@ -6,7 +6,6 @@
 # SPDX-License-Identifier: (MIT)
 ###############################################################################
 
-import datetime
 import hashlib
 import json
 import os
@@ -87,37 +86,7 @@ def prepare():
     print("cache_key=" + sh_quote(key))
 
 
-def metadata(output_path):
-    project_dir = env("PROJECT_DIR")
-    config = uberenv_config(project_dir)
-    data = {
-        "cache_format": "umpire-ci-v1",
-        "cache_key": env("CACHE_KEY"),
-        "cache_target": env("CACHE_TARGET"),
-        "created_at": datetime.datetime.utcnow().isoformat() + "Z",
-        "spec": env("SPEC_VALUE"),
-        "module_list": env("MODULE_LIST_VALUE"),
-        "sys_type": env("SYS_TYPE_VALUE", "unknown"),
-        "machine": env("MACHINE_VALUE"),
-        "spack_url": config.get("spack_url", ""),
-        "spack_branch": config.get("spack_branch", ""),
-        "spack_config_commit": config.get("spack_commit", ""),
-        "spack_commit": git_commit(os.path.join(env("PREFIX"), "spack")),
-        "spack_lock_hash": file_hash(os.path.join(env("SPACK_ENV_PATH"), "spack.lock")),
-        "uberenv_commit": git_commit(os.path.join(project_dir, "scripts/uberenv")),
-        "radiuss_configs_commit": git_commit(os.path.join(project_dir, "scripts/radiuss-spack-configs")),
-        "install_tree": env("INSTALL_TREE"),
-        "buildcache": env("BUILDCACHE"),
-    }
-    with open(output_path, "w") as fh:
-        json.dump(data, fh, indent=2, sort_keys=True)
-        fh.write("\n")
-
-
 if __name__ == "__main__":
-    if len(sys.argv) < 2 or sys.argv[1] not in ("prepare", "metadata"):
-        sys.exit("usage: umpire_ci_cache.py prepare|metadata [metadata-file]")
-    if sys.argv[1] == "prepare":
-        prepare()
-    else:
-        metadata(sys.argv[2])
+    if len(sys.argv) != 2 or sys.argv[1] != "prepare":
+        sys.exit("usage: umpire_ci_cache.py prepare")
+    prepare()
