@@ -14,4 +14,4 @@ packages:
     permissions:
       read: world
       write: group
-      group: "${UMPIRE_CI_STORAGE_GROUP}"
+      group: umpire
