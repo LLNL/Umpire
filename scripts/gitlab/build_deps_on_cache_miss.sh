@@ -21,70 +21,7 @@ truehostname="$(hostname)"
 truehostname="${truehostname//[0-9]/}"
 export ci_registry_user=${CI_REGISTRY_USER:-"${USER}"}
 export ci_registry_token=${CI_REGISTRY_TOKEN:-""}
-
-###############################################################################
-# HELPERS
-###############################################################################
-
-print_error ()
-{
-    local error_msg="${1}"
-    echo -e "\e[31m[Error]: ${error_msg}\e[0m"
-}
-
-print_warning ()
-{
-    local warning_msg="${1}"
-    echo -e "\e[1;30m[Warning]: ${warning_msg}\e[0m"
-}
-
-print_info ()
-{
-    local info_msg="${1}"
-    echo -e "[Information]: ${info_msg}"
-}
-
-section_start ()
-{
-    local section_name="${1}"
-    local section_title="${2}"
-    local section_state="${3:-""}"
-
-    local collapsed="false"
-    if [[ "${section_state}" == "collapsed" ]]
-    then
-        collapsed="true"
-    fi
-
-    local timestamp=$(date +%s)
-    echo -e "\e[0Ksection_start:${timestamp}:${section_name}[collapsed=${collapsed}]\r\e[0K${section_title}"
-}
-
-section_end ()
-{
-    local section_name="${1}"
-    local timestamp=$(date +%s)
-    echo -e "\e[0Ksection_end:${timestamp}:${section_name}\r\e[0K\e[0m"
-}
-
-run_section ()
-{
-    local section_name="$1"
-    local section_title="$2"
-    local section_state="$3"
-    local err_msg="$4"
-    shift 4
-
-    section_start "${section_name}" "${section_title}" "${section_state}"
-    if "$@"; then
-        section_end "${section_name}"
-    else
-        local status=$?
-        section_end "${section_name}"
-        print_error "${err_msg}"
-        exit ${status}
-    fi
-}
+. "${project_dir}/scripts/gitlab/gitlab_logs_helpers.bash"
 
 ensure_storage_dir ()
 {

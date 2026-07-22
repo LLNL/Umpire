@@ -35,6 +35,7 @@ option=${1:-""}
 hostname="$(hostname)"
 truehostname=${hostname//[0-9]/}
 project_dir="$(pwd)"
+. "${project_dir}/scripts/gitlab/gitlab_logs_helpers.bash"
 
 hostconfig=${HOST_CONFIG:-""}
 spec=${SPEC:-""}
@@ -66,27 +67,6 @@ project_hostconfig_result=""
 ###############################################################################
 # HELPER FUNCTIONS
 ###############################################################################
-
-# Helper function to print errors in red
-print_error ()
-{
-    local error_msg="${1}"
-    echo -e "\e[31m[Error]: ${error_msg}\e[0m"
-}
-
-# Helper function to print warnings in gray
-print_warning ()
-{
-    local warning_msg="${1}"
-    echo -e "\e[1;30m[Warning]: ${warning_msg}\e[0m"
-}
-
-# Helper function to print information
-print_info ()
-{
-    local info_msg="${1}"
-    echo -e "[Information]: ${info_msg}"
-}
 
 sha256_hex ()
 {
@@ -144,128 +124,6 @@ cache_root_for ()
       "${SYS_TYPE:-unknown}" \
       "${CI_MACHINE:-${truehostname}}" \
       "${target}"
-}
-
-# Portable UTC timestamp formatter for epoch seconds.
-format_utc_timestamp ()
-{
-    local timestamp="${1}"
-    # BSD/macOS date supports epoch conversion via: date -r <seconds>
-    if date -u -r "${timestamp}" "+%Y-%m-%d %H:%M:%S UTC" >/dev/null 2>&1
-    then
-        date -u -r "${timestamp}" "+%Y-%m-%d %H:%M:%S UTC"
-    else
-        # GNU date supports epoch conversion via: date -d "@<seconds>"
-        date -u -d "@${timestamp}" "+%Y-%m-%d %H:%M:%S UTC"
-    fi
-}
-
-# Portable elapsed time formatter (HH:MM:SS).
-format_elapsed_hms ()
-{
-    local elapsed="${1}"
-    printf '%02d:%02d:%02d' $((elapsed / 3600)) $(((elapsed % 3600) / 60)) $((elapsed % 60))
-}
-
-# Track script start time for elapsed time calculations
-script_start_time=$(date +%s)
-
-# Storage for section start times (supports nesting)
-declare -A section_start_times
-
-# Section stack for tracking nested sections
-section_id_stack=()
-section_counter=0
-section_indent=""
-
-# GitLab CI collapsible section helpers with nesting support
-section_start ()
-{
-    local section_name="${1}"
-    local section_title="${2}"
-    local section_state="${3:-""}"
-
-    local collapsed="false"
-    if [[ "${section_state}" == "collapsed" ]]
-    then
-        collapsed="true"
-    fi
-
-    # Generate unique section ID
-    section_counter=$((section_counter + 1))
-    local section_id="${section_name}_${section_counter}"
-
-    local timestamp=$(date +%s)
-    local current_time=$(format_utc_timestamp "${timestamp}")
-    local total_elapsed=$((timestamp - script_start_time))
-    local total_elapsed_formatted=$(format_elapsed_hms "${total_elapsed}")
-
-    # Store section start time for later calculation
-    section_start_times[${section_id}]=${timestamp}
-
-    # Push section ID onto stack
-    section_id_stack+=("${section_id}")
-
-    echo -e "\e[1;30m${section_indent}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\e[0m"
-    echo -e "\e[1;30m${section_indent}~ TIME                    | TOTAL    | SECTION  \e[0m"
-    echo -e "\e[1;30m${section_indent}~ ${current_time} | ${total_elapsed_formatted} | ${section_title}\e[0m"
-    echo -e "\e[0Ksection_start:${timestamp}:${section_id}[collapsed=${collapsed}]\r\e[0K${section_indent}~ ${section_title}"
-
-    # Increase indentation for nested sections
-    section_indent="${section_indent}  "
-}
-
-section_end ()
-{
-    # Pop section ID from stack
-    if [[ ${#section_id_stack[@]} -eq 0 ]]; then
-        print_warning "section_end called with empty stack"
-        return 1
-    fi
-
-    # Decrease indentation before displaying
-    section_indent="${section_indent%  }"
-
-    local stack_index=$((${#section_id_stack[@]} - 1))
-    local section_id="${section_id_stack[$stack_index]}"
-    unset section_id_stack[$stack_index]
-
-    local timestamp=$(date +%s)
-    local current_time=$(format_utc_timestamp "${timestamp}")
-    local total_elapsed=$((timestamp - script_start_time))
-    local total_elapsed_formatted=$(format_elapsed_hms "${total_elapsed}")
-
-    # Calculate section elapsed time
-    local section_start=${section_start_times[${section_id}]:-${timestamp}}
-    local section_elapsed=$((timestamp - section_start))
-    local section_elapsed_formatted=$(format_elapsed_hms "${section_elapsed}")
-
-    echo -e "\e[0Ksection_end:${timestamp}:${section_id}\r\e[0K\e[0m"
-    echo -e "\e[1;30m${section_indent}~ ${current_time} | ${total_elapsed_formatted} | ${section_elapsed_formatted}\e[0m"
-    echo -e "\e[1;30m${section_indent}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\e[0m"
-
-    # Clean up stored time
-    unset section_start_times[${section_id}]
-}
-
-# For convenience, a helper function to run a command within a section and handle errors
-run_section() {
-    local id="$1"
-    local title="$2"
-    local collapsed="$3"
-    local err_msg="$4"
-    local status=0
-    shift 4
-
-    section_start "$id" "$title" "$collapsed"
-    if "$@"; then
-        section_end
-    else
-        status=$?
-        section_end
-        print_error "$err_msg"
-        exit $status
-    fi
 }
 
 ensure_storage_dir ()
