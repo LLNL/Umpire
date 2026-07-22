@@ -395,7 +395,9 @@ void cleanup_cached_communicators()
   std::map<int, MPI_Comm>& comm = get_cached_communicators();
 
   for (auto c : comm) {
-    MPI_Comm_free(&c.second);
+    if (c.second != MPI_COMM_NULL) {
+      MPI_Comm_free(&c.second);
+    }
   }
 
   comm.clear();
