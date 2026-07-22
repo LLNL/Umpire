@@ -136,18 +136,20 @@ configure_spack_storage ()
 publish_cached_hostconfig ()
 {
     local generated_hostconfig="${1}"
-    local cache_root cache_hostconfigs_dir target_hostconfig tmp_hostconfig
+    local cache_root cache_hostconfigs_dir target_hostconfig tmp_hostconfig local_hostconfig
     cache_root="$(cache_root_for "${cache_target}")"
     cache_hostconfigs_dir="${cache_root}/host-configs"
     target_hostconfig="${cache_hostconfigs_dir}/${cache_key}.cmake"
     tmp_hostconfig="${target_hostconfig}.tmp.$$"
+    local_hostconfig="${project_dir}/${cache_key}.cmake"
 
     cp "${generated_hostconfig}" "${tmp_hostconfig}"
     mv "${tmp_hostconfig}" "${target_hostconfig}"
     set_storage_file_permissions "${target_hostconfig}"
-    cp "${target_hostconfig}" "${generated_hostconfig}"
+    cp "${target_hostconfig}" "${local_hostconfig}"
 
     print_info "Published cached host-config: ${target_hostconfig}"
+    print_info "Materialized host-config path: ${local_hostconfig}"
 }
 
 main ()

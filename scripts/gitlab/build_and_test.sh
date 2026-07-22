@@ -38,6 +38,7 @@ project_dir="$(pwd)"
 . "${project_dir}/scripts/gitlab/gitlab_logs_helpers.bash"
 
 hostconfig=${HOST_CONFIG:-""}
+hostconfig_path=""
 spec=${SPEC:-""}
 module_list=${MODULE_LIST:-""}
 job_unique_id=${CI_JOB_ID:-""}
@@ -61,7 +62,6 @@ export ci_registry_token=${CI_JOB_TOKEN:-"${registry_token}"}
 
 cache_key=""
 cache_target=""
-project_hostconfig_result=""
 
 ###############################################################################
 # HELPER FUNCTIONS
@@ -176,36 +176,13 @@ resolve_cached_hostconfig ()
         then
             cp "${cache_hostconfig_path}" "${project_dir}/$(basename "${cache_hostconfig_path}")"
             hostconfig="$(basename "${cache_hostconfig_path}")"
+            hostconfig_path="${project_dir}/${hostconfig}"
             print_info "Using cached host-config from ${target}: ${cache_hostconfig_path}"
             return 0
         fi
     done
 
     return 1
-}
-
-find_project_hostconfig ()
-{
-    local hostconfigs=()
-    project_hostconfig_result=""
-    shopt -s nullglob
-    hostconfigs=( "${project_dir}"/*.cmake )
-    shopt -u nullglob
-
-    if [[ ${#hostconfigs[@]} == 1 ]]
-    then
-        project_hostconfig_result="${hostconfigs[0]}"
-    elif [[ ${#hostconfigs[@]} == 0 ]]
-    then
-        print_error "No result for: ${project_dir}/*.cmake"
-        print_error "Spack generated host-config not found."
-        return 1
-    else
-        print_error "More than one result for: ${project_dir}/*.cmake"
-        print_error "${hostconfigs[@]}"
-        print_error "Please specify one with HOST_CONFIG variable"
-        return 1
-    fi
 }
 
 ###############################################################################
@@ -275,6 +252,7 @@ then
         fi
     else
         cache_miss=false
+        hostconfig_path="${project_dir}/${hostconfig}"
         print_info "HOST_CONFIG is set; skipping dependency installation and using provided host-config"
     fi
 
@@ -298,6 +276,14 @@ then
         run_section "cache_miss" "Building dependencies on cache miss" "collapsed" \
           "Spack dependency build failed" \
           bash "${project_dir}/scripts/gitlab/build_deps_on_cache_miss.sh"
+
+        hostconfig="${cache_key}.cmake"
+        hostconfig_path="${project_dir}/${hostconfig}"
+        if [[ ! -f "${hostconfig_path}" ]]
+        then
+            section_end ; print_error "Expected generated host-config not found: ${hostconfig_path}"
+            exit 1
+        fi
     fi
 
     section_end
@@ -306,15 +292,10 @@ fi
 ###############################################################################
 # HOST CONFIG / CMAKE CACHE FILE
 ###############################################################################
-if [[ -z ${hostconfig} ]]
+if [[ -z "${hostconfig_path}" ]]
 then
-    # If no host config file was provided, we assume it was generated.
-    # This means we are looking of a unique one in project dir.
-    find_project_hostconfig || exit 1
-    hostconfig_path=${project_hostconfig_result}
-else
-    # Using provided host-config file.
-    hostconfig_path="${project_dir}/${hostconfig}"
+    print_error "Host-config path is undefined. Provide HOST_CONFIG or run dependency setup."
+    exit 1
 fi
 
 hostconfig=$(basename ${hostconfig_path})
