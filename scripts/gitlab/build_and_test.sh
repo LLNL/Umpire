@@ -93,6 +93,60 @@ print_info ()
     echo -e "[Information]: ${info_msg}"
 }
 
+sha256_hex ()
+{
+    if command -v sha256sum >/dev/null 2>&1
+    then
+        sha256sum | awk '{print $1}'
+    else
+        shasum -a 256 | awk '{print $1}'
+    fi
+}
+
+file_sha256 ()
+{
+    local file_path="${1}"
+    sha256_hex < "${file_path}"
+}
+
+git_commit ()
+{
+    local repo_path="${1}"
+    git -C "${repo_path}" rev-parse HEAD 2>/dev/null || echo unknown
+}
+
+resolve_cache_target ()
+{
+    local upstream_target="${umpire_ci_upstream_target}"
+
+    if [[ -n "${umpire_ci_cache_target}" ]]
+    then
+        echo "${umpire_ci_cache_target}"
+    elif [[ "${CI_COMMIT_BRANCH:-}" == "${CI_DEFAULT_BRANCH:-${upstream_target}}" ]]
+    then
+        echo "${upstream_target}"
+    elif [[ -n "${CI_COMMIT_REF_SLUG:-}" ]]
+    then
+        echo "ref-${CI_COMMIT_REF_SLUG}"
+    else
+        echo "manual"
+    fi
+}
+
+resolve_cache_key ()
+{
+    printf '%s\n' \
+      "cache-format=umpire-ci-v1" \
+      "spec=${spec}" \
+      "module-list=${module_list}" \
+      "sys-type=${SYS_TYPE:-unknown}" \
+      "machine=${CI_MACHINE:-${truehostname}}" \
+      "uberenv-config-hash=$(file_sha256 "${project_dir}/.uberenv_config.json")" \
+      "uberenv-commit=$(git_commit "${project_dir}/scripts/uberenv")" \
+      "radiuss-spack-configs-commit=$(git_commit "${project_dir}/scripts/radiuss-spack-configs")" | \
+      sha256_hex
+}
+
 # Portable UTC timestamp formatter for epoch seconds.
 format_utc_timestamp ()
 {
@@ -265,20 +319,8 @@ cache_has_hostconfig ()
 
 prepare_cache_storage ()
 {
-    eval "$(
-      PROJECT_DIR="${project_dir}" \
-      SPEC_VALUE="${spec}" \
-      MODULE_LIST_VALUE="${module_list}" \
-      SYS_TYPE_VALUE="${SYS_TYPE:-unknown}" \
-      MACHINE_VALUE="${CI_MACHINE:-${truehostname}}" \
-      UMPIRE_CI_CACHE_TARGET_VALUE="${umpire_ci_cache_target}" \
-      UMPIRE_CI_UPSTREAM_TARGET_VALUE="${umpire_ci_upstream_target}" \
-      CI_MERGE_REQUEST_IID_VALUE="${CI_MERGE_REQUEST_IID:-}" \
-      CI_COMMIT_BRANCH_VALUE="${CI_COMMIT_BRANCH:-}" \
-      CI_DEFAULT_BRANCH_VALUE="${CI_DEFAULT_BRANCH:-${umpire_ci_upstream_target}}" \
-      CI_COMMIT_REF_SLUG_VALUE="${CI_COMMIT_REF_SLUG:-}" \
-      python3 "${cache_helper}" prepare
-    )"
+    cache_target="$(resolve_cache_target)"
+    cache_key="$(resolve_cache_key)"
     set_cache_paths "${cache_target}"
 
     umask "${umpire_ci_storage_umask}"
@@ -428,7 +470,6 @@ mkdir -p ${prefix}
 spack_cmd="${prefix}/spack/bin/spack"
 spack_env_path="${prefix}/spack_env"
 uberenv_cmd="${project_dir}/scripts/uberenv/uberenv.py"
-cache_helper="${project_dir}/scripts/gitlab/umpire_ci_cache.py"
 if [[ ${spack_debug} == true ]]
 then
     spack_cmd="${spack_cmd} --debug --stacktrace"
