@@ -103,6 +103,7 @@ resolve_cache_target ()
 
 resolve_cache_key ()
 {
+    # Cache identity captures inputs that materially affect dependency resolution.
     printf '%s\n' \
       "cache-format=umpire-ci-v1" \
       "spec=${spec}" \
@@ -140,6 +141,8 @@ ensure_storage_dir ()
 
 resolve_cached_hostconfig ()
 {
+    # Prepare branch-scoped cache storage, then try current target first and
+    # configured upstream target second for host-config reuse.
     cache_target="$(resolve_cache_target)"
     cache_key="$(resolve_cache_key)"
     local cache_root cache_install_tree cache_buildcache cache_hostconfigs_dir
@@ -174,6 +177,7 @@ resolve_cached_hostconfig ()
            [[ -f "${cache_hostconfig_path}" ]] && \
            [[ -d "${cache_install_tree}" && -d "${cache_install_tree}/.spack-db" ]]
         then
+            # Materialize a deterministic local path for downstream CMake steps.
             cp "${cache_hostconfig_path}" "${project_dir}/$(basename "${cache_hostconfig_path}")"
             hostconfig="$(basename "${cache_hostconfig_path}")"
             hostconfig_path="${project_dir}/${hostconfig}"
@@ -258,6 +262,7 @@ then
 
     if [[ "${cache_miss}" == true ]]
     then
+        # Miss path delegates the full dependency build/publish workflow.
         export PROJECT_DIR="${project_dir}"
         export PREFIX="${prefix}"
         export SPEC="${spec}"
@@ -277,6 +282,7 @@ then
           "Spack dependency build failed" \
           bash "${project_dir}/scripts/gitlab/build_deps_on_cache_miss.sh"
 
+        # Cache-miss script publishes host-config as <cache_key>.cmake.
         hostconfig="${cache_key}.cmake"
         hostconfig_path="${project_dir}/${hostconfig}"
         if [[ ! -f "${hostconfig_path}" ]]

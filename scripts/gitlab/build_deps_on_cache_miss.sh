@@ -125,6 +125,7 @@ configure_spack_storage ()
       "Configuring filesystem Spack cache failed" \
       run_spack -D "${prefix}/spack_env" config add "include:${common_config}"
 
+    # Non-upstream branches reuse the upstream install tree to minimize rebuilds.
     if [[ "${cache_target}" != "${umpire_ci_upstream_target}" ]] && \
        [[ -d "${upstream_install_tree}" && -d "${upstream_install_tree}/.spack-db" ]]
     then
@@ -146,6 +147,7 @@ publish_cached_hostconfig ()
     cp "${generated_hostconfig}" "${tmp_hostconfig}"
     mv "${tmp_hostconfig}" "${target_hostconfig}"
     set_storage_file_permissions "${target_hostconfig}"
+    # Keep a deterministic local name so parent script can use it directly.
     cp "${target_hostconfig}" "${local_hostconfig}"
 
     print_info "Published cached host-config: ${target_hostconfig}"
@@ -161,6 +163,7 @@ main ()
     fi
 
     local prefix_opt="${1}"
+    # Ensure shared filesystem artifacts keep group-writable permissions.
     umask "${umpire_ci_storage_umask}"
     local spack_user_cache="${prefix}/spack-user-cache"
     export SPACK_DISABLE_LOCAL_CONFIG=""
@@ -184,6 +187,7 @@ main ()
       "Spack build of dependencies failed (Uberenv)" \
       run_uberenv --skip-setup-and-env --spec="${spec}" "${prefix_opt}"
 
+    # Push dependencies and publish a host-config keyed by cache identity.
     run_section "filesystem_buildcache_push" "Push dependencies to filesystem buildcache" "collapsed" \
       "Pushing dependencies to filesystem buildcache failed" \
       run_spack -D "${prefix}/spack_env" buildcache push --only dependencies --unsigned --update-index umpire_ci_buildcache
