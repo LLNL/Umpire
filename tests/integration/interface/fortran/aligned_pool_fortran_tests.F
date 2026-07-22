@@ -22,7 +22,7 @@ contains
     type(UmpireAllocator) pool_allocator
     integer(C_SIZE_T) :: initial_size, block_size, alignment
     real(C_DOUBLE), pointer, dimension(:) :: array
-    type(C_PTR) :: c_ptr
+    type(C_PTR) :: array_ptr
     integer(C_INTPTR_T) :: ptr_int
 
     rm = rm%get_instance()
@@ -45,9 +45,9 @@ contains
     call assert_true(associated(array))
 
     ! Check alignment - convert pointer to integer and check modulo
-    c_ptr = c_loc(array)
-    ptr_int = transfer(c_ptr, ptr_int)
-    call assert_equals(0, mod(ptr_int, int(alignment, C_INTPTR_T)), &
+    array_ptr = c_loc(array)
+    ptr_int = transfer(array_ptr, ptr_int)
+    call assert_equals(0, int(mod(ptr_int, int(alignment, C_INTPTR_T))), &
                        "Allocation should be aligned to 64 bytes")
 
     ! Deallocate
@@ -67,7 +67,7 @@ contains
     type(UmpireAllocator) pool_allocator
     integer(C_SIZE_T) :: initial_size, block_size, alignment
     real(C_DOUBLE), pointer, dimension(:) :: array
-    type(C_PTR) :: c_ptr
+    type(C_PTR) :: array_ptr
     integer(C_INTPTR_T) :: ptr_int
 
     rm = rm%get_instance()
@@ -90,9 +90,9 @@ contains
     call assert_true(associated(array))
 
     ! Check alignment
-    c_ptr = c_loc(array)
-    ptr_int = transfer(c_ptr, ptr_int)
-    call assert_equals(0, mod(ptr_int, int(alignment, C_INTPTR_T)), &
+    array_ptr = c_loc(array)
+    ptr_int = transfer(array_ptr, ptr_int)
+    call assert_equals(0, int(mod(ptr_int, int(alignment, C_INTPTR_T))), &
                        "Allocation should be aligned to 128 bytes")
 
     ! Deallocate
@@ -112,7 +112,7 @@ contains
     type(UmpireAllocator) pool_allocator
     integer(C_SIZE_T) :: initial_size, block_size, alignment
     real(C_DOUBLE), pointer, dimension(:) :: array
-    type(C_PTR) :: c_ptr
+    type(C_PTR) :: array_ptr
     integer(C_INTPTR_T) :: ptr_int
 
     rm = rm%get_instance()
@@ -135,9 +135,9 @@ contains
     call assert_true(associated(array))
 
     ! Check alignment
-    c_ptr = c_loc(array)
-    ptr_int = transfer(c_ptr, ptr_int)
-    call assert_equals(0, mod(ptr_int, int(alignment, C_INTPTR_T)), &
+    array_ptr = c_loc(array)
+    ptr_int = transfer(array_ptr, ptr_int)
+    call assert_equals(0, int(mod(ptr_int, int(alignment, C_INTPTR_T))), &
                        "Allocation should be aligned to 256 bytes")
 
     ! Deallocate
@@ -157,7 +157,7 @@ contains
     type(UmpireAllocator) pool_allocator
     integer(C_SIZE_T) :: initial_size, block_size, alignment
     real(C_DOUBLE), pointer, dimension(:) :: array
-    type(C_PTR) :: c_ptr
+    type(C_PTR) :: array_ptr
     integer(C_INTPTR_T) :: ptr_int
 
     rm = rm%get_instance()
@@ -180,9 +180,9 @@ contains
     call assert_true(associated(array))
 
     ! Check alignment
-    c_ptr = c_loc(array)
-    ptr_int = transfer(c_ptr, ptr_int)
-    call assert_equals(0, mod(ptr_int, int(alignment, C_INTPTR_T)), &
+    array_ptr = c_loc(array)
+    ptr_int = transfer(array_ptr, ptr_int)
+    call assert_equals(0, int(mod(ptr_int, int(alignment, C_INTPTR_T))), &
                        "Untracked allocation should be aligned to 64 bytes")
 
     ! Deallocate
@@ -202,7 +202,7 @@ contains
     type(UmpireAllocator) pool_allocator
     integer(C_SIZE_T) :: initial_size, block_size, alignment
     real(C_DOUBLE), pointer, dimension(:) :: array
-    type(C_PTR) :: c_ptr
+    type(C_PTR) :: array_ptr
     integer(C_INTPTR_T) :: ptr_int
 
     rm = rm%get_instance()
@@ -225,9 +225,9 @@ contains
     call assert_true(associated(array))
 
     ! Check alignment
-    c_ptr = c_loc(array)
-    ptr_int = transfer(c_ptr, ptr_int)
-    call assert_equals(0, mod(ptr_int, int(alignment, C_INTPTR_T)), &
+    array_ptr = c_loc(array)
+    ptr_int = transfer(array_ptr, ptr_int)
+    call assert_equals(0, int(mod(ptr_int, int(alignment, C_INTPTR_T))), &
                        "Untracked allocation should be aligned to 128 bytes")
 
     ! Deallocate
@@ -247,7 +247,7 @@ contains
     type(UmpireAllocator) pool_allocator
     integer(C_SIZE_T) :: initial_size, block_size, alignment
     real(C_DOUBLE), pointer, dimension(:) :: array
-    type(C_PTR) :: c_ptr
+    type(C_PTR) :: array_ptr
     integer(C_INTPTR_T) :: ptr_int
 
     rm = rm%get_instance()
@@ -270,9 +270,9 @@ contains
     call assert_true(associated(array))
 
     ! Check alignment
-    c_ptr = c_loc(array)
-    ptr_int = transfer(c_ptr, ptr_int)
-    call assert_equals(0, mod(ptr_int, int(alignment, C_INTPTR_T)), &
+    array_ptr = c_loc(array)
+    ptr_int = transfer(array_ptr, ptr_int)
+    call assert_equals(0, int(mod(ptr_int, int(alignment, C_INTPTR_T))), &
                        "Untracked allocation should be aligned to 256 bytes")
 
     ! Deallocate
@@ -292,7 +292,7 @@ contains
     type(UmpireAllocator) pool_allocator
     integer(C_SIZE_T) :: initial_size, block_size, alignment
     real(C_DOUBLE), pointer, dimension(:) :: array1, array2, array3
-    type(C_PTR) :: c_ptr
+    type(C_PTR) :: array_ptr
     integer(C_INTPTR_T) :: ptr_int
 
     rm = rm%get_instance()
@@ -313,23 +313,23 @@ contains
     ! Allocate multiple arrays and check each is aligned
     call pool_allocator%allocate(array1, [50])
     call assert_true(associated(array1))
-    c_ptr = c_loc(array1)
-    ptr_int = transfer(c_ptr, ptr_int)
-    call assert_equals(0, mod(ptr_int, int(alignment, C_INTPTR_T)), &
+    array_ptr = c_loc(array1)
+    ptr_int = transfer(array_ptr, ptr_int)
+    call assert_equals(0, int(mod(ptr_int, int(alignment, C_INTPTR_T))), &
                        "First allocation should be aligned")
 
     call pool_allocator%allocate(array2, [100])
     call assert_true(associated(array2))
-    c_ptr = c_loc(array2)
-    ptr_int = transfer(c_ptr, ptr_int)
-    call assert_equals(0, mod(ptr_int, int(alignment, C_INTPTR_T)), &
+    array_ptr = c_loc(array2)
+    ptr_int = transfer(array_ptr, ptr_int)
+    call assert_equals(0, int(mod(ptr_int, int(alignment, C_INTPTR_T))), &
                        "Second allocation should be aligned")
 
     call pool_allocator%allocate(array3, [200])
     call assert_true(associated(array3))
-    c_ptr = c_loc(array3)
-    ptr_int = transfer(c_ptr, ptr_int)
-    call assert_equals(0, mod(ptr_int, int(alignment, C_INTPTR_T)), &
+    array_ptr = c_loc(array3)
+    ptr_int = transfer(array_ptr, ptr_int)
+    call assert_equals(0, int(mod(ptr_int, int(alignment, C_INTPTR_T))), &
                        "Third allocation should be aligned")
 
     ! Deallocate all
