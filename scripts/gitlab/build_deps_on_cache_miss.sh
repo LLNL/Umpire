@@ -58,10 +58,24 @@ cache_root_for ()
       "${target}"
 }
 
-install_tree_is_usable ()
+run_spack ()
 {
-    local install_tree="${1}"
-    [[ -d "${install_tree}" && -d "${install_tree}/.spack-db" ]]
+    local cmd=("${prefix}/spack/bin/spack")
+    if [[ ${spack_debug} == true ]]
+    then
+        cmd+=("--debug" "--stacktrace")
+    fi
+    "${cmd[@]}" "$@"
+}
+
+run_uberenv ()
+{
+    local cmd=("${project_dir}/scripts/uberenv/uberenv.py")
+    if [[ ${spack_debug} == true ]]
+    then
+        cmd+=("--spack-debug")
+    fi
+    "${cmd[@]}" "$@"
 }
 
 find_project_hostconfig ()
@@ -82,7 +96,7 @@ find_project_hostconfig ()
     else
         print_error "More than one result for: ${project_dir}/*.cmake"
         print_error "${hostconfigs[@]}"
-        print_error "Please specify one with HOST_CONFIG variable"
+        print_error "Expected a single generated host-config."
         return 1
     fi
 }
@@ -112,7 +126,7 @@ configure_spack_storage ()
       run_spack -D "${prefix}/spack_env" config add "include:${common_config}"
 
     if [[ "${cache_target}" != "${umpire_ci_upstream_target}" ]] && \
-       install_tree_is_usable "${upstream_install_tree}"
+       [[ -d "${upstream_install_tree}" && -d "${upstream_install_tree}/.spack-db" ]]
     then
         run_spack -D "${prefix}/spack_env" config add "include:${upstream_config}"
         print_info "Using ${umpire_ci_upstream_target} install tree as Spack upstream: ${upstream_install_tree}"
@@ -145,6 +159,7 @@ main ()
     fi
 
     local prefix_opt="${1}"
+    umask "${umpire_ci_storage_umask}"
     local spack_user_cache="${prefix}/spack-user-cache"
     export SPACK_DISABLE_LOCAL_CONFIG=""
     export SPACK_USER_CACHE_PATH="${spack_user_cache}"
@@ -167,16 +182,13 @@ main ()
       "Spack build of dependencies failed (Uberenv)" \
       run_uberenv --skip-setup-and-env --spec="${spec}" "${prefix_opt}"
 
-    if [[ -z "${HOST_CONFIG:-}" ]]
-    then
-        run_section "filesystem_buildcache_push" "Push dependencies to filesystem buildcache" "collapsed" \
-          "Pushing dependencies to filesystem buildcache failed" \
-          run_spack -D "${prefix}/spack_env" buildcache push --only dependencies --unsigned --update-index umpire_ci_buildcache
+    run_section "filesystem_buildcache_push" "Push dependencies to filesystem buildcache" "collapsed" \
+      "Pushing dependencies to filesystem buildcache failed" \
+      run_spack -D "${prefix}/spack_env" buildcache push --only dependencies --unsigned --update-index umpire_ci_buildcache
 
-        local generated_hostconfig
-        generated_hostconfig="$(find_project_hostconfig)" || return 1
-        publish_cached_hostconfig "${generated_hostconfig}"
-    fi
+    local generated_hostconfig
+    generated_hostconfig="$(find_project_hostconfig)" || return 1
+    publish_cached_hostconfig "${generated_hostconfig}"
 
     if [[ -n "${ci_registry_token}" && ${push_to_registry} == true ]]
     then
@@ -184,26 +196,6 @@ main ()
           "Pushing dependencies to gitlab registry failed" \
           run_spack -D "${prefix}/spack_env" buildcache push --only dependencies gitlab_ci
     fi
-}
-
-run_spack ()
-{
-    local cmd=("${prefix}/spack/bin/spack")
-    if [[ ${spack_debug} == true ]]
-    then
-        cmd+=("--debug" "--stacktrace")
-    fi
-    "${cmd[@]}" "$@"
-}
-
-run_uberenv ()
-{
-    local cmd=("${project_dir}/scripts/uberenv/uberenv.py")
-    if [[ ${spack_debug} == true ]]
-    then
-        cmd+=("--spack-debug")
-    fi
-    "${cmd[@]}" "$@"
 }
 
 main "--prefix=${prefix}"

@@ -59,7 +59,6 @@ ci_registry_image=${CI_REGISTRY_IMAGE:-"czregistry.llnl.gov:5050/radiuss/umpire"
 export ci_registry_user=${CI_REGISTRY_USER:-"${USER}"}
 export ci_registry_token=${CI_JOB_TOKEN:-"${registry_token}"}
 
-cache_hit=false
 cache_key=""
 cache_target=""
 project_hostconfig_result=""
@@ -139,7 +138,7 @@ ensure_storage_dir ()
       print_warning "Unable to set group writable permissions on ${dir_path}"
 }
 
-prepare_cache_storage ()
+resolve_cached_hostconfig ()
 {
     cache_target="$(resolve_cache_target)"
     cache_key="$(resolve_cache_key)"
@@ -157,10 +156,6 @@ prepare_cache_storage ()
     print_info "Umpire CI cache target: ${cache_target}"
     print_info "Umpire CI cache key: ${cache_key}"
     print_info "Umpire CI storage root: ${umpire_ci_storage_root}"
-}
-
-try_cached_hostconfig ()
-{
     local targets=("${cache_target}")
     if [[ "${cache_target}" != "${umpire_ci_upstream_target}" ]]
     then
@@ -181,7 +176,6 @@ try_cached_hostconfig ()
         then
             cp "${cache_hostconfig_path}" "${project_dir}/$(basename "${cache_hostconfig_path}")"
             hostconfig="$(basename "${cache_hostconfig_path}")"
-            cache_hit=true
             print_info "Using cached host-config from ${target}: ${cache_hostconfig_path}"
             return 0
         fi
@@ -272,15 +266,19 @@ then
         exit 1
     fi
 
+    cache_miss=true
     if [[ -z "${hostconfig}" ]]
     then
-        prepare_cache_storage
-        try_cached_hostconfig || true
+        if resolve_cached_hostconfig
+        then
+            cache_miss=false
+        fi
     else
-        print_info "HOST_CONFIG is set; bypassing persistent Spack dependency cache"
+        cache_miss=false
+        print_info "HOST_CONFIG is set; skipping dependency installation and using provided host-config"
     fi
 
-    if [[ "${cache_hit}" != true ]]
+    if [[ "${cache_miss}" == true ]]
     then
         export PROJECT_DIR="${project_dir}"
         export PREFIX="${prefix}"
