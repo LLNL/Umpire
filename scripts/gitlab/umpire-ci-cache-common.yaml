@@ -4,7 +4,7 @@ config:
 
 mirrors:
   umpire_ci_buildcache:
-    url: "file://${UMPIRE_CI_BUILDCACHE}"
+    url: "${UMPIRE_CI_BUILDCACHE_URL}"
     signed: false
     binary: true
     source: false

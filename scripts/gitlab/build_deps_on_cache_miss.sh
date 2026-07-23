@@ -103,7 +103,8 @@ find_project_hostconfig ()
 
 configure_spack_storage ()
 {
-    local common_config upstream_config cache_root cache_install_tree cache_buildcache upstream_install_tree
+    local common_config upstream_config
+    local cache_root cache_install_tree cache_buildcache upstream_install_tree
     common_config="${project_dir}/scripts/gitlab/umpire-ci-cache-common.yaml"
     upstream_config="${project_dir}/scripts/gitlab/umpire-ci-cache-upstream.yaml"
     cache_root="$(cache_root_for "${cache_target}")"
@@ -113,6 +114,7 @@ configure_spack_storage ()
 
     export UMPIRE_CI_INSTALL_TREE="${cache_install_tree}"
     export UMPIRE_CI_BUILDCACHE="${cache_buildcache}"
+    export UMPIRE_CI_BUILDCACHE_URL="file://${cache_buildcache}"
     export UMPIRE_CI_UPSTREAM_INSTALL_TREE="${upstream_install_tree}"
     export UMPIRE_CI_UPSTREAM_TARGET="${umpire_ci_upstream_target}"
     export UMPIRE_CI_STORAGE_GROUP="${umpire_ci_storage_group}"
