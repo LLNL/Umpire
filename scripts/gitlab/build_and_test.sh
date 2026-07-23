@@ -139,10 +139,8 @@ ensure_storage_dir ()
       print_warning "Unable to set group writable permissions on ${dir_path}"
 }
 
-resolve_cached_hostconfig ()
+resolve_cache_context ()
 {
-    # Prepare branch-scoped cache storage, then try current target first and
-    # configured upstream target second for host-config reuse.
     cache_target="$(resolve_cache_target)"
     cache_key="$(resolve_cache_key)"
     local cache_root cache_install_tree cache_buildcache cache_hostconfigs_dir
@@ -158,7 +156,12 @@ resolve_cached_hostconfig ()
 
     print_info "Umpire CI cache target: ${cache_target}"
     print_info "Umpire CI cache key: ${cache_key}"
-    print_info "Umpire CI storage root: ${umpire_ci_storage_root}"
+    print_info "Umpire CI cache root: ${cache_root}"
+}
+
+resolve_cached_hostconfig ()
+{
+    # Cache-read is read-only: try the branch target first, then upstream.
     local targets=("${cache_target}")
     if [[ "${cache_target}" != "${umpire_ci_upstream_target}" ]]
     then
@@ -247,48 +250,56 @@ then
         exit 1
     fi
 
-    cache_miss=true
-    if [[ -z "${hostconfig}" ]]
+    # Get a hostconfig file.
+    if [[ -n "${hostconfig}" ]]
     then
+        # Scenario 1: HOST_CONFIG explicitly provided by caller.
+        if [[ -f "${hostconfig}" ]]
+        then
+            hostconfig_path="${hostconfig}"
+        elif [[ -f "${project_dir}/${hostconfig}" ]]
+        then
+            hostconfig_path="${project_dir}/${hostconfig}"
+        else
+            section_end ; print_error "HOST_CONFIG is set but file does not exist: ${hostconfig}"
+            exit 1
+        fi
+        print_info "HOST_CONFIG is set; skipping dependency installation and using provided host-config"
+    else
+        # Scenario 2: no HOST_CONFIG, so resolve cache identity and try read-only reuse.
+        resolve_cache_context
         if resolve_cached_hostconfig
         then
-            cache_miss=false
-        fi
-    else
-        cache_miss=false
-        hostconfig_path="${project_dir}/${hostconfig}"
-        print_info "HOST_CONFIG is set; skipping dependency installation and using provided host-config"
-    fi
+            print_info "Cache hit; skipping dependency installation"
+        else
+            # Scenario 3: cache miss, so build dependencies and publish cache artifacts.
+            export PROJECT_DIR="${project_dir}"
+            export PREFIX="${prefix}"
+            export SPEC="${spec}"
+            export SPACK_DEBUG="${spack_debug}"
+            export CACHE_TARGET="${cache_target}"
+            export CACHE_KEY="${cache_key}"
+            export UMPIRE_CI_STORAGE_ROOT="${umpire_ci_storage_root}"
+            export UMPIRE_CI_STORAGE_GROUP="${umpire_ci_storage_group}"
+            export UMPIRE_CI_STORAGE_UMASK="${umpire_ci_storage_umask}"
+            export UMPIRE_CI_UPSTREAM_TARGET="${umpire_ci_upstream_target}"
+            export PUSH_TO_REGISTRY="${push_to_registry}"
+            export CI_REGISTRY_IMAGE="${ci_registry_image}"
+            export CI_REGISTRY_USER="${ci_registry_user}"
+            export CI_REGISTRY_TOKEN="${ci_registry_token}"
 
-    if [[ "${cache_miss}" == true ]]
-    then
-        # Miss path delegates the full dependency build/publish workflow.
-        export PROJECT_DIR="${project_dir}"
-        export PREFIX="${prefix}"
-        export SPEC="${spec}"
-        export SPACK_DEBUG="${spack_debug}"
-        export CACHE_TARGET="${cache_target}"
-        export CACHE_KEY="${cache_key}"
-        export UMPIRE_CI_STORAGE_ROOT="${umpire_ci_storage_root}"
-        export UMPIRE_CI_STORAGE_GROUP="${umpire_ci_storage_group}"
-        export UMPIRE_CI_STORAGE_UMASK="${umpire_ci_storage_umask}"
-        export UMPIRE_CI_UPSTREAM_TARGET="${umpire_ci_upstream_target}"
-        export PUSH_TO_REGISTRY="${push_to_registry}"
-        export CI_REGISTRY_IMAGE="${ci_registry_image}"
-        export CI_REGISTRY_USER="${ci_registry_user}"
-        export CI_REGISTRY_TOKEN="${ci_registry_token}"
+            run_section "cache_miss" "Building dependencies on cache miss" "collapsed" \
+              "Spack dependency build failed" \
+              bash "${project_dir}/scripts/gitlab/build_deps_on_cache_miss.sh"
 
-        run_section "cache_miss" "Building dependencies on cache miss" "collapsed" \
-          "Spack dependency build failed" \
-          bash "${project_dir}/scripts/gitlab/build_deps_on_cache_miss.sh"
-
-        # Cache-miss script publishes host-config as <cache_key>.cmake.
-        hostconfig="${cache_key}.cmake"
-        hostconfig_path="${project_dir}/${hostconfig}"
-        if [[ ! -f "${hostconfig_path}" ]]
-        then
-            section_end ; print_error "Expected generated host-config not found: ${hostconfig_path}"
-            exit 1
+            # Cache-miss script publishes host-config as <cache_key>.cmake.
+            hostconfig="${cache_key}.cmake"
+            hostconfig_path="${project_dir}/${hostconfig}"
+            if [[ ! -f "${hostconfig_path}" ]]
+            then
+                section_end ; print_error "Expected generated host-config not found: ${hostconfig_path}"
+                exit 1
+            fi
         fi
     fi
 
