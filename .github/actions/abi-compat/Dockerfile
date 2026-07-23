@@ -1,8 +1,6 @@
 FROM ghcr.io/llnl/radiuss:gcc-13-ubuntu-24.04
 
-RUN sudo apt-get -qq update && sudo apt-get install -y --no-install-recommends abigail-tools perl-base binutils libtool pkg-config elfutils libelf-dev python3-pip
-
-RUN apt-get update && apt-get install -y cmake
+RUN sudo apt-get -qq update && sudo apt-get install -y --no-install-recommends abigail-tools perl-base binutils libtool pkg-config elfutils libelf-dev python3-pip cmake
 
 RUN git clone https://github.com/lvc/vtable-dumper && cd vtable-dumper \
     && sudo make install
