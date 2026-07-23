@@ -35,11 +35,11 @@ format_elapsed_hms ()
     printf '%02d:%02d:%02d' $((elapsed / 3600)) $(((elapsed % 3600) / 60)) $((elapsed % 60))
 }
 
-script_start_time=$(date +%s)
+script_start_time=${GITLAB_LOGS_SCRIPT_START_TIME:-$(date +%s)}
 declare -A section_start_times
 section_id_stack=()
-section_counter=0
-section_indent=""
+section_counter=${GITLAB_LOGS_SECTION_COUNTER:-0}
+section_indent=${GITLAB_LOGS_SECTION_INDENT:-""}
 
 section_start ()
 {
@@ -54,7 +54,7 @@ section_start ()
     fi
 
     section_counter=$((section_counter + 1))
-    local section_id="${section_name}_${section_counter}"
+    local section_id="${section_name}_${BASHPID}_${section_counter}"
 
     local timestamp=$(date +%s)
     local current_time=$(format_utc_timestamp "${timestamp}")
@@ -111,6 +111,10 @@ run_section ()
     shift 4
 
     section_start "${section_name}" "${section_title}" "${section_state}"
+    # Propagate logging context so nested scripts continue indent and total time.
+    export GITLAB_LOGS_SCRIPT_START_TIME="${script_start_time}"
+    export GITLAB_LOGS_SECTION_INDENT="${section_indent}"
+    export GITLAB_LOGS_SECTION_COUNTER="${section_counter}"
     if "$@"; then
         section_end
     else
