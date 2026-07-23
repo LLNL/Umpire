@@ -57,11 +57,7 @@ class AlignedListPoolAllocatorCTest : public ::testing::TestWithParam<const char
   umpire_allocator m_allocator;
   umpire_allocator m_pool;
 
-#if defined(UMPIRE_ENABLE_DEVICE)
-  const std::size_t m_pool_init = 4294967296 + 64;
-#else
-  const std::size_t m_pool_init = 1024 * 1024 * 64;
-#endif
+  const std::size_t m_pool_init = 1024 * 1024 * 16;  // 16 MB initial pool
   const std::size_t m_big = 1024 * 1024;
   const std::size_t m_small = 64;
   const std::size_t m_nothing = 0;
@@ -124,11 +120,7 @@ class AlignedQuickPoolAllocatorCTest : public ::testing::TestWithParam<const cha
   umpire_allocator m_allocator;
   umpire_allocator m_pool;
 
-#if defined(UMPIRE_ENABLE_DEVICE)
-  const std::size_t m_pool_init = 4294967296 + 64;
-#else
-  const std::size_t m_pool_init = 1024 * 1024 * 64;
-#endif
+  const std::size_t m_pool_init = 1024 * 1024 * 16;  // 16 MB initial pool
   const std::size_t m_big = 1024 * 1024;
   const std::size_t m_small = 64;
   const std::size_t m_nothing = 0;
@@ -191,11 +183,7 @@ class AlignedResourceAwarePoolAllocatorCTest : public ::testing::TestWithParam<c
   umpire_allocator m_allocator;
   umpire_allocator m_pool;
 
-#if defined(UMPIRE_ENABLE_DEVICE)
-  const std::size_t m_pool_init = 4294967296 + 64;
-#else
-  const std::size_t m_pool_init = 1024 * 1024 * 64;
-#endif
+  const std::size_t m_pool_init = 1024 * 1024 * 16;  // 16 MB initial pool
   const std::size_t m_big = 1024 * 1024;
   const std::size_t m_small = 64;
   const std::size_t m_nothing = 0;
@@ -259,11 +247,7 @@ class AlignedListPoolUntrackedAllocatorCTest : public ::testing::TestWithParam<c
   umpire_allocator m_allocator;
   umpire_allocator m_pool;
 
-#if defined(UMPIRE_ENABLE_DEVICE)
-  const std::size_t m_pool_init = 4294967296 + 64;
-#else
-  const std::size_t m_pool_init = 1024 * 1024 * 64;
-#endif
+  const std::size_t m_pool_init = 1024 * 1024 * 16;  // 16 MB initial pool
   const std::size_t m_big = 1024 * 1024;
   const std::size_t m_small = 64;
   const std::size_t m_nothing = 0;
