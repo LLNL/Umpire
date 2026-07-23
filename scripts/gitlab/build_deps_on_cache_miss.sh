@@ -104,13 +104,23 @@ find_project_hostconfig ()
 configure_spack_storage ()
 {
     local common_config upstream_config
-    local cache_root cache_install_tree cache_buildcache upstream_install_tree
+    local cache_root cache_install_tree cache_buildcache upstream_install_tree spack_db_dir
     common_config="${project_dir}/scripts/gitlab/umpire-ci-cache-common.yaml"
     upstream_config="${project_dir}/scripts/gitlab/umpire-ci-cache-upstream.yaml"
     cache_root="$(cache_root_for "${cache_target}")"
     cache_install_tree="${cache_root}/install"
     cache_buildcache="${cache_root}/buildcache"
     upstream_install_tree="$(cache_root_for "${umpire_ci_upstream_target}")/install"
+    # Spack may pad install_tree with __spack_path_placeholder__ segments.
+    spack_db_dir="$(find "${upstream_install_tree}" -mindepth 1 -maxdepth 8 -type d -name .spack-db 2>/dev/null | head -n 1 || true)"
+    if [[ -n "${spack_db_dir}" ]]
+    then
+        if [[ "$(dirname "${spack_db_dir}")" != "${upstream_install_tree}" ]]
+        then
+            print_info "Resolved padded upstream install tree: $(dirname "${spack_db_dir}")"
+        fi
+        upstream_install_tree="$(dirname "${spack_db_dir}")"
+    fi
 
     export UMPIRE_CI_INSTALL_TREE="${cache_install_tree}"
     export UMPIRE_CI_BUILDCACHE="${cache_buildcache}"
@@ -139,10 +149,9 @@ configure_spack_storage ()
 publish_cached_hostconfig ()
 {
     local generated_hostconfig="${1}"
-    local cache_root cache_hostconfigs_dir target_hostconfig tmp_hostconfig local_hostconfig
+    local cache_root target_hostconfig tmp_hostconfig local_hostconfig
     cache_root="$(cache_root_for "${cache_target}")"
-    cache_hostconfigs_dir="${cache_root}/host-configs"
-    target_hostconfig="${cache_hostconfigs_dir}/${cache_key}.cmake"
+    target_hostconfig="${cache_root}/host-configs/${cache_key}.cmake"
     tmp_hostconfig="${target_hostconfig}.tmp.$$"
     local_hostconfig="${project_dir}/${cache_key}.cmake"
 

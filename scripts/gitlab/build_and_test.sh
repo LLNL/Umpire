@@ -168,13 +168,22 @@ resolve_cached_hostconfig ()
         targets+=("${umpire_ci_upstream_target}")
     fi
 
-    local target cache_root cache_install_tree cache_hostconfigs_dir cache_hostconfig_path
+    local target cache_root cache_install_tree cache_hostconfig_path spack_db_dir
     for target in "${targets[@]}"
     do
         cache_root="$(cache_root_for "${target}")"
         cache_install_tree="${cache_root}/install"
-        cache_hostconfigs_dir="${cache_root}/host-configs"
-        cache_hostconfig_path="${cache_hostconfigs_dir}/${cache_key}.cmake"
+        # Spack may pad install_tree with __spack_path_placeholder__ segments.
+        spack_db_dir="$(find "${cache_install_tree}" -mindepth 1 -maxdepth 8 -type d -name .spack-db 2>/dev/null | head -n 1 || true)"
+        if [[ -n "${spack_db_dir}" ]]
+        then
+            if [[ "$(dirname "${spack_db_dir}")" != "${cache_install_tree}" ]]
+            then
+                print_info "Resolved padded install tree for ${target}: $(dirname "${spack_db_dir}")"
+            fi
+            cache_install_tree="$(dirname "${spack_db_dir}")"
+        fi
+        cache_hostconfig_path="${cache_root}/host-configs/${cache_key}.cmake"
 
         if [[ "${umpire_ci_force_spack}" != true ]] && \
            [[ -f "${cache_hostconfig_path}" ]] && \
