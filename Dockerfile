@@ -69,7 +69,7 @@ FROM ghcr.io/llnl/radiuss:ubuntu-24.04-intel-2024.2 AS sycl
 ENV GTEST_COLOR=1
 COPY . /home/umpire/workspace
 WORKDIR /home/umpire/workspace/build
-RUN /bin/bash -c "source /opt/intel/oneapi/setvars.sh 2>&1 && export PATH=/opt/intel/oneapi/compiler/2024.2/bin/:\$PATH && export LD_LIBRARY_PATH=/opt/intel/oneapi/2024.2/lib:\$LD_LIBRARY_PATH && cmake -DCMAKE_CXX_COMPILER=icpx -DCMAKE_CXX_FLAGS=\"-fsycl -fsycl-unnamed-lambda\" -DENABLE_WARNINGS_AS_ERRORS=Off -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DUMPIRE_ENABLE_SYCL=On -DBLT_CXX_STD=c++20 .. && \
+RUN /bin/bash -c "source /opt/intel/oneapi/setvars.sh 2>&1 && export PATH=/opt/intel/oneapi/compiler/2024.2/bin/:\$PATH && export LD_LIBRARY_PATH=/opt/intel/oneapi/2024.2/lib:\$LD_LIBRARY_PATH && cmake -DCMAKE_CXX_COMPILER=icpx -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_FLAGS=\"-fsycl -fsycl-unnamed-lambda\" -DENABLE_WARNINGS_AS_ERRORS=Off -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DUMPIRE_ENABLE_SYCL=On -DBLT_CXX_STD=c++20 .. && \
     make -j 16"
 
 ##FROM ghcr.io/llnl/radiuss:intel-2024.0-ubuntu-20.04 AS sycl
@@ -80,12 +80,20 @@ RUN /bin/bash -c "source /opt/intel/oneapi/setvars.sh 2>&1 && export PATH=/opt/i
 ##    cmake -DCMAKE_CXX_COMPILER=icpx -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_FLAGS="-fsycl -std=c++20" -DENABLE_WARNINGS_AS_ERRORS=Off -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DUMPIRE_ENABLE_SYCL=On -DBLT_CXX_STD=c++20 .. && \
 ##    make -j 16"
 
-FROM ghcr.io/llnl/radiuss:intel-2024.0-ubuntu-20.04 AS intel
+FROM ghcr.io/llnl/radiuss:ubuntu-24.04-intel-2024.2 AS intel
 ENV GTEST_COLOR=1
 COPY . /home/umpire/workspace
 WORKDIR /home/umpire/workspace/build
-RUN /bin/bash -c "source /opt/intel/oneapi/setvars.sh 2>&1 > /dev/null && \
-    cmake -DCMAKE_CXX_COMPILER=icpx -DCMAKE_C_COMPILER=icx -DENABLE_WARNINGS_AS_ERRORS=Off -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On .. && \
-    make -j 16 && \
+RUN /bin/bash -c "source /opt/intel/oneapi/setvars.sh 2>&1 && export PATH=/opt/intel/oneapi/compiler/2024.2/bin/:\$PATH && cmake -DCMAKE_CXX_COMPILER=icpx -DCMAKE_C_COMPILER=icx -DENABLE_WARNINGS_AS_ERRORS=Off -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DBLT_CXX_STD=c++20 .. && \
+    make -j 16 &&\
     ctest -T test --output-on-failure"
+
+##FROM ghcr.io/llnl/radiuss:intel-2024.0-ubuntu-20.04 AS intel
+##ENV GTEST_COLOR=1
+##COPY . /home/umpire/workspace
+##WORKDIR /home/umpire/workspace/build
+##RUN /bin/bash -c "source /opt/intel/oneapi/setvars.sh 2>&1 > /dev/null && \
+##    cmake -DCMAKE_CXX_COMPILER=icpx -DCMAKE_C_COMPILER=icx -DENABLE_WARNINGS_AS_ERRORS=Off -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On .. && \
+##    make -j 16 && \
+##    ctest -T test --output-on-failure"
 
