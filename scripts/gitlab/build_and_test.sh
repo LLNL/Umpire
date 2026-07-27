@@ -46,6 +46,10 @@ use_dev_shm=${USE_DEV_SHM:-true}
 spack_debug=${SPACK_DEBUG:-false}
 debug_mode=${DEBUG_MODE:-false}
 push_to_registry=${PUSH_TO_REGISTRY:-false}
+# PUSH_TO_REGISTRY defaults to false: the persistent filesystem install tree
+# (configured via UMPIRE_CI_STORAGE_ROOT) is used as a Spack upstream, which
+# is faster than a binary buildcache and requires no GitLab token for read
+# access. Set PUSH_TO_REGISTRY=true to additionally push to the OCI registry.
 umpire_ci_storage_root=${UMPIRE_CI_STORAGE_ROOT:-/usr/workspace/umpire/ci-cache}
 umpire_ci_storage_group=${UMPIRE_CI_STORAGE_GROUP:-umpire}
 umpire_ci_storage_umask=${UMPIRE_CI_STORAGE_UMASK:-0002}

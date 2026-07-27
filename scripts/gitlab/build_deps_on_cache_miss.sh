@@ -137,6 +137,15 @@ configure_spack_storage ()
       "Configuring filesystem Spack cache failed" \
       run_spack -D "${prefix}/spack_env" config add "include:${common_config}"
 
+    # Inject the configurable storage group into the Spack packages config.
+    # Shell variables are not expanded by Spack when reading YAML config files,
+    # so we use 'spack config add' to set the value programmatically.
+    if [[ -n "${umpire_ci_storage_group}" ]]
+    then
+        run_spack -D "${prefix}/spack_env" config add \
+          "packages:all:permissions:group:${umpire_ci_storage_group}"
+    fi
+
     # Non-upstream branches reuse the upstream install tree to minimize rebuilds.
     if [[ "${cache_target}" != "${umpire_ci_upstream_target}" ]] && \
        [[ -d "${upstream_install_tree}" && -d "${upstream_install_tree}/.spack-db" ]]

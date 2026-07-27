@@ -61,7 +61,7 @@ section_start ()
     local total_elapsed=$((timestamp - script_start_time))
     local total_elapsed_formatted=$(format_elapsed_hms "${total_elapsed}")
 
-    section_start_times[${section_id}]=${timestamp}
+    section_start_times["${section_id}"]=${timestamp}
     section_id_stack+=("${section_id}")
 
     echo -e "\e[1;30m${section_indent}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\e[0m"
@@ -90,7 +90,7 @@ section_end ()
     local total_elapsed=$((timestamp - script_start_time))
     local total_elapsed_formatted=$(format_elapsed_hms "${total_elapsed}")
 
-    local section_start=${section_start_times[${section_id}]:-${timestamp}}
+    local section_start=${section_start_times["${section_id}"]:-${timestamp}}
     local section_elapsed=$((timestamp - section_start))
     local section_elapsed_formatted=$(format_elapsed_hms "${section_elapsed}")
 
@@ -98,7 +98,7 @@ section_end ()
     echo -e "\e[1;30m${section_indent}~ ${current_time} | ${total_elapsed_formatted} | ${section_elapsed_formatted}\e[0m"
     echo -e "\e[1;30m${section_indent}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\e[0m"
 
-    unset section_start_times[${section_id}]
+    unset "section_start_times[${section_id}]"
 }
 
 run_section ()
