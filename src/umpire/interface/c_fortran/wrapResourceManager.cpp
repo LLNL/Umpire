@@ -215,6 +215,162 @@ umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_resource_awar
     // splicer end class.ResourceManager.method.make_allocator_bufferify_resource_aware_pool
 }
 
+/**
+ * \brief Create a DynamicPoolList allocator with custom alignment
+ *
+ * Creates a tracked DynamicPoolList allocator with specified alignment.
+ * The alignment parameter must be a power of 2 (e.g., 16, 32, 64, 128).
+ */
+umpire_allocator * umpire_resourcemanager_make_allocator_list_pool_aligned(
+    umpire_resourcemanager * self, const char * name,
+    umpire_allocator allocator, size_t initial_size, size_t block,
+    size_t alignment, umpire_allocator * SHC_rv)
+{
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    // splicer begin class.ResourceManager.method.make_allocator_list_pool_aligned
+    const std::string SHC_name_cxx(name);
+    umpire::Allocator *SHC_allocator_cxx =
+        static_cast<umpire::Allocator *>(allocator.addr);
+    umpire::Allocator *SHC_rv_cxx = new umpire::Allocator;
+    *SHC_rv_cxx = SH_this->makeAllocator<umpire::strategy::DynamicPoolList>(
+        SHC_name_cxx, *SHC_allocator_cxx, initial_size, block, alignment);
+    SHC_rv->addr  = SHC_rv_cxx;
+    SHC_rv->idtor = 1;
+    return SHC_rv;
+    // splicer end class.ResourceManager.method.make_allocator_list_pool_aligned
+}
+
+/**
+ * \brief Create a DynamicPoolList allocator with custom alignment
+ *
+ * Creates a tracked DynamicPoolList allocator with specified alignment.
+ * The alignment parameter must be a power of 2 (e.g., 16, 32, 64, 128).
+ */
+umpire_allocator * umpire_resourcemanager_make_allocator_list_pool_aligned_bufferify(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    umpire_allocator allocator, size_t initial_size, size_t block,
+    size_t alignment, umpire_allocator * SHC_rv)
+{
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    // splicer begin class.ResourceManager.method.make_allocator_list_pool_aligned_bufferify
+    const std::string SHCXX_name(name, Lname);
+    umpire::Allocator * SHCXX_allocator =
+        static_cast<umpire::Allocator *>(allocator.addr);
+    umpire::Allocator * SHCXX_rv = new umpire::Allocator;
+    *SHCXX_rv = SH_this->makeAllocator<umpire::strategy::DynamicPoolList>(
+        SHCXX_name, *SHCXX_allocator, initial_size, block, alignment);
+    SHC_rv->addr = SHCXX_rv;
+    SHC_rv->idtor = 1;
+    return SHC_rv;
+    // splicer end class.ResourceManager.method.make_allocator_list_pool_aligned_bufferify
+}
+
+/**
+ * \brief Create a QuickPool allocator with custom alignment
+ *
+ * Creates a tracked QuickPool allocator with specified alignment.
+ * The alignment parameter must be a power of 2 (e.g., 16, 32, 64, 128).
+ */
+umpire_allocator * umpire_resourcemanager_make_allocator_quick_pool_aligned(
+    umpire_resourcemanager * self, const char * name,
+    umpire_allocator allocator, size_t initial_size, size_t block,
+    size_t alignment, umpire_allocator * SHC_rv)
+{
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    // splicer begin class.ResourceManager.method.make_allocator_quick_pool_aligned
+    const std::string SHC_name_cxx(name);
+    umpire::Allocator *SHC_allocator_cxx =
+        static_cast<umpire::Allocator *>(allocator.addr);
+    umpire::Allocator *SHC_rv_cxx = new umpire::Allocator;
+    *SHC_rv_cxx = SH_this->makeAllocator<umpire::strategy::QuickPool>(
+        SHC_name_cxx, *SHC_allocator_cxx, initial_size, block, alignment);
+    SHC_rv->addr  = SHC_rv_cxx;
+    SHC_rv->idtor = 1;
+    return SHC_rv;
+    // splicer end class.ResourceManager.method.make_allocator_quick_pool_aligned
+}
+
+/**
+ * \brief Create a QuickPool allocator with custom alignment
+ *
+ * Creates a tracked QuickPool allocator with specified alignment.
+ * The alignment parameter must be a power of 2 (e.g., 16, 32, 64, 128).
+ */
+umpire_allocator * umpire_resourcemanager_make_allocator_quick_pool_aligned_bufferify(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    umpire_allocator allocator, size_t initial_size, size_t block,
+    size_t alignment, umpire_allocator * SHC_rv)
+{
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    // splicer begin class.ResourceManager.method.make_allocator_quick_pool_aligned_bufferify
+    const std::string SHCXX_name(name, Lname);
+    umpire::Allocator * SHCXX_allocator =
+        static_cast<umpire::Allocator *>(allocator.addr);
+    umpire::Allocator * SHCXX_rv = new umpire::Allocator;
+    *SHCXX_rv = SH_this->makeAllocator<umpire::strategy::QuickPool>(
+        SHCXX_name, *SHCXX_allocator, initial_size, block, alignment);
+    SHC_rv->addr = SHCXX_rv;
+    SHC_rv->idtor = 1;
+    return SHC_rv;
+    // splicer end class.ResourceManager.method.make_allocator_quick_pool_aligned_bufferify
+}
+
+/**
+ * \brief Create a ResourceAwarePool allocator with custom alignment
+ *
+ * Creates a tracked ResourceAwarePool allocator with specified alignment.
+ * The alignment parameter must be a power of 2 (e.g., 16, 32, 64, 128).
+ */
+umpire_allocator * umpire_resourcemanager_make_allocator_resource_aware_pool_aligned(
+    umpire_resourcemanager * self, const char * name,
+    umpire_allocator allocator, size_t initial_size, size_t block,
+    size_t alignment, umpire_allocator * SHC_rv)
+{
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    // splicer begin class.ResourceManager.method.make_allocator_resource_aware_pool_aligned
+    const std::string SHC_name_cxx(name);
+    umpire::Allocator *SHC_allocator_cxx =
+        static_cast<umpire::Allocator *>(allocator.addr);
+    umpire::Allocator *SHC_rv_cxx = new umpire::Allocator;
+    *SHC_rv_cxx = SH_this->makeAllocator<umpire::strategy::ResourceAwarePool>(
+        SHC_name_cxx, *SHC_allocator_cxx, initial_size, block, alignment);
+    SHC_rv->addr  = SHC_rv_cxx;
+    SHC_rv->idtor = 1;
+    return SHC_rv;
+    // splicer end class.ResourceManager.method.make_allocator_resource_aware_pool_aligned
+}
+
+/**
+ * \brief Create a ResourceAwarePool allocator with custom alignment
+ *
+ * Creates a tracked ResourceAwarePool allocator with specified alignment.
+ * The alignment parameter must be a power of 2 (e.g., 16, 32, 64, 128).
+ */
+umpire_allocator * umpire_resourcemanager_make_allocator_resource_aware_pool_aligned_bufferify(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    umpire_allocator allocator, size_t initial_size, size_t block,
+    size_t alignment, umpire_allocator * SHC_rv)
+{
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    // splicer begin class.ResourceManager.method.make_allocator_resource_aware_pool_aligned_bufferify
+    const std::string SHCXX_name(name, Lname);
+    umpire::Allocator * SHCXX_allocator =
+        static_cast<umpire::Allocator *>(allocator.addr);
+    umpire::Allocator * SHCXX_rv = new umpire::Allocator;
+    *SHCXX_rv = SH_this->makeAllocator<umpire::strategy::ResourceAwarePool>(
+        SHCXX_name, *SHCXX_allocator, initial_size, block, alignment);
+    SHC_rv->addr = SHCXX_rv;
+    SHC_rv->idtor = 1;
+    return SHC_rv;
+    // splicer end class.ResourceManager.method.make_allocator_resource_aware_pool_aligned_bufferify
+}
+
 umpire_allocator * umpire_resourcemanager_make_allocator_advisor(
     umpire_resourcemanager * self, const char * name,
     umpire_allocator allocator, const char * advice_op, int device_id,
@@ -793,6 +949,168 @@ umpire_allocator * umpire_resourcemanager_make_allocator_resource_aware_pool_unt
     SHC_rv->idtor = 1;
     return SHC_rv;
     // splicer end class.ResourceManager.method.make_allocator_resource_aware_pool_untracked_bufferify
+}
+
+/**
+ * \brief Create an untracked DynamicPoolList allocator with custom alignment
+ *
+ * Creates an untracked DynamicPoolList allocator with specified alignment.
+ * Untracked allocators do not track individual allocations for reduced overhead.
+ * The alignment parameter must be a power of 2 (e.g., 16, 32, 64, 128).
+ */
+umpire_allocator * umpire_resourcemanager_make_allocator_list_pool_aligned_untracked(
+    umpire_resourcemanager * self, const char * name,
+    umpire_allocator allocator, size_t initial_size, size_t block,
+    size_t alignment, umpire_allocator * SHC_rv)
+{
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    // splicer begin class.ResourceManager.method.make_allocator_list_pool_aligned_untracked
+    const std::string SHC_name_cxx(name);
+    umpire::Allocator *SHC_allocator_cxx =
+        static_cast<umpire::Allocator *>(allocator.addr);
+    umpire::Allocator *SHC_rv_cxx = new umpire::Allocator;
+    *SHC_rv_cxx = SH_this->makeAllocator<umpire::strategy::DynamicPoolList, false>(
+        SHC_name_cxx, *SHC_allocator_cxx, initial_size, block, alignment);
+    SHC_rv->addr  = SHC_rv_cxx;
+    SHC_rv->idtor = 1;
+    return SHC_rv;
+    // splicer end class.ResourceManager.method.make_allocator_list_pool_aligned_untracked
+}
+
+/**
+ * \brief Create an untracked DynamicPoolList allocator with custom alignment
+ *
+ * Creates an untracked DynamicPoolList allocator with specified alignment.
+ * Untracked allocators do not track individual allocations for reduced overhead.
+ * The alignment parameter must be a power of 2 (e.g., 16, 32, 64, 128).
+ */
+umpire_allocator * umpire_resourcemanager_make_allocator_list_pool_aligned_untracked_bufferify(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    umpire_allocator allocator, size_t initial_size, size_t block,
+    size_t alignment, umpire_allocator * SHC_rv)
+{
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    // splicer begin class.ResourceManager.method.make_allocator_list_pool_aligned_untracked_bufferify
+    const std::string SHCXX_name(name, Lname);
+    umpire::Allocator * SHCXX_allocator =
+        static_cast<umpire::Allocator *>(allocator.addr);
+    umpire::Allocator * SHCXX_rv = new umpire::Allocator;
+    *SHCXX_rv = SH_this->makeAllocator<umpire::strategy::DynamicPoolList, false>(
+        SHCXX_name, *SHCXX_allocator, initial_size, block, alignment);
+    SHC_rv->addr = SHCXX_rv;
+    SHC_rv->idtor = 1;
+    return SHC_rv;
+    // splicer end class.ResourceManager.method.make_allocator_list_pool_aligned_untracked_bufferify
+}
+
+/**
+ * \brief Create an untracked QuickPool allocator with custom alignment
+ *
+ * Creates an untracked QuickPool allocator with specified alignment.
+ * Untracked allocators do not track individual allocations for reduced overhead.
+ * The alignment parameter must be a power of 2 (e.g., 16, 32, 64, 128).
+ */
+umpire_allocator * umpire_resourcemanager_make_allocator_quick_pool_aligned_untracked(
+    umpire_resourcemanager * self, const char * name,
+    umpire_allocator allocator, size_t initial_size, size_t block,
+    size_t alignment, umpire_allocator * SHC_rv)
+{
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    // splicer begin class.ResourceManager.method.make_allocator_quick_pool_aligned_untracked
+    const std::string SHC_name_cxx(name);
+    umpire::Allocator *SHC_allocator_cxx =
+        static_cast<umpire::Allocator *>(allocator.addr);
+    umpire::Allocator *SHC_rv_cxx = new umpire::Allocator;
+    *SHC_rv_cxx = SH_this->makeAllocator<umpire::strategy::QuickPool, false>(
+        SHC_name_cxx, *SHC_allocator_cxx, initial_size, block, alignment);
+    SHC_rv->addr  = SHC_rv_cxx;
+    SHC_rv->idtor = 1;
+    return SHC_rv;
+    // splicer end class.ResourceManager.method.make_allocator_quick_pool_aligned_untracked
+}
+
+/**
+ * \brief Create an untracked QuickPool allocator with custom alignment
+ *
+ * Creates an untracked QuickPool allocator with specified alignment.
+ * Untracked allocators do not track individual allocations for reduced overhead.
+ * The alignment parameter must be a power of 2 (e.g., 16, 32, 64, 128).
+ */
+umpire_allocator * umpire_resourcemanager_make_allocator_quick_pool_aligned_untracked_bufferify(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    umpire_allocator allocator, size_t initial_size, size_t block,
+    size_t alignment, umpire_allocator * SHC_rv)
+{
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    // splicer begin class.ResourceManager.method.make_allocator_quick_pool_aligned_untracked_bufferify
+    const std::string SHCXX_name(name, Lname);
+    umpire::Allocator * SHCXX_allocator =
+        static_cast<umpire::Allocator *>(allocator.addr);
+    umpire::Allocator * SHCXX_rv = new umpire::Allocator;
+    *SHCXX_rv = SH_this->makeAllocator<umpire::strategy::QuickPool, false>(
+        SHCXX_name, *SHCXX_allocator, initial_size, block, alignment);
+    SHC_rv->addr = SHCXX_rv;
+    SHC_rv->idtor = 1;
+    return SHC_rv;
+    // splicer end class.ResourceManager.method.make_allocator_quick_pool_aligned_untracked_bufferify
+}
+
+/**
+ * \brief Create an untracked ResourceAwarePool allocator with custom alignment
+ *
+ * Creates an untracked ResourceAwarePool allocator with specified alignment.
+ * Untracked allocators do not track individual allocations for reduced overhead.
+ * The alignment parameter must be a power of 2 (e.g., 16, 32, 64, 128).
+ */
+umpire_allocator * umpire_resourcemanager_make_allocator_resource_aware_pool_aligned_untracked(
+    umpire_resourcemanager * self, const char * name,
+    umpire_allocator allocator, size_t initial_size, size_t block,
+    size_t alignment, umpire_allocator * SHC_rv)
+{
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    // splicer begin class.ResourceManager.method.make_allocator_resource_aware_pool_aligned_untracked
+    const std::string SHC_name_cxx(name);
+    umpire::Allocator *SHC_allocator_cxx =
+        static_cast<umpire::Allocator *>(allocator.addr);
+    umpire::Allocator *SHC_rv_cxx = new umpire::Allocator;
+    *SHC_rv_cxx = SH_this->makeAllocator<umpire::strategy::ResourceAwarePool, false>(
+        SHC_name_cxx, *SHC_allocator_cxx, initial_size, block, alignment);
+    SHC_rv->addr  = SHC_rv_cxx;
+    SHC_rv->idtor = 1;
+    return SHC_rv;
+    // splicer end class.ResourceManager.method.make_allocator_resource_aware_pool_aligned_untracked
+}
+
+/**
+ * \brief Create an untracked ResourceAwarePool allocator with custom alignment
+ *
+ * Creates an untracked ResourceAwarePool allocator with specified alignment.
+ * Untracked allocators do not track individual allocations for reduced overhead.
+ * The alignment parameter must be a power of 2 (e.g., 16, 32, 64, 128).
+ */
+umpire_allocator * umpire_resourcemanager_make_allocator_resource_aware_pool_aligned_untracked_bufferify(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    umpire_allocator allocator, size_t initial_size, size_t block,
+    size_t alignment, umpire_allocator * SHC_rv)
+{
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    // splicer begin class.ResourceManager.method.make_allocator_resource_aware_pool_aligned_untracked_bufferify
+    const std::string SHCXX_name(name, Lname);
+    umpire::Allocator * SHCXX_allocator =
+        static_cast<umpire::Allocator *>(allocator.addr);
+    umpire::Allocator * SHCXX_rv = new umpire::Allocator;
+    *SHCXX_rv = SH_this->makeAllocator<umpire::strategy::ResourceAwarePool, false>(
+        SHCXX_name, *SHCXX_allocator, initial_size, block, alignment);
+    SHC_rv->addr = SHCXX_rv;
+    SHC_rv->idtor = 1;
+    return SHC_rv;
+    // splicer end class.ResourceManager.method.make_allocator_resource_aware_pool_aligned_untracked_bufferify
 }
 
 umpire_allocator * umpire_resourcemanager_make_allocator_fixed_pool_untracked(
