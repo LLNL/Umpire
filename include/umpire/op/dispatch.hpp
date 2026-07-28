@@ -6,6 +6,7 @@
 #include "umpire/ResourceManager.hpp"
 #include "umpire/config.hpp"
 #include "umpire/op/detail/traits.hpp"
+#include "umpire/op/detail/utils.hpp"
 #include "umpire/resource/platform.hpp"
 
 namespace umpire {
@@ -386,9 +387,27 @@ struct op_caller {
 //
 // This keeps the API consistent with C++ idioms where typed operations work
 // with element counts and void* operations work with byte counts.
+//
+// *** ARGUMENT ORDER WARNING ***
+//   umpire::copy(src, dst, ...) takes (SOURCE, DESTINATION) order.
+//   This is the REVERSE of the deprecated ResourceManager::copy(dst_ptr, src_ptr, ...),
+//   which takes (DESTINATION, SOURCE) order.
+//
+//   A mechanical migration from ResourceManager::copy() to umpire::copy() that does
+//   NOT swap the two pointer arguments will compile cleanly (both overloads accept
+//   the same pointer type) and will silently copy data in the WRONG DIRECTION --
+//   there is no compiler error or warning to catch this mistake. Callers migrating
+//   from ResourceManager::copy(dst, src, ...) MUST swap to umpire::copy(src, dst, ...).
+//
+//   Also note the size-parameter semantics above still apply: the typed
+//   umpire::copy<T>(src, dst, len) overloads take len as an ELEMENT COUNT, while the
+//   void* umpire::copy(src, dst, len) overload takes len as a BYTE COUNT.
 //------------------------------------------------------------------------------
 
 // Global operation implementations that use the op_caller
+//
+// NOTE: Argument order is (src, dst) -- the REVERSE of the deprecated
+// ResourceManager::copy(dst, src, ...). See the "ARGUMENT ORDER WARNING" above.
 template <typename T>
 void copy(T* src, T* dst, std::size_t len)
 {
@@ -524,12 +543,7 @@ PtrType* op::reallocate<Platform>::reallocate_impl_sync(PtrType** ptr_ptr, std::
     auto& rm = ResourceManager::getInstance();
     Allocator allocator = rm.getDefaultAllocator();
 
-    std::size_t alloc_bytes;
-    if constexpr (std::is_same_v<PtrType, void>) {
-      alloc_bytes = new_size; // Void: new_size is already in bytes
-    } else {
-      alloc_bytes = new_size * sizeof(PtrType); // Typed: new_size is element count
-    }
+    std::size_t alloc_bytes = detail::get_size<PtrType>(new_size);
 
     PtrType* new_ptr = static_cast<PtrType*>(allocator.allocate(alloc_bytes));
     *ptr_ptr = new_ptr;
@@ -550,13 +564,7 @@ PtrType* op::reallocate<Platform>::reallocate_impl_sync(PtrType** ptr_ptr, std::
 
   // 4. Calculate sizes
   std::size_t old_size = rm.getSize(current_ptr);
-  std::size_t new_bytes;
-
-  if constexpr (std::is_same_v<PtrType, void>) {
-    new_bytes = new_size; // Void: new_size is already in bytes
-  } else {
-    new_bytes = new_size * sizeof(PtrType); // Typed: new_size is element count
-  }
+  std::size_t new_bytes = detail::get_size<PtrType>(new_size);
 
   // 5. Zero-byte special case
   if (new_bytes == 0) {
@@ -603,12 +611,7 @@ camp::resources::EventProxy<camp::resources::Resource> op::reallocate<Platform>:
     auto& rm = ResourceManager::getInstance();
     Allocator allocator = rm.getDefaultAllocator();
 
-    std::size_t alloc_bytes;
-    if constexpr (std::is_same_v<PtrType, void>) {
-      alloc_bytes = new_size; // Void: new_size is already in bytes
-    } else {
-      alloc_bytes = new_size * sizeof(PtrType); // Typed: new_size is element count
-    }
+    std::size_t alloc_bytes = detail::get_size<PtrType>(new_size);
 
     PtrType* new_ptr = static_cast<PtrType*>(allocator.allocate(alloc_bytes));
     *ptr_ptr = new_ptr;
@@ -629,13 +632,7 @@ camp::resources::EventProxy<camp::resources::Resource> op::reallocate<Platform>:
 
   // 4. Calculate sizes
   std::size_t old_size = rm.getSize(current_ptr);
-  std::size_t new_bytes;
-
-  if constexpr (std::is_same_v<PtrType, void>) {
-    new_bytes = new_size; // Void: new_size is already in bytes
-  } else {
-    new_bytes = new_size * sizeof(PtrType); // Typed: new_size is element count
-  }
+  std::size_t new_bytes = detail::get_size<PtrType>(new_size);
 
   // 5. Zero-byte special case
   if (new_bytes == 0) {
@@ -648,6 +645,13 @@ camp::resources::EventProxy<camp::resources::Resource> op::reallocate<Platform>:
   // 6. Allocate new memory
   PtrType* new_ptr = static_cast<PtrType*>(allocator.allocate(new_bytes));
 
+  // Guard new pointer for exception safety: if the copy below throws (or the
+  // wait throws), release the new allocation so it is not leaked and *ptr_ptr
+  // is not left dangling.
+  auto new_cleanup = detail::make_scope_exit([&]() {
+    allocator.deallocate(new_ptr);
+  });
+
   // 7. Copy data asynchronously
   std::size_t copy_bytes = (old_size > new_bytes) ? new_bytes : old_size;
 
@@ -658,9 +662,15 @@ camp::resources::EventProxy<camp::resources::Resource> op::reallocate<Platform>:
     allocator.deallocate(current_ptr);
   });
 
-  // Wait for async copy to complete before deallocating to avoid race condition
+  // NOTE: This wait is an intentional blocking point. It guarantees the copy
+  // has completed before the old buffer is freed (and before we dismiss the
+  // new-pointer guard below). A true non-blocking async reallocate that defers
+  // the old-buffer free until the event completes is left as a follow-up.
   static_cast<camp::resources::Event>(event).wait();
   // cleanup happens automatically via RAII
+
+  // Copy (and wait) succeeded: the new allocation is valid, dismiss its guard.
+  new_cleanup.dismiss();
 
   *ptr_ptr = new_ptr;
   return event;

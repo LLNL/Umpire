@@ -271,13 +271,34 @@ class ResourceManager {
    * \param dst_ptr Destination pointer.
    * \param src_ptr Source pointer.
    * \param size Size in bytes.
-   * 
-   * \deprecated Use the global umpire::copy function instead.
+   *
+   * \deprecated Use the global umpire::copy(src, dst, size) function instead.
+   *
+   * \warning umpire::copy takes arguments in (src, dst, size) order, which is
+   *          the REVERSE of this method's (dst, src, size) order. A mechanical
+   *          migration that does not swap the pointer arguments will compile
+   *          cleanly but silently copy data in the wrong direction. In
+   *          addition, umpire::copy requires an explicit, non-zero size --
+   *          it does not auto-detect the size from the allocation the way
+   *          this method does when size == 0.
    */
-  [[deprecated("Use the global umpire::copy function instead")]]
+  [[deprecated("Use umpire::copy(src, dst, size) instead — NOTE: argument order is REVERSED (src, dst) vs this method's (dst, src)")]]
   void copy(void* dst_ptr, void* src_ptr, std::size_t size = 0);
 
-  [[deprecated("Use the global umpire::copy function with Resource instead")]]
+  /*!
+   * \brief Asynchronously copy size bytes of data from src_ptr to dst_ptr.
+   *
+   * \deprecated Use the global umpire::copy(src, dst, size, ctx) function instead.
+   *
+   * \warning umpire::copy takes arguments in (src, dst, size, ctx) order,
+   *          which is the REVERSE of this method's (dst, src, ctx, size)
+   *          order. A mechanical migration that does not swap the pointer
+   *          arguments will compile cleanly but silently copy data in the
+   *          wrong direction. In addition, umpire::copy requires an
+   *          explicit, non-zero size -- it does not auto-detect the size
+   *          from the allocation the way this method does when size == 0.
+   */
+  [[deprecated("Use umpire::copy(src, dst, size, ctx) instead — NOTE: argument order is REVERSED (src, dst) vs this method's (dst, src)")]]
   camp::resources::EventProxy<camp::resources::Resource> copy(void* dst_ptr, void* src_ptr,
                                                               camp::resources::Resource& ctx, std::size_t size = 0);
 
@@ -356,10 +377,10 @@ class ResourceManager {
    * \param allocator Allocator to use to allocate new memory for moved data.
    *
    * \return Pointer to new location of data.
-   * 
-   * \deprecated Use the global umpire::move function instead.
+   *
+   * \note No umpire::move free-function replacement exists yet (planned
+   *       follow-up). This method remains supported and is NOT deprecated.
    */
-  [[deprecated("Use the global umpire::move function instead")]]
   void* move(void* src_ptr, Allocator allocator);
 
   /*!

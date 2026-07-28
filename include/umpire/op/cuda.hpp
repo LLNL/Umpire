@@ -89,6 +89,10 @@ inline cudaStream_t get_stream(camp::resources::Resource& resource)
 /**
  * @brief Apply memory advice to a CUDA managed memory allocation
  *
+ * Advise is a performance hint, not a correctness requirement, so this is
+ * intentionally a no-op (with a logged warning) on devices that do not
+ * support managed memory.
+ *
  * @tparam T Type of memory
  * @param ptr Pointer to memory
  * @param count Number of elements
@@ -99,11 +103,18 @@ template <typename T>
 inline void advise(T* ptr, std::size_t count, int device, cudaMemoryAdvise advice)
 {
   // Skip if device doesn't support managed memory
-  if (!supports_managed_memory(device))
+  if (!supports_managed_memory(device)) {
+    UMPIRE_LOG(Warning, "cudaMemAdvise skipped: device " << device << " does not support managed memory");
     return;
+  }
 
   std::size_t size = detail::get_size<T>(count);
+#if CUDART_VERSION >= 13000
+  cudaMemLocation loc = {(device == cudaCpuDeviceId) ? cudaMemLocationTypeHost : cudaMemLocationTypeDevice, device};
+  cudaError_t error = ::cudaMemAdvise(ptr, size, advice, loc);
+#else
   cudaError_t error = ::cudaMemAdvise(ptr, size, advice, device);
+#endif
 
   if (error != cudaSuccess) {
     UMPIRE_ERROR(runtime_error,
@@ -228,10 +239,17 @@ inline void prefetch(T* ptr, int device, std::size_t count)
                  fmt::format("cudaGetDevice failed: {} ({})", cudaGetErrorString(get_dev_err), get_dev_err));
   }
   int gpu = (device != cudaCpuDeviceId) ? device : current_device;
+#if CUDART_VERSION >= 13000
+  cudaMemLocation loc = {(device == cudaCpuDeviceId) ? cudaMemLocationTypeHost : cudaMemLocationTypeDevice, device};
+#endif
 
   if (supports_managed_memory(gpu)) {
     std::size_t size = detail::get_size<T>(count);
+#if CUDART_VERSION >= 13000
+    cudaError_t error = ::cudaMemPrefetchAsync(ptr, size, loc, 0, nullptr);
+#else
     cudaError_t error = ::cudaMemPrefetchAsync(ptr, size, device, nullptr);
+#endif
 
     if (error != cudaSuccess) {
       UMPIRE_ERROR(runtime_error, fmt::format("cudaMemPrefetchAsync(ptr={}, size={}, device={}) failed with error: {}",
@@ -264,10 +282,17 @@ inline camp::resources::EventProxy<camp::resources::Resource> prefetch_async(T* 
                  fmt::format("cudaGetDevice failed: {} ({})", cudaGetErrorString(get_dev_err), get_dev_err));
   }
   int gpu = (device != cudaCpuDeviceId) ? device : current_device;
+#if CUDART_VERSION >= 13000
+  cudaMemLocation loc = {(device == cudaCpuDeviceId) ? cudaMemLocationTypeHost : cudaMemLocationTypeDevice, device};
+#endif
 
   if (supports_managed_memory(gpu)) {
     std::size_t size = detail::get_size<T>(count);
+#if CUDART_VERSION >= 13000
+    cudaError_t error = ::cudaMemPrefetchAsync(ptr, size, loc, 0, stream);
+#else
     cudaError_t error = ::cudaMemPrefetchAsync(ptr, size, device, stream);
+#endif
 
     if (error != cudaSuccess) {
       UMPIRE_ERROR(runtime_error,

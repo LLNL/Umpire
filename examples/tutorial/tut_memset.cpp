@@ -38,7 +38,7 @@ int main(int, char**)
               << std::endl;
 
     // _sphinx_tag_tut_memset_start
-    umpire::memset(data, 0, SIZE * sizeof(double));
+    umpire::memset(data, 0, SIZE);
     // _sphinx_tag_tut_memset_end
 
     std::cout << "Set data from " << destination << " (" << data << ") to 0." << std::endl;

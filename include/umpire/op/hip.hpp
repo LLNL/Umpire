@@ -86,6 +86,10 @@ inline hipStream_t get_stream(camp::resources::Resource& resource)
 /**
  * @brief Apply memory advice to a HIP managed memory allocation
  *
+ * @note advise() is a performance hint, not a correctness requirement. On
+ * devices that do not support managed memory, this is intentionally a
+ * logged no-op rather than an error.
+ *
  * @tparam T Type of memory
  * @param ptr Pointer to memory
  * @param count Number of elements
@@ -96,8 +100,10 @@ template <typename T>
 inline void advise(T* ptr, std::size_t count, int device, hipMemoryAdvise advice)
 {
   // Skip if device doesn't support managed memory
-  if (!supports_managed_memory(device))
+  if (!supports_managed_memory(device)) {
+    UMPIRE_LOG(Warning, "hipMemAdvise skipped: device " << device << " does not support managed memory");
     return;
+  }
 
   std::size_t size = detail::get_size<T>(count);
   hipError_t error = ::hipMemAdvise(ptr, size, advice, device);

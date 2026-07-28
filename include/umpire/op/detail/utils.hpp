@@ -1,8 +1,10 @@
 #pragma once
 
 #include <cstddef>
+#include <limits>
 #include <type_traits>
 #include "camp/resource.hpp"
+#include "umpire/util/error.hpp"
 
 namespace umpire {
 namespace op {
@@ -10,18 +12,24 @@ namespace detail {
 
 /**
  * @brief Calculate size in bytes based on element count and type
- * 
+ *
  * @tparam T The pointer type (void* or typed pointer)
  * @param count Number of elements or bytes (if T is void)
  * @return std::size_t Size in bytes
  */
 template <typename T>
-inline std::size_t get_size(std::size_t count) noexcept
+inline std::size_t get_size(std::size_t count)
 {
-  if constexpr (std::is_same_v<T, void>)
+  if constexpr (std::is_same_v<T, void>) {
     return count;
-  else
+  } else {
+    if (count > (std::numeric_limits<std::size_t>::max() / sizeof(T))) {
+      UMPIRE_ERROR(runtime_error,
+                   fmt::format("Requested size overflow: count ({}) * sizeof(T) ({}) exceeds size_t max", count,
+                               sizeof(T)));
+    }
     return count * sizeof(T);
+  }
 }
 
 /**

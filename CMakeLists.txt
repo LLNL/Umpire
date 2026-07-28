@@ -203,7 +203,7 @@ if (UMPIRE_ENABLE_TESTS)
   add_subdirectory(tests)
 endif ()
 
-if (UMPIRE_ENABLE_BENCHMARKS)
+if (UMPIRE_ENABLE_BENCHMARKS OR UMPIRE_ENABLE_DEVELOPER_BENCHMARKS)
   add_subdirectory(benchmarks)
   if ((NOT CMAKE_BUILD_TYPE) OR (NOT ${CMAKE_BUILD_TYPE} STREQUAL "Release"))
     message("-- Warning: CMAKE_BUILD_TYPE not set to Release, benchmark information will not be reliable for this build!")

@@ -572,13 +572,32 @@ const util::AllocationRecord* ResourceManager::findAllocationRecord(void* ptr) c
 void ResourceManager::copy(void* dst_ptr, void* src_ptr, std::size_t size)
 {
 #if defined(UMPIRE_RM_USE_NEW_OPS)
+  auto src_alloc_record = m_allocations.find(src_ptr);
+  std::ptrdiff_t src_offset = static_cast<char*>(src_ptr) - static_cast<char*>(src_alloc_record->ptr);
+
   if (size == 0) {
-    auto record = findAllocationRecord(src_ptr);
-    std::ptrdiff_t src_offset = reinterpret_cast<char*>(src_ptr) - reinterpret_cast<char*>(record->ptr);
-    size = record->size - src_offset;
+    size = src_alloc_record->size - src_offset;
   }
 
+  auto dst_alloc_record = m_allocations.find(dst_ptr);
+  std::ptrdiff_t dst_offset = static_cast<char*>(dst_ptr) - static_cast<char*>(dst_alloc_record->ptr);
+
   UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", dst_ptr=" << dst_ptr << ", size=" << size << ")");
+
+  umpire::event::record([&](auto& event) {
+    event.name("copy")
+        .category(event::category::operation)
+        .arg("src", src_ptr)
+        .arg("dst", dst_ptr)
+        .arg("src_offset", src_offset)
+        .arg("dst_offset", dst_offset)
+        .arg("size", size)
+        .arg("src_allocator_ref", (void*)src_alloc_record->strategy)
+        .arg("dst_allocator_ref", (void*)dst_alloc_record->strategy)
+        .tag("src_allocator_name", src_alloc_record->strategy->getName())
+        .tag("dst_allocator_name", dst_alloc_record->strategy->getName())
+        .tag("replay", "true");
+  });
 
   umpire::copy(static_cast<void*>(src_ptr), static_cast<void*>(dst_ptr), size);
 #else
@@ -629,13 +648,33 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::copy(voi
                                                                              std::size_t size)
 {
 #if defined(UMPIRE_RM_USE_NEW_OPS)
+  auto src_alloc_record = m_allocations.find(src_ptr);
+  std::ptrdiff_t src_offset = static_cast<char*>(src_ptr) - static_cast<char*>(src_alloc_record->ptr);
+
   if (size == 0) {
-    auto record = findAllocationRecord(src_ptr);
-    std::ptrdiff_t src_offset = reinterpret_cast<char*>(src_ptr) - reinterpret_cast<char*>(record->ptr);
-    size = record->size - src_offset;
+    size = src_alloc_record->size - src_offset;
   }
 
+  auto dst_alloc_record = m_allocations.find(dst_ptr);
+  std::ptrdiff_t dst_offset = static_cast<char*>(dst_ptr) - static_cast<char*>(dst_alloc_record->ptr);
+
   UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", dst_ptr=" << dst_ptr << ", size=" << size << ")");
+
+  umpire::event::record([&](auto& event) {
+    event.name("copy")
+        .category(event::category::operation)
+        .arg("src", src_ptr)
+        .arg("dst", dst_ptr)
+        .arg("src_offset", src_offset)
+        .arg("dst_offset", dst_offset)
+        .arg("size", size)
+        .arg("src_allocator_ref", (void*)src_alloc_record->strategy)
+        .arg("dst_allocator_ref", (void*)dst_alloc_record->strategy)
+        .tag("src_allocator_name", src_alloc_record->strategy->getName())
+        .tag("dst_allocator_name", dst_alloc_record->strategy->getName())
+        .tag("replay", "true")
+        .tag("async", "true");
+  });
 
   return umpire::copy(static_cast<void*>(src_ptr), static_cast<void*>(dst_ptr), size, ctx);
 #else
@@ -684,12 +723,25 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::copy(voi
 void ResourceManager::memset(void* ptr, int value, std::size_t length)
 {
 #if defined(UMPIRE_RM_USE_NEW_OPS)
+  auto alloc_record = m_allocations.find(ptr);
+  std::ptrdiff_t offset = static_cast<char*>(ptr) - static_cast<char*>(alloc_record->ptr);
+  std::size_t size = alloc_record->size - offset;
+
   if (length == 0) {
-    auto record = findAllocationRecord(ptr);
-    std::ptrdiff_t src_offset = reinterpret_cast<char*>(ptr) - reinterpret_cast<char*>(record->ptr);
-    length = record->size - src_offset;
+    length = size;
   }
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ", value=" << value << ", length=" << length << ")");
+
+  umpire::event::record([&](auto& event) {
+    event.name("memset")
+        .category(event::category::operation)
+        .arg("ptr", ptr)
+        .arg("value", value)
+        .arg("size", size)
+        .arg("allocator_ref", (void*)alloc_record->strategy)
+        .tag("allocator_name", alloc_record->strategy->getName())
+        .tag("replay", "true");
+  });
 
   umpire::memset(static_cast<void*>(ptr), value, length);
 #else
@@ -732,13 +784,27 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::memset(v
                                                                                std::size_t length)
 {
 #if defined(UMPIRE_RM_USE_NEW_OPS)
+  auto alloc_record = m_allocations.find(ptr);
+  std::ptrdiff_t offset = static_cast<char*>(ptr) - static_cast<char*>(alloc_record->ptr);
+  std::size_t size = alloc_record->size - offset;
+
   if (length == 0) {
-    auto record = findAllocationRecord(ptr);
-    std::ptrdiff_t src_offset = reinterpret_cast<char*>(ptr) - reinterpret_cast<char*>(record->ptr);
-    length = record->size - src_offset;
+    length = size;
   }
 
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ", value=" << value << ", length=" << length << ")");
+
+  umpire::event::record([&](auto& event) {
+    event.name("memset")
+        .category(event::category::operation)
+        .arg("ptr", ptr)
+        .arg("value", value)
+        .arg("size", size)
+        .arg("allocator_ref", (void*)alloc_record->strategy)
+        .tag("allocator_name", alloc_record->strategy->getName())
+        .tag("replay", "true")
+        .tag("async", "true");
+  });
 
   return umpire::memset(static_cast<void*>(ptr), value, length, ctx);
 #else
@@ -780,22 +846,47 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::memset(v
 void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size)
 {
 #if defined(UMPIRE_RM_USE_NEW_OPS)
+  strategy::AllocationStrategy* strategy;
+
+  if (current_ptr != nullptr) {
+    auto alloc_record = m_allocations.find(current_ptr);
+    strategy = alloc_record->strategy;
+  } else {
+    strategy = getDefaultAllocator().getAllocationStrategy();
+  }
+
+  umpire::event::record([&](auto& event) {
+    event.name("reallocate")
+        .category(event::category::operation)
+        .arg("current_ptr", current_ptr)
+        .arg("size", new_size)
+        .arg("allocator_ref", (void*)strategy)
+        .tag("allocator_name", strategy->getName())
+        .tag("replay", "true");
+  });
+
+  void* new_ptr;
 
   if (!current_ptr) {
-    auto alloc = getDefaultAllocator();
-    return alloc.allocate(new_size);
-  }
-
-  if (new_size == 0) {
-    auto alloc_record = m_allocations.find(current_ptr);
-    auto alloc = Allocator(alloc_record->strategy);
+    new_ptr = Allocator(strategy).allocate(new_size);
+  } else if (new_size == 0) {
+    Allocator alloc(strategy);
     alloc.deallocate(current_ptr);
-    return alloc.allocate(new_size);
+    new_ptr = alloc.allocate(new_size);
+  } else {
+    UMPIRE_LOG(Debug, "(current_ptr=" << current_ptr << ", new_size=" << new_size << ")");
+    new_ptr = umpire::reallocate(&current_ptr, new_size);
   }
 
-  UMPIRE_LOG(Debug, "(current_ptr=" << current_ptr << ", new_size=" << new_size << ")");
+  umpire::event::record([&](auto& event) {
+    event.name("reallocate")
+        .category(event::category::operation)
+        .arg("allocator_ref", (void*)strategy)
+        .tag("allocator_name", strategy->getName())
+        .arg("new_ptr", new_ptr);
+  });
 
-  return umpire::reallocate(&current_ptr, new_size);
+  return new_ptr;
 #else
   strategy::AllocationStrategy* strategy;
 
@@ -833,22 +924,50 @@ void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size)
 void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size, camp::resources::Resource& ctx)
 {
 #if defined(UMPIRE_RM_USE_NEW_OPS)
-  if (!current_ptr) {
-    auto alloc = getDefaultAllocator();
-    return alloc.allocate(new_size);
-  }
+  strategy::AllocationStrategy* strategy;
 
-  if (new_size == 0) {
+  if (current_ptr != nullptr) {
     auto alloc_record = m_allocations.find(current_ptr);
-    auto alloc = Allocator(alloc_record->strategy);
-    alloc.deallocate(current_ptr);
-    return alloc.allocate(new_size);
+    strategy = alloc_record->strategy;
+  } else {
+    strategy = getDefaultAllocator().getAllocationStrategy();
   }
 
-  UMPIRE_LOG(Debug, "(current_ptr=" << current_ptr << ", new_size=" << new_size << ")");
+  umpire::event::record([&](auto& event) {
+    event.name("reallocate")
+        .category(event::category::operation)
+        .arg("current_ptr", current_ptr)
+        .arg("size", new_size)
+        .arg("allocator_ref", (void*)strategy)
+        .tag("allocator_name", strategy->getName())
+        .tag("replay", "true")
+        .tag("async", "true");
+  });
 
-  auto event = umpire::reallocate(&current_ptr, new_size, ctx);
-  return current_ptr;
+  void* new_ptr;
+
+  if (!current_ptr) {
+    new_ptr = Allocator(strategy).allocate(new_size);
+  } else if (new_size == 0) {
+    Allocator alloc(strategy);
+    alloc.deallocate(current_ptr);
+    new_ptr = alloc.allocate(new_size);
+  } else {
+    UMPIRE_LOG(Debug, "(current_ptr=" << current_ptr << ", new_size=" << new_size << ")");
+    auto ev = umpire::reallocate(&current_ptr, new_size, ctx);
+    UMPIRE_USE_VAR(ev);
+    new_ptr = current_ptr;
+  }
+
+  umpire::event::record([&](auto& event) {
+    event.name("reallocate")
+        .category(event::category::operation)
+        .arg("new_ptr", new_ptr)
+        .arg("allocator_ref", (void*)strategy)
+        .tag("allocator_name", strategy->getName());
+  });
+
+  return new_ptr;
 #else
   strategy::AllocationStrategy* strategy;
 
@@ -887,28 +1006,49 @@ void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size, camp:
 void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size, Allocator alloc)
 {
 #if defined(UMPIRE_RM_USE_NEW_OPS)
-  if (!current_ptr) {
-    return alloc.allocate(new_size);
+  if (current_ptr) {
+    // We need to check if the current pointer belongs to the same allocator
+    auto src_allocator = getAllocator(current_ptr);
+    if (src_allocator.getId() != alloc.getId()) {
+      UMPIRE_ERROR(runtime_error, fmt::format("Cannot reallocate {} from allocator \"{}\" with allocator \"{}\"",
+                                              current_ptr, src_allocator.getName(), alloc.getName()));
+    }
   }
 
-  if (new_size == 0) {
+  umpire::event::record([&](auto& event) {
+    event.name("reallocate")
+        .category(event::category::operation)
+        .arg("current_ptr", current_ptr)
+        .arg("size", new_size)
+        .arg("allocator_ref", (void*)alloc.getAllocationStrategy())
+        .tag("allocator_name", alloc.getName())
+        .tag("replay", "true");
+  });
+
+  void* new_ptr;
+
+  if (!current_ptr) {
+    new_ptr = alloc.allocate(new_size);
+  } else if (new_size == 0) {
     auto alloc_record = m_allocations.find(current_ptr);
     auto a = Allocator(alloc_record->strategy);
     a.deallocate(current_ptr);
-    return alloc.allocate(new_size);
+    new_ptr = alloc.allocate(new_size);
+  } else {
+    UMPIRE_LOG(Debug, "(current_ptr=" << current_ptr << ", new_size=" << new_size << ", with Allocator "
+                                      << alloc.getName() << ")");
+    new_ptr = umpire::reallocate(&current_ptr, new_size);
   }
 
-  // We need to check if the current pointer belongs to the same allocator
-  auto src_allocator = getAllocator(current_ptr);
-  if (src_allocator.getId() != alloc.getId()) {
-    UMPIRE_ERROR(runtime_error, fmt::format("Cannot reallocate {} from allocator \"{}\" with allocator \"{}\"",
-                                            current_ptr, src_allocator.getName(), alloc.getName()));
-  }
+  umpire::event::record([&](auto& event) {
+    event.name("reallocate")
+        .category(event::category::operation)
+        .arg("new_ptr", new_ptr)
+        .arg("allocator_ref", (void*)alloc.getAllocationStrategy())
+        .tag("allocator_name", alloc.getName());
+  });
 
-  UMPIRE_LOG(Debug, "(current_ptr=" << current_ptr << ", new_size=" << new_size << ", with Allocator "
-                                    << alloc.getName() << ")");
-
-  return umpire::reallocate(&current_ptr, new_size);
+  return new_ptr;
 #else
   umpire::event::record([&](auto& event) {
     event.name("reallocate")
@@ -938,29 +1078,52 @@ void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size, Alloc
                                   camp::resources::Resource& ctx)
 {
 #if defined(UMPIRE_RM_USE_NEW_OPS)
-  if (!current_ptr) {
-    return alloc.allocate(new_size);
+  if (current_ptr) {
+    // We need to check if the current pointer belongs to the same allocator
+    auto src_allocator = getAllocator(current_ptr);
+    if (src_allocator.getId() != alloc.getId()) {
+      UMPIRE_ERROR(runtime_error, fmt::format("Cannot reallocate {} from allocator \"{}\" with allocator \"{}\"",
+                                              current_ptr, src_allocator.getName(), alloc.getName()));
+    }
   }
 
-  if (new_size == 0) {
+  umpire::event::record([&](auto& event) {
+    event.name("reallocate")
+        .category(event::category::operation)
+        .arg("current_ptr", current_ptr)
+        .arg("size", new_size)
+        .arg("allocator_ref", (void*)alloc.getAllocationStrategy())
+        .tag("allocator_name", alloc.getName())
+        .tag("replay", "true")
+        .tag("async", "true");
+  });
+
+  void* new_ptr;
+
+  if (!current_ptr) {
+    new_ptr = alloc.allocate(new_size);
+  } else if (new_size == 0) {
     auto alloc_record = m_allocations.find(current_ptr);
     auto a = Allocator(alloc_record->strategy);
     a.deallocate(current_ptr);
-    return alloc.allocate(new_size);
+    new_ptr = alloc.allocate(new_size);
+  } else {
+    UMPIRE_LOG(Debug, "(current_ptr=" << current_ptr << ", new_size=" << new_size << ", with Allocator "
+                                      << alloc.getName() << ")");
+    auto ev = umpire::reallocate(&current_ptr, new_size, ctx);
+    UMPIRE_USE_VAR(ev);
+    new_ptr = current_ptr;
   }
 
-  // We need to check if the current pointer belongs to the same allocator
-  auto src_allocator = getAllocator(current_ptr);
-  if (src_allocator.getId() != alloc.getId()) {
-    UMPIRE_ERROR(runtime_error, fmt::format("Cannot reallocate {} from allocator \"{}\" with allocator \"{}\"",
-                                            current_ptr, src_allocator.getName(), alloc.getName()));
-  }
+  umpire::event::record([&](auto& event) {
+    event.name("reallocate")
+        .category(event::category::operation)
+        .arg("new_ptr", new_ptr)
+        .arg("allocator_ref", (void*)alloc.getAllocationStrategy())
+        .tag("allocator_name", alloc.getName());
+  });
 
-  UMPIRE_LOG(Debug, "(current_ptr=" << current_ptr << ", new_size=" << new_size << ", with Allocator "
-                                    << alloc.getName() << ")");
-
-  auto event = umpire::reallocate(&current_ptr, new_size, ctx);
-  return current_ptr;
+  return new_ptr;
 #else
   umpire::event::record([&](auto& event) {
     event.name("reallocate")
@@ -1093,15 +1256,57 @@ void* ResourceManager::move(void* src_ptr, Allocator allocator)
 #if defined(UMPIRE_RM_USE_NEW_OPS)
   UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", allocator=" << allocator.getName() << ")");
 
-  auto src_allocator = getAllocator(src_ptr);
+  auto alloc_record = m_allocations.find(src_ptr);
 
   // short-circuit if ptr was allocated by 'allocator'
-  if (src_allocator.getId() == allocator.getId()) {
+  if (alloc_record->strategy == allocator.getAllocationStrategy()) {
+    umpire::event::record([&](auto& event) {
+      event.name("move")
+          .category(event::category::operation)
+          .arg("ptr", src_ptr)
+          .arg("allocator_ref", (void*)allocator.getAllocationStrategy())
+          .tag("allocator_name", allocator.getName())
+          .tag("replay", "true");
+    });
     return src_ptr;
   }
 
+#if defined(UMPIRE_ENABLE_NUMA)
+  {
+    auto base_strategy = util::unwrap_allocator<strategy::AllocationStrategy>(allocator);
+
+    // If found, use op::NumaMoveOperation to move in-place (same address
+    // returned)
+    if (dynamic_cast<strategy::NumaPolicy*>(base_strategy)) {
+      auto& op_registry = op::MemoryOperationRegistry::getInstance();
+
+      auto src_alloc_record = m_allocations.find(src_ptr);
+
+      const std::size_t size{src_alloc_record->size};
+      util::AllocationRecord dst_alloc_record{nullptr, size, allocator.getAllocationStrategy()};
+
+      if (size > 0) {
+        auto op = op_registry.find("MOVE", src_alloc_record->strategy, dst_alloc_record.strategy);
+        void* ret{nullptr};
+        op->transform(src_ptr, &ret, src_alloc_record, &dst_alloc_record, size);
+        UMPIRE_ASSERT(ret == src_ptr);
+      }
+
+      umpire::event::record([&](auto& event) {
+        event.name("move")
+            .category(event::category::operation)
+            .arg("ptr", src_ptr)
+            .arg("allocator_ref", (void*)allocator.getAllocationStrategy())
+            .tag("allocator_name", allocator.getName())
+            .tag("replay", "true")
+            .arg("result", src_ptr);
+      });
+      return src_ptr;
+    }
+  }
+#endif
+
   // Check for offset pointers
-  auto alloc_record = m_allocations.find(src_ptr);
   if (src_ptr != alloc_record->ptr) {
     UMPIRE_ERROR(runtime_error, fmt::format("Cannot move an offset ptr (ptr={}, base={})", src_ptr, alloc_record->ptr));
   }
@@ -1115,6 +1320,16 @@ void* ResourceManager::move(void* src_ptr, Allocator allocator)
 
   // Deallocate original
   deallocate(src_ptr);
+
+  umpire::event::record([&](auto& event) {
+    event.name("move")
+        .category(event::category::operation)
+        .arg("ptr", src_ptr)
+        .arg("allocator_ref", (void*)allocator.getAllocationStrategy())
+        .tag("allocator_name", allocator.getName())
+        .tag("replay", "true")
+        .arg("result", dst_ptr);
+  });
 
   return dst_ptr;
 #else
@@ -1200,6 +1415,10 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::prefetch
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ", device=" << device << ")");
 
   auto alloc_record = m_allocations.find(ptr);
+
+  if (alloc_record->strategy->getTraits().resource != umpire::MemoryResourceTraits::resource_type::um) {
+    UMPIRE_ERROR(runtime_error, "ResourceManager::prefetch only works on allocations from a UM resource.");
+  }
 
   // Get size from offset to end of allocation
   std::ptrdiff_t offset = static_cast<char*>(ptr) - static_cast<char*>(alloc_record->ptr);
