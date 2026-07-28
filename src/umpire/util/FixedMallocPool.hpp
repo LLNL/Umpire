@@ -46,9 +46,8 @@ class FixedMallocPool {
  private:
   struct Pool {
     unsigned char* data;
-    unsigned char* next;
-    unsigned int num_initialized;
-    std::size_t num_free;
+    unsigned char* free_list;  // recycled slots, linked through their own storage
+    unsigned int num_used;     // high-water mark: slots ever handed out
     Pool(const std::size_t object_bytes, const std::size_t objects_per_pool);
   };
 
@@ -59,7 +58,6 @@ class FixedMallocPool {
   void* allocate_impl(std::size_t bytes);
 
   unsigned char* addr_from_index(const Pool& p, unsigned int i) const;
-  unsigned int index_from_addr(const Pool& p, const unsigned char* ptr) const;
 
   const std::size_t m_obj_bytes;
   const std::size_t m_obj_per_pool;
