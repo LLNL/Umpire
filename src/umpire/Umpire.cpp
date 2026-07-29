@@ -356,6 +356,21 @@ std::map<int, MPI_Comm>& get_cached_communicators()
   static std::map<int, MPI_Comm> cached_communicators{};
   return cached_communicators;
 }
+
+#if defined(UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
+std::string get_mpi3_socket_preflight_error_message(int error_code)
+{
+  char buffer[MPI_MAX_ERROR_STRING];
+  int length{0};
+  const int status = MPI_Error_string(error_code, buffer, &length);
+
+  if (status != MPI_SUCCESS) {
+    return fmt::format("MPI error code {} (MPI_Error_string failed with code {})", error_code, status);
+  }
+
+  return std::string{buffer, static_cast<std::size_t>(length)};
+}
+#endif
 } // namespace
 
 MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm)
@@ -404,15 +419,32 @@ void cleanup_cached_communicators()
 }
 #endif
 
-bool affinity_maps_to_single_socket(std::string& reason)
+#if defined(UMPIRE_ENABLE_MPI)
+bool can_use_socket_scoped_mpi3_shared_memory(MPI_Comm comm, std::string& reason)
 {
 #if defined(UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
-  return resource::affinity_maps_to_single_socket(reason);
+  const int local_affinity_valid = resource::affinity_maps_to_single_socket(reason) ? 1 : 0;
+  int all_affinity_valid{0};
+  const int status = MPI_Allreduce(&local_affinity_valid, &all_affinity_valid, 1, MPI_INT, MPI_MIN, comm);
+
+  if (status != MPI_SUCCESS) {
+    reason = fmt::format("MPI_Allreduce failed while checking socket affinity: {}",
+                         get_mpi3_socket_preflight_error_message(status));
+    return false;
+  }
+
+  if (!all_affinity_valid && local_affinity_valid) {
+    reason = "Another rank in the communicator does not map to a single socket";
+  }
+
+  return all_affinity_valid != 0;
 #else
+  UMPIRE_USE_VAR(comm);
   reason = "MPI3 shared memory support is disabled";
   return false;
 #endif
 }
+#endif
 
 void register_external_allocation(void* ptr, util::AllocationRecord record)
 {

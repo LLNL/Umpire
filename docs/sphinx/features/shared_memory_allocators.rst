@@ -81,6 +81,22 @@ Shared Memory allocators. For example, you can grab the MPI communicator for a p
    also call ``umpire::cleanup_cached_communicators()`` function before you call ``MPI_Finalize()``
    in order to avoid memory leaks.
 
+MPI3 socket-scoped shared memory also provides CPU-affinity preflight helpers:
+
+.. code-block:: cpp
+
+   std::string reason;
+
+   // Local-rank check. This inspects only the calling rank's CPU affinity mask.
+   if (!umpire::resource::affinity_maps_to_single_socket(reason)) {
+     // The calling rank is not pinned to exactly one socket.
+   }
+
+   // Collective check. Every rank in the communicator must call this function.
+   if (!umpire::can_use_socket_scoped_mpi3_shared_memory(MPI_COMM_WORLD, reason)) {
+     // At least one rank in MPI_COMM_WORLD cannot use socket scope.
+   }
+
 Additionally, we can double check that an allocator has the ``SHARED`` memory resource by asserting:
 
 .. code-block:: cpp

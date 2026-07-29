@@ -84,6 +84,8 @@ To create an allocator with the MPI3 Shared Memory resource, you can do the foll
 
 .. note::
    Socket scope requires Linux and MPI ranks bound such that each rank's CPU affinity mask maps to a single socket.
+   Use ``umpire::resource::affinity_maps_to_single_socket(reason)`` to check the calling rank, or
+   ``umpire::can_use_socket_scoped_mpi3_shared_memory(comm, reason)`` to check every rank in an MPI communicator.
 
 See the bottom of this page for a full example of how to use MPI3 Shared Memory Allocators with Umpire.
 

@@ -18,18 +18,13 @@ namespace umpire {
 namespace resource {
 
 /*!
- * \brief Determine whether the calling rank's CPU affinity mask spans exactly
- * one socket.
+ * \brief Check whether this rank is bound to one socket.
  *
- * Socket-scoped MPI3 shared memory requires each rank pinned to exactly one
- * socket so that ranks can be grouped into socket-local communicators.
+ * This is a local check; it does not communicate with other MPI ranks.
  *
- * On non-Linux platforms this function returns false because the MPI3 socket
- * scope implementation relies on Linux CPU affinity information.
+ * \param reason Failure reason when the check returns false.
  *
- * \param reason Diagnostic message describing why the check failed.
- *
- * \return true when the affinity mask is non-empty and maps to a single socket.
+ * \return true when this rank's CPU affinity maps to one socket.
  */
 bool affinity_maps_to_single_socket(std::string& reason);
 

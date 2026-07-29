@@ -22,25 +22,6 @@ const std::string trait_name = "SHARED::IPC";
 const std::string alloc_name = "SHARED::IPC::allocator";
 #endif
 
-#if defined(__linux__) && defined(UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
-namespace {
-
-bool all_ranks_affinity_maps_to_single_socket(std::string& reason)
-{
-  const int local_affinity_valid = umpire::affinity_maps_to_single_socket(reason) ? 1 : 0;
-  int all_affinity_valid{0};
-  MPI_Allreduce(&local_affinity_valid, &all_affinity_valid, 1, MPI_INT, MPI_MIN, MPI_COMM_WORLD);
-
-  if (!all_affinity_valid && local_affinity_valid) {
-    reason = "Another rank in MPI_COMM_WORLD does not map to a single socket";
-  }
-
-  return all_affinity_valid != 0;
-}
-
-} // namespace
-#endif
-
 TEST(GetCommunicator, Null)
 {
   auto& rm = umpire::ResourceManager::getInstance();
@@ -77,7 +58,7 @@ TEST(GetCommunicator, SharedSocket)
   traits.scope = umpire::MemoryResourceTraits::shared_scope::socket;
 
   std::string reason;
-  if (!all_ranks_affinity_maps_to_single_socket(reason)) {
+  if (!umpire::can_use_socket_scoped_mpi3_shared_memory(MPI_COMM_WORLD, reason)) {
     GTEST_SKIP() << reason;
   }
 

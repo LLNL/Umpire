@@ -35,7 +35,7 @@ namespace {
 
 constexpr int IGNORE_KEY{0};
 
-std::string get_mpi_error_message(int error_code)
+std::string get_mpi3_resource_error_message(int error_code)
 {
   char buffer[MPI_MAX_ERROR_STRING];
   int length{0};
@@ -51,7 +51,7 @@ std::string get_mpi_error_message(int error_code)
 void check_mpi_call(int error_code, const char* call_name)
 {
   if (error_code != MPI_SUCCESS) {
-    UMPIRE_ERROR(runtime_error, fmt::format("{} failed: {}", call_name, get_mpi_error_message(error_code)));
+    UMPIRE_ERROR(runtime_error, fmt::format("{} failed: {}", call_name, get_mpi3_resource_error_message(error_code)));
   }
 }
 

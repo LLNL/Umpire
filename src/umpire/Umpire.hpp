@@ -220,22 +220,19 @@ MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm);
 void cleanup_cached_communicators();
 #endif
 
+#if defined(UMPIRE_ENABLE_MPI)
 /*!
- * \brief Determine whether the calling rank's CPU affinity mask spans exactly
- * one socket.
+ * \brief Collective preflight check for socket-scoped MPI3 shared memory.
  *
- * Socket-scoped MPI3 shared memory requires each rank pinned to exactly one
- * socket so that ranks can be grouped into socket-local communicators.
+ * All ranks in \p comm must call this function.
  *
- * When MPI3 shared memory support is disabled (or the platform does not
- * provide the required affinity information), this function returns false and
- * populates \p reason with a diagnostic message.
+ * \param comm MPI communicator to check.
+ * \param reason Failure reason when the check returns false.
  *
- * \param reason Diagnostic message describing why the check failed.
- *
- * \return true when the affinity mask is non-empty and maps to a single socket.
+ * \return true when every rank in \p comm is bound to one socket.
  */
-bool affinity_maps_to_single_socket(std::string& reason);
+bool can_use_socket_scoped_mpi3_shared_memory(MPI_Comm comm, std::string& reason);
+#endif
 
 void register_external_allocation(void* ptr, util::AllocationRecord record);
 util::AllocationRecord deregister_external_allocation(void* ptr);
