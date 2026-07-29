@@ -159,8 +159,9 @@ inline camp::resources::EventProxy<camp::resources::Resource> copy_async(T* src,
   hipError_t error = ::hipMemcpyAsync(dst, src, size, kind, stream);
   if (error != hipSuccess) {
     UMPIRE_ERROR(runtime_error,
-                 fmt::format("hipMemcpyAsync(dst={}, src={}, size={}, kind={}, stream={}) failed with error: {}", dst,
-                             src, size, static_cast<int>(kind), static_cast<void*>(stream), hipGetErrorString(error)));
+                 fmt::format("hipMemcpyAsync(dst={}, src={}, size={}, kind={}, stream={}) failed with error: {}",
+                             fmt::ptr(dst), fmt::ptr(src), size, static_cast<int>(kind), static_cast<void*>(stream),
+                             hipGetErrorString(error)));
   }
 
   return camp::resources::EventProxy<camp::resources::Resource>{resource};
@@ -220,8 +221,8 @@ inline camp::resources::EventProxy<camp::resources::Resource> memset_async(T* pt
   hipError_t error = ::hipMemsetAsync(ptr, value, size, stream);
   if (error != hipSuccess) {
     UMPIRE_ERROR(runtime_error,
-                 fmt::format("hipMemsetAsync(ptr={}, value={}, size={}, stream={}) failed with error: {}", ptr, value,
-                             size, static_cast<void*>(stream), hipGetErrorString(error)));
+                 fmt::format("hipMemsetAsync(ptr={}, value={}, size={}, stream={}) failed with error: {}",
+                             fmt::ptr(ptr), value, size, static_cast<void*>(stream), hipGetErrorString(error)));
   }
 
   return camp::resources::EventProxy<camp::resources::Resource>{resource};
@@ -293,8 +294,8 @@ inline camp::resources::EventProxy<camp::resources::Resource> prefetch_async(T* 
 
     if (error != hipSuccess) {
       UMPIRE_ERROR(runtime_error,
-                   fmt::format("hipMemPrefetchAsync(ptr={}, size={}, device={}, stream={}) failed with error: {}", ptr,
-                               size, device, static_cast<void*>(stream), hipGetErrorString(error)));
+                   fmt::format("hipMemPrefetchAsync(ptr={}, size={}, device={}, stream={}) failed with error: {}",
+                               fmt::ptr(ptr), size, device, static_cast<void*>(stream), hipGetErrorString(error)));
     }
   }
 

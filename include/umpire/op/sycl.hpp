@@ -68,7 +68,7 @@ inline sycl::queue& get_queue_for_ptr(const void* ptr)
   auto* queue = record->strategy->getTraits().queue;
   if (!queue) {
     UMPIRE_ERROR(resource_error,
-                 fmt::format("No SYCL queue bound to allocation strategy for ptr={}", ptr));
+                 fmt::format("No SYCL queue bound to allocation strategy for ptr={}", fmt::ptr(ptr)));
   }
   return *queue;
 }

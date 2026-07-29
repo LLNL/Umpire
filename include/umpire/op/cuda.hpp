@@ -15,8 +15,8 @@ namespace op {
 // CUDA implementation helpers
 namespace detail {
 
-template <typename T>
 #if defined(__CUDACC__)
+template <typename T>
 __global__ void umpire_device_memset_kernel(T* data, T value, std::size_t count);
 #endif
 
@@ -118,8 +118,8 @@ inline void advise(T* ptr, std::size_t count, int device, cudaMemoryAdvise advic
 
   if (error != cudaSuccess) {
     UMPIRE_ERROR(runtime_error,
-                 fmt::format("cudaMemAdvise(ptr={}, size={}, advice={}, device={}) failed with error: {}", ptr, size,
-                             static_cast<int>(advice), device, cudaGetErrorString(error)));
+                 fmt::format("cudaMemAdvise(ptr={}, size={}, advice={}, device={}) failed with error: {}",
+                             fmt::ptr(ptr), size, static_cast<int>(advice), device, cudaGetErrorString(error)));
   }
 }
 
@@ -166,8 +166,9 @@ inline camp::resources::EventProxy<camp::resources::Resource> copy_async(T* src,
   cudaError_t error = ::cudaMemcpyAsync(dst, src, size, kind, stream);
   if (error != cudaSuccess) {
     UMPIRE_ERROR(runtime_error,
-                 fmt::format("cudaMemcpyAsync(dst={}, src={}, size={}, kind={}, stream={}) failed with error: {}", dst,
-                             src, size, static_cast<int>(kind), static_cast<void*>(stream), cudaGetErrorString(error)));
+                 fmt::format("cudaMemcpyAsync(dst={}, src={}, size={}, kind={}, stream={}) failed with error: {}",
+                             fmt::ptr(dst), fmt::ptr(src), size, static_cast<int>(kind), static_cast<void*>(stream),
+                             cudaGetErrorString(error)));
   }
 
   return camp::resources::EventProxy<camp::resources::Resource>{resource};
@@ -213,8 +214,8 @@ inline camp::resources::EventProxy<camp::resources::Resource> memset_async(T* pt
   cudaError_t error = ::cudaMemsetAsync(ptr, value, size, stream);
   if (error != cudaSuccess) {
     UMPIRE_ERROR(runtime_error,
-                 fmt::format("cudaMemsetAsync(ptr={}, value={}, size={}, stream={}) failed with error: {}", ptr, value,
-                             size, static_cast<void*>(stream), cudaGetErrorString(error)));
+                 fmt::format("cudaMemsetAsync(ptr={}, value={}, size={}, stream={}) failed with error: {}",
+                             fmt::ptr(ptr), value, size, static_cast<void*>(stream), cudaGetErrorString(error)));
   }
 
   return camp::resources::EventProxy<camp::resources::Resource>{resource};
@@ -296,8 +297,8 @@ inline camp::resources::EventProxy<camp::resources::Resource> prefetch_async(T* 
 
     if (error != cudaSuccess) {
       UMPIRE_ERROR(runtime_error,
-                   fmt::format("cudaMemPrefetchAsync(ptr={}, size={}, device={}, stream={}) failed with error: {}", ptr,
-                               size, device, static_cast<void*>(stream), cudaGetErrorString(error)));
+                   fmt::format("cudaMemPrefetchAsync(ptr={}, size={}, device={}, stream={}) failed with error: {}",
+                               fmt::ptr(ptr), size, device, static_cast<void*>(stream), cudaGetErrorString(error)));
     }
   }
 
