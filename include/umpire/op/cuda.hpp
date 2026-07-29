@@ -237,7 +237,8 @@ inline void prefetch(T* ptr, int device, std::size_t count)
   cudaError_t get_dev_err = cudaGetDevice(&current_device);
   if (get_dev_err != cudaSuccess) {
     UMPIRE_ERROR(runtime_error,
-                 fmt::format("cudaGetDevice failed: {} ({})", cudaGetErrorString(get_dev_err), get_dev_err));
+                 fmt::format("cudaGetDevice failed: {} ({})", cudaGetErrorString(get_dev_err),
+                             static_cast<int>(get_dev_err)));
   }
   int gpu = (device != cudaCpuDeviceId) ? device : current_device;
 #if CUDART_VERSION >= 13000
@@ -280,7 +281,8 @@ inline camp::resources::EventProxy<camp::resources::Resource> prefetch_async(T* 
   cudaError_t get_dev_err = cudaGetDevice(&current_device);
   if (get_dev_err != cudaSuccess) {
     UMPIRE_ERROR(runtime_error,
-                 fmt::format("cudaGetDevice failed: {} ({})", cudaGetErrorString(get_dev_err), get_dev_err));
+                 fmt::format("cudaGetDevice failed: {} ({})", cudaGetErrorString(get_dev_err),
+                             static_cast<int>(get_dev_err)));
   }
   int gpu = (device != cudaCpuDeviceId) ? device : current_device;
 #if CUDART_VERSION >= 13000
