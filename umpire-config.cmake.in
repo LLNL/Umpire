@@ -69,10 +69,17 @@ if (@UMPIRE_ENABLE_ALIAS_TARGETS@)
     get_target_property(_umpire_include_dirs umpire::umpire INTERFACE_INCLUDE_DIRECTORIES)
     get_target_property(_umpire_compile_defs umpire::umpire INTERFACE_COMPILE_DEFINITIONS)
 
+    set_target_properties(umpire PROPERTIES INTERFACE_LINK_LIBRARIES umpire::umpire)
+
+    if(_umpire_include_dirs AND NOT _umpire_include_dirs MATCHES "-NOTFOUND$")
+      set_target_properties(umpire PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${_umpire_include_dirs}")
+    endif()
+
+    if(_umpire_compile_defs AND NOT _umpire_compile_defs MATCHES "-NOTFOUND$")
+      set_target_properties(umpire PROPERTIES INTERFACE_COMPILE_DEFINITIONS "${_umpire_compile_defs}")
+    endif()
+
     set_target_properties(umpire PROPERTIES
-      INTERFACE_LINK_LIBRARIES umpire::umpire
-      INTERFACE_INCLUDE_DIRECTORIES "${_umpire_include_dirs}"
-      INTERFACE_COMPILE_DEFINITIONS "${_umpire_compile_defs}"
       DEPRECATION "Target 'umpire' is deprecated. Please use 'umpire::umpire' instead. To disable this warning and backwards-compatible targets, set UMPIRE_ENABLE_ALIAS_TARGETS=OFF when configuring Umpire.")
 
     unset(_umpire_include_dirs)
@@ -86,10 +93,17 @@ if (@UMPIRE_ENABLE_ALIAS_TARGETS@)
     get_target_property(_umpire_device_include_dirs umpire::umpire_device INTERFACE_INCLUDE_DIRECTORIES)
     get_target_property(_umpire_device_compile_defs umpire::umpire_device INTERFACE_COMPILE_DEFINITIONS)
 
+    set_target_properties(umpire_device PROPERTIES INTERFACE_LINK_LIBRARIES umpire::umpire_device)
+
+    if(_umpire_device_include_dirs AND NOT _umpire_device_include_dirs MATCHES "-NOTFOUND$")
+      set_target_properties(umpire_device PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${_umpire_device_include_dirs}")
+    endif()
+
+    if(_umpire_device_compile_defs AND NOT _umpire_device_compile_defs MATCHES "-NOTFOUND$")
+      set_target_properties(umpire_device PROPERTIES INTERFACE_COMPILE_DEFINITIONS "${_umpire_device_compile_defs}")
+    endif()
+
     set_target_properties(umpire_device PROPERTIES
-      INTERFACE_LINK_LIBRARIES umpire::umpire_device
-      INTERFACE_INCLUDE_DIRECTORIES "${_umpire_device_include_dirs}"
-      INTERFACE_COMPILE_DEFINITIONS "${_umpire_device_compile_defs}"
       DEPRECATION "Target 'umpire_device' is deprecated. Please use 'umpire::umpire_device' instead. To disable this warning and backwards-compatible targets, set UMPIRE_ENABLE_ALIAS_TARGETS=OFF when configuring Umpire.")
 
     unset(_umpire_device_include_dirs)
