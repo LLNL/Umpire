@@ -170,7 +170,8 @@ if (UMPIRE_ENABLE_LOGGING AND NOT TARGET spdlog::spdlog)
       NO_DEFAULT_PATH
       PATHS
         ${spdlog_DIR}
-        ${spdlog_DIR}/lib/cmake/spdlog)
+        ${spdlog_DIR}/lib/cmake/spdlog
+        ${spdlog_DIR}/lib64/cmake/spdlog)
 
     set_target_properties(spdlog::spdlog PROPERTIES IMPORTED_GLOBAL TRUE)
     blt_convert_to_system_includes(TARGET spdlog::spdlog)
