@@ -5,23 +5,21 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "gtest/gtest.h"
-
 #include "umpire/config.hpp"
 
 #if defined(UMPIRE_ENABLE_LOGGING)
-#include "umpire/util/Logger.hpp"
-#include "umpire/util/io.hpp"
-
 #include <cstdlib>
 #include <fstream>
 #include <string>
+
+#include "umpire/util/Logger.hpp"
+#include "umpire/util/io.hpp"
 
 #if !defined(_MSC_VER)
 #include <unistd.h>
 #else
 #include <process.h>
 #define getpid _getpid
-#define putenv _putenv
 #define unsetenv(name) _putenv_s(name, "")
 #endif
 
@@ -29,7 +27,8 @@ class LoggerTest : public ::testing::Test {
  protected:
   void SetUp() override
   {
-    // Clear environment variables before each test
+    // Clear environment variables and logger state before each test so
+    // every test exercises a fresh Logger::initialize()
 #if defined(_MSC_VER)
     _putenv_s("UMPIRE_LOG_LEVEL", "");
     _putenv_s("UMPIRE_LOG_TO_CONSOLE", "");
@@ -41,11 +40,12 @@ class LoggerTest : public ::testing::Test {
     unsetenv("UMPIRE_LOG_ASYNC");
     unsetenv("UMPIRE_LOG_QUEUE_SIZE");
 #endif
+    umpire::util::Logger::reset();
   }
 
   void TearDown() override
   {
-    // Clean up environment after each test
+    // Clean up environment and logger state after each test
     SetUp();
   }
 
@@ -188,7 +188,8 @@ TEST_F(LoggerTest, LogMessageWrittenToFile)
   const std::string test_message = "LoggerTest_UniqueMessage_12345";
   umpire::util::Logger::log(umpire::util::message::Info, test_message, __FILE__, __LINE__);
 
-  umpire::util::Logger::finalize();
+  // reset() flushes and destroys the logger, guaranteeing the message is on disk
+  umpire::util::Logger::reset();
 
   // Check that the message was written to the log file
   ASSERT_TRUE(logFileContains(test_message));
@@ -211,7 +212,9 @@ TEST_F(LoggerTest, AsyncLoggingMode)
   const std::string test_message = "AsyncTest_Message_67890";
   umpire::util::Logger::log(umpire::util::message::Info, test_message, __FILE__, __LINE__);
 
-  umpire::util::Logger::finalize();
+  // reset() joins the async worker thread, guaranteeing the message is on disk
+  // (finalize() alone only enqueues a flush request in async mode)
+  umpire::util::Logger::reset();
 
   // Message should still be written even in async mode
   ASSERT_TRUE(logFileContains(test_message));
@@ -303,17 +306,18 @@ TEST_F(LoggerTest, ConsoleOutputEnabled)
   umpire::util::Logger::finalize();
 }
 
-TEST_F(LoggerTest, DefaultConsoleOutputEnabled)
+TEST_F(LoggerTest, DefaultConsoleOutputDisabled)
 {
 #if defined(_MSC_VER)
   _putenv_s("UMPIRE_LOG_LEVEL", "INFO");
-  // Don't set UMPIRE_LOG_TO_CONSOLE - should default to enabled
+  // Don't set UMPIRE_LOG_TO_CONSOLE - console defaults to disabled (file only)
 #else
   setenv("UMPIRE_LOG_LEVEL", "INFO", 1);
-  // Don't set UMPIRE_LOG_TO_CONSOLE - should default to enabled
+  // Don't set UMPIRE_LOG_TO_CONSOLE - console defaults to disabled (file only)
 #endif
 
-  // Should initialize successfully with default console output (enabled)
+  // Should initialize successfully with default console output (disabled);
+  // the behavioral stderr check lives in tests/integration/io/log_tests_runner.py
   ASSERT_NO_THROW(umpire::util::Logger::initialize());
 
   umpire::util::Logger::finalize();
