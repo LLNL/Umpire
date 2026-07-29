@@ -6,9 +6,10 @@
 //////////////////////////////////////////////////////////////////////////////
 
 // FixedMallocPool hands out fixed-size slots from malloc()'d pools.
-// Recycled slots are kept on a LIFO free list linked through their own
-// storage; slots that have never been handed out are dispensed in order
-// with a bump pointer and are never read or written until allocated.
+// Recycled slots are kept on a LIFO free list of slot indices linked
+// through the slots' own storage; slots that have never been handed out
+// are dispensed in order with a bump pointer and are never read or
+// written until allocated.
 
 #include "umpire/util/FixedMallocPool.hpp"
 
@@ -28,8 +29,15 @@ inline unsigned char* FixedMallocPool::addr_from_index(const FixedMallocPool::Po
   return p.data + i * m_obj_bytes;
 }
 
+inline unsigned int FixedMallocPool::index_from_addr(const FixedMallocPool::Pool& p, const unsigned char* ptr) const
+{
+  return static_cast<unsigned int>((ptr - p.data) / m_obj_bytes);
+}
+
 FixedMallocPool::Pool::Pool(const std::size_t object_bytes, const std::size_t objects_per_pool)
-    : data(static_cast<unsigned char*>(std::malloc(object_bytes * objects_per_pool))), free_list(nullptr), num_used(0)
+    : data(static_cast<unsigned char*>(std::malloc(object_bytes * objects_per_pool))),
+      free_list(static_cast<unsigned int>(objects_per_pool)),
+      num_used(0)
 {
 }
 
@@ -37,7 +45,7 @@ FixedMallocPool::FixedMallocPool(const std::size_t object_bytes, const std::size
     : m_obj_bytes(object_bytes), m_obj_per_pool(objects_per_pool), m_data_bytes(m_obj_bytes * m_obj_per_pool), m_pool()
 {
   // Free-list links are stored in the slots themselves
-  UMPIRE_ASSERT(object_bytes >= sizeof(unsigned char*));
+  UMPIRE_ASSERT(object_bytes >= sizeof(unsigned int));
   newPool();
 }
 
@@ -54,10 +62,10 @@ void FixedMallocPool::newPool()
 
 void* FixedMallocPool::allocInPool(Pool& p) noexcept
 {
-  if (p.free_list) {
-    void* ret = static_cast<void*>(p.free_list);
-    p.free_list = *reinterpret_cast<unsigned char**>(p.free_list);
-    return ret;
+  if (p.free_list < m_obj_per_pool) {
+    unsigned char* ret = addr_from_index(p, p.free_list);
+    p.free_list = *reinterpret_cast<unsigned int*>(ret);
+    return static_cast<void*>(ret);
   }
 
   if (p.num_used < m_obj_per_pool) {
@@ -101,8 +109,8 @@ void FixedMallocPool::deallocate(void* ptr)
     const unsigned char* t_ptr = reinterpret_cast<unsigned char*>(ptr);
     const ptrdiff_t offset = t_ptr - p.data;
     if ((offset >= 0) && (offset < static_cast<ptrdiff_t>(m_data_bytes))) {
-      *reinterpret_cast<unsigned char**>(ptr) = p.free_list;
-      p.free_list = reinterpret_cast<unsigned char*>(ptr);
+      *reinterpret_cast<unsigned int*>(ptr) = p.free_list;
+      p.free_list = index_from_addr(p, t_ptr);
       return;
     }
   }

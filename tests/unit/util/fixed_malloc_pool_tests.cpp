@@ -126,6 +126,28 @@ TEST_F(FixedMallocPoolTest, ExhaustionGrowsPool)
   ASSERT_EQ(pool.numPools(), 2);
 }
 
+TEST(FixedMallocPoolSmallObjectTest, IntSizedObjects)
+{
+  // MemoryMap<int> instantiates FixedMallocPool with sizeof(int); the
+  // free list must fit in a slot that small
+  umpire::util::FixedMallocPool small_pool{sizeof(int), objects_per_pool};
+
+  void* a = small_pool.allocate(sizeof(int));
+  void* b = small_pool.allocate(sizeof(int));
+  ASSERT_NE(a, nullptr);
+  ASSERT_NE(b, nullptr);
+  ASSERT_NE(a, b);
+
+  small_pool.deallocate(a);
+  small_pool.deallocate(b);
+
+  ASSERT_EQ(small_pool.allocate(sizeof(int)), b);
+  ASSERT_EQ(small_pool.allocate(sizeof(int)), a);
+
+  small_pool.deallocate(a);
+  small_pool.deallocate(b);
+}
+
 TEST_F(FixedMallocPoolTest, DeallocateUnknownPointer)
 {
   int not_from_pool;
