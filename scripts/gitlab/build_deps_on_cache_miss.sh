@@ -78,27 +78,34 @@ run_uberenv ()
     "${cmd[@]}" "$@"
 }
 
+clean_hostconfig ()
+{
+    # Clear stale host-config from any prior build before generating a fresh one.
+    shopt -s nullglob
+    stale_cmake=( "${prefix}"/*.cmake )
+    shopt -u nullglob
+    if [[ ${#stale_cmake[@]} -gt 0 ]]
+    then
+        print_info "Removing stale host-config files: ${stale_cmake[*]}"
+        rm -f "${stale_cmake[@]}"
+    fi
+}
+
 find_project_hostconfig ()
 {
     local hostconfigs=()
     shopt -s nullglob
-    hostconfigs=( "${project_dir}"/*.cmake )
+    hostconfigs=( "${prefix}"/*.cmake )
     shopt -u nullglob
 
-    if [[ ${#hostconfigs[@]} == 1 ]]
+    if [[ ${#hostconfigs[@]} -ne 1 ]]
     then
-        printf '%s\n' "${hostconfigs[0]}"
-    elif [[ ${#hostconfigs[@]} == 0 ]]
-    then
-        print_error "No result for: ${project_dir}/*.cmake"
-        print_error "Spack generated host-config not found."
-        return 1
-    else
-        print_error "More than one result for: ${project_dir}/*.cmake"
-        print_error "${hostconfigs[@]}"
-        print_error "Expected a single generated host-config."
+        print_error "Expected exactly one .cmake file in ${prefix}, found ${#hostconfigs[@]}:"
+        printf '%s\n' "${hostconfigs[@]}"
         return 1
     fi
+
+    printf '%s\n' "${hostconfigs[0]}"
 }
 
 configure_spack_storage ()
@@ -174,54 +181,60 @@ publish_cached_hostconfig ()
     print_info "Materialized host-config path: ${local_hostconfig}"
 }
 
-main ()
-{
-    if [[ -z "${spec}" ]]
-    then
-        print_error "SPEC is undefined, aborting..."
-        return 1
-    fi
+###############################################################################
+# SCRIPT CORE
+###############################################################################
 
-    local prefix_opt="${1}"
-    # Ensure shared filesystem artifacts keep group-writable permissions.
-    umask "${umpire_ci_storage_umask}"
-    local spack_user_cache="${prefix}/spack-user-cache"
-    export SPACK_DISABLE_LOCAL_CONFIG=""
-    export SPACK_USER_CACHE_PATH="${spack_user_cache}"
-    mkdir -p "${spack_user_cache}"
+if [[ -z "${spec}" ]]
+then
+    print_error "SPEC is undefined, aborting..."
+    return 1
+fi
 
-    run_section "spack_setup" "Spack setup and environment" "collapsed" \
-      "Spack environment setup failed (Uberenv)" \
-      run_uberenv --setup-and-env-only --spec="${spec}" "${prefix_opt}"
+if [[ ! -d "${prefix}" ]]
+then
+    print_error "PREFIX ${prefix} does not exist or is not a directory, aborting..."
+    return 1
+fi
 
-    configure_spack_storage
+# Ensure shared filesystem artifacts keep group-writable permissions.
+umask "${umpire_ci_storage_umask}"
+spack_user_cache="${prefix}/spack-user-cache"
+export SPACK_DISABLE_LOCAL_CONFIG=""
+export SPACK_USER_CACHE_PATH="${spack_user_cache}"
+mkdir -p "${spack_user_cache}"
 
-    if [[ -n "${ci_registry_token}" && ${push_to_registry} == true ]]
-    then
-        run_section "registry_setup" "GitLab registry as Spack Buildcache" "collapsed" \
-          "Adding gitlab registry to spack environment failed" \
-          run_spack -D "${prefix}/spack_env" mirror add --unsigned --oci-username-variable ci_registry_user --oci-password-variable ci_registry_token gitlab_ci "oci://${ci_registry_image}"
-    fi
+run_section "spack_setup" "Spack setup and environment" "collapsed" \
+  "Spack environment setup failed (Uberenv)" \
+  run_uberenv --setup-and-env-only --spec="${spec}" --prefix="${prefix}"
 
-    run_section "spack_build" "Spack build of dependencies" "collapsed" \
-      "Spack build of dependencies failed (Uberenv)" \
-      run_uberenv --skip-setup-and-env --spec="${spec}" "${prefix_opt}"
+configure_spack_storage
 
-    # Push dependencies and publish a host-config keyed by cache identity.
-    run_section "filesystem_buildcache_push" "Push dependencies to filesystem buildcache" "collapsed" \
-      "Pushing dependencies to filesystem buildcache failed" \
-      run_spack -D "${prefix}/spack_env" buildcache push --only dependencies --unsigned --update-index umpire_ci_buildcache
+if [[ -n "${ci_registry_token}" && ${push_to_registry} == true ]]
+then
+    run_section "registry_setup" "GitLab registry as Spack Buildcache" "collapsed" \
+      "Adding gitlab registry to spack environment failed" \
+      run_spack -D "${prefix}/spack_env" mirror add --unsigned --oci-username-variable ci_registry_user --oci-password-variable ci_registry_token gitlab_ci "oci://${ci_registry_image}"
+fi
 
-    local generated_hostconfig
-    generated_hostconfig="$(find_project_hostconfig)" || return 1
-    publish_cached_hostconfig "${generated_hostconfig}"
+clean_hostconfig
 
-    if [[ -n "${ci_registry_token}" && ${push_to_registry} == true ]]
-    then
-        run_section "registry_buildcache_push" "Push dependencies to GitLab registry buildcache" "collapsed" \
-          "Pushing dependencies to gitlab registry failed" \
-          run_spack -D "${prefix}/spack_env" buildcache push --only dependencies gitlab_ci
-    fi
-}
+run_section "spack_build" "Spack build of dependencies" "collapsed" \
+  "Spack build of dependencies failed (Uberenv)" \
+  run_uberenv --skip-setup-and-env --spec="${spec}" --prefix="${prefix}"
 
-main "--prefix=${prefix}"
+generated_hostconfig="$(find_project_hostconfig)" || return 1
+
+# Push dependencies and publish a host-config keyed by cache identity.
+run_section "filesystem_buildcache_push" "Push dependencies to filesystem buildcache" "collapsed" \
+  "Pushing dependencies to filesystem buildcache failed" \
+  run_spack -D "${prefix}/spack_env" buildcache push --only dependencies --unsigned --update-index umpire_ci_buildcache
+
+publish_cached_hostconfig "${generated_hostconfig}"
+
+if [[ -n "${ci_registry_token}" && ${push_to_registry} == true ]]
+then
+    run_section "registry_buildcache_push" "Push dependencies to GitLab registry buildcache" "collapsed" \
+      "Pushing dependencies to gitlab registry failed" \
+      run_spack -D "${prefix}/spack_env" buildcache push --only dependencies gitlab_ci
+fi
