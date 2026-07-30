@@ -71,8 +71,9 @@ using hip = resource::hip_platform;
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
 using omp_target = resource::omp_target_platform;
 #endif
-#if defined(UMPIRE_ENABLE_SYCL)
-using sycl = resource::sycl_platform;
-#endif
+// No `umpire::sycl` alias: inside `namespace umpire` it would shadow the
+// SYCL standard library's global `::sycl` namespace, breaking unqualified
+// `sycl::queue`/`sycl::event` references throughout umpire's SYCL code.
+// Use umpire::resource::sycl_platform directly instead.
 
 } // namespace umpire
