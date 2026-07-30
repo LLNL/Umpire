@@ -19,6 +19,7 @@
 #include "umpire/util/error.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/resource/platform.hpp"
+#include "umpire/op/operations.hpp"
 #include "umpire/op/detail/utils.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"

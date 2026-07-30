@@ -15,6 +15,7 @@
 #include "umpire/util/error.hpp"
 #include "umpire/util/sycl_compat.hpp"
 #include "umpire/resource/platform.hpp"
+#include "umpire/op/operations.hpp"
 #include "umpire/op/detail/utils.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "camp/resource.hpp"
