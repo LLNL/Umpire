@@ -142,8 +142,8 @@ protected:
     if constexpr (Tracking) {
       untrack_allocation(ptr);
     }
-    using pointer = typename std::allocator_traits<Allocator>::pointer;
-    allocator_.deallocate(static_cast<pointer>(ptr), size);
+    // Backend allocator wrappers use a char-based interface.
+    allocator_.deallocate(static_cast<char*>(ptr), size);
   }
 
 public:

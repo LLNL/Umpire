@@ -38,8 +38,8 @@ namespace strategy {
 //! @par Memory Release
 //! - release() method returns completely free pools to parent
 //! - Always keeps at least one pool allocated
-//! - Cannot track which pool an object came from (for performance)
-//! - Therefore release() is conservative and only releases full pools
+//! - Pool membership is recomputed from address ranges during release(),
+//!   so only pools whose every slot is free are returned to the parent
 //!
 //! @par Platform Propagation
 //! The platform type is propagated from the wrapped memory source:
@@ -183,33 +183,81 @@ public:
   //! @brief Release unused pools back to parent memory source
   //!
   //! Returns completely free pools to the parent while keeping at least
-  //! one pool allocated. Since we don't track which pool each object
-  //! came from (for performance), we can only release pools when we know
-  //! for certain that entire pools are free.
+  //! one pool allocated. A pool is releasable only when every one of its
+  //! slots is currently on the free list, determined by partitioning the
+  //! free list by each pool's address range.
   //!
-  //! This implementation is conservative: it only releases pools when
-  //! free_objects_ >= objects_per_pool_ and keeps at least one pool.
+  //! Allocation and deallocation remain O(1); the membership scan cost is
+  //! confined to release() itself.
   void release() {
-    // Can only release complete pools, and must keep at least one
-    while (pools_.size() > 1 && free_objects_ >= objects_per_pool_) {
-      // Remove last pool
-      void* pool = pools_.back();
-      pools_.pop_back();
-      parent_->deallocate(pool);
+    if (pools_.size() <= 1) {
+      return;
+    }
 
-      // Remove objects from free list
-      // Note: We don't know which entries in free_list_ belong to this pool,
-      // so we just remove the last objects_per_pool_ entries since they
-      // should correspond to the most recently freed objects
-      for (std::size_t i = 0; i < objects_per_pool_; ++i) {
-        if (!free_list_.empty()) {
-          free_list_.pop_back();
+    const std::size_t pool_bytes = object_size_ * objects_per_pool_;
+
+    auto pool_index_of = [&](void* slot) -> std::size_t {
+      const char* addr = static_cast<const char*>(slot);
+      for (std::size_t i = 0; i < pools_.size(); ++i) {
+        const char* base = static_cast<const char*>(pools_[i]);
+        if (addr >= base && static_cast<std::size_t>(addr - base) < pool_bytes) {
+          return i;
         }
       }
+      // Unreachable for slots produced by this pool.
+      return pools_.size();
+    };
 
-      total_objects_ -= objects_per_pool_;
-      free_objects_ -= objects_per_pool_;
+    // Count free slots per pool.
+    std::vector<std::size_t> free_count(pools_.size(), 0);
+    for (void* slot : free_list_) {
+      std::size_t index = pool_index_of(slot);
+      if (index < pools_.size()) {
+        ++free_count[index];
+      }
     }
+
+    // Mark fully-free pools releasable, always keeping at least one pool.
+    std::vector<bool> releasable(pools_.size(), false);
+    std::size_t pools_kept = pools_.size();
+    for (std::size_t i = 0; i < pools_.size() && pools_kept > 1; ++i) {
+      if (free_count[i] == objects_per_pool_) {
+        releasable[i] = true;
+        --pools_kept;
+      }
+    }
+
+    if (pools_kept == pools_.size()) {
+      return;
+    }
+
+    // Drop free-list entries belonging to released pools.
+    std::vector<void*> surviving_free_list;
+    surviving_free_list.reserve(free_list_.size());
+    for (void* slot : free_list_) {
+      std::size_t index = pool_index_of(slot);
+      if (index >= pools_.size() || !releasable[index]) {
+        surviving_free_list.push_back(slot);
+      }
+    }
+    free_list_ = std::move(surviving_free_list);
+
+    // Return released pools to the parent and rebuild the pool list.
+    std::vector<void*> surviving_pools;
+    surviving_pools.reserve(pools_kept);
+    std::size_t released_pools = 0;
+    for (std::size_t i = 0; i < pools_.size(); ++i) {
+      if (releasable[i]) {
+        parent_->deallocate(pools_[i]);
+        ++released_pools;
+      } else {
+        surviving_pools.push_back(pools_[i]);
+      }
+    }
+    pools_ = std::move(surviving_pools);
+
+    total_objects_ -= released_pools * objects_per_pool_;
+    free_objects_ -= released_pools * objects_per_pool_;
   }
 
   //! @brief Get the fixed object size for this pool

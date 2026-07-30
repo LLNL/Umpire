@@ -93,14 +93,18 @@ std::optional<allocation_record> registry::find_allocation(void* ptr) const
 std::optional<allocation_record> registry::find_containing_allocation(void* ptr) const
 {
   std::lock_guard<std::mutex> lock{allocation_mutex_};
-  const auto target = reinterpret_cast<std::uintptr_t>(ptr);
 
-  for (const auto& [base, record] : allocation_map_) {
-    (void)base;
-    const auto begin = reinterpret_cast<std::uintptr_t>(record.ptr);
-    if (target >= begin && (target - begin) < record.size) {
-      return record;
-    }
+  // The candidate record is the one with the greatest base pointer <= ptr.
+  auto it = allocation_map_.upper_bound(ptr);
+  if (it == allocation_map_.begin()) {
+    return std::nullopt;
+  }
+  --it;
+
+  const auto target = reinterpret_cast<std::uintptr_t>(ptr);
+  const auto begin = reinterpret_cast<std::uintptr_t>(it->second.ptr);
+  if (target >= begin && (target - begin) < it->second.size) {
+    return it->second;
   }
 
   return std::nullopt;
@@ -116,6 +120,36 @@ bool registry::has_allocation(void* ptr) const
 {
   std::lock_guard<std::mutex> lock{allocation_mutex_};
   return allocation_map_.find(ptr) != allocation_map_.end();
+}
+
+std::vector<allocation_record> registry::find_allocations_by_memory(const memory* mem) const
+{
+  std::lock_guard<std::mutex> lock{allocation_mutex_};
+  std::vector<allocation_record> records;
+
+  for (const auto& [base, record] : allocation_map_) {
+    (void)base;
+    if (record.strategy == mem) {
+      records.push_back(record);
+    }
+  }
+
+  return records;
+}
+
+std::vector<allocation_record> registry::find_allocations_by_memory(int id) const
+{
+  std::lock_guard<std::mutex> lock{allocation_mutex_};
+  std::vector<allocation_record> records;
+
+  for (const auto& [base, record] : allocation_map_) {
+    (void)base;
+    if (record.strategy && record.strategy->get_id() == id) {
+      records.push_back(record);
+    }
+  }
+
+  return records;
 }
 
 } // namespace detail

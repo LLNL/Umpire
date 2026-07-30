@@ -210,14 +210,14 @@ SDKROOT=$(xcrun --show-sdk-path)
 ```
 
 The representative `cppcheck` pass used for API v2 host validation should
-enable inline suppressions and explicitly suppress the known
-`noExplicitConstructor` false positives on the intentionally implicit
-`allocator<T, Memory>` rebind constructor:
+enable inline suppressions. The intentionally implicit `allocator<T, Memory>`
+rebind constructor carries an inline `cppcheck-suppress noExplicitConstructor`
+annotation; only the legacy v1 `Allocator.hpp` still needs a file-level
+suppression:
 
 ```bash
 cppcheck \
   --inline-suppr \
-  --suppress=noExplicitConstructor:include/umpire/allocator.hpp \
   --suppress=noExplicitConstructor:include/umpire/Allocator.hpp \
   --enable=warning,style,performance,portability \
   --std=c++17 \

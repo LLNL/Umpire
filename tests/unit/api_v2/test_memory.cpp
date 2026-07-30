@@ -20,6 +20,7 @@ namespace {
 class test_memory : public umpire::memory {
 public:
   test_memory() : umpire::memory{"test"} { }
+  explicit test_memory(const std::string& name) : umpire::memory{name} { }
 
   void* allocate(std::size_t size) override
   {
@@ -86,6 +87,63 @@ TEST(memory, unknown_allocation_throws)
   } catch (...) {
     FAIL() << "Expected umpire::unknown_allocation";
   }
+}
+
+TEST(memory, deallocate_through_wrong_owner_throws)
+{
+  test_memory owner{"owner"};
+  test_memory other{"other"};
+
+  void* ptr = owner.allocate(16);
+
+  try {
+    other.deallocate(ptr);
+    FAIL() << "Expected unknown_allocation";
+  } catch (const umpire::unknown_allocation& e) {
+    const std::string what{e.what()};
+    EXPECT_NE(what.find("owned by"), std::string::npos);
+    EXPECT_NE(what.find("owner"), std::string::npos);
+    EXPECT_NE(what.find("other"), std::string::npos);
+  } catch (...) {
+    FAIL() << "Expected umpire::unknown_allocation";
+  }
+
+  // The failed deallocation must not have disturbed the record or the
+  // statistics of either object.
+  EXPECT_TRUE(umpire::detail::registry::get().has_allocation(ptr));
+  EXPECT_EQ(owner.get_current_size(), 16);
+  EXPECT_EQ(other.get_current_size(), 0);
+
+  owner.deallocate(ptr);
+}
+
+TEST(memory, destruction_with_active_allocations_warns_and_does_not_deallocate)
+{
+  void* leaked{nullptr};
+  {
+    test_memory mem{"leaky"};
+    leaked = mem.allocate(32);
+    // mem is destroyed here with one live allocation: the destructor must
+    // warn (not throw) and must NOT deallocate the tracked allocation.
+  }
+
+  // The record intentionally survives the memory object's destruction.
+  auto& registry = umpire::detail::registry::get();
+  EXPECT_TRUE(registry.has_allocation(leaked));
+
+  // Clean up the orphaned record and storage so other tests are unaffected.
+  registry.remove_allocation(leaked);
+  std::free(leaked);
+}
+
+TEST(memory, destruction_with_no_allocations_is_silent)
+{
+  {
+    test_memory mem{"clean"};
+    void* ptr = mem.allocate(8);
+    mem.deallocate(ptr);
+  }
+  SUCCEED();
 }
 
 TEST(memory, registry_lookup_returns_stable_copy)

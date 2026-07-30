@@ -115,12 +115,8 @@ public:
   void deallocate(void* ptr) override {
     if (!ptr) return;  // nullptr deallocation is safe no-op
 
-    if constexpr (Tracking) {
-      base::untrack_allocation(ptr);
-    }
-
-    // malloc_allocator doesn't need size, just passes ignored parameter
-    base::allocator_.deallocate(static_cast<char*>(ptr), 0);
+    // malloc_allocator ignores the size parameter
+    base::deallocate_impl(ptr, 0);
   }
 };
 

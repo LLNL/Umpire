@@ -63,8 +63,7 @@ public:
    *
    * \throws std::invalid_argument if `memory_source` is null.
    */
-  // Dummy second parameter avoids cppcheck's single-argument constructor heuristic
-  explicit allocator(Memory* memory_source, int /*unused_tag*/ = 0)
+  explicit allocator(Memory* memory_source)
     : memory_(memory_source)
   {
     if (!memory_) {
@@ -85,6 +84,7 @@ public:
    *       container rebinding requirements.
    */
   template<typename U>
+  // cppcheck-suppress noExplicitConstructor
   allocator(const allocator<U, Memory>& other)
     : memory_(other.get_memory())
   {

@@ -13,6 +13,7 @@
 
 #include <algorithm>
 #include <cstdlib>
+#include <cstring>
 #include <stdexcept>
 #include <vector>
 
@@ -301,6 +302,145 @@ TEST(fixed_pool, release_keeps_at_least_one_pool)
   void* ptr = pool.allocate(64);
   EXPECT_NE(ptr, nullptr);
   pool.deallocate(ptr);
+}
+
+TEST(fixed_pool, release_only_removes_fully_free_pool)
+{
+  test_memory parent;
+  umpire::strategy::fixed_pool<test_memory> pool("fixed_pool", &parent, 64, 10);
+
+  // Two pools: ptrs[0..9] come from the first pool, ptrs[10..19] from the
+  // second (the free list is fully drained before each growth).
+  std::vector<void*> ptrs;
+  for (int i = 0; i < 20; ++i) {
+    ptrs.push_back(pool.allocate(64));
+  }
+  EXPECT_EQ(pool.get_pool_count(), 2);
+
+  // Free the FIRST pool's objects; the second pool stays fully live.
+  for (int i = 0; i < 10; ++i) {
+    pool.deallocate(ptrs[i]);
+  }
+  EXPECT_EQ(pool.get_free_objects(), 10);
+
+  pool.release();
+
+  // Only the fully-free first pool may be released; live allocations from
+  // the second pool must survive.
+  EXPECT_EQ(pool.get_pool_count(), 1);
+  EXPECT_EQ(pool.get_allocated_objects(), 10);
+  EXPECT_EQ(pool.get_free_objects(), 0);
+
+  // Surviving pointers remain usable.
+  for (int i = 10; i < 20; ++i) {
+    std::memset(ptrs[i], 0xAB, 64);
+    EXPECT_EQ(static_cast<unsigned char*>(ptrs[i])[0], 0xAB);
+    EXPECT_EQ(static_cast<unsigned char*>(ptrs[i])[63], 0xAB);
+  }
+
+  // New allocations must not alias live pointers.
+  std::vector<void*> fresh;
+  for (int i = 0; i < 10; ++i) {
+    void* p = pool.allocate(64);
+    EXPECT_NE(p, nullptr);
+    for (int j = 10; j < 20; ++j) {
+      EXPECT_NE(p, ptrs[j]);
+    }
+    fresh.push_back(p);
+  }
+
+  for (void* p : fresh) {
+    pool.deallocate(p);
+  }
+  for (int i = 10; i < 20; ++i) {
+    pool.deallocate(ptrs[i]);
+  }
+}
+
+TEST(fixed_pool, release_removes_fully_free_middle_pool)
+{
+  test_memory parent;
+  umpire::strategy::fixed_pool<test_memory> pool("fixed_pool", &parent, 64, 10);
+
+  // Three pools: indices 0-9, 10-19, 20-29 map to pools 1, 2, 3.
+  std::vector<void*> ptrs;
+  for (int i = 0; i < 30; ++i) {
+    ptrs.push_back(pool.allocate(64));
+  }
+  EXPECT_EQ(pool.get_pool_count(), 3);
+
+  // Free only the middle pool's objects.
+  for (int i = 10; i < 20; ++i) {
+    pool.deallocate(ptrs[i]);
+  }
+
+  pool.release();
+
+  EXPECT_EQ(pool.get_pool_count(), 2);
+  EXPECT_EQ(pool.get_allocated_objects(), 20);
+  EXPECT_EQ(pool.get_free_objects(), 0);
+
+  // Live pointers from the first and third pools remain usable.
+  for (int i = 0; i < 10; ++i) {
+    std::memset(ptrs[i], 0x5C, 64);
+    EXPECT_EQ(static_cast<unsigned char*>(ptrs[i])[63], 0x5C);
+  }
+  for (int i = 20; i < 30; ++i) {
+    std::memset(ptrs[i], 0x5C, 64);
+    EXPECT_EQ(static_cast<unsigned char*>(ptrs[i])[63], 0x5C);
+  }
+
+  for (int i = 0; i < 10; ++i) {
+    pool.deallocate(ptrs[i]);
+  }
+  for (int i = 20; i < 30; ++i) {
+    pool.deallocate(ptrs[i]);
+  }
+}
+
+TEST(fixed_pool, release_with_no_fully_free_pool_is_noop)
+{
+  test_memory parent;
+  umpire::strategy::fixed_pool<test_memory> pool("fixed_pool", &parent, 64, 10);
+
+  std::vector<void*> ptrs;
+  for (int i = 0; i < 20; ++i) {
+    ptrs.push_back(pool.allocate(64));
+  }
+  EXPECT_EQ(pool.get_pool_count(), 2);
+
+  // Free every other object: 10 free objects total, but 5 in each pool, so
+  // neither pool is fully free and nothing may be released.
+  for (int i = 0; i < 20; i += 2) {
+    pool.deallocate(ptrs[i]);
+  }
+  EXPECT_EQ(pool.get_free_objects(), 10);
+
+  pool.release();
+
+  EXPECT_EQ(pool.get_pool_count(), 2);
+  EXPECT_EQ(pool.get_free_objects(), 10);
+  EXPECT_EQ(pool.get_allocated_objects(), 10);
+
+  // All still-allocated pointers remain usable.
+  for (int i = 1; i < 20; i += 2) {
+    std::memset(ptrs[i], 0x7E, 64);
+    EXPECT_EQ(static_cast<unsigned char*>(ptrs[i])[0], 0x7E);
+  }
+
+  // The freed slots can be reallocated.
+  std::vector<void*> fresh;
+  for (int i = 0; i < 10; ++i) {
+    fresh.push_back(pool.allocate(64));
+  }
+  EXPECT_EQ(pool.get_free_objects(), 0);
+
+  for (void* p : fresh) {
+    pool.deallocate(p);
+  }
+  for (int i = 1; i < 20; i += 2) {
+    pool.deallocate(ptrs[i]);
+  }
 }
 
 // ============================================================================

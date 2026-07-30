@@ -8,6 +8,7 @@
 #define UMPIRE_detail_registry_HPP
 
 #include <atomic>
+#include <map>
 #include <mutex>
 #include <optional>
 #include <string>
@@ -48,7 +49,10 @@ private:
   std::unordered_map<std::string, memory*> allocator_by_name_;
   std::unordered_map<int, memory*> allocator_by_id_;
 
-  std::unordered_map<void*, allocation_record> allocation_map_;
+  // Ordered by base pointer so containing-pointer lookup is O(log n) via
+  // upper_bound. Exact-match operations pay O(log n) instead of the previous
+  // amortized O(1), which is an accepted tradeoff for interop lookups.
+  std::map<void*, allocation_record, std::less<void*>> allocation_map_;
 
   mutable std::mutex allocator_mutex_;
   mutable std::mutex allocation_mutex_;
@@ -82,6 +86,11 @@ public:
   void remove_allocation(void* ptr);
   //! Return whether `ptr` is the base pointer of a tracked allocation.
   bool has_allocation(void* ptr) const;
+
+  //! Return all live allocation records owned by `mem`.
+  std::vector<allocation_record> find_allocations_by_memory(const memory* mem) const;
+  //! Return all live allocation records owned by the memory object with `id`.
+  std::vector<allocation_record> find_allocations_by_memory(int id) const;
 };
 
 } // namespace detail

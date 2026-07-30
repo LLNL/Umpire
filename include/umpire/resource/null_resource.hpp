@@ -56,6 +56,13 @@ private:
   using base = memory_resource<undefined_platform, null_allocator, false>;
 
 public:
+  //! \brief Return the process-wide default null resource singleton for this behavior.
+  static null_resource& get()
+  {
+    static null_resource instance;
+    return instance;
+  }
+
   /*!
    * \brief Construct a null resource.
    *

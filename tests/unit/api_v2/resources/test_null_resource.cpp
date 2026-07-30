@@ -56,6 +56,26 @@ TEST(null_resource, custom_instance_with_custom_name)
   EXPECT_EQ(mem.get_name(), "CUSTOM_NULL");
 }
 
+TEST(null_resource, singleton_get_returns_same_instance)
+{
+  auto& a = null_resource<>::get();
+  auto& b = null_resource<>::get();
+
+  EXPECT_EQ(&a, &b);
+  EXPECT_EQ(a.get_name(), "NULL");
+}
+
+TEST(null_resource, singleton_get_is_independent_per_behavior)
+{
+  auto& throwing = null_resource<null_behavior::throw_exception>::get();
+  auto& silent = null_resource<null_behavior::return_nullptr>::get();
+
+  EXPECT_NE(static_cast<void*>(&throwing), static_cast<void*>(&silent));
+
+  EXPECT_THROW(throwing.allocate(64), umpire::out_of_memory_error);
+  EXPECT_EQ(silent.allocate(64), nullptr);
+}
+
 TEST(null_resource, platform_type_is_undefined)
 {
   null_resource<> mem("PLATFORM_NULL");

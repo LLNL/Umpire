@@ -81,8 +81,17 @@ The registry SHALL:
 - Use Meyer's Singleton pattern for access via `registry::get()`
 - Provide thread-safe unique ID generation via `get_id()`
 - Maintain `allocator_list`, `allocator_map` (by name), and `allocator_id_map` (by ID)
-- Maintain or wrap a global `allocation_map` for pointer-to-record lookup that is visible to existing tooling and operations
+- Maintain a v2-owned `allocation_map`, ordered by base pointer, for pointer-to-record lookup
+- Provide `find_allocations_by_memory(const memory*)` and `find_allocations_by_memory(int id)` to enumerate live allocations owned by a memory instance (leak detection)
 - Be non-copyable
+
+Visibility to existing (v1) tooling SHALL be provided by a bridge, not a single
+shared map: tracked allocations from the canonical `HOST` v2 resource are
+mirrored into the legacy `ResourceManager` allocation map on
+track/untrack (`src/umpire/memory.cpp`), and legacy v1 operation paths consult
+the v2 registry as a fallback when a pointer is not found in the v1 map.
+Non-host v2 allocations are not currently visible to v1 tooling; extending the
+bridge to device backends is tracked separately (bead `umpire-rhg`).
 
 The registry SHALL NOT:
 - Create or manage allocator lifecycles
@@ -104,7 +113,8 @@ New API components SHALL obtain allocator identity and allocation records throug
 
 #### Scenario: Allocation lookup
 - **WHEN** a pointer is passed to find its owning allocator
-- **THEN** the registry's allocation map provides O(1) lookup to the allocation record
+- **THEN** the registry's ordered allocation map provides O(log n) lookup to the allocation record
+- **AND** interior pointers are resolved via `find_containing_allocation` in O(log n)
 
 ---
 
@@ -119,11 +129,14 @@ The allocator SHALL define:
 - Copy constructor and assignment
 - Equality comparison operators
 - `allocate(size_type n)` returning `pointer`
-- `deallocate(pointer ptr, size_type n)` where `n` is the count of `T` objects (NOT bytes)
+- `deallocate(pointer ptr, size_type n)` where `n` is accepted for STL Allocator conformance and ignored — v2 deallocation is pointer-based, resolving size and ownership through the registry
 - Introspection methods returning counts in units of T
 - `get_memory()` to access the underlying memory source
 
-The system SHALL provide `using Allocator = allocator<char>` for backward compatibility.
+The system SHALL NOT provide a v2 `using Allocator = allocator<char>` alias:
+the `umpire::Allocator` name remains owned by the coexisting v1 `Allocator`
+class for the duration of the v1/v2 parallel-operation period. Migrating code
+uses the template name `umpire::allocator<T, Memory>` directly.
 
 #### Scenario: Basic typed allocation
 - **WHEN** `allocator<double>` is constructed with a host memory resource
@@ -140,16 +153,10 @@ The system SHALL provide `using Allocator = allocator<char>` for backward compat
 - **WHEN** template code inspects `Alloc::platform`
 - **THEN** compile-time platform detection enables specialized implementations via `if constexpr`
 
-#### Scenario: Deallocation with size
-- **WHEN** `deallocate(ptr, 100)` is called on `allocator<double>`
-- **THEN** the allocator knows to deallocate 800 bytes (100 * sizeof(double))
-- **AND** no registry lookup is required for size
-
-#### Scenario: Deallocation size consistency
-- **WHEN** `deallocate(ptr, n)` is called
-- **AND** `n` does not match the original `allocate(n)` count
-- **THEN** behavior is undefined (programming error)
-- **AND** this is documented as a precondition violation
+#### Scenario: Pointer-based deallocation
+- **WHEN** `deallocate(ptr, n)` is called on `allocator<double>`
+- **THEN** the element count `n` is ignored and deallocation is delegated to the underlying memory source by pointer
+- **AND** for tracked memory sources, size and ownership are resolved through the registry's allocation record
 
 ---
 
@@ -232,47 +239,42 @@ The system SHALL provide allocation strategy classes that wrap memory resources 
 
 ### Requirement: Memory Operations Integration
 
-The system SHALL integrate with Umpire's existing memory operations (`copy`, `memset`, `reallocate`, `prefetch`) by providing template-based front-end APIs that dispatch to the existing `MemoryOperationRegistry` and concrete `MemoryOperation` implementations based on platform types.
+The system SHALL provide template-based memory operations (`copy`, `memset`, `reallocate`, `prefetch`) as a new, self-contained dispatch layer (`umpire/op/dispatch.hpp` plus per-backend headers such as `umpire/op/host.hpp`, `umpire/op/cuda.hpp`, `umpire/op/hip.hpp`, `umpire/op/sycl.hpp`, `umpire/op/openmp_target.hpp`). Operation tags (`op::copy<Src, Dst>`, `op::memset<Src>`, ...) are specialized per platform pair and invoke backend primitives (e.g. `cudaMemcpy`) directly.
 
-The integration layer SHALL:
-- Provide function templates (and, where appropriate, thin template wrappers) parameterized by platform tag types
-- Use `platform_for<Platform>` to map platform tags to `camp::resources::Platform` values
-- Use the existing `MemoryOperationRegistry` to look up the correct `MemoryOperation` by name and pair of `Platform` enums
-- Support cross-platform operations (e.g., host-to-device copy) using the pre-existing operation implementations
-- Throw `umpire::runtime_error` with a clear message when runtime platform lookup reaches a platform pair that the current build does not dispatch
+The operations layer SHALL:
+- Provide operation templates parameterized by platform tag types, with direct per-backend `exec` implementations
+- Provide runtime dispatch helpers that map `camp::resources::Platform` values (obtained from tracked allocations or `platform_for<Platform>`) to the compiled platform specializations
+- Support cross-platform operations (e.g., host-to-device copy) for the platform pairs compiled into the current build
+- Throw `umpire::runtime_error` naming the offending platform (or platform pair, for two-platform operations) when runtime dispatch reaches a combination the current build does not support
+- Be selectable as the backend for legacy `ResourceManager` operation entry points via the `UMPIRE_RM_USE_NEW_OPS` CMake option
 
-The integration layer SHALL NOT:
-- Change or replace the existing `MemoryOperation` subclasses
-- Change or replace the `MemoryOperationRegistry` lookup behavior
+The operations layer SHALL NOT:
+- Change or remove the existing v1 `MemoryOperation` subclasses or `MemoryOperationRegistry`, which continue to serve v1 code paths when `UMPIRE_RM_USE_NEW_OPS` is disabled
 
-Direct template wrappers SHALL only be available for the platform tags and platform pairs whose `op::*` specializations are compiled into the current build. Disabled backends and unsupported direct template pairs SHALL therefore be rejected at compile time rather than deferred to a runtime error path.
+Direct template instantiations SHALL only be available for the platform tags and platform pairs whose `op::*` specializations are compiled into the current build. Disabled backends and unsupported direct template pairs SHALL therefore be rejected at compile time rather than deferred to a runtime error path.
 
 #### Scenario: Platform-dispatched copy
-- **WHEN** a new API function template `copy<SrcPlatform, DstPlatform>(void* dst, const void* src, std::size_t size)` is called
-- **THEN** it uses `platform_for<SrcPlatform>` and `platform_for<DstPlatform>` to obtain `camp::resources::Platform` values
-- **AND** it uses `MemoryOperationRegistry::getInstance().find("COPY", {src_platform, dst_platform})` to obtain the operation
-- **AND** it invokes the returned `MemoryOperation`'s `transform` or `transform_async` method
+- **WHEN** the function template `copy<SrcPlatform, DstPlatform>(dst, src, count)` is called
+- **THEN** the `op::copy<SrcPlatform, DstPlatform>` specialization for that platform pair executes the backend copy primitive directly
+- **AND** an asynchronous overload accepting a `camp::resources::Resource` context is available where the backend supports it
 
 #### Scenario: Same-platform operation
-- **WHEN** a new API function template `memset<Platform>(void* ptr, int value, std::size_t size)` is called
-- **THEN** it uses `platform_for<Platform>` to obtain the `camp::resources::Platform` value
-- **AND** it uses `MemoryOperationRegistry::getInstance().find("MEMSET", {platform, platform})` to obtain the operation
-- **AND** the platform-specific memset implementation is used
+- **WHEN** the function template `memset<Platform>(ptr, value, length)` is called
+- **THEN** the `op::memset<Platform>` specialization executes the platform-specific memset implementation directly
 
 #### Scenario: Unsupported runtime platform pair
-- **WHEN** `copy<sycl_platform, cuda_platform>()` is called
-- **AND** runtime platform dispatch reaches a platform combination that the current build does not support
+- **WHEN** runtime platform dispatch reaches a platform combination that the current build does not support
 - **THEN** `umpire::runtime_error` is thrown
-- **AND** the error message indicates the unsupported platform pair
+- **AND** the error message names the unsupported source and destination platforms
 
 #### Scenario: Unsupported direct template pair is unavailable
-- **WHEN** code attempts to instantiate a direct template wrapper for a disabled backend or for a platform pair with no compiled `op::*` specialization
+- **WHEN** code attempts to instantiate an operation template for a disabled backend or for a platform pair with no compiled `op::*` specialization
 - **THEN** the program is ill-formed at compile time
 - **AND** the call does not reach runtime dispatch
 
 #### Scenario: Operation error propagation
 - **WHEN** a platform-specific operation (e.g., `cudaMemcpy`) fails
-- **THEN** the template wrapper catches the error
+- **THEN** the operation implementation detects the backend error
 - **AND** throws `umpire::runtime_error` with the underlying error details
 
 ---
@@ -300,29 +302,29 @@ The record SHALL contain:
 ### Requirement: Backward Compatibility
 
 The system SHALL maintain backward compatibility with existing Umpire code through:
-- `Allocator` type alias for `allocator<char>`
-- Existing operations in `umpire/op/` continuing to work unchanged
-- Allocations registered with new API visible in global allocation map
+- The v1 `umpire::Allocator` class remaining unchanged and fully functional
+- Existing v1 operations and `MemoryOperationRegistry` continuing to work unchanged
+- Tracked v2 HOST allocations bridged into the legacy allocation map, and legacy operation paths falling back to the v2 registry for pointer resolution
 - Thread safety as opt-in via `thread_safe<>` wrapper
 
 #### Scenario: Legacy code compatibility
-- **WHEN** existing code uses `umpire::Allocator`
-- **THEN** it compiles and functions as before via the type alias
+- **WHEN** existing code uses the v1 `umpire::Allocator` class
+- **THEN** it compiles and functions as before, unchanged by v2
 
 #### Scenario: Debugging tool compatibility
-- **WHEN** allocations are made with the new API
-- **THEN** they appear in the global allocation map for debugging and replay tools
+- **WHEN** tracked HOST allocations are made with the new API
+- **THEN** they appear in the legacy allocation map (via the bridge) for debugging and replay tools
 
 #### Scenario: Mixed API allocations visible together
-- **WHEN** allocations are made with both v1 `ResourceManager` and v2 `allocator<>`
-- **THEN** both appear in the global allocation map
-- **AND** debugging tools (replay, introspection) see all allocations
+- **WHEN** allocations are made with both v1 `ResourceManager` and v2 tracked HOST resources
+- **THEN** both are resolvable by legacy tooling paths
+- **AND** the documented host compatibility matrix (`tests/api_v2/README.md`, migration guide) defines the validated combinations
 
-#### Scenario: V1 operations work with V2 allocations
-- **WHEN** a v2 `allocator<T, host_memory>` allocates memory
-- **AND** v1 `copy()` operation is used on that pointer
+#### Scenario: V1 operations work with V2 host allocations
+- **WHEN** a v2 `allocator<T, resource::host_memory<>>` allocates memory
+- **AND** a validated v1 `ResourceManager` operation (e.g. `copy()`, `memset()`, `deallocate()`) is used on that pointer
 - **THEN** the operation succeeds
-- **AND** the registry provides allocation metadata to v1 operations
+- **AND** the v2 registry or bridged legacy record provides allocation metadata to the v1 path
 
 ---
 
@@ -426,8 +428,8 @@ The system SHALL:
 - **AND** the memory instance is removed from registry
 
 #### Scenario: Leak detection
-- **WHEN** `registry::get().find_allocations_by_memory(memory_id)` is called before destruction
-- **THEN** all active allocations for that memory instance are returned
+- **WHEN** `registry::get().find_allocations_by_memory(memory_id)` (or the `const memory*` overload) is called before destruction
+- **THEN** all active allocations for that memory instance are returned as `allocation_record` copies
 - **AND** leak detection tools can enumerate them
 
 ---
@@ -520,7 +522,7 @@ The system SHALL:
 - Use inline methods for allocation hot paths where possible
 - Avoid virtual dispatch in type-specific code paths
 - Use compile-time dispatch via `if constexpr` instead of runtime checks
-- Provide extern template declarations for common instantiations to reduce binary bloat
+- Provide explicit template instantiations for common configurations (`src/umpire/api_v2_instantiations.cpp`); matching `extern template` declarations in headers are DEFERRED to a follow-up
 
 #### Scenario: Zero-cost abstraction validation
 - **WHEN** `allocator<T, host_memory<malloc, false>>` is used
@@ -563,7 +565,7 @@ The system SHALL:
 The system SHALL keep template instantiation overhead reasonable and support incremental compilation.
 
 The system SHALL:
-- Provide extern template declarations for common instantiations
+- Provide explicit template instantiations for common configurations (extern template declarations deferred; see Performance)
 - Keep template recursion depth reasonable (< 10 levels for typical compositions)
 - Support incremental compilation without excessive recompilation
 
@@ -611,10 +613,10 @@ This section provides examples of typical v2 API usage patterns.
 #include <vector>
 
 // Get the singleton host memory resource
-auto& host_mem = umpire::host_memory<>::get();
+auto& host_mem = umpire::resource::host_memory<>::get();
 
 // Create a typed allocator for doubles
-umpire::allocator<double, umpire::host_memory<>> alloc{&host_mem};
+umpire::allocator<double, umpire::resource::host_memory<>> alloc{&host_mem};
 
 // Use with STL vector
 std::vector<double, decltype(alloc)> vec(alloc);
@@ -629,15 +631,16 @@ vec.resize(1000);  // Allocates 8000 bytes from host memory
 #include <umpire/allocator.hpp>
 
 // Create a fixed pool backed by CUDA device memory
-using pool_t = umpire::fixed_pool<umpire::cuda_device_memory<>>;
-auto pool = std::make_shared<pool_t>(
-  umpire::cuda_device_memory<>::get(),
+using pool_t = umpire::strategy::fixed_pool<umpire::resource::cuda_device_memory<>>;
+pool_t pool{
+  "gpu_pool",                                     // registry name
+  &umpire::resource::cuda_device_memory<>::get(),
   64,    // object size in bytes
   1024   // objects per pool
-);
+};
 
 // Create allocator using the pool
-umpire::allocator<float, pool_t> gpu_alloc{pool.get()};
+umpire::allocator<float, pool_t> gpu_alloc{&pool};
 
 // Use with STL containers
 std::vector<float, decltype(gpu_alloc)> gpu_vec(gpu_alloc);
@@ -653,11 +656,11 @@ gpu_vec.resize(1024);  // Allocated from pre-allocated pool
 #include <thread>
 
 // Create thread-safe wrapper around host memory
-using safe_host_t = umpire::thread_safe<umpire::host_memory<>>;
-auto safe_mem = std::make_shared<safe_host_t>(umpire::host_memory<>::get());
+using safe_host_t = umpire::strategy::thread_safe<umpire::resource::host_memory<>>;
+safe_host_t safe_mem{"safe_host", &umpire::resource::host_memory<>::get()};
 
 // Create allocator
-umpire::allocator<int, safe_host_t> safe_alloc{safe_mem.get()};
+umpire::allocator<int, safe_host_t> safe_alloc{&safe_mem};
 
 // Safe to use from multiple threads
 auto worker = [&]() {
@@ -682,17 +685,17 @@ t2.join();
 #include <umpire/allocator.hpp>
 
 // Compose strategies: thread-safe wrapper around size-limited fixed pool
-using pool_t = umpire::fixed_pool<umpire::host_memory<>>;
-using limited_pool_t = umpire::size_limiter<pool_t>;
-using safe_limited_pool_t = umpire::thread_safe<limited_pool_t>;
+using pool_t = umpire::strategy::fixed_pool<umpire::resource::host_memory<>>;
+using limited_pool_t = umpire::strategy::size_limiter<pool_t>;
+using safe_limited_pool_t = umpire::strategy::thread_safe<limited_pool_t>;
 
-// Create the composed strategy
-auto pool = std::make_shared<pool_t>(umpire::host_memory<>::get(), 64, 1024);
-auto limited = std::make_shared<limited_pool_t>(pool.get(), 1024 * 1024);  // 1MB limit
-auto safe = std::make_shared<safe_limited_pool_t>(limited.get());
+// Create the composed strategy (each layer is named for the registry)
+pool_t pool{"pool", &umpire::resource::host_memory<>::get(), 64, 1024};
+limited_pool_t limited{"limited_pool", &pool, 1024 * 1024};  // 1MB limit
+safe_limited_pool_t safe{"safe_limited_pool", &limited};
 
 // Create allocator
-umpire::allocator<char, safe_limited_pool_t> alloc{safe.get()};
+umpire::allocator<char, safe_limited_pool_t> alloc{&safe};
 
 // Allocations are:
 // 1. Thread-safe (mutex protected)
@@ -709,30 +712,30 @@ umpire::allocator<char, safe_limited_pool_t> alloc{safe.get()};
 #include <umpire/op/copy.hpp>
 
 // Allocate on host
-umpire::allocator<float, umpire::host_memory<>> host_alloc{
-  &umpire::host_memory<>::get()
+umpire::allocator<float, umpire::resource::host_memory<>> host_alloc{
+  &umpire::resource::host_memory<>::get()
 };
 auto host_ptr = host_alloc.allocate(1000);
 
 // Allocate on GPU
-umpire::allocator<float, umpire::cuda_device_memory<>> gpu_alloc{
-  &umpire::cuda_device_memory<>::get()
+umpire::allocator<float, umpire::resource::cuda_device_memory<>> gpu_alloc{
+  &umpire::resource::cuda_device_memory<>::get()
 };
 auto gpu_ptr = gpu_alloc.allocate(1000);
 
-// Copy host to device using template-based operation
+// Copy host to device: copy<SrcPlatform, DstPlatform>(src, dst, count)
 umpire::copy<umpire::host_platform, umpire::cuda_platform>(
-  gpu_ptr, host_ptr, 1000 * sizeof(float)
+  host_ptr, gpu_ptr, 1000
 );
 
 // Process on GPU...
 
 // Copy back device to host
 umpire::copy<umpire::cuda_platform, umpire::host_platform>(
-  host_ptr, gpu_ptr, 1000 * sizeof(float)
+  gpu_ptr, host_ptr, 1000
 );
 
-// Clean up
+// Clean up (element count accepted for STL compatibility, ignored)
 host_alloc.deallocate(host_ptr, 1000);
 gpu_alloc.deallocate(gpu_ptr, 1000);
 ```
@@ -768,8 +771,8 @@ void process_data(Allocator& alloc, typename Allocator::size_type n) {
 #include <umpire/resource/host_memory.hpp>
 #include <umpire/allocator.hpp>
 
-// Disable tracking for zero overhead
-using fast_host = umpire::host_memory<std::allocator<char>, false>;  // Tracking=false
+// Disable tracking for zero overhead (alias provided by host_memory.hpp)
+using fast_host = umpire::resource::fast_host_memory;  // Tracking=false
 auto& fast_mem = fast_host::get();
 
 umpire::allocator<double, fast_host> fast_alloc{&fast_mem};
@@ -798,8 +801,8 @@ auto alloc = rm.makeAllocator("my_pool",
 
 ```cpp
 // V2
-auto& host_mem = umpire::host_memory<>::get();
-auto alloc = umpire::allocator<char, umpire::host_memory<>>{&host_mem};
+auto& host_mem = umpire::resource::host_memory<>::get();
+auto alloc = umpire::allocator<char, umpire::resource::host_memory<>>{&host_mem};
 ```
 
 ### V1: Getting an allocator by name
@@ -812,9 +815,9 @@ auto alloc = rm.getAllocator("HOST");
 ```cpp
 // V2
 // Use direct singleton access or registry lookup
-auto& host_mem = umpire::host_memory<>::get();
+auto& host_mem = umpire::resource::host_memory<>::get();
 // or
-auto* mem = umpire::detail::registry::get().find_by_name("HOST");
+auto* mem = umpire::detail::registry::get().find_allocator_by_name("HOST");
 ```
 
 ### V1: Typed allocation
@@ -827,8 +830,8 @@ double* ptr = static_cast<double*>(alloc.allocate(100 * sizeof(double)));
 
 ```cpp
 // V2
-auto& host_mem = umpire::host_memory<>::get();
-umpire::allocator<double, umpire::host_memory<>> alloc{&host_mem};
+auto& host_mem = umpire::resource::host_memory<>::get();
+umpire::allocator<double, umpire::resource::host_memory<>> alloc{&host_mem};
 double* ptr = alloc.allocate(100);  // Type-safe, no cast needed
 ```
 
@@ -837,13 +840,13 @@ double* ptr = alloc.allocate(100);  // Type-safe, no cast needed
 ```cpp
 // V1
 auto alloc = rm.getAllocator("HOST");
-std::vector<int> vec(umpire::StdAllocator<int>(alloc));
+std::vector<int> vec(umpire::TypedAllocator<int>(alloc));
 ```
 
 ```cpp
 // V2
-auto& host_mem = umpire::host_memory<>::get();
-umpire::allocator<int, umpire::host_memory<>> alloc{&host_mem};
+auto& host_mem = umpire::resource::host_memory<>::get();
+umpire::allocator<int, umpire::resource::host_memory<>> alloc{&host_mem};
 std::vector<int, decltype(alloc)> vec(alloc);
 ```
 
@@ -857,8 +860,7 @@ auto alloc = rm.makeAllocator<umpire::strategy::FixedPool>(
 
 ```cpp
 // V2
-using pool_t = umpire::fixed_pool<umpire::host_memory<>>;
-auto pool = std::make_shared<pool_t>(
-  umpire::host_memory<>::get(), 64, 1024);
-umpire::allocator<char, pool_t> alloc{pool.get()};
+using pool_t = umpire::strategy::fixed_pool<umpire::resource::host_memory<>>;
+pool_t pool{"my_pool", &umpire::resource::host_memory<>::get(), 64, 1024};
+umpire::allocator<char, pool_t> alloc{&pool};
 ```

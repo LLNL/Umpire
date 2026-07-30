@@ -12,6 +12,7 @@
 #include "umpire/error.hpp"
 #include "umpire/event/event.hpp"
 #include "umpire/util/AllocationRecord.hpp"
+#include "umpire/util/Macros.hpp"
 
 #include "fmt/format.h"
 
@@ -52,6 +53,17 @@ memory::memory(const std::string& name)
 
 memory::~memory()
 {
+  auto live_allocations = detail::registry::get().find_allocations_by_memory(this);
+  if (!live_allocations.empty()) {
+    std::size_t live_bytes{0};
+    for (const auto& record : live_allocations) {
+      live_bytes += record.size;
+    }
+    UMPIRE_LOG(Warning, "memory \"" << name_ << "\" (id=" << id_ << ") destroyed with "
+                                    << live_allocations.size() << " active allocation(s) totaling "
+                                    << live_bytes << " bytes; these will not be deallocated");
+  }
+
   detail::registry::get().deregister_allocator(this);
 }
 
@@ -73,6 +85,13 @@ void memory::untrack_allocation(void* ptr)
   auto record = detail::registry::get().find_allocation(ptr);
   if (!record) {
     throw unknown_allocation(fmt::format("Attempted to deallocate unknown pointer {:p}", ptr));
+  }
+
+  if (record->strategy != this) {
+    throw unknown_allocation(fmt::format(
+        "Attempted to deallocate pointer {:p} through memory \"{}\" (id={}), but it is owned by \"{}\" (id={})", ptr,
+        name_, id_, record->strategy ? record->strategy->get_name() : "<unknown>",
+        record->strategy ? record->strategy->get_id() : -1));
   }
 
   std::size_t size = record->size;

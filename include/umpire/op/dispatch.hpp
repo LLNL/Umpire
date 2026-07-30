@@ -8,6 +8,7 @@
 #include "umpire/memory.hpp"
 #include "umpire/op/detail/traits.hpp"
 #include "umpire/resource/platform.hpp"
+#include "umpire/util/Platform.hpp"
 
 namespace umpire {
 namespace op {
@@ -45,7 +46,8 @@ inline auto dispatch(camp::resources::Platform platform, Args&&... args)
       return Op<resource::omp_target_platform>::exec(std::forward<Args>(args)...);
 #endif
     default:
-      UMPIRE_ERROR(runtime_error, "Unknown platform for operation");
+      UMPIRE_ERROR(runtime_error,
+                   fmt::format("Unknown or disabled platform \"{}\" for operation", platform_to_string(platform)));
   }
 }
 
@@ -85,7 +87,8 @@ inline auto dispatch(camp::resources::Platform src_platform, camp::resources::Pl
             std::forward<Args>(args)...);
 #endif
       default:
-        UMPIRE_ERROR(runtime_error, "Unknown platform for same-platform operation");
+        UMPIRE_ERROR(runtime_error, fmt::format("Unknown or disabled platform \"{}\" for same-platform operation",
+                                                platform_to_string(src_platform)));
     }
   }
 
@@ -126,7 +129,8 @@ inline auto dispatch(camp::resources::Platform src_platform, camp::resources::Pl
   }
 #endif
 
-  UMPIRE_ERROR(runtime_error, "Unsupported platform combination");
+  UMPIRE_ERROR(runtime_error, fmt::format("Unsupported platform combination: src=\"{}\", dst=\"{}\"",
+                                          platform_to_string(src_platform), platform_to_string(dst_platform)));
 }
 
 template <typename T>
