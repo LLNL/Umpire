@@ -7,7 +7,7 @@
 
 #include "gtest/gtest.h"
 #include "umpire/ResourceManager.hpp"
-#include "umpire/op/operations.hpp"
+#include "umpire/op.hpp"
 
 #include <optional>
 #include <vector>
