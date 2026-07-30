@@ -356,21 +356,6 @@ std::map<int, MPI_Comm>& get_cached_communicators()
   static std::map<int, MPI_Comm> cached_communicators{};
   return cached_communicators;
 }
-
-#if defined(UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
-std::string get_mpi3_socket_preflight_error_message(int error_code)
-{
-  char buffer[MPI_MAX_ERROR_STRING];
-  int length{0};
-  const int status = MPI_Error_string(error_code, buffer, &length);
-
-  if (status != MPI_SUCCESS) {
-    return fmt::format("MPI error code {} (MPI_Error_string failed with code {})", error_code, status);
-  }
-
-  return std::string{buffer, static_cast<std::size_t>(length)};
-}
-#endif
 } // namespace
 
 MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm)
@@ -429,7 +414,7 @@ bool can_use_socket_scoped_mpi3_shared_memory(MPI_Comm comm, std::string& reason
 
   if (status != MPI_SUCCESS) {
     reason = fmt::format("MPI_Allreduce failed while checking socket affinity: {}",
-                         get_mpi3_socket_preflight_error_message(status));
+                         util::get_mpi_error_message(status));
     return false;
   }
 

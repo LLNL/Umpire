@@ -10,6 +10,7 @@ set(UMPIRE_ENABLE_SYCL ${UMPIRE_ENABLE_SYCL})
 set (umpire_util_headers
   AllocationMap.hpp
   AllocationRecord.hpp
+  affinity.hpp
   backtrace.hpp
   backtrace.inl
   error.hpp
@@ -40,6 +41,7 @@ endif ()
 
 set (umpire_util_sources
   AllocationMap.cpp
+  affinity.cpp
   FixedMallocPool.cpp
   io.cpp
   Logger.cpp
