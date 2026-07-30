@@ -78,11 +78,13 @@ inline sycl::queue& get_queue_for_ptr(const void* ptr)
 // SYCL implementation helpers
 namespace {
 // Error handling for SYCL operations
+// Note: the caught exception must not be named `e` -- UMPIRE_ERROR declares a
+// local `e` internally, and the message expression would self-reference it.
 inline void sycl_error_check(sycl::event event, const char* message) {
   try {
     event.wait_and_throw();
-  } catch (const sycl::exception& e) {
-    UMPIRE_ERROR(runtime_error, message + std::string(": ") + std::string(e.what()));
+  } catch (const sycl::exception& ex) {
+    UMPIRE_ERROR(runtime_error, message + std::string(": ") + std::string(ex.what()));
   }
 }
 
@@ -112,9 +114,12 @@ inline camp::resources::EventProxy<camp::resources::Resource> copy_async_impl(
 
   std::size_t size = detail::get_size<T>(count);
   sycl::queue& queue = detail::get_queue(res);
-  auto event = queue.memcpy(dst_ptr, src_ptr, size);
+  // camp's EventProxy carries the resource, not an individual sycl::event
+  // (matching the CUDA/HIP async impls); the resource's in-order queue
+  // provides ordering for the returned proxy.
+  queue.memcpy(dst_ptr, src_ptr, size);
 
-  return camp::resources::EventProxy<camp::resources::Resource>{res, event};
+  return camp::resources::EventProxy<camp::resources::Resource>{res};
 }
 
 // Synchronous memset implementation
@@ -139,9 +144,9 @@ inline camp::resources::EventProxy<camp::resources::Resource> memset_async_impl(
 
   std::size_t size = detail::get_size<T>(count);
   sycl::queue& queue = detail::get_queue(res);
-  auto event = queue.memset(ptr, val, size);
+  queue.memset(ptr, val, size);
 
-  return camp::resources::EventProxy<camp::resources::Resource>{res, event};
+  return camp::resources::EventProxy<camp::resources::Resource>{res};
 }
 
 // Asynchronous prefetch implementation
@@ -157,9 +162,9 @@ inline camp::resources::EventProxy<camp::resources::Resource> prefetch_async_imp
 
   std::size_t size = detail::get_size<T>(count);
   sycl::queue& queue = detail::get_queue(res);
-  auto event = queue.prefetch(ptr, size);
+  queue.prefetch(ptr, size);
 
-  return camp::resources::EventProxy<camp::resources::Resource>{res, event};
+  return camp::resources::EventProxy<camp::resources::Resource>{res};
 }
 } // namespace
 
