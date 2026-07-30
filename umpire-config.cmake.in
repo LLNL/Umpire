@@ -8,21 +8,6 @@
   
 include(CMakeFindDependencyMacro)
 
-# cache the prefix dir (could be overriden by find_dependency)
-set(UMPIRE_PACKAGE_PREFIX_DIR ${PACKAGE_PREFIX_DIR})
-
-if (@UMPIRE_NEEDS_BLT_TPLS@)
-  set(BLT_TGTS "${CMAKE_CURRENT_LIST_DIR}/bltTargets.cmake")
-  if(EXISTS "${BLT_TGTS}")
-    include("${BLT_TGTS}")
-  endif()
-  unset(BLT_TGTS)
-endif()
-
-if (@UMPIRE_ENABLE_CUDA@ OR @UMPIRE_ENABLE_MPI@ OR @UMPIRE_ENABLE_IPC_SHARED_MEMORY@)
-  find_dependency(Threads)
-endif ()
-
 if (NOT TARGET camp)
   set(UMPIRE_CAMP_DIR "@UMPIRE_CONFIG_camp_DIR@")
   if(NOT camp_DIR) 
@@ -50,7 +35,8 @@ if (NOT TARGET @UMPIRE_FMT_TARGET@)
     ${fmt_DIR}
     ${fmt_DIR}/lib64/cmake/fmt
     ${UMPIRE_PACKAGE_PREFIX_DIR}
-    ${UMPIRE_PACKAGE_PREFIX_DIR}/lib64/cmake/fmt)
+    ${UMPIRE_PACKAGE_PREFIX_DIR}/lib64/cmake/fmt
+    ${UMPIRE_PACKAGE_PREFIX_DIR}/lib/cmake/fmt)
 endif ()
 
 if (@UMPIRE_ENABLE_SQLITE_EXPERIMENTAL@)
@@ -72,8 +58,11 @@ if (@UMPIRE_ENABLE_ALIAS_TARGETS@)
     set_target_properties(umpire PROPERTIES
       INTERFACE_LINK_LIBRARIES umpire::umpire
       INTERFACE_INCLUDE_DIRECTORIES "${_umpire_include_dirs}"
-      INTERFACE_COMPILE_DEFINITIONS "${_umpire_compile_defs}"
       DEPRECATION "Target 'umpire' is deprecated. Please use 'umpire::umpire' instead. To disable this warning and backwards-compatible targets, set UMPIRE_ENABLE_ALIAS_TARGETS=OFF when configuring Umpire.")
+
+    if (_umpire_compile_defs AND NOT _umpire_compile_defs MATCHES "-NOTFOUND$")
+      set_target_properties(umpire PROPERTIES INTERFACE_COMPILE_DEFINITIONS "${_umpire_compile_defs}")
+    endif()
 
     unset(_umpire_include_dirs)
     unset(_umpire_compile_defs)
@@ -89,8 +78,11 @@ if (@UMPIRE_ENABLE_ALIAS_TARGETS@)
     set_target_properties(umpire_device PROPERTIES
       INTERFACE_LINK_LIBRARIES umpire::umpire_device
       INTERFACE_INCLUDE_DIRECTORIES "${_umpire_device_include_dirs}"
-      INTERFACE_COMPILE_DEFINITIONS "${_umpire_device_compile_defs}"
       DEPRECATION "Target 'umpire_device' is deprecated. Please use 'umpire::umpire_device' instead. To disable this warning and backwards-compatible targets, set UMPIRE_ENABLE_ALIAS_TARGETS=OFF when configuring Umpire.")
+
+    if (_umpire_device_compile_defs AND NOT _umpire_device_compile_defs MATCHES "-NOTFOUND$")
+      set_target_properties(umpire_device PROPERTIES INTERFACE_COMPILE_DEFINITIONS "${_umpire_device_compile_defs}")
+    endif()
 
     unset(_umpire_device_include_dirs)
     unset(_umpire_device_compile_defs)
