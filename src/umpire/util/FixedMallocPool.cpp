@@ -17,6 +17,7 @@
 #include <cstddef>
 #include <cstdlib>
 #include <cstring>
+#include <limits>
 
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/error.hpp"
@@ -46,6 +47,8 @@ FixedMallocPool::FixedMallocPool(const std::size_t object_bytes, const std::size
 {
   // Free-list links are stored in the slots themselves
   UMPIRE_ASSERT(object_bytes >= sizeof(unsigned int));
+  // Slot indices (free-list links and num_used) are unsigned int
+  UMPIRE_ASSERT(objects_per_pool <= std::numeric_limits<unsigned int>::max());
   newPool();
 }
 

@@ -75,9 +75,10 @@ TEST_F(FixedMallocPoolTest, LifoReuse)
 
 TEST_F(FixedMallocPoolTest, Churn)
 {
-  // Regression test for the eager-initialization behavior fixed after
-  // PR #1082: churning a small live set must recycle slots rather than
-  // consuming never-used slots, so the pool never grows.
+  // Churning a small live set must recycle slots rather than consuming
+  // never-used slots, so the pool never grows. This guards against
+  // reintroducing eager initialization of the free list, which touched
+  // (and made resident) every page in the pool up front.
   constexpr std::size_t live_set = 4;
   const std::size_t initial_bytes = pool.totalBytes();
 
