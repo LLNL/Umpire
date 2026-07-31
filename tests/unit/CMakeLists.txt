@@ -106,6 +106,17 @@ if (UMPIRE_ENABLE_API_V2)
     NAME api_v2_null_resource_tests
     COMMAND api_v2_null_resource_tests)
 
+  if (UMPIRE_ENABLE_FILE_RESOURCE)
+    blt_add_executable(
+      NAME api_v2_file_memory_tests
+      SOURCES api_v2/resources/test_file_memory.cpp
+      DEPENDS_ON ${unit_depends})
+
+    blt_add_test(
+      NAME api_v2_file_memory_tests
+      COMMAND api_v2_file_memory_tests)
+  endif()
+
   if (UMPIRE_ENABLE_CUDA)
     blt_add_executable(
       NAME api_v2_cuda_device_memory_tests

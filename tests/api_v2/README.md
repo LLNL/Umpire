@@ -15,6 +15,7 @@ The current API v2 unit test executables are defined in
 - `api_v2_allocation_strategy_tests`
 - `api_v2_host_memory_tests`
 - `api_v2_null_resource_tests`
+- `api_v2_file_memory_tests` (only when `UMPIRE_ENABLE_FILE_RESOURCE` is `On`; off by default on Windows/macOS, on by default elsewhere)
 - `api_v2_thread_safe_tests`
 - `api_v2_fixed_pool_tests`
 - `api_v2_coalescing_pool_list_tests`
