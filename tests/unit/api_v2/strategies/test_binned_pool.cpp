@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 
-#include "umpire/strategy/quick_pool.hpp"
+#include "umpire/strategy/binned_pool.hpp"
 #include "umpire/resource/host_memory.hpp"
 #include "umpire/memory.hpp"
 
@@ -52,51 +52,51 @@ public:
 // Construction and Validation Tests
 // ============================================================================
 
-TEST(quick_pool, construct_with_valid_parameters)
+TEST(binned_pool, construct_with_valid_parameters)
 {
   test_memory parent;
-  umpire::strategy::quick_pool<test_memory> pool("quick_pool", &parent);
+  umpire::strategy::binned_pool<test_memory> pool("binned_pool", &parent);
 
   EXPECT_EQ(pool.get_parent(), &parent);
-  EXPECT_EQ(pool.get_name(), "quick_pool");
+  EXPECT_EQ(pool.get_name(), "binned_pool");
   EXPECT_GT(pool.get_total_allocated(), 0);  // Pre-allocated chunks
   EXPECT_EQ(pool.get_user_allocated(), 0);
   EXPECT_GT(pool.get_chunk_count(), 0);
 }
 
-TEST(quick_pool, construct_with_nullptr_throws)
+TEST(binned_pool, construct_with_nullptr_throws)
 {
   EXPECT_THROW(
-    umpire::strategy::quick_pool<test_memory> pool("quick_pool", nullptr),
+    umpire::strategy::binned_pool<test_memory> pool("binned_pool", nullptr),
     std::invalid_argument
   );
 }
 
-TEST(quick_pool, get_platform_delegates_to_parent)
+TEST(binned_pool, get_platform_delegates_to_parent)
 {
   test_memory parent;
-  umpire::strategy::quick_pool<test_memory> pool("quick_pool", &parent);
+  umpire::strategy::binned_pool<test_memory> pool("binned_pool", &parent);
 
   EXPECT_EQ(pool.get_platform(), parent.get_platform());
   EXPECT_EQ(pool.get_platform(), umpire::resource::Platform::host);
 }
 
-TEST(quick_pool, bin_configuration)
+TEST(binned_pool, bin_configuration)
 {
   test_memory parent;
-  umpire::strategy::quick_pool<test_memory> pool("quick_pool", &parent);
+  umpire::strategy::binned_pool<test_memory> pool("binned_pool", &parent);
 
   // Verify bin sizes are power of 2
-  EXPECT_EQ(umpire::strategy::quick_pool<test_memory>::get_num_bins(), 9);
-  EXPECT_EQ(umpire::strategy::quick_pool<test_memory>::get_bin_size(0), 16);
-  EXPECT_EQ(umpire::strategy::quick_pool<test_memory>::get_bin_size(1), 32);
-  EXPECT_EQ(umpire::strategy::quick_pool<test_memory>::get_bin_size(2), 64);
-  EXPECT_EQ(umpire::strategy::quick_pool<test_memory>::get_bin_size(3), 128);
-  EXPECT_EQ(umpire::strategy::quick_pool<test_memory>::get_bin_size(4), 256);
-  EXPECT_EQ(umpire::strategy::quick_pool<test_memory>::get_bin_size(5), 512);
-  EXPECT_EQ(umpire::strategy::quick_pool<test_memory>::get_bin_size(6), 1024);
-  EXPECT_EQ(umpire::strategy::quick_pool<test_memory>::get_bin_size(7), 2048);
-  EXPECT_EQ(umpire::strategy::quick_pool<test_memory>::get_bin_size(8), 4096);
+  EXPECT_EQ(umpire::strategy::binned_pool<test_memory>::get_num_bins(), 9);
+  EXPECT_EQ(umpire::strategy::binned_pool<test_memory>::get_bin_size(0), 16);
+  EXPECT_EQ(umpire::strategy::binned_pool<test_memory>::get_bin_size(1), 32);
+  EXPECT_EQ(umpire::strategy::binned_pool<test_memory>::get_bin_size(2), 64);
+  EXPECT_EQ(umpire::strategy::binned_pool<test_memory>::get_bin_size(3), 128);
+  EXPECT_EQ(umpire::strategy::binned_pool<test_memory>::get_bin_size(4), 256);
+  EXPECT_EQ(umpire::strategy::binned_pool<test_memory>::get_bin_size(5), 512);
+  EXPECT_EQ(umpire::strategy::binned_pool<test_memory>::get_bin_size(6), 1024);
+  EXPECT_EQ(umpire::strategy::binned_pool<test_memory>::get_bin_size(7), 2048);
+  EXPECT_EQ(umpire::strategy::binned_pool<test_memory>::get_bin_size(8), 4096);
 
   EXPECT_EQ(pool.get_configured_bin_size(0), 16);
   EXPECT_EQ(pool.get_configured_bin_size(8), 4096);
@@ -104,14 +104,14 @@ TEST(quick_pool, bin_configuration)
   EXPECT_EQ(pool.get_blocks_per_bin(8), 8);
 }
 
-TEST(quick_pool, construct_with_custom_configuration)
+TEST(binned_pool, construct_with_custom_configuration)
 {
-  using pool_type = umpire::strategy::quick_pool<test_memory>;
+  using pool_type = umpire::strategy::binned_pool<test_memory>;
 
   test_memory parent;
   pool_type::configuration_array bin_sizes = {32, 64, 128, 256, 512, 1024, 2048, 4096, 8192};
   pool_type::configuration_array blocks_per_bin = {2, 2, 2, 2, 2, 1, 1, 1, 1};
-  pool_type pool("quick_pool", &parent, bin_sizes, blocks_per_bin);
+  pool_type pool("binned_pool", &parent, bin_sizes, blocks_per_bin);
 
   EXPECT_EQ(pool.get_configured_bin_size(0), 32);
   EXPECT_EQ(pool.get_configured_bin_size(8), 8192);
@@ -120,26 +120,26 @@ TEST(quick_pool, construct_with_custom_configuration)
   EXPECT_EQ(pool.get_bin_free_count(0), 2);
 }
 
-TEST(quick_pool, invalid_configuration_throws)
+TEST(binned_pool, invalid_configuration_throws)
 {
-  using pool_type = umpire::strategy::quick_pool<test_memory>;
+  using pool_type = umpire::strategy::binned_pool<test_memory>;
 
   test_memory parent;
 
   auto invalid_bins = pool_type::default_bin_sizes();
   auto blocks_per_bin = pool_type::default_blocks_per_bin();
   invalid_bins[3] = 96;
-  EXPECT_THROW(pool_type("quick_pool", &parent, invalid_bins, blocks_per_bin),
+  EXPECT_THROW(pool_type("binned_pool", &parent, invalid_bins, blocks_per_bin),
                std::invalid_argument);
 
   auto non_monotonic_bins = pool_type::default_bin_sizes();
   non_monotonic_bins[4] = non_monotonic_bins[3];
-  EXPECT_THROW(pool_type("quick_pool", &parent, non_monotonic_bins, blocks_per_bin),
+  EXPECT_THROW(pool_type("binned_pool", &parent, non_monotonic_bins, blocks_per_bin),
                std::invalid_argument);
 
   auto invalid_blocks = pool_type::default_blocks_per_bin();
   invalid_blocks[0] = 0;
-  EXPECT_THROW(pool_type("quick_pool", &parent, pool_type::default_bin_sizes(), invalid_blocks),
+  EXPECT_THROW(pool_type("binned_pool", &parent, pool_type::default_bin_sizes(), invalid_blocks),
                std::invalid_argument);
 }
 
@@ -147,10 +147,10 @@ TEST(quick_pool, invalid_configuration_throws)
 // Basic Allocation Tests
 // ============================================================================
 
-TEST(quick_pool, basic_allocation)
+TEST(binned_pool, basic_allocation)
 {
   test_memory parent;
-  umpire::strategy::quick_pool<test_memory> pool("quick_pool", &parent);
+  umpire::strategy::binned_pool<test_memory> pool("binned_pool", &parent);
 
   void* ptr = pool.allocate(64);
   EXPECT_NE(ptr, nullptr);
@@ -162,19 +162,19 @@ TEST(quick_pool, basic_allocation)
   EXPECT_EQ(pool.get_user_allocated(), 0);
 }
 
-TEST(quick_pool, zero_size_allocation_returns_nullptr)
+TEST(binned_pool, zero_size_allocation_returns_nullptr)
 {
   test_memory parent;
-  umpire::strategy::quick_pool<test_memory> pool("quick_pool", &parent);
+  umpire::strategy::binned_pool<test_memory> pool("binned_pool", &parent);
 
   void* ptr = pool.allocate(0);
   EXPECT_EQ(ptr, nullptr);
 }
 
-TEST(quick_pool, multiple_allocations)
+TEST(binned_pool, multiple_allocations)
 {
   test_memory parent;
-  umpire::strategy::quick_pool<test_memory> pool("quick_pool", &parent);
+  umpire::strategy::binned_pool<test_memory> pool("binned_pool", &parent);
 
   std::vector<void*> ptrs;
   for (int i = 0; i < 10; ++i) {
@@ -192,10 +192,10 @@ TEST(quick_pool, multiple_allocations)
   EXPECT_EQ(pool.get_user_allocated(), 0);
 }
 
-TEST(quick_pool, nullptr_deallocation_is_safe)
+TEST(binned_pool, nullptr_deallocation_is_safe)
 {
   test_memory parent;
-  umpire::strategy::quick_pool<test_memory> pool("quick_pool", &parent);
+  umpire::strategy::binned_pool<test_memory> pool("binned_pool", &parent);
 
   std::size_t allocated_before = pool.get_user_allocated();
   EXPECT_NO_THROW(pool.deallocate(nullptr));
@@ -206,10 +206,10 @@ TEST(quick_pool, nullptr_deallocation_is_safe)
 // Power-of-2 Bin Selection Tests
 // ============================================================================
 
-TEST(quick_pool, bin_selection_exact_sizes)
+TEST(binned_pool, bin_selection_exact_sizes)
 {
   test_memory parent;
-  umpire::strategy::quick_pool<test_memory> pool("quick_pool", &parent);
+  umpire::strategy::binned_pool<test_memory> pool("binned_pool", &parent);
 
   // Exact bin sizes should map correctly
   std::vector<std::size_t> sizes = {16, 32, 64, 128, 256, 512, 1024, 2048, 4096};
@@ -226,10 +226,10 @@ TEST(quick_pool, bin_selection_exact_sizes)
   }
 }
 
-TEST(quick_pool, bin_selection_rounding_up)
+TEST(binned_pool, bin_selection_rounding_up)
 {
   test_memory parent;
-  umpire::strategy::quick_pool<test_memory> pool("quick_pool", &parent);
+  umpire::strategy::binned_pool<test_memory> pool("binned_pool", &parent);
 
   // Test that sizes round up to next power-of-2
   struct test_case {
@@ -250,7 +250,7 @@ TEST(quick_pool, bin_selection_rounding_up)
   };
 
   for (const auto& test : tests) {
-    EXPECT_EQ(umpire::strategy::quick_pool<test_memory>::get_bin_size(test.expected_bin_index),
+    EXPECT_EQ(umpire::strategy::binned_pool<test_memory>::get_bin_size(test.expected_bin_index),
               test.expected_bin_size);
     EXPECT_EQ(pool.get_bin_allocations(test.expected_bin_index), 0);
 
@@ -263,10 +263,10 @@ TEST(quick_pool, bin_selection_rounding_up)
   }
 }
 
-TEST(quick_pool, small_allocation_uses_correct_bin)
+TEST(binned_pool, small_allocation_uses_correct_bin)
 {
   test_memory parent;
-  umpire::strategy::quick_pool<test_memory> pool("quick_pool", &parent);
+  umpire::strategy::binned_pool<test_memory> pool("binned_pool", &parent);
 
   // Allocate 1 byte - should use bin 0 (16 bytes)
   void* ptr = pool.allocate(1);
@@ -283,10 +283,10 @@ TEST(quick_pool, small_allocation_uses_correct_bin)
 // Large Allocation Tests
 // ============================================================================
 
-TEST(quick_pool, large_allocation_forwarded_to_parent)
+TEST(binned_pool, large_allocation_forwarded_to_parent)
 {
   test_memory parent;
-  umpire::strategy::quick_pool<test_memory> pool("quick_pool", &parent);
+  umpire::strategy::binned_pool<test_memory> pool("binned_pool", &parent);
 
   // Allocations > 4096 should be forwarded to parent
   void* ptr = pool.allocate(8192);
@@ -295,10 +295,10 @@ TEST(quick_pool, large_allocation_forwarded_to_parent)
   pool.deallocate(ptr);
 }
 
-TEST(quick_pool, very_large_allocation)
+TEST(binned_pool, very_large_allocation)
 {
   test_memory parent;
-  umpire::strategy::quick_pool<test_memory> pool("quick_pool", &parent);
+  umpire::strategy::binned_pool<test_memory> pool("binned_pool", &parent);
 
   void* ptr = pool.allocate(1024 * 1024);
   EXPECT_NE(ptr, nullptr);
@@ -306,10 +306,10 @@ TEST(quick_pool, very_large_allocation)
   pool.deallocate(ptr);
 }
 
-TEST(quick_pool, mixed_small_and_large_allocations)
+TEST(binned_pool, mixed_small_and_large_allocations)
 {
   test_memory parent;
-  umpire::strategy::quick_pool<test_memory> pool("quick_pool", &parent);
+  umpire::strategy::binned_pool<test_memory> pool("binned_pool", &parent);
 
   std::vector<void*> ptrs;
 
@@ -333,10 +333,10 @@ TEST(quick_pool, mixed_small_and_large_allocations)
 // Internal Fragmentation Tests
 // ============================================================================
 
-TEST(quick_pool, internal_fragmentation_measurement)
+TEST(binned_pool, internal_fragmentation_measurement)
 {
   // Test fragmentation calculation
-  using pool_type = umpire::strategy::quick_pool<test_memory>;
+  using pool_type = umpire::strategy::binned_pool<test_memory>;
 
   // 1 byte in 16-byte bin: 93.75% fragmentation
   double frag1 = pool_type::calculate_fragmentation(1);
@@ -355,10 +355,10 @@ TEST(quick_pool, internal_fragmentation_measurement)
   EXPECT_EQ(frag_large, 0.0);
 }
 
-TEST(quick_pool, worst_case_fragmentation)
+TEST(binned_pool, worst_case_fragmentation)
 {
   test_memory parent;
-  umpire::strategy::quick_pool<test_memory> pool("quick_pool", &parent);
+  umpire::strategy::binned_pool<test_memory> pool("binned_pool", &parent);
 
   // Allocate sizes just over bin boundary (worst fragmentation)
   std::vector<void*> ptrs;
@@ -377,10 +377,10 @@ TEST(quick_pool, worst_case_fragmentation)
 // Free List Operations Tests
 // ============================================================================
 
-TEST(quick_pool, free_list_reuse)
+TEST(binned_pool, free_list_reuse)
 {
   test_memory parent;
-  umpire::strategy::quick_pool<test_memory> pool("quick_pool", &parent);
+  umpire::strategy::binned_pool<test_memory> pool("binned_pool", &parent);
 
   // Allocate and free multiple times
   void* ptr1 = pool.allocate(64);
@@ -406,10 +406,10 @@ TEST(quick_pool, free_list_reuse)
   EXPECT_LE(pool.get_chunk_count(), chunk_count + 1);
 }
 
-TEST(quick_pool, multiple_bins_free_lists)
+TEST(binned_pool, multiple_bins_free_lists)
 {
   test_memory parent;
-  umpire::strategy::quick_pool<test_memory> pool("quick_pool", &parent);
+  umpire::strategy::binned_pool<test_memory> pool("binned_pool", &parent);
 
   // Allocate from different bins
   void* ptr16 = pool.allocate(16);
@@ -437,10 +437,10 @@ TEST(quick_pool, multiple_bins_free_lists)
 // Statistics Tests
 // ============================================================================
 
-TEST(quick_pool, statistics_accuracy)
+TEST(binned_pool, statistics_accuracy)
 {
   test_memory parent;
-  umpire::strategy::quick_pool<test_memory> pool("quick_pool", &parent);
+  umpire::strategy::binned_pool<test_memory> pool("binned_pool", &parent);
 
   EXPECT_EQ(pool.get_user_allocated(), 0);
 
@@ -459,10 +459,10 @@ TEST(quick_pool, statistics_accuracy)
   EXPECT_EQ(pool.get_user_allocated(), 0);
 }
 
-TEST(quick_pool, direct_allocation_returns_total_to_baseline)
+TEST(binned_pool, direct_allocation_returns_total_to_baseline)
 {
   test_memory parent;
-  umpire::strategy::quick_pool<test_memory> pool("quick_pool", &parent);
+  umpire::strategy::binned_pool<test_memory> pool("binned_pool", &parent);
 
   const std::size_t baseline_total = pool.get_total_allocated();
 
@@ -474,10 +474,10 @@ TEST(quick_pool, direct_allocation_returns_total_to_baseline)
   EXPECT_EQ(pool.get_total_allocated(), baseline_total);
 }
 
-TEST(quick_pool, bin_statistics)
+TEST(binned_pool, bin_statistics)
 {
   test_memory parent;
-  umpire::strategy::quick_pool<test_memory> pool("quick_pool", &parent);
+  umpire::strategy::binned_pool<test_memory> pool("binned_pool", &parent);
 
   // Allocate multiple from same bin
   std::vector<void*> ptrs;
@@ -499,10 +499,10 @@ TEST(quick_pool, bin_statistics)
   }
 }
 
-TEST(quick_pool, free_count_tracking)
+TEST(binned_pool, free_count_tracking)
 {
   test_memory parent;
-  umpire::strategy::quick_pool<test_memory> pool("quick_pool", &parent);
+  umpire::strategy::binned_pool<test_memory> pool("binned_pool", &parent);
 
   // Get initial free count for bin 2 (64 bytes)
   std::size_t initial_free = pool.get_bin_free_count(2);
@@ -525,10 +525,10 @@ TEST(quick_pool, free_count_tracking)
 // Memory Content Tests
 // ============================================================================
 
-TEST(quick_pool, allocated_memory_is_writable)
+TEST(binned_pool, allocated_memory_is_writable)
 {
   test_memory parent;
-  umpire::strategy::quick_pool<test_memory> pool("quick_pool", &parent);
+  umpire::strategy::binned_pool<test_memory> pool("binned_pool", &parent);
 
   void* ptr = pool.allocate(256);
   ASSERT_NE(ptr, nullptr);
@@ -547,10 +547,10 @@ TEST(quick_pool, allocated_memory_is_writable)
   pool.deallocate(ptr);
 }
 
-TEST(quick_pool, allocation_alignment_is_preserved)
+TEST(binned_pool, allocation_alignment_is_preserved)
 {
   test_memory parent;
-  umpire::strategy::quick_pool<test_memory> pool("quick_pool", &parent);
+  umpire::strategy::binned_pool<test_memory> pool("binned_pool", &parent);
 
   void* small = pool.allocate(1);
   ASSERT_NE(small, nullptr);
@@ -563,10 +563,10 @@ TEST(quick_pool, allocation_alignment_is_preserved)
   pool.deallocate(large);
 }
 
-TEST(quick_pool, unique_allocations)
+TEST(binned_pool, unique_allocations)
 {
   test_memory parent;
-  umpire::strategy::quick_pool<test_memory> pool("quick_pool", &parent);
+  umpire::strategy::binned_pool<test_memory> pool("binned_pool", &parent);
 
   // Allocate multiple blocks and verify they're unique
   std::vector<void*> ptrs;
@@ -591,10 +591,10 @@ TEST(quick_pool, unique_allocations)
 // Allocation Pattern Tests
 // ============================================================================
 
-TEST(quick_pool, churn_pattern)
+TEST(binned_pool, churn_pattern)
 {
   test_memory parent;
-  umpire::strategy::quick_pool<test_memory> pool("quick_pool", &parent);
+  umpire::strategy::binned_pool<test_memory> pool("binned_pool", &parent);
 
   // Simulate allocation churn
   for (int iter = 0; iter < 100; ++iter) {
@@ -612,10 +612,10 @@ TEST(quick_pool, churn_pattern)
   EXPECT_EQ(pool.get_user_allocated(), 0);
 }
 
-TEST(quick_pool, interleaved_alloc_dealloc)
+TEST(binned_pool, interleaved_alloc_dealloc)
 {
   test_memory parent;
-  umpire::strategy::quick_pool<test_memory> pool("quick_pool", &parent);
+  umpire::strategy::binned_pool<test_memory> pool("binned_pool", &parent);
 
   std::vector<void*> ptrs;
 
@@ -637,16 +637,16 @@ TEST(quick_pool, interleaved_alloc_dealloc)
   EXPECT_EQ(pool.get_user_allocated(), 0);
 }
 
-TEST(quick_pool, custom_blocks_per_bin_control_growth)
+TEST(binned_pool, custom_blocks_per_bin_control_growth)
 {
-  using pool_type = umpire::strategy::quick_pool<test_memory>;
+  using pool_type = umpire::strategy::binned_pool<test_memory>;
 
   test_memory parent;
   auto bin_sizes = pool_type::default_bin_sizes();
   auto blocks_per_bin = pool_type::default_blocks_per_bin();
   blocks_per_bin[0] = 2;
 
-  pool_type pool("quick_pool", &parent, bin_sizes, blocks_per_bin);
+  pool_type pool("binned_pool", &parent, bin_sizes, blocks_per_bin);
   const std::size_t initial_chunk_count = pool.get_chunk_count();
 
   void* ptr1 = pool.allocate(16);
@@ -661,10 +661,10 @@ TEST(quick_pool, custom_blocks_per_bin_control_growth)
   pool.deallocate(ptr3);
 }
 
-TEST(quick_pool, variable_sized_allocations)
+TEST(binned_pool, variable_sized_allocations)
 {
   test_memory parent;
-  umpire::strategy::quick_pool<test_memory> pool("quick_pool", &parent);
+  umpire::strategy::binned_pool<test_memory> pool("binned_pool", &parent);
 
   std::vector<std::size_t> sizes = {16, 32, 64, 128, 256, 512, 1024, 64, 32};
   std::vector<void*> ptrs;
@@ -691,13 +691,13 @@ TEST(quick_pool, variable_sized_allocations)
 // Platform Type Propagation Tests
 // ============================================================================
 
-TEST(quick_pool, platform_type_propagation)
+TEST(binned_pool, platform_type_propagation)
 {
   using host_mem = umpire::resource::host_memory<>;
-  using quick_pool_host = umpire::strategy::quick_pool<host_mem>;
+  using binned_pool_host = umpire::strategy::binned_pool<host_mem>;
 
   // Platform type should be propagated from host_memory
-  static_assert(std::is_same<quick_pool_host::platform, umpire::host_platform>::value,
+  static_assert(std::is_same<binned_pool_host::platform, umpire::host_platform>::value,
                 "Platform type should be propagated from wrapped memory");
 }
 
@@ -705,11 +705,11 @@ TEST(quick_pool, platform_type_propagation)
 // Composition Tests
 // ============================================================================
 
-TEST(quick_pool, composition_with_host_memory)
+TEST(binned_pool, composition_with_host_memory)
 {
   auto& host = umpire::resource::host_memory<>::get();
-  umpire::strategy::quick_pool<umpire::resource::host_memory<>>
-    pool("quick_pool_host", &host);
+  umpire::strategy::binned_pool<umpire::resource::host_memory<>>
+    pool("binned_pool_host", &host);
 
   void* ptr = pool.allocate(512);
   EXPECT_NE(ptr, nullptr);
@@ -728,10 +728,10 @@ TEST(quick_pool, composition_with_host_memory)
 // Edge Case Tests
 // ============================================================================
 
-TEST(quick_pool, boundary_sizes)
+TEST(binned_pool, boundary_sizes)
 {
   test_memory parent;
-  umpire::strategy::quick_pool<test_memory> pool("quick_pool", &parent);
+  umpire::strategy::binned_pool<test_memory> pool("binned_pool", &parent);
 
   // Test sizes at bin boundaries
   std::vector<std::size_t> boundary_sizes = {
@@ -745,10 +745,10 @@ TEST(quick_pool, boundary_sizes)
   }
 }
 
-TEST(quick_pool, many_small_allocations)
+TEST(binned_pool, many_small_allocations)
 {
   test_memory parent;
-  umpire::strategy::quick_pool<test_memory> pool("quick_pool", &parent);
+  umpire::strategy::binned_pool<test_memory> pool("binned_pool", &parent);
 
   std::vector<void*> ptrs;
   for (int i = 0; i < 1000; ++i) {
@@ -762,10 +762,10 @@ TEST(quick_pool, many_small_allocations)
   EXPECT_EQ(pool.get_user_allocated(), 0);
 }
 
-TEST(quick_pool, all_bins_used)
+TEST(binned_pool, all_bins_used)
 {
   test_memory parent;
-  umpire::strategy::quick_pool<test_memory> pool("quick_pool", &parent);
+  umpire::strategy::binned_pool<test_memory> pool("binned_pool", &parent);
 
   // Allocate from every bin
   std::vector<void*> ptrs;
@@ -783,10 +783,10 @@ TEST(quick_pool, all_bins_used)
   }
 }
 
-TEST(quick_pool, release_is_safe)
+TEST(binned_pool, release_is_safe)
 {
   test_memory parent;
-  umpire::strategy::quick_pool<test_memory> pool("quick_pool", &parent);
+  umpire::strategy::binned_pool<test_memory> pool("binned_pool", &parent);
 
   void* ptr = pool.allocate(128);
   pool.deallocate(ptr);

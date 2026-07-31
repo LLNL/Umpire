@@ -5,8 +5,8 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 
-#include "umpire/strategy/quick_pool.hpp"
-#include "umpire/strategy/dynamic_pool_list.hpp"
+#include "umpire/strategy/binned_pool.hpp"
+#include "umpire/strategy/coalescing_pool_list.hpp"
 #include "umpire/resource/host_memory.hpp"
 
 #include <algorithm>
@@ -71,7 +71,7 @@ void benchmark_o1_allocation() {
   std::cout << "\n=== Benchmark: O(1) Allocation Verification ===" << std::endl;
 
   bench_memory parent;
-  umpire::strategy::quick_pool<bench_memory> pool("quick_pool", &parent);
+  umpire::strategy::binned_pool<bench_memory> pool("binned_pool", &parent);
 
   const int num_rounds = 1000;
   const int allocs_per_round = 100;
@@ -109,7 +109,7 @@ void benchmark_o1_allocation() {
 // ============================================================================
 
 void benchmark_vs_dynamic_pool() {
-  std::cout << "\n=== Benchmark: quick_pool vs dynamic_pool_list ===" << std::endl;
+  std::cout << "\n=== Benchmark: binned_pool vs dynamic_pool_list ===" << std::endl;
 
   const int num_rounds = 1000;
   const int allocs_per_round = 100;
@@ -119,7 +119,7 @@ void benchmark_vs_dynamic_pool() {
     {16, 16},      // Single size
     {16, 256},     // Small range
     {16, 1024},    // Medium range
-    {16, 4096},    // Full quick_pool range
+    {16, 4096},    // Full binned_pool range
   };
 
   for (const auto& range : size_ranges) {
@@ -129,9 +129,9 @@ void benchmark_vs_dynamic_pool() {
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> size_dist(range.first, range.second);
 
-    // Benchmark quick_pool
+    // Benchmark binned_pool
     bench_memory parent1;
-    umpire::strategy::quick_pool<bench_memory> quick("quick_pool", &parent1);
+    umpire::strategy::binned_pool<bench_memory> quick("binned_pool", &parent1);
 
     Timer timer;
     timer.start();
@@ -153,7 +153,7 @@ void benchmark_vs_dynamic_pool() {
 
     // Benchmark dynamic_pool_list
     bench_memory parent2;
-    umpire::strategy::dynamic_pool_list<bench_memory> dynamic(
+    umpire::strategy::coalescing_pool_list<bench_memory> dynamic(
       "dynamic_pool", &parent2, 64 * 1024, 1024, 2.0);
 
     timer.start();
@@ -173,7 +173,7 @@ void benchmark_vs_dynamic_pool() {
 
     double dynamic_time = timer.elapsed_ms();
 
-    std::cout << "    quick_pool time: " << quick_time << " ms" << std::endl;
+    std::cout << "    binned_pool time: " << quick_time << " ms" << std::endl;
     std::cout << "    dynamic_pool_list time: " << dynamic_time << " ms" << std::endl;
     std::cout << "    Speedup: " << std::fixed << std::setprecision(2)
               << (dynamic_time / quick_time) << "x" << std::endl;
@@ -185,7 +185,7 @@ void benchmark_vs_dynamic_pool() {
 // ============================================================================
 
 void benchmark_vs_malloc() {
-  std::cout << "\n=== Benchmark: quick_pool vs malloc ===" << std::endl;
+  std::cout << "\n=== Benchmark: binned_pool vs malloc ===" << std::endl;
 
   const int num_rounds = 1000;
   const int allocs_per_round = 100;
@@ -213,9 +213,9 @@ void benchmark_vs_malloc() {
 
   double malloc_time = timer.elapsed_ms();
 
-  // Benchmark quick_pool
+  // Benchmark binned_pool
   bench_memory parent;
-  umpire::strategy::quick_pool<bench_memory> pool("quick_pool", &parent);
+  umpire::strategy::binned_pool<bench_memory> pool("binned_pool", &parent);
 
   timer.start();
 
@@ -235,7 +235,7 @@ void benchmark_vs_malloc() {
   double pool_time = timer.elapsed_ms();
 
   std::cout << "  malloc time: " << malloc_time << " ms" << std::endl;
-  std::cout << "  quick_pool time: " << pool_time << " ms" << std::endl;
+  std::cout << "  binned_pool time: " << pool_time << " ms" << std::endl;
   std::cout << "  Speedup: " << std::fixed << std::setprecision(2)
             << (malloc_time / pool_time) << "x" << std::endl;
 }
@@ -248,7 +248,7 @@ void benchmark_size_classes() {
   std::cout << "\n=== Benchmark: Performance Across Size Classes ===" << std::endl;
 
   bench_memory parent;
-  umpire::strategy::quick_pool<bench_memory> pool("quick_pool", &parent);
+  umpire::strategy::binned_pool<bench_memory> pool("binned_pool", &parent);
 
   const int num_rounds = 1000;
   const int allocs_per_round = 100;
@@ -287,7 +287,7 @@ void benchmark_size_classes() {
 void benchmark_fragmentation() {
   std::cout << "\n=== Benchmark: Internal Fragmentation Analysis ===" << std::endl;
 
-  using pool_type = umpire::strategy::quick_pool<bench_memory>;
+  using pool_type = umpire::strategy::binned_pool<bench_memory>;
 
   std::cout << "\n  Fragmentation by allocation size:" << std::endl;
 
@@ -318,7 +318,7 @@ void benchmark_fragmentation() {
 
   // Calculate average fragmentation for realistic workload
   bench_memory parent;
-  umpire::strategy::quick_pool<bench_memory> pool("quick_pool", &parent);
+  umpire::strategy::binned_pool<bench_memory> pool("binned_pool", &parent);
 
   std::random_device rd;
   std::mt19937 gen(rd());
@@ -347,7 +347,7 @@ void benchmark_multi_bin_stress() {
   std::cout << "\n=== Benchmark: Multi-Bin Stress Test ===" << std::endl;
 
   bench_memory parent;
-  umpire::strategy::quick_pool<bench_memory> pool("quick_pool", &parent);
+  umpire::strategy::binned_pool<bench_memory> pool("binned_pool", &parent);
 
   const int num_rounds = 100;
   const int allocs_per_round = 1000;
@@ -403,7 +403,7 @@ void benchmark_churn_pattern() {
   std::cout << "\n=== Benchmark: Allocation Churn Pattern ===" << std::endl;
 
   bench_memory parent;
-  umpire::strategy::quick_pool<bench_memory> pool("quick_pool", &parent);
+  umpire::strategy::binned_pool<bench_memory> pool("binned_pool", &parent);
 
   const int num_iterations = 10000;
   const int objects_per_iteration = 10;
@@ -448,7 +448,7 @@ void benchmark_large_vs_small() {
   // Small allocations (binned)
   {
     bench_memory parent;
-    umpire::strategy::quick_pool<bench_memory> pool("quick_pool", &parent);
+    umpire::strategy::binned_pool<bench_memory> pool("binned_pool", &parent);
 
     Timer timer;
     timer.start();
@@ -470,7 +470,7 @@ void benchmark_large_vs_small() {
   // Large allocations (direct)
   {
     bench_memory parent;
-    umpire::strategy::quick_pool<bench_memory> pool("quick_pool", &parent);
+    umpire::strategy::binned_pool<bench_memory> pool("binned_pool", &parent);
 
     Timer timer;
     timer.start();
@@ -498,7 +498,7 @@ void benchmark_scalability() {
   std::cout << "\n=== Benchmark: Scalability Test ===" << std::endl;
 
   bench_memory parent;
-  umpire::strategy::quick_pool<bench_memory> pool("quick_pool", &parent);
+  umpire::strategy::binned_pool<bench_memory> pool("binned_pool", &parent);
 
   std::vector<int> allocation_counts = {10, 100, 1000, 10000};
 
@@ -532,7 +532,7 @@ void benchmark_scalability() {
 
 int main() {
   std::cout << "==================================================" << std::endl;
-  std::cout << "  quick_pool Benchmark Suite" << std::endl;
+  std::cout << "  binned_pool Benchmark Suite" << std::endl;
   std::cout << "==================================================" << std::endl;
 
   benchmark_o1_allocation();

@@ -61,11 +61,11 @@ if (UMPIRE_ENABLE_API_V2)
     ${PROJECT_SOURCE_DIR}/include/umpire/resource/null_resource.hpp
     ${PROJECT_SOURCE_DIR}/include/umpire/resource/platform.hpp
     ${PROJECT_SOURCE_DIR}/include/umpire/strategy/allocation_strategy.hpp
-    ${PROJECT_SOURCE_DIR}/include/umpire/strategy/dynamic_pool_list.hpp
+    ${PROJECT_SOURCE_DIR}/include/umpire/strategy/coalescing_pool_list.hpp
     ${PROJECT_SOURCE_DIR}/include/umpire/strategy/fixed_pool.hpp
     ${PROJECT_SOURCE_DIR}/include/umpire/strategy/monotonic_buffer.hpp
     ${PROJECT_SOURCE_DIR}/include/umpire/strategy/named.hpp
-    ${PROJECT_SOURCE_DIR}/include/umpire/strategy/quick_pool.hpp
+    ${PROJECT_SOURCE_DIR}/include/umpire/strategy/binned_pool.hpp
     ${PROJECT_SOURCE_DIR}/include/umpire/strategy/size_limiter.hpp
     ${PROJECT_SOURCE_DIR}/include/umpire/strategy/thread_safe.hpp)
 

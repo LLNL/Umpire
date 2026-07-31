@@ -4,8 +4,8 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_strategy_quick_pool_HPP
-#define UMPIRE_strategy_quick_pool_HPP
+#ifndef UMPIRE_strategy_binned_pool_HPP
+#define UMPIRE_strategy_binned_pool_HPP
 
 #include "umpire/strategy/allocation_strategy.hpp"
 #include "umpire/util/error.hpp"
@@ -26,7 +26,7 @@ namespace strategy {
 
 //! @brief Fast pool using power-of-2 size bins for O(1) allocation
 //!
-//! The quick_pool strategy provides O(1) allocation by using fixed power-of-2
+//! The binned_pool strategy provides O(1) allocation by using fixed power-of-2
 //! size bins. Each bin maintains its own free list for allocations of that
 //! size, and each bin can be configured with its own growth chunk size.
 //!
@@ -49,7 +49,7 @@ namespace strategy {
 //!
 //! @tparam Memory The memory source type to wrap (must inherit from memory)
 template<typename Memory>
-class quick_pool : public allocation_strategy {
+class binned_pool : public allocation_strategy {
 public:
   //! @brief Platform type propagated from wrapped memory source
   using platform = typename Memory::platform;
@@ -65,7 +65,7 @@ private:
   };
 
   static_assert(alignof(pool_header) >= alignof(std::max_align_t),
-                "quick_pool header must preserve standard alignment");
+                "binned_pool header must preserve standard alignment");
 
   static constexpr std::size_t HEADER_SIZE = sizeof(pool_header);
   static constexpr std::size_t DIRECT_ALLOC_INDEX = NUM_BINS;
@@ -106,25 +106,25 @@ private:
     for (std::size_t i = 0; i < NUM_BINS; ++i) {
       if (!is_power_of_two(bin_sizes_[i])) {
         throw std::invalid_argument(
-          fmt::format("quick_pool: bin size {} at index {} must be a non-zero power of two",
+          fmt::format("binned_pool: bin size {} at index {} must be a non-zero power of two",
                       bin_sizes_[i], i));
       }
 
       if (i > 0 && bin_sizes_[i] <= bin_sizes_[i - 1]) {
         throw std::invalid_argument(
-          fmt::format("quick_pool: bin size {} at index {} must be strictly greater than {}",
+          fmt::format("binned_pool: bin size {} at index {} must be strictly greater than {}",
                       bin_sizes_[i], i, bin_sizes_[i - 1]));
       }
 
       if (blocks_per_bin_[i] == 0) {
         throw std::invalid_argument(
-          fmt::format("quick_pool: blocks_per_bin for index {} must be greater than 0", i));
+          fmt::format("binned_pool: blocks_per_bin for index {} must be greater than 0", i));
       }
 
       if (blocks_per_bin_[i] >
           std::numeric_limits<std::size_t>::max() / (bin_sizes_[i] + HEADER_SIZE)) {
         throw std::invalid_argument(
-          fmt::format("quick_pool: chunk configuration for bin {} overflows size_t", i));
+          fmt::format("binned_pool: chunk configuration for bin {} overflows size_t", i));
       }
     }
   }
@@ -138,7 +138,7 @@ private:
 
     if (!chunk) {
       UMPIRE_ERROR(out_of_memory_error,
-                   fmt::format("quick_pool: failed to allocate chunk of {} bytes", chunk_size));
+                   fmt::format("binned_pool: failed to allocate chunk of {} bytes", chunk_size));
     }
 
     chunks_.push_back(chunk);
@@ -207,7 +207,7 @@ public:
    *
    * \throws std::invalid_argument if the configuration is inconsistent.
    */
-  explicit quick_pool(
+  explicit binned_pool(
     const std::string& name,
     Memory* parent,
     configuration_array bin_sizes = default_bin_sizes(),
@@ -228,7 +228,7 @@ public:
   }
 
   //! @brief Destructor that returns all backing chunks to the parent.
-  ~quick_pool()
+  ~binned_pool()
   {
     for (void* chunk : chunks_) {
       parent_->deallocate(chunk);
@@ -252,7 +252,7 @@ public:
 
     if (size > std::numeric_limits<std::size_t>::max() - HEADER_SIZE) {
       UMPIRE_ERROR(out_of_memory_error,
-                   fmt::format("quick_pool: allocation size {} overflows header accounting", size));
+                   fmt::format("binned_pool: allocation size {} overflows header accounting", size));
     }
 
     const std::size_t bin_index = get_bin_index(size);
@@ -262,7 +262,7 @@ public:
       void* ptr = parent_->allocate(alloc_size);
       if (!ptr) {
         UMPIRE_ERROR(out_of_memory_error,
-                     fmt::format("quick_pool: failed to allocate {} bytes", alloc_size));
+                     fmt::format("binned_pool: failed to allocate {} bytes", alloc_size));
       }
 
       total_allocated_ += alloc_size;
@@ -317,10 +317,10 @@ public:
     }
 
     throw std::runtime_error(
-      fmt::format("quick_pool: invalid bin index {} for pointer {:p}", bin_index, user_ptr));
+      fmt::format("binned_pool: invalid bin index {} for pointer {:p}", bin_index, user_ptr));
   }
 
-  //! @brief No-op release hook; quick_pool does not track fully free chunks.
+  //! @brief No-op release hook; binned_pool does not track fully free chunks.
   void release()
   {
     // No-op: tracking completely free chunks would add more metadata than this
@@ -384,4 +384,4 @@ public:
 } // namespace strategy
 } // namespace umpire
 
-#endif // UMPIRE_strategy_quick_pool_HPP
+#endif // UMPIRE_strategy_binned_pool_HPP

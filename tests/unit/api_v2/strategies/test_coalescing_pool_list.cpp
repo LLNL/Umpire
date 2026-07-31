@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 
-#include "umpire/strategy/dynamic_pool_list.hpp"
+#include "umpire/strategy/coalescing_pool_list.hpp"
 #include "umpire/resource/host_memory.hpp"
 #include "umpire/memory.hpp"
 
@@ -50,10 +50,10 @@ public:
 // Construction and Validation Tests
 // ============================================================================
 
-TEST(dynamic_pool_list, construct_with_default_parameters)
+TEST(coalescing_pool_list, construct_with_default_parameters)
 {
   test_memory parent;
-  umpire::strategy::dynamic_pool_list<test_memory> pool("dynamic_pool", &parent);
+  umpire::strategy::coalescing_pool_list<test_memory> pool("dynamic_pool", &parent);
 
   EXPECT_EQ(pool.get_parent(), &parent);
   EXPECT_EQ(pool.get_name(), "dynamic_pool");
@@ -65,10 +65,10 @@ TEST(dynamic_pool_list, construct_with_default_parameters)
   EXPECT_EQ(pool.get_free_size(), pool.get_total_size());
 }
 
-TEST(dynamic_pool_list, construct_with_custom_parameters)
+TEST(coalescing_pool_list, construct_with_custom_parameters)
 {
   test_memory parent;
-  umpire::strategy::dynamic_pool_list<test_memory> pool(
+  umpire::strategy::coalescing_pool_list<test_memory> pool(
     "dynamic_pool", &parent, 128 * 1024, 8 * 1024, 1.5);
 
   EXPECT_EQ(pool.get_initial_pool_size(), 128 * 1024);
@@ -78,49 +78,49 @@ TEST(dynamic_pool_list, construct_with_custom_parameters)
   EXPECT_EQ(pool.get_free_size(), 128 * 1024);
 }
 
-TEST(dynamic_pool_list, construct_with_nullptr_throws)
+TEST(coalescing_pool_list, construct_with_nullptr_throws)
 {
   EXPECT_THROW(
-    umpire::strategy::dynamic_pool_list<test_memory> pool("dynamic_pool", nullptr),
+    umpire::strategy::coalescing_pool_list<test_memory> pool("dynamic_pool", nullptr),
     std::invalid_argument
   );
 }
 
-TEST(dynamic_pool_list, construct_with_zero_initial_pool_size_throws)
+TEST(coalescing_pool_list, construct_with_zero_initial_pool_size_throws)
 {
   test_memory parent;
   EXPECT_THROW(
-    umpire::strategy::dynamic_pool_list<test_memory> pool("dynamic_pool", &parent, 0),
+    umpire::strategy::coalescing_pool_list<test_memory> pool("dynamic_pool", &parent, 0),
     std::invalid_argument
   );
 }
 
-TEST(dynamic_pool_list, construct_with_zero_min_alloc_size_throws)
+TEST(coalescing_pool_list, construct_with_zero_min_alloc_size_throws)
 {
   test_memory parent;
   EXPECT_THROW(
-    umpire::strategy::dynamic_pool_list<test_memory> pool("dynamic_pool", &parent, 64*1024, 0),
+    umpire::strategy::coalescing_pool_list<test_memory> pool("dynamic_pool", &parent, 64*1024, 0),
     std::invalid_argument
   );
 }
 
-TEST(dynamic_pool_list, construct_with_invalid_growth_factor_throws)
+TEST(coalescing_pool_list, construct_with_invalid_growth_factor_throws)
 {
   test_memory parent;
   EXPECT_THROW(
-    umpire::strategy::dynamic_pool_list<test_memory> pool("dynamic_pool", &parent, 64*1024, 4*1024, 1.0),
+    umpire::strategy::coalescing_pool_list<test_memory> pool("dynamic_pool", &parent, 64*1024, 4*1024, 1.0),
     std::invalid_argument
   );
   EXPECT_THROW(
-    umpire::strategy::dynamic_pool_list<test_memory> pool("dynamic_pool", &parent, 64*1024, 4*1024, 0.5),
+    umpire::strategy::coalescing_pool_list<test_memory> pool("dynamic_pool", &parent, 64*1024, 4*1024, 0.5),
     std::invalid_argument
   );
 }
 
-TEST(dynamic_pool_list, get_platform_delegates_to_parent)
+TEST(coalescing_pool_list, get_platform_delegates_to_parent)
 {
   test_memory parent;
-  umpire::strategy::dynamic_pool_list<test_memory> pool("dynamic_pool", &parent);
+  umpire::strategy::coalescing_pool_list<test_memory> pool("dynamic_pool", &parent);
 
   EXPECT_EQ(pool.get_platform(), parent.get_platform());
   EXPECT_EQ(pool.get_platform(), umpire::resource::Platform::host);
@@ -130,10 +130,10 @@ TEST(dynamic_pool_list, get_platform_delegates_to_parent)
 // Basic Allocation Tests
 // ============================================================================
 
-TEST(dynamic_pool_list, basic_allocation)
+TEST(coalescing_pool_list, basic_allocation)
 {
   test_memory parent;
-  umpire::strategy::dynamic_pool_list<test_memory> pool("dynamic_pool", &parent, 64*1024, 1024);
+  umpire::strategy::coalescing_pool_list<test_memory> pool("dynamic_pool", &parent, 64*1024, 1024);
 
   void* ptr = pool.allocate(1024);
   EXPECT_NE(ptr, nullptr);
@@ -146,19 +146,19 @@ TEST(dynamic_pool_list, basic_allocation)
   EXPECT_EQ(pool.get_allocated_size(), 0);
 }
 
-TEST(dynamic_pool_list, zero_size_allocation_returns_nullptr)
+TEST(coalescing_pool_list, zero_size_allocation_returns_nullptr)
 {
   test_memory parent;
-  umpire::strategy::dynamic_pool_list<test_memory> pool("dynamic_pool", &parent);
+  umpire::strategy::coalescing_pool_list<test_memory> pool("dynamic_pool", &parent);
 
   void* ptr = pool.allocate(0);
   EXPECT_EQ(ptr, nullptr);
 }
 
-TEST(dynamic_pool_list, multiple_allocations)
+TEST(coalescing_pool_list, multiple_allocations)
 {
   test_memory parent;
-  umpire::strategy::dynamic_pool_list<test_memory> pool("dynamic_pool", &parent, 64*1024, 1024);
+  umpire::strategy::coalescing_pool_list<test_memory> pool("dynamic_pool", &parent, 64*1024, 1024);
 
   std::vector<void*> ptrs;
   for (int i = 0; i < 5; ++i) {
@@ -176,10 +176,10 @@ TEST(dynamic_pool_list, multiple_allocations)
   EXPECT_EQ(pool.get_allocated_size(), 0);
 }
 
-TEST(dynamic_pool_list, variable_sized_allocations)
+TEST(coalescing_pool_list, variable_sized_allocations)
 {
   test_memory parent;
-  umpire::strategy::dynamic_pool_list<test_memory> pool("dynamic_pool", &parent, 64*1024, 512);
+  umpire::strategy::coalescing_pool_list<test_memory> pool("dynamic_pool", &parent, 64*1024, 512);
 
   void* ptr1 = pool.allocate(1024);
   void* ptr2 = pool.allocate(2048);
@@ -200,10 +200,10 @@ TEST(dynamic_pool_list, variable_sized_allocations)
   pool.deallocate(ptr4);
 }
 
-TEST(dynamic_pool_list, nullptr_deallocation_is_safe)
+TEST(coalescing_pool_list, nullptr_deallocation_is_safe)
 {
   test_memory parent;
-  umpire::strategy::dynamic_pool_list<test_memory> pool("dynamic_pool", &parent);
+  umpire::strategy::coalescing_pool_list<test_memory> pool("dynamic_pool", &parent);
 
   std::size_t allocated_before = pool.get_allocated_size();
   EXPECT_NO_THROW(pool.deallocate(nullptr));
@@ -214,10 +214,10 @@ TEST(dynamic_pool_list, nullptr_deallocation_is_safe)
 // Block Splitting Tests
 // ============================================================================
 
-TEST(dynamic_pool_list, block_splitting)
+TEST(coalescing_pool_list, block_splitting)
 {
   test_memory parent;
-  umpire::strategy::dynamic_pool_list<test_memory> pool("dynamic_pool", &parent, 64*1024, 1024);
+  umpire::strategy::coalescing_pool_list<test_memory> pool("dynamic_pool", &parent, 64*1024, 1024);
 
   std::size_t initial_blocks = pool.get_block_count();
 
@@ -231,10 +231,10 @@ TEST(dynamic_pool_list, block_splitting)
   pool.deallocate(ptr);
 }
 
-TEST(dynamic_pool_list, no_split_when_remainder_too_small)
+TEST(coalescing_pool_list, no_split_when_remainder_too_small)
 {
   test_memory parent;
-  umpire::strategy::dynamic_pool_list<test_memory> pool("dynamic_pool", &parent, 8*1024, 4*1024);
+  umpire::strategy::coalescing_pool_list<test_memory> pool("dynamic_pool", &parent, 8*1024, 4*1024);
 
   std::size_t initial_blocks = pool.get_block_count();
 
@@ -249,10 +249,10 @@ TEST(dynamic_pool_list, no_split_when_remainder_too_small)
   pool.deallocate(ptr);
 }
 
-TEST(dynamic_pool_list, split_when_remainder_large_enough)
+TEST(coalescing_pool_list, split_when_remainder_large_enough)
 {
   test_memory parent;
-  umpire::strategy::dynamic_pool_list<test_memory> pool("dynamic_pool", &parent, 16*1024, 4*1024);
+  umpire::strategy::coalescing_pool_list<test_memory> pool("dynamic_pool", &parent, 16*1024, 4*1024);
 
   std::size_t initial_blocks = pool.get_block_count();
 
@@ -271,10 +271,10 @@ TEST(dynamic_pool_list, split_when_remainder_large_enough)
 // Coalescing Tests
 // ============================================================================
 
-TEST(dynamic_pool_list, coalesce_adjacent_free_blocks)
+TEST(coalescing_pool_list, coalesce_adjacent_free_blocks)
 {
   test_memory parent;
-  umpire::strategy::dynamic_pool_list<test_memory> pool("dynamic_pool", &parent, 64*1024, 1024);
+  umpire::strategy::coalescing_pool_list<test_memory> pool("dynamic_pool", &parent, 64*1024, 1024);
 
   // Allocate three adjacent blocks
   void* ptr1 = pool.allocate(4096);
@@ -294,10 +294,10 @@ TEST(dynamic_pool_list, coalesce_adjacent_free_blocks)
   EXPECT_LT(pool.get_block_count(), blocks_allocated);
 }
 
-TEST(dynamic_pool_list, coalesce_with_next_block)
+TEST(coalescing_pool_list, coalesce_with_next_block)
 {
   test_memory parent;
-  umpire::strategy::dynamic_pool_list<test_memory> pool("dynamic_pool", &parent, 64*1024, 1024);
+  umpire::strategy::coalescing_pool_list<test_memory> pool("dynamic_pool", &parent, 64*1024, 1024);
 
   void* ptr1 = pool.allocate(4096);
   void* ptr2 = pool.allocate(4096);
@@ -312,10 +312,10 @@ TEST(dynamic_pool_list, coalesce_with_next_block)
   EXPECT_LT(pool.get_block_count(), blocks_before);
 }
 
-TEST(dynamic_pool_list, coalesce_with_previous_block)
+TEST(coalescing_pool_list, coalesce_with_previous_block)
 {
   test_memory parent;
-  umpire::strategy::dynamic_pool_list<test_memory> pool("dynamic_pool", &parent, 64*1024, 1024);
+  umpire::strategy::coalescing_pool_list<test_memory> pool("dynamic_pool", &parent, 64*1024, 1024);
 
   void* ptr1 = pool.allocate(4096);
   void* ptr2 = pool.allocate(4096);
@@ -330,10 +330,10 @@ TEST(dynamic_pool_list, coalesce_with_previous_block)
   EXPECT_LT(pool.get_block_count(), blocks_before);
 }
 
-TEST(dynamic_pool_list, coalesce_multiple_adjacent_blocks)
+TEST(coalescing_pool_list, coalesce_multiple_adjacent_blocks)
 {
   test_memory parent;
-  umpire::strategy::dynamic_pool_list<test_memory> pool("dynamic_pool", &parent, 128*1024, 1024);
+  umpire::strategy::coalescing_pool_list<test_memory> pool("dynamic_pool", &parent, 128*1024, 1024);
 
   // Allocate many small blocks
   std::vector<void*> ptrs;
@@ -354,10 +354,10 @@ TEST(dynamic_pool_list, coalesce_multiple_adjacent_blocks)
 // Pool Growth Tests
 // ============================================================================
 
-TEST(dynamic_pool_list, automatic_pool_growth)
+TEST(coalescing_pool_list, automatic_pool_growth)
 {
   test_memory parent;
-  umpire::strategy::dynamic_pool_list<test_memory> pool("dynamic_pool", &parent, 8*1024, 1024, 2.0);
+  umpire::strategy::coalescing_pool_list<test_memory> pool("dynamic_pool", &parent, 8*1024, 1024, 2.0);
 
   std::size_t initial_total = pool.get_total_size();
 
@@ -375,10 +375,10 @@ TEST(dynamic_pool_list, automatic_pool_growth)
   }
 }
 
-TEST(dynamic_pool_list, growth_factor_applied)
+TEST(coalescing_pool_list, growth_factor_applied)
 {
   test_memory parent;
-  umpire::strategy::dynamic_pool_list<test_memory> pool("dynamic_pool", &parent, 8*1024, 1024, 2.0);
+  umpire::strategy::coalescing_pool_list<test_memory> pool("dynamic_pool", &parent, 8*1024, 1024, 2.0);
 
   // Fill initial pool
   std::vector<void*> ptrs;
@@ -400,10 +400,10 @@ TEST(dynamic_pool_list, growth_factor_applied)
   }
 }
 
-TEST(dynamic_pool_list, large_allocation_triggers_appropriate_growth)
+TEST(coalescing_pool_list, large_allocation_triggers_appropriate_growth)
 {
   test_memory parent;
-  umpire::strategy::dynamic_pool_list<test_memory> pool("dynamic_pool", &parent, 8*1024, 1024, 2.0);
+  umpire::strategy::coalescing_pool_list<test_memory> pool("dynamic_pool", &parent, 8*1024, 1024, 2.0);
 
   // Request allocation larger than next pool size
   void* ptr = pool.allocate(32 * 1024);
@@ -419,10 +419,10 @@ TEST(dynamic_pool_list, large_allocation_triggers_appropriate_growth)
 // Release Tests
 // ============================================================================
 
-TEST(dynamic_pool_list, release_with_no_free_blocks)
+TEST(coalescing_pool_list, release_with_no_free_blocks)
 {
   test_memory parent;
-  umpire::strategy::dynamic_pool_list<test_memory> pool("dynamic_pool", &parent, 16*1024, 1024);
+  umpire::strategy::coalescing_pool_list<test_memory> pool("dynamic_pool", &parent, 16*1024, 1024);
 
   // Allocate all memory
   std::vector<void*> ptrs;
@@ -442,10 +442,10 @@ TEST(dynamic_pool_list, release_with_no_free_blocks)
   }
 }
 
-TEST(dynamic_pool_list, release_returns_free_memory)
+TEST(coalescing_pool_list, release_returns_free_memory)
 {
   test_memory parent;
-  umpire::strategy::dynamic_pool_list<test_memory> pool("dynamic_pool", &parent, 16*1024, 1024, 2.0);
+  umpire::strategy::coalescing_pool_list<test_memory> pool("dynamic_pool", &parent, 16*1024, 1024, 2.0);
 
   // Allocate to create multiple pools
   std::vector<void*> ptrs;
@@ -469,10 +469,10 @@ TEST(dynamic_pool_list, release_returns_free_memory)
   EXPECT_LE(pool.get_total_size(), total_after_alloc);
 }
 
-TEST(dynamic_pool_list, release_keeps_some_free_memory)
+TEST(coalescing_pool_list, release_keeps_some_free_memory)
 {
   test_memory parent;
-  umpire::strategy::dynamic_pool_list<test_memory> pool("dynamic_pool", &parent, 16*1024, 1024);
+  umpire::strategy::coalescing_pool_list<test_memory> pool("dynamic_pool", &parent, 16*1024, 1024);
 
   void* ptr = pool.allocate(1024);
   pool.deallocate(ptr);
@@ -490,10 +490,10 @@ TEST(dynamic_pool_list, release_keeps_some_free_memory)
 // Error Detection Tests
 // ============================================================================
 
-TEST(dynamic_pool_list, unknown_pointer_throws)
+TEST(coalescing_pool_list, unknown_pointer_throws)
 {
   test_memory parent;
-  umpire::strategy::dynamic_pool_list<test_memory> pool("dynamic_pool", &parent);
+  umpire::strategy::coalescing_pool_list<test_memory> pool("dynamic_pool", &parent);
 
   // Try to free pointer not from this pool
   int dummy;
@@ -502,10 +502,10 @@ TEST(dynamic_pool_list, unknown_pointer_throws)
   EXPECT_THROW(pool.deallocate(bad_ptr), umpire::unknown_pointer_error);
 }
 
-TEST(dynamic_pool_list, double_free_throws)
+TEST(coalescing_pool_list, double_free_throws)
 {
   test_memory parent;
-  umpire::strategy::dynamic_pool_list<test_memory> pool("dynamic_pool", &parent);
+  umpire::strategy::coalescing_pool_list<test_memory> pool("dynamic_pool", &parent);
 
   void* ptr = pool.allocate(1024);
   pool.deallocate(ptr);
@@ -518,10 +518,10 @@ TEST(dynamic_pool_list, double_free_throws)
 // Statistics Tests
 // ============================================================================
 
-TEST(dynamic_pool_list, statistics_accuracy)
+TEST(coalescing_pool_list, statistics_accuracy)
 {
   test_memory parent;
-  umpire::strategy::dynamic_pool_list<test_memory> pool("dynamic_pool", &parent, 64*1024, 1024);
+  umpire::strategy::coalescing_pool_list<test_memory> pool("dynamic_pool", &parent, 64*1024, 1024);
 
   std::size_t initial_total = pool.get_total_size();
   EXPECT_EQ(pool.get_allocated_size(), 0);
@@ -543,10 +543,10 @@ TEST(dynamic_pool_list, statistics_accuracy)
   EXPECT_EQ(pool.get_allocated_size(), 0);
 }
 
-TEST(dynamic_pool_list, statistics_consistency)
+TEST(coalescing_pool_list, statistics_consistency)
 {
   test_memory parent;
-  umpire::strategy::dynamic_pool_list<test_memory> pool("dynamic_pool", &parent, 64*1024, 1024);
+  umpire::strategy::coalescing_pool_list<test_memory> pool("dynamic_pool", &parent, 64*1024, 1024);
 
   // Total should equal allocated + free at all times
   EXPECT_EQ(pool.get_total_size(), pool.get_allocated_size() + pool.get_free_size());
@@ -568,10 +568,10 @@ TEST(dynamic_pool_list, statistics_consistency)
 // Memory Content Tests
 // ============================================================================
 
-TEST(dynamic_pool_list, allocated_memory_is_writable)
+TEST(coalescing_pool_list, allocated_memory_is_writable)
 {
   test_memory parent;
-  umpire::strategy::dynamic_pool_list<test_memory> pool("dynamic_pool", &parent);
+  umpire::strategy::coalescing_pool_list<test_memory> pool("dynamic_pool", &parent);
 
   void* ptr = pool.allocate(1024);
   ASSERT_NE(ptr, nullptr);
@@ -590,10 +590,10 @@ TEST(dynamic_pool_list, allocated_memory_is_writable)
   pool.deallocate(ptr);
 }
 
-TEST(dynamic_pool_list, unique_allocations)
+TEST(coalescing_pool_list, unique_allocations)
 {
   test_memory parent;
-  umpire::strategy::dynamic_pool_list<test_memory> pool("dynamic_pool", &parent, 64*1024, 512);
+  umpire::strategy::coalescing_pool_list<test_memory> pool("dynamic_pool", &parent, 64*1024, 512);
 
   // Allocate multiple blocks and verify they're unique
   std::vector<void*> ptrs;
@@ -618,10 +618,10 @@ TEST(dynamic_pool_list, unique_allocations)
 // Allocation Pattern Tests
 // ============================================================================
 
-TEST(dynamic_pool_list, churn_pattern)
+TEST(coalescing_pool_list, churn_pattern)
 {
   test_memory parent;
-  umpire::strategy::dynamic_pool_list<test_memory> pool("dynamic_pool", &parent, 64*1024, 1024);
+  umpire::strategy::coalescing_pool_list<test_memory> pool("dynamic_pool", &parent, 64*1024, 1024);
 
   // Simulate allocation churn
   for (int iter = 0; iter < 10; ++iter) {
@@ -639,10 +639,10 @@ TEST(dynamic_pool_list, churn_pattern)
   EXPECT_EQ(pool.get_allocated_size(), 0);
 }
 
-TEST(dynamic_pool_list, interleaved_alloc_dealloc)
+TEST(coalescing_pool_list, interleaved_alloc_dealloc)
 {
   test_memory parent;
-  umpire::strategy::dynamic_pool_list<test_memory> pool("dynamic_pool", &parent, 64*1024, 1024);
+  umpire::strategy::coalescing_pool_list<test_memory> pool("dynamic_pool", &parent, 64*1024, 1024);
 
   std::vector<void*> ptrs;
 
@@ -664,10 +664,10 @@ TEST(dynamic_pool_list, interleaved_alloc_dealloc)
   EXPECT_EQ(pool.get_allocated_size(), 0);
 }
 
-TEST(dynamic_pool_list, fragmentation_pattern)
+TEST(coalescing_pool_list, fragmentation_pattern)
 {
   test_memory parent;
-  umpire::strategy::dynamic_pool_list<test_memory> pool("dynamic_pool", &parent, 128*1024, 1024);
+  umpire::strategy::coalescing_pool_list<test_memory> pool("dynamic_pool", &parent, 128*1024, 1024);
 
   // Allocate many blocks
   std::vector<void*> ptrs;
@@ -696,10 +696,10 @@ TEST(dynamic_pool_list, fragmentation_pattern)
 // Platform Type Propagation Tests
 // ============================================================================
 
-TEST(dynamic_pool_list, platform_type_propagation)
+TEST(coalescing_pool_list, platform_type_propagation)
 {
   using host_mem = umpire::resource::host_memory<>;
-  using dynamic_pool_host = umpire::strategy::dynamic_pool_list<host_mem>;
+  using dynamic_pool_host = umpire::strategy::coalescing_pool_list<host_mem>;
 
   // Platform type should be propagated from host_memory
   static_assert(std::is_same<dynamic_pool_host::platform, umpire::host_platform>::value,
@@ -710,10 +710,10 @@ TEST(dynamic_pool_list, platform_type_propagation)
 // Composition Tests
 // ============================================================================
 
-TEST(dynamic_pool_list, composition_with_host_memory)
+TEST(coalescing_pool_list, composition_with_host_memory)
 {
   auto& host = umpire::resource::host_memory<>::get();
-  umpire::strategy::dynamic_pool_list<umpire::resource::host_memory<>>
+  umpire::strategy::coalescing_pool_list<umpire::resource::host_memory<>>
     pool("dynamic_pool_host", &host, 64*1024, 2*1024);
 
   void* ptr = pool.allocate(4096);
@@ -733,10 +733,10 @@ TEST(dynamic_pool_list, composition_with_host_memory)
 // Edge Case Tests
 // ============================================================================
 
-TEST(dynamic_pool_list, large_allocation)
+TEST(coalescing_pool_list, large_allocation)
 {
   test_memory parent;
-  umpire::strategy::dynamic_pool_list<test_memory> pool("dynamic_pool", &parent, 8*1024, 1024);
+  umpire::strategy::coalescing_pool_list<test_memory> pool("dynamic_pool", &parent, 8*1024, 1024);
 
   // Allocate much larger than initial pool
   void* ptr = pool.allocate(1024 * 1024);
@@ -745,10 +745,10 @@ TEST(dynamic_pool_list, large_allocation)
   pool.deallocate(ptr);
 }
 
-TEST(dynamic_pool_list, many_small_allocations)
+TEST(coalescing_pool_list, many_small_allocations)
 {
   test_memory parent;
-  umpire::strategy::dynamic_pool_list<test_memory> pool("dynamic_pool", &parent, 64*1024, 256);
+  umpire::strategy::coalescing_pool_list<test_memory> pool("dynamic_pool", &parent, 64*1024, 256);
 
   std::vector<void*> ptrs;
   for (int i = 0; i < 100; ++i) {
@@ -762,10 +762,10 @@ TEST(dynamic_pool_list, many_small_allocations)
   EXPECT_EQ(pool.get_allocated_size(), 0);
 }
 
-TEST(dynamic_pool_list, mixed_size_allocations)
+TEST(coalescing_pool_list, mixed_size_allocations)
 {
   test_memory parent;
-  umpire::strategy::dynamic_pool_list<test_memory> pool("dynamic_pool", &parent, 128*1024, 512);
+  umpire::strategy::coalescing_pool_list<test_memory> pool("dynamic_pool", &parent, 128*1024, 512);
 
   std::vector<std::size_t> sizes = {512, 1024, 2048, 4096, 8192, 512, 1024};
   std::vector<void*> ptrs;

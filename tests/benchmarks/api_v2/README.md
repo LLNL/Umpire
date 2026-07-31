@@ -35,7 +35,7 @@ Pass criteria:
 
 Purpose:
 - exercise variable-size host allocation churn through
-  `bench_dynamic_pool_list.cpp`
+  `bench_coalescing_pool_list.cpp`
 
 Representative patterns:
 - random size allocations
@@ -51,16 +51,16 @@ Pass criteria:
   the latest accepted baseline collected on the same machine, compiler, and
   build configuration
 
-### 3. `host_quick_pool_small_object`
+### 3. `host_binned_pool_small_object`
 
 Purpose:
 - exercise small-object host allocation churn through
-  `bench_quick_pool.cpp`
+  `bench_binned_pool.cpp`
 
 Representative patterns:
 - O(1) allocation verification
-- quick_pool versus dynamic_pool_list
-- quick_pool versus malloc
+- binned_pool versus coalescing_pool_list
+- binned_pool versus malloc
 - size classes
 - fragmentation
 - multi-bin stress
@@ -122,8 +122,8 @@ cmake --build build \
 ```
 
 The checked-in benchmark targets are:
-- `api_v2_dynamic_pool_list_benchmarks`
-- `api_v2_quick_pool_benchmarks`
+- `api_v2_coalescing_pool_list_benchmarks`
+- `api_v2_binned_pool_benchmarks`
 - `api_v2_release_workload_host_benchmarks` (aggregate target for the host-safe
   release workload benchmarks)
 
@@ -133,8 +133,8 @@ option, so both options must be enabled for these targets to appear.
 Run the host-safe benchmark bundle through the built benchmark binaries:
 
 ```bash
-./build/bin/api_v2_dynamic_pool_list_benchmarks
-./build/bin/api_v2_quick_pool_benchmarks
+./build/bin/api_v2_coalescing_pool_list_benchmarks
+./build/bin/api_v2_binned_pool_benchmarks
 ```
 
 The execution bead must then:

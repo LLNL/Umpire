@@ -186,26 +186,26 @@ if (UMPIRE_ENABLE_API_V2)
     COMMAND api_v2_allocator_benchmarks)
 
   blt_add_executable(
-    NAME api_v2_dynamic_pool_list_benchmarks
-    SOURCES ../tests/benchmarks/api_v2/bench_dynamic_pool_list.cpp
+    NAME api_v2_coalescing_pool_list_benchmarks
+    SOURCES ../tests/benchmarks/api_v2/bench_coalescing_pool_list.cpp
     DEPENDS_ON umpire)
 
   blt_add_benchmark(
-    NAME api_v2_dynamic_pool_list_benchmarks
-    COMMAND api_v2_dynamic_pool_list_benchmarks)
+    NAME api_v2_coalescing_pool_list_benchmarks
+    COMMAND api_v2_coalescing_pool_list_benchmarks)
 
   blt_add_executable(
-    NAME api_v2_quick_pool_benchmarks
-    SOURCES ../tests/benchmarks/api_v2/bench_quick_pool.cpp
+    NAME api_v2_binned_pool_benchmarks
+    SOURCES ../tests/benchmarks/api_v2/bench_binned_pool.cpp
     DEPENDS_ON umpire)
 
   blt_add_benchmark(
-    NAME api_v2_quick_pool_benchmarks
-    COMMAND api_v2_quick_pool_benchmarks)
+    NAME api_v2_binned_pool_benchmarks
+    COMMAND api_v2_binned_pool_benchmarks)
 
   add_custom_target(
     api_v2_release_workload_host_benchmarks
     DEPENDS
-      api_v2_dynamic_pool_list_benchmarks
-      api_v2_quick_pool_benchmarks)
+      api_v2_coalescing_pool_list_benchmarks
+      api_v2_binned_pool_benchmarks)
 endif ()

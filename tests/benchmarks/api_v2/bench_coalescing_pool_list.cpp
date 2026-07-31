@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 
-#include "umpire/strategy/dynamic_pool_list.hpp"
+#include "umpire/strategy/coalescing_pool_list.hpp"
 #include "umpire/resource/host_memory.hpp"
 
 #include <chrono>
@@ -69,7 +69,7 @@ void benchmark_random_size_allocations() {
   std::cout << "\n=== Benchmark: Random Size Allocations ===" << std::endl;
 
   bench_memory parent;
-  umpire::strategy::dynamic_pool_list<bench_memory> pool(
+  umpire::strategy::coalescing_pool_list<bench_memory> pool(
     "dynamic_pool", &parent, 1024 * 1024, 4096, 2.0);
 
   const int num_rounds = 1000;
@@ -116,7 +116,7 @@ void benchmark_fragmentation_patterns() {
   std::cout << "\n=== Benchmark: Fragmentation Patterns ===" << std::endl;
 
   bench_memory parent;
-  umpire::strategy::dynamic_pool_list<bench_memory> pool(
+  umpire::strategy::coalescing_pool_list<bench_memory> pool(
     "dynamic_pool", &parent, 512 * 1024, 2048, 2.0);
 
   const int num_rounds = 100;
@@ -235,9 +235,9 @@ void benchmark_malloc_comparison() {
 
   double malloc_time = timer.elapsed_ms();
 
-  // Benchmark dynamic_pool_list
+  // Benchmark coalescing_pool_list
   bench_memory parent;
-  umpire::strategy::dynamic_pool_list<bench_memory> pool(
+  umpire::strategy::coalescing_pool_list<bench_memory> pool(
     "dynamic_pool", &parent, 1024 * 1024, 4096, 2.0);
 
   timer.start();
@@ -258,7 +258,7 @@ void benchmark_malloc_comparison() {
   double pool_time = timer.elapsed_ms();
 
   std::cout << "  malloc time: " << malloc_time << " ms" << std::endl;
-  std::cout << "  dynamic_pool_list time: " << pool_time << " ms" << std::endl;
+  std::cout << "  coalescing_pool_list time: " << pool_time << " ms" << std::endl;
   std::cout << "  Speedup: " << std::fixed << std::setprecision(2)
             << (malloc_time / pool_time) << "x" << std::endl;
 }
@@ -271,7 +271,7 @@ void benchmark_coalescing_overhead() {
   std::cout << "\n=== Benchmark: Coalescing Overhead ===" << std::endl;
 
   bench_memory parent;
-  umpire::strategy::dynamic_pool_list<bench_memory> pool(
+  umpire::strategy::coalescing_pool_list<bench_memory> pool(
     "dynamic_pool", &parent, 1024 * 1024, 1024, 2.0);
 
   const int num_rounds = 100;
@@ -350,7 +350,7 @@ void benchmark_variable_size_stress() {
   std::cout << "\n=== Benchmark: Variable Size Stress Test ===" << std::endl;
 
   bench_memory parent;
-  umpire::strategy::dynamic_pool_list<bench_memory> pool(
+  umpire::strategy::coalescing_pool_list<bench_memory> pool(
     "dynamic_pool", &parent, 2 * 1024 * 1024, 4096, 1.5);
 
   const int num_rounds = 50;
@@ -414,7 +414,7 @@ void benchmark_pool_growth() {
   std::vector<double> growth_factors = {1.5, 2.0, 3.0};
 
   for (double growth_factor : growth_factors) {
-    umpire::strategy::dynamic_pool_list<bench_memory> pool(
+    umpire::strategy::coalescing_pool_list<bench_memory> pool(
       "dynamic_pool", &parent, 64 * 1024, 4096, growth_factor);
 
     Timer timer;
@@ -448,7 +448,7 @@ void benchmark_pool_growth() {
 
 int main() {
   std::cout << "==================================================" << std::endl;
-  std::cout << "  dynamic_pool_list Benchmark Suite" << std::endl;
+  std::cout << "  coalescing_pool_list Benchmark Suite" << std::endl;
   std::cout << "==================================================" << std::endl;
 
   benchmark_random_size_allocations();

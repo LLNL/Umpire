@@ -4,8 +4,8 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_strategy_dynamic_pool_list_HPP
-#define UMPIRE_strategy_dynamic_pool_list_HPP
+#ifndef UMPIRE_strategy_coalescing_pool_list_HPP
+#define UMPIRE_strategy_coalescing_pool_list_HPP
 
 #include "umpire/strategy/allocation_strategy.hpp"
 #include "umpire/util/error.hpp"
@@ -21,7 +21,7 @@ namespace strategy {
 
 //! @brief Dynamic memory pool with variable-sized blocks and coalescing
 //!
-//! The dynamic_pool_list strategy manages variable-sized memory allocations
+//! The coalescing_pool_list strategy manages variable-sized memory allocations
 //! efficiently by maintaining a list of memory blocks and coalescing adjacent
 //! free blocks to reduce fragmentation. This is ideal for workloads with
 //! variable allocation sizes.
@@ -51,8 +51,8 @@ namespace strategy {
 //!
 //! @par Platform Propagation
 //! The platform type is propagated from the wrapped memory source:
-//! - dynamic_pool_list<host_memory>::platform is host_platform
-//! - dynamic_pool_list<cuda_device_memory>::platform is cuda_platform
+//! - coalescing_pool_list<host_memory>::platform is host_platform
+//! - coalescing_pool_list<cuda_device_memory>::platform is cuda_platform
 //!
 //! @par Performance
 //! - O(n) allocation (first-fit search through block list)
@@ -62,12 +62,12 @@ namespace strategy {
 //!
 //! @par Composition
 //! Can wrap any memory source:
-//! - Resources: dynamic_pool_list<host_memory>
-//! - Thread-safe: thread_safe<dynamic_pool_list<host_memory>>
+//! - Resources: coalescing_pool_list<host_memory>
+//! - Thread-safe: thread_safe<coalescing_pool_list<host_memory>>
 //!
 //! @tparam Memory The memory source type to wrap (must inherit from memory)
 template<typename Memory>
-class dynamic_pool_list : public allocation_strategy {
+class coalescing_pool_list : public allocation_strategy {
 public:
   //! @brief Platform type propagated from wrapped memory source
   using platform = typename Memory::platform;
@@ -103,7 +103,7 @@ private:
 
     if (!pool) {
       UMPIRE_ERROR(out_of_memory_error,
-                   fmt::format("dynamic_pool_list: failed to allocate pool of {} bytes", size));
+                   fmt::format("coalescing_pool_list: failed to allocate pool of {} bytes", size));
     }
 
     // Track pool for cleanup
@@ -186,7 +186,7 @@ public:
   //! @throws std::invalid_argument if initial_pool_size is 0
   //! @throws std::invalid_argument if min_alloc_size is 0
   //! @throws std::invalid_argument if growth_factor <= 1.0
-  explicit dynamic_pool_list(
+  explicit coalescing_pool_list(
       const std::string& name,
       Memory* parent,
       std::size_t initial_pool_size = 64 * 1024,
@@ -202,15 +202,15 @@ public:
     , next_pool_size_(initial_pool_size)
   {
     if (initial_pool_size_ == 0) {
-      throw std::invalid_argument("dynamic_pool_list: initial_pool_size must be greater than 0");
+      throw std::invalid_argument("coalescing_pool_list: initial_pool_size must be greater than 0");
     }
 
     if (min_alloc_size_ == 0) {
-      throw std::invalid_argument("dynamic_pool_list: min_alloc_size must be greater than 0");
+      throw std::invalid_argument("coalescing_pool_list: min_alloc_size must be greater than 0");
     }
 
     if (growth_factor_ <= 1.0) {
-      throw std::invalid_argument("dynamic_pool_list: growth_factor must be greater than 1.0");
+      throw std::invalid_argument("coalescing_pool_list: growth_factor must be greater than 1.0");
     }
 
     // Allocate initial pool
@@ -218,7 +218,7 @@ public:
   }
 
   //! @brief Destructor - returns all pools to parent
-  ~dynamic_pool_list() {
+  ~coalescing_pool_list() {
     // Return all pools to parent
     // Note: This assumes all user allocations have been deallocated
     // If there are still allocated blocks, this will leak them
@@ -300,12 +300,12 @@ public:
     auto it = find_block(ptr);
     if (it == blocks_.end()) {
       UMPIRE_ERROR(unknown_pointer_error,
-                   fmt::format("dynamic_pool_list: pointer {:p} not found in pool", ptr));
+                   fmt::format("coalescing_pool_list: pointer {:p} not found in pool", ptr));
     }
 
     if (it->is_free) {
       UMPIRE_ERROR(runtime_error,
-                   fmt::format("dynamic_pool_list: double free detected for pointer {:p}", ptr));
+                   fmt::format("coalescing_pool_list: double free detected for pointer {:p}", ptr));
     }
 
     // Mark as free
@@ -378,4 +378,4 @@ public:
 } // namespace strategy
 } // namespace umpire
 
-#endif // UMPIRE_strategy_dynamic_pool_list_HPP
+#endif // UMPIRE_strategy_coalescing_pool_list_HPP

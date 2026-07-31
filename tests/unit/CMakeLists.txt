@@ -169,22 +169,22 @@ if (UMPIRE_ENABLE_API_V2)
     COMMAND api_v2_fixed_pool_tests)
 
   blt_add_executable(
-    NAME api_v2_dynamic_pool_list_tests
-    SOURCES api_v2/strategies/test_dynamic_pool_list.cpp
+    NAME api_v2_coalescing_pool_list_tests
+    SOURCES api_v2/strategies/test_coalescing_pool_list.cpp
     DEPENDS_ON ${unit_depends})
 
   blt_add_test(
-    NAME api_v2_dynamic_pool_list_tests
-    COMMAND api_v2_dynamic_pool_list_tests)
+    NAME api_v2_coalescing_pool_list_tests
+    COMMAND api_v2_coalescing_pool_list_tests)
 
   blt_add_executable(
-    NAME api_v2_quick_pool_tests
-    SOURCES api_v2/strategies/test_quick_pool.cpp
+    NAME api_v2_binned_pool_tests
+    SOURCES api_v2/strategies/test_binned_pool.cpp
     DEPENDS_ON ${unit_depends})
 
   blt_add_test(
-    NAME api_v2_quick_pool_tests
-    COMMAND api_v2_quick_pool_tests)
+    NAME api_v2_binned_pool_tests
+    COMMAND api_v2_binned_pool_tests)
 
   blt_add_executable(
     NAME api_v2_size_limiter_tests

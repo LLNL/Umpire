@@ -91,8 +91,8 @@ API v2 uses a small hierarchy with both runtime and compile-time roles:
             |
             +-- strategy::thread_safe<Memory>
             +-- strategy::fixed_pool<Memory>
-            +-- strategy::dynamic_pool_list<Memory>
-            +-- strategy::quick_pool<Memory>
+            +-- strategy::coalescing_pool_list<Memory>
+            +-- strategy::binned_pool<Memory>
             +-- strategy::size_limiter<Memory>
             +-- strategy::monotonic_buffer<Memory>
             +-- strategy::named<Memory>
@@ -290,7 +290,7 @@ Use ``fixed_pool`` when allocation size is stable and frequent:
    }
 
 ``fixed_pool`` throws if the requested size differs from the configured object
-size. That is intentional; use ``quick_pool`` or ``dynamic_pool_list`` when the
+size. That is intentional; use ``binned_pool`` or ``coalescing_pool_list`` when the
 request size varies.
 
 Thread safety
@@ -398,8 +398,8 @@ still depends on picking the right composition:
 - use ``host_memory`` directly when you want the simplest tracked host path
 - use ``fast_host_memory`` when you explicitly want to disable tracking overhead
 - use ``fixed_pool`` for stable, repeated allocation sizes
-- use ``quick_pool`` for a small range of short-lived allocation sizes
-- use ``dynamic_pool_list`` for broader variable-size workloads
+- use ``binned_pool`` for a small range of short-lived allocation sizes
+- use ``coalescing_pool_list`` for broader variable-size workloads
 - use ``thread_safe`` only when the wrapped resource is truly shared across
   threads
 

@@ -38,8 +38,8 @@ if (UMPIRE_ENABLE_API_V2
     api_v2_null_resource_tests
     api_v2_fixed_pool_tests
     api_v2_thread_safe_tests
-    api_v2_dynamic_pool_list_tests
-    api_v2_quick_pool_tests
+    api_v2_coalescing_pool_list_tests
+    api_v2_binned_pool_tests
     api_v2_size_limiter_tests
     api_v2_monotonic_buffer_tests
     api_v2_named_tests
