@@ -9,6 +9,7 @@
 #include "umpire/detail/registry.hpp"
 #include "umpire/resource/host_memory.hpp"
 #include "umpire/strategy/NamedAllocationStrategy.hpp"
+#include "umpire/strategy/fixed_pool.hpp"
 
 #include "camp/resource/host.hpp"
 #include "gtest/gtest.h"
@@ -17,6 +18,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <set>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -394,4 +396,65 @@ TEST(ApiV1V2Interop, V1ReallocateRejectsOffsetPointerForV2HostAllocation)
   EXPECT_EQ(host().get_current_size(), 32u);
 
   host().deallocate(ptr);
+}
+
+TEST(ApiV1V2Interop, InterleavedV1AndV2AllocatorIdsAreUnique)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto& registry = umpire::detail::registry::get();
+
+  std::vector<int> v1_ids;
+  std::vector<int> v2_ids;
+
+  // Interleave v1 allocator creation with v2 memory object construction so
+  // that both sides pull ids from the shared registry counter.
+  auto v1_alloc_a = rm.makeAllocator<umpire::strategy::NamedAllocationStrategy>(
+      unique_allocator_name("API_V2_INTEROP_IDS_V1"), rm.getAllocator("HOST"));
+  v1_ids.push_back(v1_alloc_a.getId());
+
+  umpire::strategy::fixed_pool<host_memory> v2_pool_a{"api_v2_interop_ids_pool_a", &host(), sizeof(double), 4};
+  v2_ids.push_back(v2_pool_a.get_id());
+
+  auto v1_alloc_b = rm.makeAllocator<umpire::strategy::NamedAllocationStrategy>(
+      unique_allocator_name("API_V2_INTEROP_IDS_V1"), rm.getAllocator("HOST"));
+  v1_ids.push_back(v1_alloc_b.getId());
+
+  umpire::strategy::fixed_pool<host_memory> v2_pool_b{"api_v2_interop_ids_pool_b", &host(), sizeof(double), 4};
+  v2_ids.push_back(v2_pool_b.get_id());
+
+  auto v1_alloc_c = rm.makeAllocator<umpire::strategy::NamedAllocationStrategy>(
+      unique_allocator_name("API_V2_INTEROP_IDS_V1"), rm.getAllocator("HOST"));
+  v1_ids.push_back(v1_alloc_c.getId());
+
+  // The v1 HOST allocator itself, created at ResourceManager startup, should
+  // also participate in the shared id space.
+  v1_ids.push_back(rm.getAllocator("HOST").getId());
+
+  // The v2 host() singleton is also already registered.
+  v2_ids.push_back(host().get_id());
+
+  std::vector<int> all_ids;
+  all_ids.insert(all_ids.end(), v1_ids.begin(), v1_ids.end());
+  all_ids.insert(all_ids.end(), v2_ids.begin(), v2_ids.end());
+
+  std::set<int> unique_ids(all_ids.begin(), all_ids.end());
+  EXPECT_EQ(unique_ids.size(), all_ids.size()) << "v1 and v2 allocator ids must never collide";
+
+  // A v1 allocator id must not resolve to a v2 memory object, and vice versa.
+  for (int id : v1_ids) {
+    EXPECT_EQ(registry.find_allocator_by_id(id), nullptr)
+        << "v1 allocator id " << id << " unexpectedly resolved to a v2 memory object";
+  }
+
+  for (int id : v2_ids) {
+    EXPECT_NE(registry.find_allocator_by_id(id), nullptr) << "v2 memory object id " << id << " should resolve";
+  }
+
+  EXPECT_TRUE(rm.isAllocator(v1_alloc_a.getId()));
+  EXPECT_TRUE(rm.isAllocator(v1_alloc_b.getId()));
+  EXPECT_TRUE(rm.isAllocator(v1_alloc_c.getId()));
+
+  for (int id : v2_ids) {
+    EXPECT_FALSE(rm.isAllocator(id)) << "v2 memory object id " << id << " unexpectedly resolved via v1 ResourceManager";
+  }
 }

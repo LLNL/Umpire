@@ -86,7 +86,6 @@ ResourceManager::ResourceManager()
       m_allocators_by_id(),
       m_allocators_by_name(),
       m_memory_resources(),
-      m_id(0),
       m_mutex()
 {
   UMPIRE_LOG(Debug, "() entering");
@@ -1159,7 +1158,7 @@ std::vector<int> ResourceManager::getAllocatorIds() const noexcept
 
 int ResourceManager::getNextId() noexcept
 {
-  return m_id++;
+  return detail::registry::get().get_id();
 }
 
 std::string ResourceManager::getAllocatorInformation() const noexcept
