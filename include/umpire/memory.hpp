@@ -59,9 +59,29 @@ protected:
   /*!
    * \brief Update current and peak statistics by a signed byte delta.
    *
+   * Applies the delta to both the live-byte and backend-accounted counters;
+   * appropriate for resources where the two always move together.
+   *
    * \param size_delta Signed change in live bytes.
    */
   void update_statistics(std::ptrdiff_t size_delta);
+
+  /*!
+   * \brief Update live-byte statistics (and peak watermark) only.
+   *
+   * Pooling strategies use this for user-facing allocations, tracking the
+   * backing memory separately via update_actual_size().
+   *
+   * \param size_delta Signed change in live bytes.
+   */
+  void update_current_size(std::ptrdiff_t size_delta);
+
+  /*!
+   * \brief Update backend-accounted bytes only.
+   *
+   * \param size_delta Signed change in backend-accounted bytes.
+   */
+  void update_actual_size(std::ptrdiff_t size_delta);
 
 public:
   /*!

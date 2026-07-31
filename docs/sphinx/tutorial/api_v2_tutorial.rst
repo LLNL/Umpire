@@ -95,7 +95,7 @@ Pitfalls:
 
 - ``fixed_pool`` rejects any request whose size differs from the configured
   object size
-- if sizes vary, prefer ``binned_pool`` or ``coalescing_pool_list`` instead
+- if sizes vary, prefer ``quick_pool`` or ``dynamic_pool_list`` instead
 
 Example 4: Thread-Safe Shared Resource
 --------------------------------------

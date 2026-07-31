@@ -108,19 +108,25 @@ void memory::untrack_allocation(void* ptr)
 
 void memory::update_statistics(std::ptrdiff_t size_delta)
 {
-  // Update current size
+  update_current_size(size_delta);
+  update_actual_size(size_delta);
+}
+
+void memory::update_current_size(std::ptrdiff_t size_delta)
+{
   std::size_t old_current = current_size_.fetch_add(size_delta, std::memory_order_relaxed);
   std::size_t new_current = old_current + size_delta;
 
-  // Update highwatermark if needed
   std::size_t old_hwm = highwatermark_.load(std::memory_order_relaxed);
   while (new_current > old_hwm) {
     if (highwatermark_.compare_exchange_weak(old_hwm, new_current, std::memory_order_relaxed)) {
       break;
     }
   }
+}
 
-  // Update actual size (always same as current for base implementation)
+void memory::update_actual_size(std::ptrdiff_t size_delta)
+{
   actual_size_.fetch_add(size_delta, std::memory_order_relaxed);
 }
 
