@@ -8,3 +8,5 @@ CMakeFiles
 *spack.lock*
 .spack_env/*/.spack-env
 *.orig
+.cache/
+.claude/settings.json
