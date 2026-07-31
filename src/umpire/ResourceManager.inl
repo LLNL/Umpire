@@ -24,16 +24,17 @@ Allocator ResourceManager::makeAllocator(const std::string& name, Tracking track
   std::unique_ptr<strategy::AllocationStrategy> allocator;
   bool is_tracked = (tracked == Tracking::Tracked) ? true : false;
 
-  if (m_id + 1 == umpire::invalid_allocator_id) {
-    UMPIRE_ERROR(runtime_error, "Maximum number of concurrent allocators exceeded! Please email umpire-dev@llnl.gov");
-  }
-
   UMPIRE_LOG(Debug, "(name=\"" << name << "\")");
   if (isAllocator(name)) {
     UMPIRE_ERROR(runtime_error, fmt::format("Allocator with name \"{}\" is already registered", name));
   }
 
-  allocator = util::make_unique<Strategy>(name, getNextId(), std::forward<Args>(args)...);
+  const int new_id{getNextId()};
+  if (new_id == umpire::invalid_allocator_id) {
+    UMPIRE_ERROR(runtime_error, "Maximum number of concurrent allocators exceeded! Please email umpire-dev@llnl.gov");
+  }
+
+  allocator = util::make_unique<Strategy>(name, new_id, std::forward<Args>(args)...);
   allocator->setTracking(is_tracked);
 
   umpire::event::record([&](auto& event) {

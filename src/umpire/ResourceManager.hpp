@@ -384,8 +384,6 @@ class ResourceManager {
   strategy::AllocationStrategy* m_null_allocator{nullptr};
   strategy::AllocationStrategy* m_zero_byte_pool{nullptr};
 
-  int m_id;
-
   std::mutex m_mutex;
 
   // Methods that need access to m_allocations to print/filter records
