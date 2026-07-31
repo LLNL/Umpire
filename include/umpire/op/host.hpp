@@ -90,6 +90,13 @@ struct device_memset<resource::host_platform> {
   {
     UMPIRE_ERROR(runtime_error, "device_memset cannot be used on host memory. Use memset instead.");
   }
+
+  template <typename T>
+  static camp::resources::EventProxy<camp::resources::Resource> exec(T* /*ptr*/, int /*val*/, std::size_t /*len*/,
+                                                                     camp::resources::Resource& /*resource*/)
+  {
+    UMPIRE_ERROR(runtime_error, "device_memset cannot be used on host memory. Use memset instead.");
+  }
 };
 
 template <>

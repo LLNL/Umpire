@@ -439,6 +439,15 @@ void device_memset(T* ptr, V v, std::size_t len)
   op::op_caller<op::device_memset>::exec(ptr, v, len);
 }
 
+// Asynchronous device_memset. Required for SYCL, whose synchronous
+// device_memset cannot determine a queue and throws directing callers here.
+template <typename T, typename V>
+camp::resources::EventProxy<camp::resources::Resource> device_memset(T* ptr, V v, std::size_t len,
+                                                                     camp::resources::Resource& ctx)
+{
+  return op::op_caller<op::device_memset>::exec(ptr, v, len, ctx);
+}
+
 template <typename T>
 inline T* reallocate(T** src, std::size_t size)
 {

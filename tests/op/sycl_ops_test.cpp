@@ -432,9 +432,16 @@ TEST(SyclOps, PrefetchSync) {
   std::memcpy(host_temp, host_data.data(), num_bytes);
   umpire::copy(host_temp, device_ptr, num_bytes);
 
-  // Prefetch (synchronous) - hints to bring data closer to device
-  // This is a performance hint and doesn't affect correctness
-  umpire::prefetch(device_ptr, num_bytes);
+  // The synchronous SYCL prefetch intentionally throws: it has no queue
+  // context, so callers are redirected to the resource-taking async overload
+  // (see prefetch<sycl_platform>::exec in op/sycl.hpp).
+  EXPECT_THROW(umpire::prefetch(device_ptr, 0, num_bytes), umpire::runtime_error);
+
+  // Async prefetch with a resource context is the supported path. It is a
+  // performance hint and doesn't affect correctness.
+  camp::resources::Resource sycl_ctx{camp::resources::Sycl{}};
+  auto event = umpire::prefetch(device_ptr, 0, num_bytes, sycl_ctx);
+  static_cast<camp::resources::Event>(event).wait();
 
   // Verify data is still intact
   void* host_verify = rm.getAllocator("HOST").allocate(num_bytes);

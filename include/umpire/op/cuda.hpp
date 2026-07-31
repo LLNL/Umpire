@@ -499,6 +499,17 @@ struct device_memset<resource::cuda_platform> {
   {
     detail::device_memset(ptr, val, len);
   }
+
+  // Async overload for API parity: the underlying kernel wrapper synchronizes
+  // the device before returning, so the returned event represents completed
+  // work.
+  template <typename T>
+  static camp::resources::EventProxy<camp::resources::Resource> exec(T* ptr, T val, std::size_t len,
+                                                                     camp::resources::Resource& res)
+  {
+    detail::device_memset(ptr, val, len);
+    return camp::resources::EventProxy<camp::resources::Resource>{res};
+  }
 };
 
 // Memory advice operations define macro to reduce duplication
