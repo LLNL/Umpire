@@ -32,6 +32,9 @@ Backend-specific unit tests are added when those backends are enabled:
 - `api_v2_hip_device_memory_tests`
 - `api_v2_sycl_device_memory_tests`
 - `api_v2_openmp_target_memory_tests`
+- `api_v2_um_memory_tests` (CUDA, HIP, or SYCL)
+- `api_v2_pinned_memory_tests` (CUDA, HIP, or SYCL)
+- `api_v2_device_const_memory_tests` (CUDA or HIP only)
 
 The current API v2 integration test executables are defined in
 `tests/integration/CMakeLists.txt` and `tests/integration/api_v2/CMakeLists.txt`:
@@ -143,10 +146,12 @@ cmake -S . -B build-hip -G Ninja \
   -DUMPIRE_ENABLE_TESTS=On
 
 cmake --build build-hip --parallel \
-  --target api_v2_hip_device_memory_tests api_v2_operations_tests
+  --target api_v2_hip_device_memory_tests api_v2_um_memory_tests \
+  api_v2_pinned_memory_tests api_v2_device_const_memory_tests \
+  api_v2_operations_tests
 
 ctest --test-dir build-hip \
-  -R '^(api_v2_hip_device_memory_tests|api_v2_operations_tests)$' \
+  -R '^(api_v2_hip_device_memory_tests|api_v2_um_memory_tests|api_v2_pinned_memory_tests|api_v2_device_const_memory_tests|api_v2_operations_tests)$' \
   --output-on-failure
 ```
 
@@ -252,11 +257,13 @@ use.
   - `device_cuda_validate` builds CUDA validation images
     (`api_v2_cuda_validate`, `api_v2_cuda13_validate`) on
     `radiuss-cuda-runners` and runs
-    `api_v2_cuda_device_memory_tests` plus `api_v2_operations_tests`
-    inside those containers.
+    `api_v2_cuda_device_memory_tests`, `api_v2_um_memory_tests`,
+    `api_v2_pinned_memory_tests`, `api_v2_device_const_memory_tests`, and
+    `api_v2_operations_tests` inside those containers.
   - `device_sycl_validate` builds `api_v2_sycl_validate` on
     `radiuss-cpu-runners` and runs
-    `api_v2_sycl_device_memory_tests` and `api_v2_operations_tests` in
+    `api_v2_sycl_device_memory_tests`, `api_v2_um_memory_tests`,
+    `api_v2_pinned_memory_tests`, and `api_v2_operations_tests` in
     that container.
 
 An operator with access to the GitHub-hosted repository and Actions can run the

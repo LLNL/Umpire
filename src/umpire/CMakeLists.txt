@@ -81,19 +81,27 @@ if (UMPIRE_ENABLE_API_V2)
   if (UMPIRE_ENABLE_CUDA)
     list(APPEND umpire_api_v2_headers
       ${PROJECT_SOURCE_DIR}/include/umpire/op/cuda.hpp
-      ${PROJECT_SOURCE_DIR}/include/umpire/resource/cuda_device_memory.hpp)
+      ${PROJECT_SOURCE_DIR}/include/umpire/resource/cuda_device_memory.hpp
+      ${PROJECT_SOURCE_DIR}/include/umpire/resource/cuda_um_memory.hpp
+      ${PROJECT_SOURCE_DIR}/include/umpire/resource/cuda_pinned_memory.hpp
+      ${PROJECT_SOURCE_DIR}/include/umpire/resource/cuda_device_const_memory.hpp)
   endif ()
 
   if (UMPIRE_ENABLE_HIP)
     list(APPEND umpire_api_v2_headers
       ${PROJECT_SOURCE_DIR}/include/umpire/op/hip.hpp
-      ${PROJECT_SOURCE_DIR}/include/umpire/resource/hip_device_memory.hpp)
+      ${PROJECT_SOURCE_DIR}/include/umpire/resource/hip_device_memory.hpp
+      ${PROJECT_SOURCE_DIR}/include/umpire/resource/hip_um_memory.hpp
+      ${PROJECT_SOURCE_DIR}/include/umpire/resource/hip_pinned_memory.hpp
+      ${PROJECT_SOURCE_DIR}/include/umpire/resource/hip_device_const_memory.hpp)
   endif ()
 
   if (UMPIRE_ENABLE_SYCL)
     list(APPEND umpire_api_v2_headers
       ${PROJECT_SOURCE_DIR}/include/umpire/op/sycl.hpp
-      ${PROJECT_SOURCE_DIR}/include/umpire/resource/sycl_device_memory.hpp)
+      ${PROJECT_SOURCE_DIR}/include/umpire/resource/sycl_device_memory.hpp
+      ${PROJECT_SOURCE_DIR}/include/umpire/resource/sycl_um_memory.hpp
+      ${PROJECT_SOURCE_DIR}/include/umpire/resource/sycl_pinned_memory.hpp)
   endif ()
 
   if (UMPIRE_ENABLE_OPENMP_TARGET)

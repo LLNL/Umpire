@@ -150,6 +150,61 @@ if (UMPIRE_ENABLE_API_V2)
       COMMAND api_v2_sycl_device_memory_tests)
   endif()
 
+  if (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP OR UMPIRE_ENABLE_SYCL)
+    set (api_v2_um_memory_depends ${unit_depends})
+    if (UMPIRE_ENABLE_CUDA)
+      list(APPEND api_v2_um_memory_depends cuda_runtime)
+    endif()
+    if (UMPIRE_ENABLE_HIP)
+      list(APPEND api_v2_um_memory_depends hip)
+    endif()
+
+    blt_add_executable(
+      NAME api_v2_um_memory_tests
+      SOURCES api_v2/resources/test_um_memory.cpp
+      DEPENDS_ON ${api_v2_um_memory_depends})
+
+    blt_add_test(
+      NAME api_v2_um_memory_tests
+      COMMAND api_v2_um_memory_tests)
+
+    set (api_v2_pinned_memory_depends ${unit_depends})
+    if (UMPIRE_ENABLE_CUDA)
+      list(APPEND api_v2_pinned_memory_depends cuda_runtime)
+    endif()
+    if (UMPIRE_ENABLE_HIP)
+      list(APPEND api_v2_pinned_memory_depends hip)
+    endif()
+
+    blt_add_executable(
+      NAME api_v2_pinned_memory_tests
+      SOURCES api_v2/resources/test_pinned_memory.cpp
+      DEPENDS_ON ${api_v2_pinned_memory_depends})
+
+    blt_add_test(
+      NAME api_v2_pinned_memory_tests
+      COMMAND api_v2_pinned_memory_tests)
+  endif()
+
+  if (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP)
+    set (api_v2_device_const_memory_depends ${unit_depends})
+    if (UMPIRE_ENABLE_CUDA)
+      list(APPEND api_v2_device_const_memory_depends cuda_runtime)
+    endif()
+    if (UMPIRE_ENABLE_HIP)
+      list(APPEND api_v2_device_const_memory_depends hip)
+    endif()
+
+    blt_add_executable(
+      NAME api_v2_device_const_memory_tests
+      SOURCES api_v2/resources/test_device_const_memory.cpp
+      DEPENDS_ON ${api_v2_device_const_memory_depends})
+
+    blt_add_test(
+      NAME api_v2_device_const_memory_tests
+      COMMAND api_v2_device_const_memory_tests)
+  endif()
+
   if (UMPIRE_ENABLE_OPENMP_TARGET)
     blt_add_executable(
       NAME api_v2_openmp_target_memory_tests

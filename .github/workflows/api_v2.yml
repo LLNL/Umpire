@@ -182,12 +182,12 @@ jobs:
           build_target: api_v2_cuda_validate
           image_name: umpire-api-v2-cuda-validate
           docker_run_args: --gpus all
-          ctest_regex: '^(api_v2_cuda_device_memory_tests|api_v2_operations_tests)$'
+          ctest_regex: '^(api_v2_cuda_device_memory_tests|api_v2_um_memory_tests|api_v2_pinned_memory_tests|api_v2_device_const_memory_tests|api_v2_operations_tests)$'
         - name: cuda13
           build_target: api_v2_cuda13_validate
           image_name: umpire-api-v2-cuda13-validate
           docker_run_args: --gpus all
-          ctest_regex: '^(api_v2_cuda_device_memory_tests|api_v2_operations_tests)$'
+          ctest_regex: '^(api_v2_cuda_device_memory_tests|api_v2_um_memory_tests|api_v2_pinned_memory_tests|api_v2_device_const_memory_tests|api_v2_operations_tests)$'
     runs-on: radiuss-cuda-runners
     steps:
     - run: |
@@ -240,5 +240,5 @@ jobs:
         docker run --rm \
           umpire-api-v2-sycl-validate \
           ctest --test-dir /home/umpire/workspace/build \
-          -R '^(api_v2_sycl_device_memory_tests|api_v2_operations_tests)$' \
+          -R '^(api_v2_sycl_device_memory_tests|api_v2_um_memory_tests|api_v2_pinned_memory_tests|api_v2_operations_tests)$' \
           --output-on-failure
