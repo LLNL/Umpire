@@ -25,6 +25,15 @@
 #include <cuda_runtime_api.h>
 #endif
 
+// O_LARGEFILE and ftruncate64 are Linux glibc extensions; off_t is already
+// 64-bit on macOS/BSD, so the plain POSIX names are sufficient there.
+#if !defined(O_LARGEFILE)
+#define O_LARGEFILE 0
+#endif
+#if !defined(UMPIRE_HAVE_FTRUNCATE64)
+#define ftruncate64 ftruncate
+#endif
+
 namespace umpire {
 namespace resource {
 

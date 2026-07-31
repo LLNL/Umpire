@@ -73,6 +73,11 @@ if (UMPIRE_ENABLE_API_V2)
     ${PROJECT_SOURCE_DIR}/include/umpire/strategy/size_limiter.hpp
     ${PROJECT_SOURCE_DIR}/include/umpire/strategy/thread_safe.hpp)
 
+  if (UMPIRE_ENABLE_FILE_RESOURCE)
+    list(APPEND umpire_api_v2_headers
+      ${PROJECT_SOURCE_DIR}/include/umpire/resource/file_memory.hpp)
+  endif ()
+
   if (UMPIRE_ENABLE_CUDA)
     list(APPEND umpire_api_v2_headers
       ${PROJECT_SOURCE_DIR}/include/umpire/op/cuda.hpp
