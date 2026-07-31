@@ -351,7 +351,7 @@ TYPED_TEST(MemsetTest, InvalidPointer)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  ASSERT_THROW(rm.memset((void*)0x1, 0), umpire::runtime_error);
+  ASSERT_THROW(rm.memset((void*)0x1, 0), umpire::unknown_allocation);
 }
 
 template <typename T>

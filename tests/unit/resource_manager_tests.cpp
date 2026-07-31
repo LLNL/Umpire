@@ -34,13 +34,13 @@ TEST(ResourceManager, findAllocationRecord)
   ASSERT_EQ(ptr, rec_middle->ptr);
   ASSERT_EQ(ptr, rec_end->ptr);
 
-  ASSERT_THROW(rm.findAllocationRecord(ptr + size), umpire::runtime_error);
+  ASSERT_THROW(rm.findAllocationRecord(ptr + size), umpire::unknown_allocation);
 
-  ASSERT_THROW(rm.findAllocationRecord(ptr + size + 1), umpire::runtime_error);
+  ASSERT_THROW(rm.findAllocationRecord(ptr + size + 1), umpire::unknown_allocation);
 
   alloc.deallocate(ptr);
 
-  ASSERT_THROW(rm.findAllocationRecord(nullptr), umpire::runtime_error);
+  ASSERT_THROW(rm.findAllocationRecord(nullptr), umpire::unknown_allocation);
 }
 
 TEST(ResourceManager, getAllocatorByName)

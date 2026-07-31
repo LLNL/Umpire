@@ -56,7 +56,7 @@ TEST_F(AllocationMapTest, Add)
 
 TEST_F(AllocationMapTest, FindNotFound)
 {
-  ASSERT_THROW(map.find(data), umpire::runtime_error);
+  ASSERT_THROW(map.find(data), umpire::unknown_allocation);
 }
 
 TEST_F(AllocationMapTest, Find)
@@ -96,7 +96,7 @@ TEST_F(AllocationMapTest, Remove)
     map.remove(data);
   });
 
-  ASSERT_THROW(map.find(data), umpire::runtime_error);
+  ASSERT_THROW(map.find(data), umpire::unknown_allocation);
 
   ASSERT_FALSE(map.contains(data));
 }

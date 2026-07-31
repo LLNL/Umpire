@@ -329,13 +329,13 @@ TYPED_TEST(ReleaseTest, ReleaseCheck)
   }
 
   this->m_allocator->release(); // this should have no effect
-  ASSERT_THROW(this->test[0] = this->m_limiter_allocator->allocate(this->max_alloc_size), umpire::runtime_error);
+  ASSERT_THROW(this->test[0] = this->m_limiter_allocator->allocate(this->max_alloc_size), umpire::out_of_memory);
 
   for (int i = 0; i < this->num_allocs; i++) {
     this->m_allocator->deallocate(this->test[i]);
   }
 
-  ASSERT_THROW(this->test[0] = this->m_limiter_allocator->allocate(this->max_alloc_size), umpire::runtime_error);
+  ASSERT_THROW(this->test[0] = this->m_limiter_allocator->allocate(this->max_alloc_size), umpire::out_of_memory);
   this->m_allocator->release();
 
   ASSERT_NO_THROW(this->test[0] = this->m_limiter_allocator->allocate(this->max_alloc_size));
