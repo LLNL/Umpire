@@ -121,6 +121,14 @@ cmake_dependent_option( UMPIRE_ENABLE_IPC_SHARED_MEMORY "Enable Host IPC Shared 
                         "NOT WIN32;NOT APPLE" Off )
 cmake_dependent_option( UMPIRE_ENABLE_MPI3_SHARED_MEMORY "Enable MPI3 Shared Memory Resource" Off "${ENABLE_MPI}" Off)
 
+# API v2 POSIX shared_memory resource: unlike UMPIRE_ENABLE_IPC_SHARED_MEMORY
+# (the v1 resource), this does not depend on MPI and is not disabled on APPLE
+# -- shm_open/mmap/pthread process-shared mutexes are all available on macOS,
+# and the v2 port has no MPI-communicator support (POSIX only), so there is no
+# reason to force it off there. Only WIN32 (no POSIX shared memory) disables it.
+cmake_dependent_option( UMPIRE_ENABLE_SHARED_MEMORY "Enable API v2 POSIX Host Shared Memory Resource" Off
+                        "NOT WIN32" Off )
+
 if(UMPIRE_ENABLE_IPC_SHARED_MEMORY AND NOT UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
   set(UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE "POSIX" CACHE STRING "Default implementation for SHARED memory resource (POSIX)")
 elseif(UMPIRE_ENABLE_MPI3_SHARED_MEMORY)

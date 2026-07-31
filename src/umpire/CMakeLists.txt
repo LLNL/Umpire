@@ -96,6 +96,12 @@ if (UMPIRE_ENABLE_API_V2)
       ${PROJECT_SOURCE_DIR}/include/umpire/resource/openmp_target_memory.hpp)
   endif ()
 
+  if (UMPIRE_ENABLE_SHARED_MEMORY)
+    list(APPEND umpire_api_v2_headers
+      ${PROJECT_SOURCE_DIR}/include/umpire/resource/shared_memory.hpp)
+    list(APPEND umpire_sources resource/shared_memory.cpp)
+  endif ()
+
   list(APPEND umpire_sources api_v2_instantiations.cpp)
 endif ()
 
@@ -237,6 +243,19 @@ if (UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
   message(STATUS "Host (MPI3) Shared Memory Enabled")
 else()
   message(STATUS "MPI3 Shared Memory Disabled")
+endif()
+
+if (UMPIRE_ENABLE_SHARED_MEMORY)
+  message(STATUS "API v2 Host Shared Memory Enabled")
+  find_package(Threads)
+  target_link_libraries(umpire INTERFACE Threads::Threads)
+  if (NOT APPLE)
+    # librt is required for shm_open()/shm_unlink() on Linux; on macOS these
+    # are part of libSystem and there is no separate librt to link.
+    target_link_libraries(umpire INTERFACE -lrt)
+  endif ()
+else()
+  message(STATUS "API v2 Host Shared Memory Disabled")
 endif()
 
 if (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP)
