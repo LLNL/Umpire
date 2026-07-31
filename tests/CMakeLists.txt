@@ -55,6 +55,9 @@ if (UMPIRE_ENABLE_API_V2
   if (UMPIRE_ENABLE_FILE_RESOURCE)
     list(APPEND api_v2_coverage_targets api_v2_file_memory_tests)
   endif ()
+  if (UMPIRE_ENABLE_SHARED_MEMORY)
+    list(APPEND api_v2_coverage_targets api_v2_shared_memory_tests)
+  endif()
   set(API_V2_COVERAGE_EXCLUDED_TESTS "")
   configure_file(
     ${PROJECT_SOURCE_DIR}/cmake/RunApiV2CoverageTests.cmake.in

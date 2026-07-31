@@ -26,6 +26,12 @@ The current API v2 unit test executables are defined in
 - `api_v2_monotonic_buffer_tests`
 - `api_v2_named_tests`
 
+Gated unit tests are added when the corresponding CMake option is enabled:
+
+- `api_v2_shared_memory_tests` (requires `-DUMPIRE_ENABLE_SHARED_MEMORY=On`;
+  POSIX shared memory resource, independent of the v1
+  `UMPIRE_ENABLE_IPC_SHARED_MEMORY` flag)
+
 Backend-specific unit tests are added when those backends are enabled:
 
 - `api_v2_cuda_device_memory_tests`

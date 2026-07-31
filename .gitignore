@@ -10,3 +10,4 @@ CMakeFiles
 *.orig
 .cache/
 .claude/settings.json
+.claude/worktrees/
