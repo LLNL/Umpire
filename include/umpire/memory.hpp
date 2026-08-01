@@ -123,6 +123,24 @@ public:
    */
   virtual resource::Platform get_platform() const = 0;
 
+  /*!
+   * \brief Whether callers may bypass the v1 `Allocator` layer and operate on
+   * this object's allocations directly (e.g. the reallocate()/move()/
+   * deallocate() "v2 fast path" in ResourceManager and op::dispatch, which
+   * calls allocate()/deallocate() on the registry's `memory*` directly
+   * instead of going through `Allocator::do_allocate()`/`do_deallocate()`).
+   *
+   * Defaults to true for ordinary API v2 memory/strategy objects, for which
+   * the v2 registry is the sole source of truth. Bridges that mirror
+   * allocations into a *second*, independent bookkeeping system that the
+   * fast path does not know how to update (e.g.
+   * `strategy::detail::v1_backed_memory`, which mirrors into v1's
+   * `ResourceManager::m_allocations`) must override this to return false, so
+   * that fast-path callers fall back to the slower path that keeps both
+   * systems in sync.
+   */
+  virtual bool supports_v2_fast_path() const { return true; }
+
   //! Stable registry-assigned identifier.
   int get_id() const { return id_; }
   //! Human-readable name supplied at construction.

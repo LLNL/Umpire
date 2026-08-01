@@ -6,6 +6,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "umpire/Umpire.hpp"
+#include "umpire/config.hpp"
 #include "umpire/detail/registry.hpp"
 #include "umpire/resource/host_memory.hpp"
 #include "umpire/strategy/NamedAllocationStrategy.hpp"
@@ -252,7 +253,19 @@ TEST(ApiV1V2Interop, V1MoveToDistinctAllocatorTransfersOwnershipToV1)
 
   ASSERT_NE(moved, nullptr);
   EXPECT_NE(moved, ptr);
+#if defined(UMPIRE_V1_DELEGATE_TO_V2)
+  // Under UMPIRE_V1_DELEGATE_TO_V2, NamedAllocationStrategy forwards
+  // allocate()/deallocate() to a v2 named<v1_backed_memory> delegate (see
+  // src/umpire/strategy/NamedAllocationStrategy.cpp), which mirrors the
+  // allocation into the shared v2 registry for discoverability (see
+  // src/umpire/strategy/detail/v1_backed_memory.hpp). So a pointer moved
+  // into a NamedAllocationStrategy allocator IS now visible in the v2
+  // registry too, unlike the non-delegated build where NamedAllocationStrategy
+  // is purely a v1 construct.
+  EXPECT_TRUE(umpire::detail::registry::get().find_allocation(moved).has_value());
+#else
   EXPECT_FALSE(umpire::detail::registry::get().find_allocation(moved).has_value());
+#endif
   EXPECT_EQ(rm.getAllocator(moved).getName(), named_allocator.getName());
   EXPECT_EQ(host().get_current_size(), 0u);
 

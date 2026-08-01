@@ -17,9 +17,29 @@
 #include <cstddef>
 #include <limits>
 #include <string>
+#include <type_traits>
 
 namespace umpire {
 namespace strategy {
+
+namespace detail {
+
+// SFINAE helper mirroring strategy::detail::thread_safe_platform (see
+// thread_safe.hpp): tolerates a `Memory` type without a `platform` member
+// alias (e.g. a runtime-typed bridge such as
+// strategy::detail::v1_backed_memory), defaulting to `void` instead of a
+// hard compile error.
+template <typename Memory, typename = void>
+struct size_limiter_platform {
+  using type = void;
+};
+
+template <typename Memory>
+struct size_limiter_platform<Memory, std::void_t<typename Memory::platform>> {
+  using type = typename Memory::platform;
+};
+
+} // namespace detail
 
 //! @brief Decorator that caps the total live bytes allocated through a parent
 //!
@@ -44,7 +64,8 @@ namespace strategy {
 template<typename Memory>
 class size_limiter : public allocation_strategy {
 public:
-  using platform = typename Memory::platform;
+  //! @brief Platform type propagated from the wrapped memory source when available
+  using platform = typename detail::size_limiter_platform<Memory>::type;
 
 private:
   std::size_t limit_;
@@ -110,7 +131,7 @@ public:
       return;
     }
 
-    auto record = detail::registry::get().find_allocation(ptr);
+    auto record = umpire::detail::registry::get().find_allocation(ptr);
     if (!record) {
       throw umpire::unknown_allocation(
         fmt::format("size_limiter: cannot determine allocation size for pointer {:p}", ptr));

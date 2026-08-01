@@ -147,12 +147,12 @@ inline auto find_v2_allocation(void* ptr)
 {
   auto& registry = ::umpire::detail::registry::get();
   auto record = registry.find_allocation(ptr);
-  if (record && record->strategy) {
+  if (record && record->strategy && record->strategy->supports_v2_fast_path()) {
     return record;
   }
 
   record = registry.find_containing_allocation(ptr);
-  if (record && record->strategy) {
+  if (record && record->strategy && record->strategy->supports_v2_fast_path()) {
     if (ptr != record->ptr) {
       UMPIRE_ERROR(runtime_error,
                    fmt::format("Cannot reallocate an offset ptr (ptr={}, base={})", ptr, record->ptr));

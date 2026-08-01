@@ -541,11 +541,56 @@ Practical Advice
 - Validate GPU-backed migration separately on capable systems; this machine's
   host-only coverage does not substitute for device validation.
 
+V1 Delegation (Experimental)
+----------------------------
+
+A separate, opt-in ``UMPIRE_V1_DELEGATE_TO_V2`` CMake option (default
+``Off``, requires/implies ``UMPIRE_ENABLE_API_V2``) lets select v1
+``strategy::AllocationStrategy`` implementations forward their private
+``allocate()``/``deallocate()`` virtuals to an equivalent API v2
+``umpire::memory`` decorator, instead of implementing the logic natively.
+This is a different, narrower mechanism than the host-side ownership
+delegation described above: it converts the *implementation* of a v1
+strategy to reuse v2 code, while leaving the strategy's public v1 behavior
+(exception types, ``m_current_size``/``m_high_watermark``/
+``m_allocation_count`` bookkeeping via
+``allocate_internal``/``deallocate_internal``) unchanged.
+
+The bridge is ``strategy::detail::v1_backed_memory``
+(``src/umpire/strategy/detail/v1_backed_memory.hpp``), a v2 ``umpire::memory``
+subclass that wraps a v1 ``AllocationStrategy*`` parent and forwards
+``allocate()``/``deallocate()`` onto it. It mirrors each allocation into the
+shared v2 registry (for discoverability via
+``detail::registry::find_allocation()`` /
+``find_allocations_by_memory()``) but does not call
+``memory::track_allocation()``/``untrack_allocation()``, so v2 statistics are
+not double-counted against the v1 strategy's own counters. Because the v2
+"fast path" reallocate/move/deallocate dispatch in ``ResourceManager`` and
+``umpire::op::dispatch`` would otherwise treat any registry-visible pointer
+as safe to mutate directly (bypassing v1's ``Allocator``/
+``ResourceManager::m_allocations`` bookkeeping),
+``v1_backed_memory::supports_v2_fast_path()`` overrides
+``umpire::memory::supports_v2_fast_path()`` to return ``false``, so those
+allocations always fall back to the slower, v1-safe path instead.
+
+As of this writing, three v1 strategies delegate to v2 under this flag:
+
+- ``strategy::SizeLimiter`` -> ``strategy::size_limiter<v1_backed_memory>``
+- ``strategy::NamedAllocationStrategy`` -> ``strategy::named<v1_backed_memory>``
+- ``strategy::ThreadSafeAllocator`` -> ``strategy::thread_safe<v1_backed_memory>``
+
+Pool strategies (``QuickPool``, ``DynamicPoolList``, ``FixedPool``) are not
+yet converted. See ``tests/integration/api_v2/test_v1_delegation.cpp`` for
+delegation-specific coverage (limit enforcement with v1 exception types,
+concurrent thread-safe access, and dual v1/v2 registry visibility), gated on
+the flag via ``tests/integration/api_v2/CMakeLists.txt``.
+
 Related References
 ------------------
 
 - ``docs/sphinx/features/api_v2_design_rationale.rst``
 - ``examples/api_v2/stl_containers.cpp``
 - ``tests/integration/api_v2/test_v1_v2_interop.cpp``
+- ``tests/integration/api_v2/test_v1_delegation.cpp``
 - ``openspec/changes/add-api-v2/design.md``
 - ``openspec/changes/add-api-v2/specs/api-v2/spec.md``
