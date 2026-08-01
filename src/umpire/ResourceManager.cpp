@@ -54,12 +54,12 @@ std::optional<allocation_record> find_v2_allocation(void* ptr)
 {
   auto& registry = detail::registry::get();
   auto record = registry.find_allocation(ptr);
-  if (record && record->strategy) {
+  if (record && record->strategy && record->strategy->supports_v2_fast_path()) {
     return record;
   }
 
   record = registry.find_containing_allocation(ptr);
-  if (record && record->strategy) {
+  if (record && record->strategy && record->strategy->supports_v2_fast_path()) {
     if (ptr != record->ptr) {
       UMPIRE_ERROR(runtime_error,
                    fmt::format("Cannot operate on an offset ptr (ptr={}, base={})", ptr, record->ptr));
@@ -89,6 +89,22 @@ ResourceManager::ResourceManager()
       m_id(0),
       m_mutex()
 {
+  // Force the API v2 registry singleton (a function-local static, like this
+  // object) to complete construction *before* this constructor finishes.
+  // Function-local statics are destroyed in the reverse order in which they
+  // *finish* construction, so this guarantees detail::registry::get()'s
+  // instance outlives ResourceManager's own singleton at static teardown.
+  //
+  // This matters when UMPIRE_V1_DELEGATE_TO_V2 is enabled: converted v1
+  // strategies (see strategy::detail::v1_backed_memory) own long-lived
+  // umpire::memory-derived objects that register themselves with the
+  // registry and are destroyed as part of ResourceManager's own allocator
+  // list (m_allocators) at shutdown. Without this ordering guarantee, the
+  // registry singleton could be torn down first, leaving those destructors
+  // (and any live-allocation warnings they emit) to operate on an
+  // already-destroyed registry.
+  detail::registry::get();
+
   UMPIRE_LOG(Debug, "() entering");
 
   const char* env_enable_log{std::getenv("UMPIRE_LOG_LEVEL")};

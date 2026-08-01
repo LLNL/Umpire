@@ -25,6 +25,12 @@ set (umpire_strategy_headers
   StdAllocator.hpp
   ThreadSafeAllocator.hpp)
 
+if (UMPIRE_V1_DELEGATE_TO_V2)
+  set (umpire_strategy_headers
+    ${umpire_strategy_headers}
+    detail/v1_backed_memory.hpp)
+endif ()
+
 if (UMPIRE_ENABLE_MPI AND UMPIRE_ENABLE_IPC_SHARED_MEMORY AND (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP))
   set (umpire_strategy_headers
     ${umpire_strategy_headers}
@@ -106,6 +112,7 @@ target_include_directories(
   umpire_strategy
   PUBLIC
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 

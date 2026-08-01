@@ -189,6 +189,18 @@ else ()
   message(STATUS "API v2 disabled")
 endif ()
 
+if (UMPIRE_V1_DELEGATE_TO_V2)
+  if (NOT UMPIRE_ENABLE_API_V2)
+    message(FATAL_ERROR "\
+    UMPIRE_V1_DELEGATE_TO_V2 requires API v2 to be enabled. \
+    Please re-configure with UMPIRE_ENABLE_API_V2=On, or leave \
+    UMPIRE_V1_DELEGATE_TO_V2=Off.")
+  endif ()
+  message(STATUS "v1-to-v2 strategy delegation enabled (SizeLimiter, NamedAllocationStrategy, ThreadSafeAllocator)")
+else ()
+  message(STATUS "v1-to-v2 strategy delegation disabled")
+endif ()
+
 if (WIN32)
   if ((NOT UMPIRE_ENABLE_FILESYSTEM) OR (CMAKE_CXX_STANDARD LESS 17))
     message(FATAL_ERROR "\

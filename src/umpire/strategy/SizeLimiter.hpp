@@ -10,7 +10,13 @@
 #include <memory>
 
 #include "umpire/Allocator.hpp"
+#include "umpire/config.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
+
+#if defined(UMPIRE_V1_DELEGATE_TO_V2)
+#include "umpire/strategy/detail/v1_backed_memory.hpp"
+#include "umpire/strategy/size_limiter.hpp"
+#endif
 
 namespace umpire {
 namespace strategy {
@@ -39,6 +45,17 @@ class SizeLimiter : public AllocationStrategy {
 
   std::size_t m_size_limit;
   std::size_t m_total_size;
+
+#if defined(UMPIRE_V1_DELEGATE_TO_V2)
+  // Compile-time-only layout difference (matches the UMPIRE_RM_USE_NEW_OPS
+  // precedent): when delegation is enabled, allocate()/deallocate() forward
+  // to a v2 size_limiter<v1_backed_memory> instead of implementing the limit
+  // check natively. m_size_limit/m_total_size above remain unused bookkeeping
+  // in this configuration but are kept so the class layout difference stays
+  // minimal and getTraits()/getPlatform() logic is untouched.
+  std::unique_ptr<detail::v1_backed_memory> m_v1_backed_parent;
+  std::unique_ptr<size_limiter<detail::v1_backed_memory>> m_delegate;
+#endif
 };
 
 } // end of namespace strategy

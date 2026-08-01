@@ -73,3 +73,34 @@ target_include_directories(
 blt_add_test(
   NAME api_v2_v1_interop_tests
   COMMAND api_v2_v1_interop_tests)
+
+if (UMPIRE_V1_DELEGATE_TO_V2)
+  blt_add_executable(
+    NAME api_v2_v1_delegation_tests
+    SOURCES test_v1_delegation.cpp
+    DEPENDS_ON ${integration_tests_depends})
+
+  blt_add_target_compile_flags(
+    TO api_v2_v1_delegation_tests
+    FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
+
+  target_include_directories(
+    api_v2_v1_delegation_tests
+    BEFORE PRIVATE
+    ${PROJECT_SOURCE_DIR}/src
+    ${PROJECT_SOURCE_DIR}/src/umpire
+    ${PROJECT_SOURCE_DIR}/include)
+
+  target_include_directories(
+    api_v2_v1_delegation_tests
+    PRIVATE
+    ${PROJECT_SOURCE_DIR}/include)
+  target_include_directories(
+    api_v2_v1_delegation_tests
+    PRIVATE
+    ${PROJECT_BINARY_DIR}/include)
+
+  blt_add_test(
+    NAME api_v2_v1_delegation_tests
+    COMMAND api_v2_v1_delegation_tests)
+endif ()

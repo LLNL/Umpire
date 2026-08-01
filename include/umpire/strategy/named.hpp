@@ -10,9 +10,29 @@
 #include "umpire/strategy/allocation_strategy.hpp"
 
 #include <string>
+#include <type_traits>
 
 namespace umpire {
 namespace strategy {
+
+namespace detail {
+
+// SFINAE helper mirroring strategy::detail::thread_safe_platform (see
+// thread_safe.hpp): tolerates a `Memory` type without a `platform` member
+// alias (e.g. a runtime-typed bridge such as
+// strategy::detail::v1_backed_memory), defaulting to `void` instead of a
+// hard compile error.
+template <typename Memory, typename = void>
+struct named_platform {
+  using type = void;
+};
+
+template <typename Memory>
+struct named_platform<Memory, std::void_t<typename Memory::platform>> {
+  using type = typename Memory::platform;
+};
+
+} // namespace detail
 
 //! @brief Lightweight naming wrapper for memory resources and strategies
 //!
@@ -26,8 +46,8 @@ namespace strategy {
 template<typename Memory>
 class named : public allocation_strategy {
 public:
-  //! @brief Platform type propagated from the wrapped memory source
-  using platform = typename Memory::platform;
+  //! @brief Platform type propagated from the wrapped memory source when available
+  using platform = typename detail::named_platform<Memory>::type;
 
   //! @brief Construct a named wrapper around a memory source
   //!
