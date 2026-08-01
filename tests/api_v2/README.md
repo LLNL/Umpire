@@ -341,11 +341,21 @@ Current replay guarantee for tracked API v2 host allocations:
 
 - Direct `resource::host_memory<>::get()` allocation/deallocation lifecycle is
   validated by `replay_tests`.
-- This does not yet publish replay support for legacy v1 operation paths acting
-  on v2-backed allocations, such as legacy `ResourceManager` ownership-changing
-  flows in the new-ops path.
-- Follow-up bead `umpire-ifd.5` tracks the missing legacy v1-on-v2 replay event
-  coverage separately from the validated direct HOST lifecycle.
+- Legacy `ResourceManager::copy()`, `memset()`, `reallocate()`, and `move()`
+  now emit the same high-level "copy", "memset", "reallocate", and "move"
+  operation events in the default new-ops path (`UMPIRE_RM_USE_NEW_OPS=On`)
+  as the legacy dispatch path, for pointers that are not v2-tracked. This is
+  validated by `replay_tests`.
+- For v2-backed (e.g. HOST-bridged) allocations, these same `ResourceManager`
+  entry points intentionally continue to emit only the allocate/deallocate
+  lifecycle events already produced by the shared v2 registry, and do not
+  additionally emit a high-level operation event. This avoids double-emitting
+  events for a single logical operation during replay, and is validated by
+  `replay_api_v2_host_audit`.
+- Bead `umpire-ifd.5` tracked the missing legacy v1-on-v2 replay event
+  coverage; the pure-v1 portion of that gap is now closed, while the
+  v2-backed HOST behavior above remains the intended, permanent shape rather
+  than a remaining gap.
 
 ## Non-Host Legacy Boundary
 
