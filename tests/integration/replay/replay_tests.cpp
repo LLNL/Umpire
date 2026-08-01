@@ -56,6 +56,21 @@ void testCopy(std::string name)
   dst_allocator.deallocate(dst_buffer);
 }
 
+void testMemset(std::string name)
+{
+  constexpr std::size_t MAX_ALLOCATION_SIZE = 128;
+  constexpr std::size_t MEMSET_AMOUNT = 64;
+
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto allocator = rm.getAllocator(name);
+
+  char* buffer = static_cast<char*>(allocator.allocate(MAX_ALLOCATION_SIZE));
+
+  rm.memset(buffer, 0, MEMSET_AMOUNT);
+
+  allocator.deallocate(buffer);
+}
+
 void testMove(std::string name)
 {
   constexpr std::size_t MAX_ALLOCATION_SIZE = 128;
@@ -185,6 +200,7 @@ static void runTest()
 
   for (auto basename : allocators) {
     testCopy(basename);
+    testMemset(basename);
     testMove(basename);
     testAllocation(basename);
     testReallocation(basename);

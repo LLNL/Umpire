@@ -261,12 +261,22 @@ boundary on this branch.
      - ``replay_tests``, ``replay_api_v2_host_audit``, ``umpire-ifd.2``
      - Current replay guarantee is limited to allocation lifecycle recording and
        replay for tracked HOST resources.
+   * - Replay of high-level legacy v1 ``copy()``, ``memset()``, ``reallocate()``,
+       and ``move()`` events for pure v1 (non-v2-tracked) allocations
+     - Supported
+     - ``replay_tests``, ``umpire-ifd.5``
+     - The default new-ops path (``UMPIRE_RM_USE_NEW_OPS=On``) now emits the
+       same high-level "copy", "memset", "reallocate", and "move" operation
+       events as the legacy dispatch path, restoring replay parity for
+       ``ResourceManager`` entry points that do not involve v2-tracked
+       pointers.
    * - Replay of high-level legacy v1 copy, move, and reallocate events on
        v2-backed HOST allocations
-     - Not yet published
+     - Intentionally unsupported
      - ``replay_api_v2_host_audit``, ``umpire-ifd.5``
-     - The current new-ops path emits auditable allocation lifecycle events, but
-       not full replay-parity high-level operation events.
+     - Tracked v2 HOST allocations already emit allocate/deallocate lifecycle
+       events from the shared v2 registry; a redundant high-level operation
+       event is deliberately withheld to avoid double-emission during replay.
    * - API v2 operation templates on API v2 HOST allocations
      - Supported
      - ``api_v2_operations_tests``
