@@ -11,6 +11,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <type_traits>
 #include <unordered_map>
 
 #include "umpire/error.hpp"
@@ -24,6 +25,25 @@
 
 namespace umpire {
 namespace strategy {
+
+namespace detail {
+
+// SFINAE helper mirroring strategy::detail::thread_safe_platform (see
+// thread_safe.hpp): tolerates a `Memory` type without a `platform` member
+// alias (e.g. a runtime-typed bridge such as
+// strategy::detail::v1_backed_memory), defaulting to `void` instead of a
+// hard compile error.
+template <typename Memory, typename = void>
+struct quick_pool_platform {
+  using type = void;
+};
+
+template <typename Memory>
+struct quick_pool_platform<Memory, std::void_t<typename Memory::platform>> {
+  using type = typename Memory::platform;
+};
+
+} // namespace detail
 
 //! @brief Best-fit chunk pool with heuristic-driven coalescing
 //!
@@ -47,8 +67,8 @@ namespace strategy {
 template <typename Memory>
 class quick_pool : public allocation_strategy, private mixins::aligned_allocation {
 public:
-  //! @brief Platform type propagated from wrapped memory source
-  using platform = typename Memory::platform;
+  //! @brief Platform type propagated from wrapped memory source when available
+  using platform = typename detail::quick_pool_platform<Memory>::type;
 
   static constexpr std::size_t s_default_first_block_size{512 * 1024 * 1024};
   static constexpr std::size_t s_default_next_block_size{1 * 1024 * 1024};

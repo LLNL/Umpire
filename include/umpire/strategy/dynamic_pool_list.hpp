@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <string>
+#include <type_traits>
 
 #include "umpire/error.hpp"
 #include "umpire/event/event.hpp"
@@ -22,6 +23,25 @@
 
 namespace umpire {
 namespace strategy {
+
+namespace detail {
+
+// SFINAE helper mirroring strategy::detail::thread_safe_platform (see
+// thread_safe.hpp): tolerates a `Memory` type without a `platform` member
+// alias (e.g. a runtime-typed bridge such as
+// strategy::detail::v1_backed_memory), defaulting to `void` instead of a
+// hard compile error.
+template <typename Memory, typename = void>
+struct dynamic_pool_list_platform {
+  using type = void;
+};
+
+template <typename Memory>
+struct dynamic_pool_list_platform<Memory, std::void_t<typename Memory::platform>> {
+  using type = typename Memory::platform;
+};
+
+} // namespace detail
 
 //! @brief Growable block-list pool with heuristic-driven coalescing
 //!
@@ -45,8 +65,8 @@ namespace strategy {
 template <typename Memory>
 class dynamic_pool_list : public allocation_strategy, private mixins::aligned_allocation {
 public:
-  //! @brief Platform type propagated from wrapped memory source
-  using platform = typename Memory::platform;
+  //! @brief Platform type propagated from wrapped memory source when available
+  using platform = typename detail::dynamic_pool_list_platform<Memory>::type;
 
   static constexpr std::size_t s_default_first_block_size{512 * 1024 * 1024};
   static constexpr std::size_t s_default_next_block_size{1 * 1024 * 1024};
@@ -512,11 +532,18 @@ private:
     return nb;
   }
 
+public:
   //! Release free blocks and re-allocate a single block sized to
   //! `suggested_size` so future requests are served contiguously.
   //!
   //! Internal traffic deliberately bypasses the requested-byte statistics
   //! and the coalesce heuristic, matching v1's DynamicSizePool::coalesce.
+  //!
+  //! Exposed publicly (mirroring quick_pool<Memory>::do_coalesce(), which is
+  //! already public) so that callers wrapping this pool (e.g. a
+  //! v1-compatibility bridge that computes the suggested size itself, to
+  //! emit its own event exactly once rather than relying on this class's
+  //! own coalesce()) can invoke the actual coalesce operation directly.
   void do_coalesce(std::size_t suggested_size)
   {
     if (get_free_block_count() > 1) {
@@ -539,6 +566,7 @@ private:
     }
   }
 
+private:
   util::FixedMallocPool m_block_pool{sizeof(block)};
 
   block* m_used_blocks{nullptr};

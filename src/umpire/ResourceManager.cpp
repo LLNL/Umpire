@@ -72,16 +72,31 @@ std::optional<allocation_record> find_v2_allocation(void* ptr)
 
 // Non-throwing variant that permits offset pointers, for use by operations (copy/memset)
 // that legitimately operate on pointers into the middle of a v2-tracked allocation.
+//
+// Note: this must gate on supports_v2_fast_path() exactly like find_v2_allocation()
+// above. Without that check, a pointer returned by a *delegated* v1 pool strategy
+// (e.g. DynamicPoolList/QuickPool under UMPIRE_V1_DELEGATE_TO_V2) would spuriously
+// match here: strategy::detail::v1_backed_memory registers each *block* it pulls
+// from its v1 parent in the shared v2 registry (purely for read-only
+// discoverability -- see v1_backed_memory::allocate()), so a user-facing
+// sub-allocation pointer handed out from within that block is found by
+// find_containing_allocation() as an "offset" into the block's record. That block
+// record's strategy is the v1_backed_memory bridge, whose authoritative size
+// accounting lives in v1 (m_allocations), not the v2 registry -- so treating it as
+// v2-backed here would compute a bogus size (the enclosing block's size, not the
+// sub-allocation's) for zero-size copy/memset calls. Filtering on
+// supports_v2_fast_path() (false for v1_backed_memory) correctly falls back to the
+// legacy v1 m_allocations lookup for these pointers, matching find_v2_allocation().
 std::optional<allocation_record> find_v2_allocation_allow_offset(void* ptr)
 {
   auto& registry = detail::registry::get();
   auto record = registry.find_allocation(ptr);
-  if (record && record->strategy) {
+  if (record && record->strategy && record->strategy->supports_v2_fast_path()) {
     return record;
   }
 
   record = registry.find_containing_allocation(ptr);
-  if (record && record->strategy) {
+  if (record && record->strategy && record->strategy->supports_v2_fast_path()) {
     return record;
   }
 

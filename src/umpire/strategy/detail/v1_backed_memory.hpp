@@ -108,8 +108,23 @@ public:
       size = record->size;
     }
 
-    umpire::detail::registry::get().remove_allocation(ptr);
+    // Deliberately deallocate through the v1 parent BEFORE removing the
+    // registry entry (rather than removing it first): when v1_parent_ is
+    // itself a delegated v1 strategy (e.g. a delegated SizeLimiter used as
+    // a pool's parent resource), its deallocate_internal() call chain ends
+    // up invoking another v1_backed_memory-wrapped v2 strategy's own
+    // deallocate(), which independently needs to recover this same ptr's
+    // size via find_allocation() (v2's memory interface carries no size on
+    // deallocate()). Removing the record up-front would make that nested
+    // lookup fail with umpire::unknown_allocation even though the
+    // allocation is perfectly valid. Removing it only after
+    // deallocate_internal() returns keeps the record visible for the
+    // duration of any such nested lookups; a second, no-op removal by an
+    // inner v1_backed_memory (e.g. the one that originally registered this
+    // allocation) is harmless, since registry::remove_allocation() is a
+    // safe no-op for an already-removed key.
     v1_parent_->deallocate_internal(ptr, size);
+    umpire::detail::registry::get().remove_allocation(ptr);
   }
 
   resource::Platform get_platform() const override

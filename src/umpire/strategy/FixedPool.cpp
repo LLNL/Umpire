@@ -25,6 +25,141 @@ namespace strategy {
 
 static constexpr std::size_t bits_per_int = sizeof(int) * 8;
 
+#if defined(UMPIRE_V1_DELEGATE_TO_V2)
+
+FixedPool::Pool::Pool(AllocationStrategy*, const std::size_t, const std::size_t, const std::size_t)
+    : strategy(nullptr), data(nullptr), avail(nullptr), num_avail(0)
+{
+  // Unused in the delegated branch: FixedPool::newPool()/allocInPool() are
+  // never called, so this constructor body is unreachable. It exists only
+  // because struct Pool must remain a complete type for m_pool's (unused)
+  // std::vector<Pool> member declaration to compile identically across both
+  // branches.
+}
+
+FixedPool::FixedPool(const std::string& name, int id, Allocator allocator, const std::size_t object_bytes,
+                     const std::size_t objects_per_pool) noexcept
+    : AllocationStrategy{name, id, allocator.getAllocationStrategy(), "FixedPool"},
+      m_strategy{allocator.getAllocationStrategy()},
+      m_obj_bytes{object_bytes},
+      m_obj_per_pool{objects_per_pool},
+      m_data_bytes{m_obj_bytes * m_obj_per_pool},
+      m_avail_bytes{objects_per_pool / bits_per_int + 1},
+      m_current_bytes{0},
+      m_actual_bytes{0},
+      m_highwatermark{0},
+      m_pool{},
+      m_v1_backed_parent{std::make_unique<detail::v1_backed_memory>(m_strategy)},
+      m_delegate{std::make_unique<fixed_pool<detail::v1_backed_memory>>(name, m_v1_backed_parent.get(), object_bytes,
+                                                                        objects_per_pool)},
+      m_native_highwatermark{0}
+{
+  UMPIRE_LOG(Debug, "(name=\"" << name << "\", id=" << id << ", allocator=\"" << allocator.getName()
+                                << "\", object_bytes=" << object_bytes << ", objects_per_pool=" << objects_per_pool
+                                << ")");
+}
+
+FixedPool::~FixedPool()
+{
+  // m_delegate's own destructor returns every pool it owns back to the
+  // v1-backed parent (see v2 fixed_pool<Memory>::~fixed_pool()); unlike the
+  // non-delegated path below, there is no leaked-address diagnostic here
+  // since v2's fixed_pool tracks pools generically rather than per-bit
+  // availability, and it always releases all pools unconditionally at
+  // destruction (matching the "no leaks" branch of v1's destructor).
+}
+
+void FixedPool::newPool()
+{
+  // Unused in the delegated branch; v2's fixed_pool<Memory> grows its own
+  // pools internally inside allocate().
+}
+
+void* FixedPool::allocInPool(Pool&)
+{
+  // Unused in the delegated branch.
+  return nullptr;
+}
+
+void* FixedPool::allocate(std::size_t bytes)
+{
+  // Check that bytes passed matches m_obj_bytes or bytes was not passed
+  // (default = 0), matching v1's tolerant assert-only behavior. v2's
+  // fixed_pool<Memory>::allocate() strictly throws std::invalid_argument
+  // when size != object_size_ (including for size == 0), so the pool's
+  // configured object size is always requested from the delegate here
+  // rather than the caller-supplied `bytes`, preserving v1's more permissive
+  // contract.
+  UMPIRE_ASSERT(!bytes || bytes == m_obj_bytes);
+
+  void* ptr = m_delegate->allocate(m_obj_bytes);
+
+  if (ptr) {
+    m_current_bytes += m_obj_bytes;
+    m_native_highwatermark = std::max(m_native_highwatermark, m_current_bytes);
+  } else {
+    UMPIRE_ERROR(runtime_error, fmt::format("FixedPool::allocate(size={}): Could not allocate.", m_obj_bytes));
+  }
+
+  return ptr;
+}
+
+void FixedPool::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
+{
+  m_delegate->deallocate(ptr);
+  m_current_bytes -= m_obj_bytes;
+}
+
+void FixedPool::release()
+{
+  m_delegate->release();
+}
+
+std::size_t FixedPool::getCurrentSize() const noexcept
+{
+  return m_current_bytes;
+}
+
+std::size_t FixedPool::getActualSize() const noexcept
+{
+  // v2's fixed_pool<Memory> has no bitmap-overhead concept (it uses a
+  // std::vector free list rather than v1's malloc'd availability bitmap per
+  // pool), so this replicates v1's exact m_actual_bytes formula natively:
+  // each pool contributes `m_avail_bytes` (bitmap bytes) + `m_data_bytes`
+  // (object storage bytes), summed across `get_pool_count()` pools.
+  return m_delegate->get_pool_count() * (m_avail_bytes + m_data_bytes);
+}
+
+std::size_t FixedPool::getHighWatermark() const noexcept
+{
+  // v2's fixed_pool<Memory> exposes no high-watermark getter at all, so the
+  // peak is tracked natively (see allocate() above), mirroring v1's running
+  // max-of-current-bytes computation exactly.
+  return m_native_highwatermark;
+}
+
+Platform FixedPool::getPlatform() noexcept
+{
+  return m_strategy->getPlatform();
+}
+
+MemoryResourceTraits FixedPool::getTraits() const noexcept
+{
+  return m_strategy->getTraits();
+}
+
+std::size_t FixedPool::numPools() const noexcept
+{
+  return m_delegate->get_pool_count();
+}
+
+bool FixedPool::pointerIsFromPool(void* ptr) const noexcept
+{
+  return m_delegate->owns(ptr);
+}
+
+#else // !defined(UMPIRE_V1_DELEGATE_TO_V2)
+
 FixedPool::Pool::Pool(AllocationStrategy* allocation_strategy, const std::size_t object_bytes,
                       const std::size_t objects_per_pool, const std::size_t avail_bytes)
     : strategy(allocation_strategy),
@@ -228,6 +363,8 @@ bool FixedPool::pointerIsFromPool(void* ptr) const noexcept
 
   return false;
 }
+
+#endif // defined(UMPIRE_V1_DELEGATE_TO_V2)
 
 } // end of namespace strategy
 } // end of namespace umpire
