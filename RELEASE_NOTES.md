@@ -6,7 +6,8 @@
 
 ## Changes Impacting Builds
 
-- CMake namespace target updated to `umpire::umpire` with deprecated legacy `umpire` target
+- Updated the exported CMake target name to `umpire::umpire`. The legacy `umpire` target is deprecated, 
+  but remains available when configured with UMPIRE_ENABLE_LEGACY_CMAKE_TARGETS=ON
 
 - Umpire now requires C++20
 
