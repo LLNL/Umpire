@@ -63,6 +63,14 @@ include("${CMAKE_CURRENT_LIST_DIR}/umpire-targets.cmake")
 # Provide backwards-compatible non-namespaced targets unless explicitly disabled.
 if (@UMPIRE_ENABLE_ALIAS_TARGETS@)
   include("${CMAKE_CURRENT_LIST_DIR}/umpire-non-namespaced-targets.cmake")
+
+  set_target_properties(umpire PROPERTIES
+    DEPRECATION "Target 'umpire' is deprecated. Please use 'umpire::umpire' instead. To disable this warning and backwards-compatible targets, set UMPIRE_ENABLE_ALIAS_TARGETS=OFF when configuring Umpire.")
+
+  if (TARGET umpire_device)
+    set_target_properties(umpire_device PROPERTIES
+      DEPRECATION "Target 'umpire_device' is deprecated. Please use 'umpire::umpire_device' instead. To disable this warning and backwards-compatible targets, set UMPIRE_ENABLE_ALIAS_TARGETS=OFF when configuring Umpire.")
+  endif()
 endif()
 
 check_required_components(@PROJECT_NAME@)
