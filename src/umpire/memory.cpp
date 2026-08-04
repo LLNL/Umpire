@@ -20,21 +20,60 @@ namespace umpire {
 
 namespace {
 
+//! \brief The canonical v2 HOST singleton (`resource::host_memory<>::get()`)
+//! must always mirror into v1's ResourceManager, independent of
+//! `memory::mirrors_to_v1()`, to preserve existing v1/v2 interop behavior
+//! (see tests/integration/api_v2/test_v1_v2_interop.cpp).
 bool should_bridge_to_v1_host_allocator(const memory& mem)
 {
   return mem.get_name() == "HOST" && mem.get_platform() == resource::Platform::host;
 }
 
-void register_with_v1_host_allocator(void* ptr, std::size_t size)
+//! \brief Resolve the v1 `AllocationStrategy*` that should be recorded on a
+//! mirrored `util::AllocationRecord` for `mem`.
+//!
+//! Prefers a v1 allocator registered under `mem`'s own name (so a mirrored
+//! object that shares a name with a v1 resource, e.g. "HOST", reuses that
+//! resource's v1 strategy). Falls back to the v1 "HOST" allocator's
+//! strategy for host-platform objects that have no matching v1 allocator by
+//! name. Returns `nullptr` if neither resolves, meaning the caller should
+//! not mirror the allocation, since there would be no sensible v1 strategy
+//! pointer to record.
+strategy::AllocationStrategy* resolve_v1_mirror_strategy(const memory& mem)
 {
   auto& rm = ResourceManager::getInstance();
-  if (!rm.hasAllocator(ptr)) {
-    auto host_allocator = rm.getAllocator("HOST");
-    rm.registerAllocation(ptr, util::AllocationRecord{ptr, size, host_allocator.getAllocationStrategy()});
+
+  if (rm.isAllocator(mem.get_name())) {
+    return rm.getAllocator(mem.get_name()).getAllocationStrategy();
   }
+
+  if (mem.get_platform() == resource::Platform::host && rm.isAllocator("HOST")) {
+    return rm.getAllocator("HOST").getAllocationStrategy();
+  }
+
+  return nullptr;
 }
 
-void deregister_from_v1_host_allocator(void* ptr)
+void register_with_v1_allocator(const memory& mem, void* ptr, std::size_t size)
+{
+  auto& rm = ResourceManager::getInstance();
+  if (rm.hasAllocator(ptr)) {
+    return;
+  }
+
+  auto* strategy = resolve_v1_mirror_strategy(mem);
+  if (!strategy) {
+    UMPIRE_LOG(Debug, "memory \"" << mem.get_name()
+                                  << "\" opted into v1 mirroring but no matching v1 allocator "
+                                     "could be resolved; skipping mirror for ptr="
+                                  << ptr);
+    return;
+  }
+
+  rm.registerAllocation(ptr, util::AllocationRecord{ptr, size, strategy});
+}
+
+void deregister_from_v1_allocator(void* ptr)
 {
   auto& rm = ResourceManager::getInstance();
   if (rm.hasAllocator(ptr)) {
@@ -71,8 +110,8 @@ void memory::track_allocation(void* ptr, std::size_t size)
 {
   allocation_record record{ptr, size, this};
   detail::registry::get().register_allocation(record);
-  if (should_bridge_to_v1_host_allocator(*this)) {
-    register_with_v1_host_allocator(ptr, size);
+  if (mirrors_to_v1() || should_bridge_to_v1_host_allocator(*this)) {
+    register_with_v1_allocator(*this, ptr, size);
   }
   update_statistics(static_cast<std::ptrdiff_t>(size));
 
@@ -100,8 +139,8 @@ void memory::untrack_allocation(void* ptr)
       [&](auto& event) { event.ref(static_cast<void*>(this)).ptr(ptr); });
 
   detail::registry::get().remove_allocation(ptr);
-  if (should_bridge_to_v1_host_allocator(*this)) {
-    deregister_from_v1_host_allocator(ptr);
+  if (mirrors_to_v1() || should_bridge_to_v1_host_allocator(*this)) {
+    deregister_from_v1_allocator(ptr);
   }
   update_statistics(-static_cast<std::ptrdiff_t>(size));
 }
