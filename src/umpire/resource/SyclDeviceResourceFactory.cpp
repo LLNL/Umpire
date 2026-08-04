@@ -6,9 +6,16 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/resource/SyclDeviceResourceFactory.hpp"
 
+#include <memory>
+
 #include "umpire/alloc/SyclMallocAllocator.hpp"
 #include "umpire/resource/SyclDeviceMemoryResource.hpp"
 #include "umpire/util/make_unique.hpp"
+
+#if defined(UMPIRE_V1_DELEGATE_TO_V2)
+#include "umpire/resource/sycl_device_memory.hpp"
+#include "umpire/resource/v2_backed_resource.hpp"
+#endif
 
 namespace umpire {
 namespace resource {
@@ -69,8 +76,26 @@ std::unique_ptr<resource::MemoryResource> SyclDeviceResourceFactory::create(cons
     }
   }
 
+#if defined(UMPIRE_V1_DELEGATE_TO_V2)
+  // Tracking=false: see the double-tracking discussion in
+  // v2_backed_resource.hpp.
+  //
+  // Queue binding: v1's SyclDeviceMemoryResource passes `*traits.queue`
+  // explicitly on every allocate()/deallocate() call, while v2's
+  // sycl_device_memory binds a queue once at construction. Both models refer
+  // to the same underlying SYCL queue (a reference-counted handle), so
+  // constructing the v2 instance with a copy of the queue built above by the
+  // factory (`*traits.queue`) is semantically equivalent.
+  auto v2_memory =
+      std::make_unique<resource::sycl_device_memory<resource::sycl_default_allocator, false>>(
+          name + "_v2backed", *traits.queue);
+
+  return util::make_unique<v2_backed_resource>(name, id, traits, Platform::sycl, std::move(v2_memory),
+                                                [](Platform p) { return p == Platform::sycl; });
+#else
   return util::make_unique<resource::SyclDeviceMemoryResource<alloc::SyclMallocAllocator>>(Platform::sycl, name, id,
                                                                                            traits);
+#endif
 }
 
 MemoryResourceTraits SyclDeviceResourceFactory::getDefaultTraits()

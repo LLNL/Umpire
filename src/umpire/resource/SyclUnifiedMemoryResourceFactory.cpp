@@ -6,9 +6,16 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/resource/SyclUnifiedMemoryResourceFactory.hpp"
 
+#include <memory>
+
 #include "umpire/alloc/SyclMallocManagedAllocator.hpp"
 #include "umpire/resource/SyclDeviceMemoryResource.hpp"
 #include "umpire/util/make_unique.hpp"
+
+#if defined(UMPIRE_V1_DELEGATE_TO_V2)
+#include "umpire/resource/sycl_um_memory.hpp"
+#include "umpire/resource/v2_backed_resource.hpp"
+#endif
 
 namespace umpire {
 namespace resource {
@@ -69,8 +76,20 @@ std::unique_ptr<resource::MemoryResource> SyclUnifiedMemoryResourceFactory::crea
     }
   }
 
+#if defined(UMPIRE_V1_DELEGATE_TO_V2)
+  // Tracking=false: see the double-tracking discussion in
+  // v2_backed_resource.hpp. Queue binding: see the note in
+  // SyclDeviceResourceFactory.cpp.
+  auto v2_memory = std::make_unique<resource::sycl_um_memory<resource::sycl_um_allocator, false>>(
+      name + "_v2backed", *traits.queue);
+
+  return util::make_unique<v2_backed_resource>(
+      name, id, traits, Platform::sycl, std::move(v2_memory),
+      [](Platform p) { return p == Platform::sycl || p == Platform::host; });
+#else
   return util::make_unique<resource::SyclDeviceMemoryResource<alloc::SyclMallocManagedAllocator>>(Platform::sycl, name,
                                                                                                   id, traits);
+#endif
 }
 
 MemoryResourceTraits SyclUnifiedMemoryResourceFactory::getDefaultTraits()
