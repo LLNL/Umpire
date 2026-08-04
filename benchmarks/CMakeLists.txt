@@ -186,6 +186,15 @@ if (UMPIRE_ENABLE_API_V2)
     COMMAND api_v2_allocator_benchmarks)
 
   blt_add_executable(
+    NAME api_v2_delegation_benchmarks
+    SOURCES api_v2_delegation_benchmarks.cpp
+    DEPENDS_ON ${benchmark_depends})
+
+  blt_add_benchmark(
+    NAME api_v2_delegation_benchmarks
+    COMMAND api_v2_delegation_benchmarks)
+
+  blt_add_executable(
     NAME api_v2_coalescing_pool_list_benchmarks
     SOURCES ../tests/benchmarks/api_v2/bench_coalescing_pool_list.cpp
     DEPENDS_ON umpire)

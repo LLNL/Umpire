@@ -40,7 +40,45 @@ private:
   std::atomic<std::size_t> actual_size_{0};
   std::atomic<std::size_t> highwatermark_{0};
 
+  //! \brief Whether this object's tracked allocations should also be
+  //! mirrored into the v1 `ResourceManager::m_allocations` map. Defaults to
+  //! false; see `set_v1_mirroring()`.
+  bool mirrors_to_v1_{false};
+
 protected:
+  /*!
+   * \brief Opt this object's allocations in (or out) of the v1
+   * `ResourceManager` mirror.
+   *
+   * By default, API v2 `memory` objects are NOT mirrored into v1's
+   * `ResourceManager::m_allocations` map; the shared v2 registry
+   * (`detail::registry`) is the sole source of truth. Setting this to
+   * `true` additionally registers/deregisters each tracked allocation with
+   * v1's `ResourceManager` (see `memory.cpp`), so pointers allocated
+   * through this object become visible to v1 APIs such as
+   * `ResourceManager::hasAllocator()`, `getAllocator(void*)`,
+   * `findAllocationRecord()`, and the introspection helpers in
+   * `umpire/Umpire.hpp`.
+   *
+   * The mirrored `util::AllocationRecord::strategy` is resolved by name: if
+   * a v1 allocator is registered under this object's `get_name()`, that
+   * allocator's strategy is used; otherwise, for host-platform objects, the
+   * v1 "HOST" allocator's strategy is used as a fallback. If neither
+   * resolves, the allocation is not mirrored (a debug message is logged)
+   * since there would be no sensible v1 strategy pointer to record.
+   *
+   * The canonical HOST v2 singleton (`resource::host_memory<>::get()`)
+   * mirrors unconditionally regardless of this flag, preserving existing
+   * v1/v2 interop behavior; this flag is the opt-in path for any other v2
+   * object that wants the same treatment. Correctness of mirroring
+   * non-host-platform objects (e.g. device resources) is unvalidated today,
+   * so callers should leave this unset unless they have verified it for
+   * their platform.
+   *
+   * \param enable Whether to mirror this object's allocations into v1.
+   */
+  void set_v1_mirroring(bool enable) { mirrors_to_v1_ = enable; }
+
   /*!
    * \brief Register a live allocation in the shared API v2 registry.
    *
@@ -140,6 +178,19 @@ public:
    * systems in sync.
    */
   virtual bool supports_v2_fast_path() const { return true; }
+
+  /*!
+   * \brief Whether this object's allocations are mirrored into v1's
+   * `ResourceManager::m_allocations` map.
+   *
+   * See `set_v1_mirroring()` for the full description of what mirroring
+   * means and how the mirrored record's strategy is resolved.
+   *
+   * \return `true` if this object opted in via `set_v1_mirroring(true)`.
+   *         Note that the HOST v2 singleton mirrors unconditionally
+   *         regardless of this flag (see `memory.cpp`).
+   */
+  bool mirrors_to_v1() const { return mirrors_to_v1_; }
 
   //! Stable registry-assigned identifier.
   int get_id() const { return id_; }

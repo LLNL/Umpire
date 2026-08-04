@@ -5,6 +5,7 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 
+#include "umpire/ResourceManager.hpp"
 #include "umpire/detail/registry.hpp"
 #include "umpire/error.hpp"
 #include "umpire/memory.hpp"
@@ -21,6 +22,10 @@ class test_memory : public umpire::memory {
 public:
   test_memory() : umpire::memory{"test"} { }
   explicit test_memory(const std::string& name) : umpire::memory{name} { }
+  test_memory(const std::string& name, bool mirror_to_v1) : umpire::memory{name}
+  {
+    set_v1_mirroring(mirror_to_v1);
+  }
 
   void* allocate(std::size_t size) override
   {
@@ -191,4 +196,55 @@ TEST(memory, lookup_copy_survives_cross_thread_removal)
   EXPECT_EQ(snapshot->ptr, ptr);
   EXPECT_EQ(snapshot->size, 24);
   EXPECT_EQ(snapshot->strategy, &mem);
+}
+
+// A memory object with v1 mirroring enabled (via the protected
+// set_v1_mirroring() opt-in) registers each tracked allocation in v1's
+// ResourceManager and deregisters it on deallocation. Since this object's
+// name ("mirror_enabled") does not match any v1 allocator, the mirror
+// falls back to the v1 "HOST" allocator's strategy because this object
+// reports the host platform (see resolve_v1_mirror_strategy() in
+// src/umpire/memory.cpp).
+TEST(memory, v1_mirroring_enabled_registers_with_v1_resource_manager)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  test_memory mem{"mirror_enabled", true};
+
+  void* ptr = mem.allocate(32);
+  EXPECT_TRUE(rm.hasAllocator(ptr));
+
+  auto* record = rm.findAllocationRecord(ptr);
+  ASSERT_NE(record, nullptr);
+  EXPECT_EQ(record->ptr, ptr);
+  EXPECT_EQ(record->size, 32u);
+
+  mem.deallocate(ptr);
+  EXPECT_FALSE(rm.hasAllocator(ptr));
+}
+
+// A memory object without v1 mirroring enabled (the default) must NOT
+// appear in v1's ResourceManager bookkeeping at all.
+TEST(memory, v1_mirroring_disabled_does_not_register_with_v1_resource_manager)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  test_memory mem{"mirror_disabled", false};
+
+  void* ptr = mem.allocate(32);
+  EXPECT_FALSE(rm.hasAllocator(ptr));
+
+  mem.deallocate(ptr);
+  EXPECT_FALSE(rm.hasAllocator(ptr));
+}
+
+// The default constructor (no mirroring argument) must also leave v1's
+// ResourceManager untouched, confirming the default-false behavior.
+TEST(memory, default_construction_does_not_mirror_to_v1)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  test_memory mem{"mirror_default"};
+
+  void* ptr = mem.allocate(16);
+  EXPECT_FALSE(rm.hasAllocator(ptr));
+
+  mem.deallocate(ptr);
 }
