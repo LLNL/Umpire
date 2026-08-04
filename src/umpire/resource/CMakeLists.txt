@@ -27,6 +27,13 @@ if(UMPIRE_ENABLE_DEVELOPER_BENCHMARKS)
   )
 endif()
 
+if(UMPIRE_V1_DELEGATE_TO_V2)
+  set (umpire_resource_headers
+    ${umpire_resource_headers}
+    v2_backed_resource.hpp
+  )
+endif()
+
 set (umpire_resource_sources
   HostResourceFactory.cpp
   MemoryResource.cpp
@@ -34,6 +41,13 @@ set (umpire_resource_sources
   NullMemoryResource.cpp
   NullMemoryResourceFactory.cpp
 )
+
+if(UMPIRE_V1_DELEGATE_TO_V2)
+  set (umpire_resource_sources
+    ${umpire_resource_sources}
+    v2_backed_resource.cpp
+  )
+endif()
 
 if(UMPIRE_ENABLE_FILE_RESOURCE)
   set (umpire_resource_headers

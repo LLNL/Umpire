@@ -30,6 +30,11 @@ std::unique_ptr<resource::MemoryResource> NoOpResourceFactory::create(const std:
 std::unique_ptr<resource::MemoryResource> NoOpResourceFactory::create(const std::string& name, int id,
                                                                       MemoryResourceTraits traits)
 {
+  // NOTE (UMPIRE_V1_DELEGATE_TO_V2): intentionally left NATIVE. This
+  // developer-benchmark-only resource (see UMPIRE_ENABLE_DEVELOPER_BENCHMARKS)
+  // exists purely to measure overhead of the v1 tracking/statistics layer
+  // itself; v2 has no equivalent "no-op backend" resource, and delegating it
+  // would defeat its purpose.
   return util::make_unique<resource::NoOpMemoryResource>(Platform::host, name, id, traits);
 }
 

@@ -31,6 +31,9 @@ std::unique_ptr<resource::MemoryResource> NullMemoryResourceFactory::create(cons
 std::unique_ptr<resource::MemoryResource> NullMemoryResourceFactory::create(const std::string& name, int id,
                                                                             MemoryResourceTraits traits)
 {
+  // NOTE (UMPIRE_V1_DELEGATE_TO_V2): intentionally left NATIVE. v2 has no
+  // "always fails" resource counterpart to mirror the internal
+  // __umpire_internal_null sentinel, so there is nothing to delegate to.
   return util::make_unique<NullMemoryResource>(Platform::undefined, name, id, traits);
 }
 

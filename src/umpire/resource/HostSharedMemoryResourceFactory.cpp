@@ -31,6 +31,13 @@ std::unique_ptr<resource::MemoryResource> HostSharedMemoryResourceFactory::creat
   if (traits.scope != MemoryResourceTraits::shared_scope::node) {
     UMPIRE_ERROR(runtime_error, "HostSharedMemoryResource only supports shared_scope::node");
   }
+  // NOTE (UMPIRE_V1_DELEGATE_TO_V2): intentionally left NATIVE. v1's
+  // HostSharedMemoryResource exposes extra virtuals (allocate_named(),
+  // find_pointer_from_name()) that v2_backed_resource's generic
+  // allocate(bytes)/deallocate(ptr) adapter cannot forward, and v2's
+  // shared_memory has a differing anonymous-allocate semantic (it
+  // synthesizes a name rather than throwing as v1 does). Reconciling those
+  // API and behavioral differences is out of scope for the generic adapter.
   return util::make_unique<HostSharedMemoryResource>(Platform::host, name, id, traits);
 }
 

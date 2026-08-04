@@ -6,6 +6,8 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/resource/HostResourceFactory.hpp"
 
+#include <memory>
+
 #include "umpire/alloc/MallocAllocator.hpp"
 #include "umpire/config.hpp"
 #include "umpire/resource/DefaultMemoryResource.hpp"
@@ -18,6 +20,11 @@
 
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
 #include "omp.h"
+#endif
+
+#if defined(UMPIRE_V1_DELEGATE_TO_V2)
+#include "umpire/resource/host_memory.hpp"
+#include "umpire/resource/v2_backed_resource.hpp"
 #endif
 
 namespace umpire {
@@ -46,7 +53,32 @@ std::unique_ptr<resource::MemoryResource> HostResourceFactory::create(const std:
   using HostAllocator = alloc::MallocAllocator;
 #endif
 
+#if defined(UMPIRE_V1_DELEGATE_TO_V2) && !defined(UMPIRE_ENABLE_NUMA)
+  // Delegate to the API v2 HOST resource. Tracking=false (fast_host_memory)
+  // so v1's ResourceManager::m_allocations remains the sole bookkeeping
+  // system for these allocations -- see the "Tracking / double-tracking
+  // hazard" discussion in v2_backed_resource.hpp. The wrapped instance is
+  // given a distinct name ("<name>_v2backed") so it is neither the process
+  // singleton (host_memory::get(), name "HOST") nor equal to the v1-visible
+  // name; this also sidesteps the HOST-only v1<->v2 bridge in
+  // src/umpire/memory.cpp (which keys off get_name() == "HOST"), even though
+  // that bridge only fires from track_allocation() which Tracking=false
+  // never calls.
+  //
+  // NUMA builds are excluded: v1's PosixMemalignAllocator has no v2
+  // equivalent (v2's host_memory always uses malloc_allocator), so
+  // delegating under UMPIRE_ENABLE_NUMA would silently change the
+  // allocation backend; HOST stays NATIVE in that configuration.
+  auto v2_memory = std::make_unique<resource::fast_host_memory>(name + "_v2backed");
+
+  return util::make_unique<v2_backed_resource>(
+      name, id, traits, Platform::host, std::move(v2_memory), [](Platform p) {
+        alloc::MallocAllocator allocator;
+        return allocator.isAccessible(p);
+      });
+#else
   return util::make_unique<DefaultMemoryResource<HostAllocator>>(Platform::host, name, id, traits);
+#endif
 }
 
 MemoryResourceTraits HostResourceFactory::getDefaultTraits()

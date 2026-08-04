@@ -13,8 +13,11 @@
 
 #include "umpire/ResourceManager.hpp"
 #include "umpire/Umpire.hpp"
+#include "umpire/config.hpp"
 #include "umpire/detail/registry.hpp"
 #include "umpire/error.hpp"
+#include "umpire/resource/host_memory.hpp"
+#include "umpire/resource/v2_backed_resource.hpp"
 #include "umpire/strategy/SizeLimiter.hpp"
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
 
@@ -22,6 +25,7 @@
 
 #include <atomic>
 #include <cstddef>
+#include <cstring>
 #include <string>
 #include <thread>
 #include <vector>
@@ -158,3 +162,151 @@ TEST(V1Delegation, DelegatedAllocationsVisibleInV1AndV2Registries)
   EXPECT_FALSE(rm.hasAllocator(ptr));
   EXPECT_FALSE(umpire::detail::registry::get().find_allocation(ptr).has_value());
 }
+
+//////////////////////////////////////////////////////////////////////////////
+// v1 RESOURCE -> API v2 delegation tests (resource::v2_backed_resource)
+//
+// The tests below exercise v1's *resources* (as opposed to the *strategies*
+// tested above) being backed by API v2 memory objects via
+// umpire::resource::v2_backed_resource -- see
+// src/umpire/resource/v2_backed_resource.hpp for the adapter itself, and the
+// per-resource factories (e.g. src/umpire/resource/HostResourceFactory.cpp)
+// for the wiring under UMPIRE_V1_DELEGATE_TO_V2.
+//////////////////////////////////////////////////////////////////////////////
+
+// rm.getAllocator("HOST") is backed by a v2_backed_resource wrapping a
+// Tracking=false umpire::resource::fast_host_memory instance (unless
+// UMPIRE_ENABLE_NUMA is set, in which case HOST stays NATIVE -- see
+// HostResourceFactory.cpp). Basic allocate/deallocate and introspection
+// (getCurrentSize/getHighWatermark/getAllocationCount) must behave exactly
+// as the native path, since v1's counters live in the outer
+// AllocationStrategy and are untouched by delegation.
+TEST(V1Delegation, DelegatedHostResourceAllocateDeallocateAndIntrospection)
+{
+#if !defined(UMPIRE_ENABLE_NUMA)
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto host_allocator = rm.getAllocator("HOST");
+
+  const std::size_t initial_current = host_allocator.getCurrentSize();
+  const std::size_t initial_count = host_allocator.getAllocationCount();
+
+  void* ptr = host_allocator.allocate(1024);
+  ASSERT_NE(ptr, nullptr);
+
+  EXPECT_EQ(host_allocator.getCurrentSize(), initial_current + 1024);
+  EXPECT_EQ(host_allocator.getAllocationCount(), initial_count + 1);
+  EXPECT_GE(host_allocator.getHighWatermark(), initial_current + 1024);
+  EXPECT_TRUE(rm.hasAllocator(ptr));
+
+  auto* record = rm.findAllocationRecord(ptr);
+  ASSERT_NE(record, nullptr);
+  EXPECT_EQ(record->ptr, ptr);
+  EXPECT_EQ(record->size, 1024u);
+
+  host_allocator.deallocate(ptr);
+
+  EXPECT_EQ(host_allocator.getCurrentSize(), initial_current);
+  EXPECT_EQ(host_allocator.getAllocationCount(), initial_count);
+  EXPECT_FALSE(rm.hasAllocator(ptr));
+#else
+  GTEST_SKIP() << "HOST stays NATIVE under UMPIRE_ENABLE_NUMA; nothing to delegate.";
+#endif
+}
+
+// A delegated HOST allocation must be a fully usable buffer through v1's
+// ResourceManager::memset()/copy() operations -- these dispatch on
+// getAllocationStrategy()->getPlatform(), and v2_backed_resource::getPlatform()
+// returns the platform supplied by the factory (Platform::host here), so the
+// native host memset/copy operations are selected exactly as for the
+// non-delegated path.
+TEST(V1Delegation, DelegatedHostResourceSupportsMemsetAndCopyThroughResourceManager)
+{
+#if !defined(UMPIRE_ENABLE_NUMA)
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto host_allocator = rm.getAllocator("HOST");
+
+  constexpr std::size_t kSize = 256;
+  void* src = host_allocator.allocate(kSize);
+  void* dst = host_allocator.allocate(kSize);
+  ASSERT_NE(src, nullptr);
+  ASSERT_NE(dst, nullptr);
+
+  rm.memset(src, 0x5A, kSize);
+
+  auto* src_bytes = static_cast<unsigned char*>(src);
+  for (std::size_t i = 0; i < kSize; ++i) {
+    ASSERT_EQ(src_bytes[i], 0x5A);
+  }
+
+  std::memset(dst, 0, kSize);
+  rm.copy(dst, src, kSize);
+
+  auto* dst_bytes = static_cast<unsigned char*>(dst);
+  for (std::size_t i = 0; i < kSize; ++i) {
+    ASSERT_EQ(dst_bytes[i], 0x5A);
+  }
+
+  host_allocator.deallocate(src);
+  host_allocator.deallocate(dst);
+#else
+  GTEST_SKIP() << "HOST stays NATIVE under UMPIRE_ENABLE_NUMA; nothing to delegate.";
+#endif
+}
+
+// The v2_backed_resource wraps a NAMED (non-singleton) v2 memory instance,
+// distinct from umpire::resource::host_memory::get() (name "HOST") and from
+// the v1-visible resource name itself. Confirm that identity directly via
+// v2_memory(), and confirm the wrapped instance's name carries the
+// "_v2backed" suffix documented in v2_backed_resource.hpp (this is what
+// prevents the HOST-only v1<->v2 interop bridge in src/umpire/memory.cpp,
+// which keys off get_name() == "HOST", from firing for delegated
+// allocations).
+TEST(V1Delegation, DelegatedHostResourceWrapsDistinctlyNamedV2Instance)
+{
+#if !defined(UMPIRE_ENABLE_NUMA)
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto host_allocator = rm.getAllocator("HOST");
+
+  auto* strategy = host_allocator.getAllocationStrategy();
+  ASSERT_NE(strategy, nullptr);
+
+  auto* v2_backed = dynamic_cast<umpire::resource::v2_backed_resource*>(strategy);
+  ASSERT_NE(v2_backed, nullptr) << "Expected HOST to be backed by v2_backed_resource under "
+                                   "UMPIRE_V1_DELEGATE_TO_V2 (NUMA disabled).";
+
+  ASSERT_NE(v2_backed->v2_memory(), nullptr);
+  EXPECT_NE(v2_backed->v2_memory()->get_name(), "HOST");
+  EXPECT_NE(static_cast<umpire::memory*>(v2_backed->v2_memory()),
+            static_cast<umpire::memory*>(&umpire::resource::host_memory<>::get()));
+#else
+  GTEST_SKIP() << "HOST stays NATIVE under UMPIRE_ENABLE_NUMA; nothing to delegate.";
+#endif
+}
+
+#if defined(UMPIRE_ENABLE_FILE_RESOURCE) && !defined(UMPIRE_ENABLE_UMAP)
+// FILE resources are delegated to v2's file_memory unless UMAP support is
+// enabled (v2's file_memory has no UMAP-backed path -- see
+// FileMemoryResourceFactory.cpp). Verify a full mmap-backed allocate/write/
+// read/deallocate round trip through the delegated resource.
+TEST(V1Delegation, DelegatedFileResourceAllocateWriteReadDeallocateRoundTrip)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto file_allocator = rm.getAllocator("FILE");
+
+  constexpr std::size_t kSize = 4096;
+  void* ptr = file_allocator.allocate(kSize);
+  ASSERT_NE(ptr, nullptr);
+
+  auto* bytes = static_cast<unsigned char*>(ptr);
+  for (std::size_t i = 0; i < kSize; ++i) {
+    bytes[i] = static_cast<unsigned char>(i % 256);
+  }
+  for (std::size_t i = 0; i < kSize; ++i) {
+    ASSERT_EQ(bytes[i], static_cast<unsigned char>(i % 256));
+  }
+
+  EXPECT_TRUE(rm.hasAllocator(ptr));
+  file_allocator.deallocate(ptr);
+  EXPECT_FALSE(rm.hasAllocator(ptr));
+}
+#endif // UMPIRE_ENABLE_FILE_RESOURCE && !UMPIRE_ENABLE_UMAP

@@ -129,6 +129,19 @@ cmake_dependent_option( UMPIRE_ENABLE_MPI3_SHARED_MEMORY "Enable MPI3 Shared Mem
 cmake_dependent_option( UMPIRE_ENABLE_SHARED_MEMORY "Enable API v2 POSIX Host Shared Memory Resource" Off
                         "NOT WIN32" Off )
 
+# UMPIRE_ENABLE_IPC_SHARED_MEMORY (the v1 resource) implies
+# UMPIRE_ENABLE_SHARED_MEMORY (the v2 resource): any build that requests the
+# v1 host IPC shared memory resource should also have the v2 counterpart
+# available, e.g. for v1-on-v2 delegation
+# (UMPIRE_V1_DELEGATE_TO_V2) and for interoperability tests that exercise
+# both APIs side by side. This mirrors UMPIRE_ENABLE_SHARED_MEMORY's own
+# "NOT WIN32" restriction, so it is a no-op on platforms where the v2
+# resource is unavailable.
+if (UMPIRE_ENABLE_IPC_SHARED_MEMORY AND NOT UMPIRE_ENABLE_SHARED_MEMORY AND NOT WIN32)
+  set(UMPIRE_ENABLE_SHARED_MEMORY On CACHE BOOL "Enable API v2 POSIX Host Shared Memory Resource" FORCE)
+  message(STATUS "UMPIRE_ENABLE_IPC_SHARED_MEMORY implies UMPIRE_ENABLE_SHARED_MEMORY: forcing it On")
+endif ()
+
 if(UMPIRE_ENABLE_IPC_SHARED_MEMORY AND NOT UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
   set(UMPIRE_DEFAULT_SHARED_MEMORY_RESOURCE "POSIX" CACHE STRING "Default implementation for SHARED memory resource (POSIX)")
 elseif(UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
