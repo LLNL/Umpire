@@ -1,8 +1,6 @@
-#v2026.07.0
+# v2026.07.0
 
 ## Improvements
-
-- Umpire now requires C++20
 
 - A list of available allocators is output if the requested allocator is not found
 
@@ -10,13 +8,15 @@
 
 - CMake namespace target updated to `umpire::umpire` with deprecated legacy `umpire` target
 
+- Umpire now requires C++20
+
 ## New Features
 
 - Added a tryGetAllocator which can be used to return an optional `umpire::Allocator`
 
 - Added an IPC Shared Memory Release function to return memory back to system
 
-- Added a `destroyAllocator` method which frees any resources associated to that Allocator
+- Added a `destroyAllocator` method which frees any resources owned by that Allocator
 
 - Added a MPI3 Shared Memory trait for socket scope
 
