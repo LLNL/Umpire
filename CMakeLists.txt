@@ -197,7 +197,18 @@ install(FILES
   "${PROJECT_BINARY_DIR}/umpire-config-version.cmake"
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/umpire)
 
-install(EXPORT umpire-targets NAMESPACE umpire:: DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/umpire)
+install(
+  EXPORT umpire-targets
+  FILE umpire-targets.cmake
+  NAMESPACE umpire::
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/umpire)
+
+if (UMPIRE_ENABLE_ALIAS_TARGETS)
+  install(
+    EXPORT umpire-targets
+    FILE umpire-non-namespaced-targets.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/umpire)
+endif()
 
 if (UMPIRE_ENABLE_TESTS)
   add_subdirectory(tests)
