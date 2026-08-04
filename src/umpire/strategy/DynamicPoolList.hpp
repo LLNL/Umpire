@@ -11,9 +11,15 @@
 #include <memory>
 #include <vector>
 
+#include "umpire/config.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/DynamicSizePool.hpp"
 #include "umpire/strategy/PoolCoalesceHeuristic.hpp"
+
+#if defined(UMPIRE_V1_DELEGATE_TO_V2)
+#include "umpire/strategy/detail/v1_backed_memory.hpp"
+#include "umpire/strategy/dynamic_pool_list.hpp"
+#endif
 
 namespace umpire {
 
@@ -120,6 +126,16 @@ class DynamicPoolList : public AllocationStrategy {
   strategy::AllocationStrategy* m_allocator;
   DynamicSizePool<> dpa;
   PoolCoalesceHeuristic<DynamicPoolList> m_should_coalesce;
+
+#if defined(UMPIRE_V1_DELEGATE_TO_V2)
+  // Compile-time-only layout difference (see QuickPool.hpp for the shared
+  // rationale). `dpa` above remains constructed (unused bookkeeping) so the
+  // class layout difference stays minimal; all pool mechanics forward to a
+  // v2 dynamic_pool_list<v1_backed_memory> instead. The heuristic wrapper
+  // works exactly as documented in QuickPool.hpp.
+  std::unique_ptr<detail::v1_backed_memory> m_v1_backed_parent;
+  std::unique_ptr<dynamic_pool_list<detail::v1_backed_memory>> m_delegate;
+#endif
 };
 
 std::ostream& operator<<(std::ostream& out, PoolCoalesceHeuristic<DynamicPoolList>&);

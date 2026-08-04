@@ -16,9 +16,29 @@
 #include <limits>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 
 namespace umpire {
 namespace strategy {
+
+namespace detail {
+
+// SFINAE helper mirroring strategy::detail::thread_safe_platform (see
+// thread_safe.hpp): tolerates a `Memory` type without a `platform` member
+// alias (e.g. a runtime-typed bridge such as
+// strategy::detail::v1_backed_memory), defaulting to `void` instead of a
+// hard compile error.
+template <typename Memory, typename = void>
+struct monotonic_buffer_platform {
+  using type = void;
+};
+
+template <typename Memory>
+struct monotonic_buffer_platform<Memory, std::void_t<typename Memory::platform>> {
+  using type = typename Memory::platform;
+};
+
+} // namespace detail
 
 //! @brief Bump-pointer allocator with bulk reset semantics
 //!
@@ -29,8 +49,8 @@ namespace strategy {
 template<typename Memory>
 class monotonic_buffer : public allocation_strategy {
 public:
-  //! @brief Platform type propagated from wrapped memory source
-  using platform = typename Memory::platform;
+  //! @brief Platform type propagated from wrapped memory source when available
+  using platform = typename detail::monotonic_buffer_platform<Memory>::type;
 
 private:
   static constexpr std::size_t ALIGNMENT = alignof(std::max_align_t);
@@ -133,6 +153,17 @@ public:
     const std::size_t aligned_offset = align_up(current_offset_);
     return aligned_offset >= capacity_ ? 0 : capacity_ - aligned_offset;
   }
+
+  //! @brief Access the raw backing buffer acquired from the parent
+  //!
+  //! Exposed so callers that need to manage bump-pointer offsets themselves
+  //! (e.g. a v1-compatibility bridge that must preserve an unaligned,
+  //! zero-overhead bump-allocation contract different from this class's own
+  //! `allocate()`) can still route buffer acquisition/release through this
+  //! class's constructor/destructor.
+  //!
+  //! @return Pointer to the start of the backing buffer
+  void* get_buffer() const { return buffer_; }
 };
 
 } // namespace strategy

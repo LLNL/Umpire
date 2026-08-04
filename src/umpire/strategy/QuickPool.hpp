@@ -13,11 +13,17 @@
 #include <tuple>
 #include <unordered_map>
 
+#include "umpire/config.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/PoolCoalesceHeuristic.hpp"
 #include "umpire/strategy/mixins/AlignedAllocation.hpp"
 #include "umpire/util/FixedMallocPool.hpp"
 #include "umpire/util/MemoryResourceTraits.hpp"
+
+#if defined(UMPIRE_V1_DELEGATE_TO_V2)
+#include "umpire/strategy/detail/v1_backed_memory.hpp"
+#include "umpire/strategy/quick_pool.hpp"
+#endif
 
 namespace umpire {
 
@@ -170,6 +176,27 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
   std::size_t m_releasable_bytes{0};
   std::size_t m_actual_highwatermark{0};
   bool m_is_destructing{false};
+
+#if defined(UMPIRE_V1_DELEGATE_TO_V2)
+  // Compile-time-only layout difference (matches the SizeLimiter/
+  // ThreadSafeAllocator precedent): when delegation is enabled, all pool
+  // mechanics forward to a v2 quick_pool<v1_backed_memory> instead of using
+  // the members above. They remain present (unused bookkeeping) so the
+  // class layout difference stays minimal.
+  //
+  // The v2 pool's heuristic type is `pool_coalesce_heuristic<quick_pool<...>>`
+  // (a std::function taking `const quick_pool<v1_backed_memory>&`), which is
+  // not the same type as v1's `PoolCoalesceHeuristic<QuickPool>` (a
+  // std::function taking `const QuickPool&`). m_should_coalesce above still
+  // stores the v1-shaped heuristic the caller supplied (needed so
+  // getters/percent_releasable-style factories keep behaving as documented,
+  // and so introspection methods below can be exercised standalone); a
+  // wrapper lambda closing over `this` adapts it to the v2 shape by calling
+  // `m_should_coalesce(*this)` and is passed explicitly to the v2 pool's
+  // constructor so the v2 default-arg heuristic never fires.
+  std::unique_ptr<detail::v1_backed_memory> m_v1_backed_parent;
+  std::unique_ptr<quick_pool<detail::v1_backed_memory>> m_delegate;
+#endif
 };
 
 std::ostream& operator<<(std::ostream& out, umpire::strategy::PoolCoalesceHeuristic<QuickPool>&);

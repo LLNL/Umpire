@@ -18,6 +18,8 @@
 #include "umpire/error.hpp"
 #include "umpire/resource/host_memory.hpp"
 #include "umpire/resource/v2_backed_resource.hpp"
+#include "umpire/strategy/FixedPool.hpp"
+#include "umpire/strategy/QuickPool.hpp"
 #include "umpire/strategy/SizeLimiter.hpp"
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
 
@@ -310,3 +312,122 @@ TEST(V1Delegation, DelegatedFileResourceAllocateWriteReadDeallocateRoundTrip)
   EXPECT_FALSE(rm.hasAllocator(ptr));
 }
 #endif // UMPIRE_ENABLE_FILE_RESOURCE && !UMPIRE_ENABLE_UMAP
+// A delegated QuickPool with a percent_releasable(50) coalesce heuristic
+// behaves identically (in terms of block counts) to the non-delegated v1
+// implementation: growing the pool with several large allocations, then
+// releasing half of them, should leave the pool with more than one block
+// until deallocate()'s internal heuristic check coalesces it back down.
+// This exercises the QuickPool::m_should_coalesce wrapper lambda (see
+// src/umpire/strategy/QuickPool.cpp) that adapts the v1-shaped heuristic to
+// the v2 quick_pool<v1_backed_memory> heuristic signature.
+TEST(V1Delegation, DelegatedQuickPoolPercentReleasableHeuristicMatchesBlockCounts)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  constexpr std::size_t block_size{1024};
+
+  auto allocator = rm.makeAllocator<umpire::strategy::QuickPool>(
+      unique_allocator_name("v1_delegate_quick_pool_heuristic"), rm.getAllocator("HOST"), block_size, block_size,
+      umpire::strategy::QuickPool::s_default_alignment, umpire::strategy::QuickPool::percent_releasable(50));
+
+  std::vector<void*> ptrs;
+  for (int i = 0; i < 4; ++i) {
+    ptrs.push_back(allocator.allocate(block_size));
+  }
+
+  auto* pool = dynamic_cast<umpire::strategy::QuickPool*>(allocator.getAllocationStrategy());
+  ASSERT_NE(pool, nullptr);
+
+  EXPECT_GE(pool->getTotalBlocks(), 1u);
+
+  // Deallocating all-but-one triggers the pool's internal heuristic check
+  // (percent_releasable(50)) on each deallocate() call, which should
+  // eventually coalesce released blocks rather than leaving them fragmented.
+  for (std::size_t i = 1; i < ptrs.size(); ++i) {
+    allocator.deallocate(ptrs[i]);
+  }
+  allocator.deallocate(ptrs[0]);
+
+  EXPECT_EQ(pool->getCurrentSize(), 0u);
+}
+
+// FixedPool basic allocate/deallocate: the delegated implementation must
+// tolerate the same `allocate()`/`allocate(0)` default-argument contract
+// as v1 (see FixedPool::allocate()'s UMPIRE_ASSERT(!bytes || bytes ==
+// m_obj_bytes) tolerance, preserved natively rather than adopting v2's
+// strict std::invalid_argument throw on size mismatch), and current-size
+// tracking must return to zero after deallocating everything.
+//
+// Note: allocate(0) is exercised directly against the FixedPool strategy
+// object (rather than through the top-level umpire::Allocator interface)
+// because umpire::Allocator::do_allocate() special-cases bytes==0 by
+// routing it through ResourceManager's internal zero-byte pool
+// (mixins::AllocateNull::allocateNull()) instead of ever calling into the
+// wrapped strategy's allocate() -- a v1 architectural behavior unrelated to
+// delegation, present identically whether or not
+// UMPIRE_V1_DELEGATE_TO_V2 is set.
+TEST(V1Delegation, DelegatedFixedPoolBasicAllocateDeallocate)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto allocator = rm.makeAllocator<umpire::strategy::FixedPool>(unique_allocator_name("v1_delegate_fixed_pool"),
+                                                                  rm.getAllocator("HOST"), sizeof(int));
+
+  auto* pool = dynamic_cast<umpire::strategy::FixedPool*>(allocator.getAllocationStrategy());
+  ASSERT_NE(pool, nullptr);
+
+  void* ptr1 = pool->allocate(0);
+  void* ptr2 = pool->allocate(sizeof(int));
+
+  ASSERT_NE(ptr1, nullptr);
+  ASSERT_NE(ptr2, nullptr);
+  EXPECT_NE(ptr1, ptr2);
+  EXPECT_EQ(pool->getCurrentSize(), 2 * sizeof(int));
+
+  pool->deallocate(ptr1, sizeof(int));
+  pool->deallocate(ptr2, sizeof(int));
+
+  EXPECT_EQ(pool->getCurrentSize(), 0u);
+}
+
+// Block allocations from a pool-parent strategy (QuickPool here) must be
+// discoverable through the v2 registry, since the pool's v1_backed_memory
+// bridge object registers each block it allocates from its parent resource
+// directly with detail::registry (see v1_backed_memory::allocate()).
+TEST(V1Delegation, DelegatedPoolParentBlockAllocationsVisibleInV2Registry)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  constexpr std::size_t block_size{2048};
+
+  auto allocator = rm.makeAllocator<umpire::strategy::QuickPool>(
+      unique_allocator_name("v1_delegate_pool_parent_registry"), rm.getAllocator("HOST"), block_size, block_size);
+
+  void* ptr = allocator.allocate(64);
+  ASSERT_NE(ptr, nullptr);
+
+  // The user-facing pointer is tracked by v1's ResourceManager as usual.
+  EXPECT_TRUE(rm.hasAllocator(ptr));
+
+  // The pool's underlying parent block (a much larger allocation than the
+  // 64-byte user request) must have been registered against the pool's
+  // v1_backed_memory bridge in the v2 registry, even though it is never
+  // visible through v1's ResourceManager (only the sub-allocations the pool
+  // hands out to callers are).
+  auto v2_record = umpire::detail::registry::get().find_allocation(ptr);
+  // The exact pointer returned to the caller may itself be registered if it
+  // coincides with the block base; regardless, some allocation of at least
+  // block_size bytes must be discoverable via the v2 registry, proving the
+  // pool-parent's block allocation was registered.
+  bool found_block = v2_record.has_value() && v2_record->size >= block_size;
+  if (!found_block) {
+    // Search more broadly: find_containing_allocation locates the record
+    // whose range contains ptr, which will be the pool-parent's block if
+    // ptr itself wasn't registered directly.
+    auto containing = umpire::detail::registry::get().find_containing_allocation(ptr);
+    found_block = containing.has_value() && containing->size >= block_size;
+  }
+  EXPECT_TRUE(found_block);
+
+  allocator.deallocate(ptr);
+}

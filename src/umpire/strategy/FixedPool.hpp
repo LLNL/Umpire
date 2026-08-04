@@ -8,10 +8,17 @@
 #define UMPIRE_FixedPool_HPP
 
 #include <cstddef>
+#include <memory>
 #include <vector>
 
 #include "umpire/Allocator.hpp"
+#include "umpire/config.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
+
+#if defined(UMPIRE_V1_DELEGATE_TO_V2)
+#include "umpire/strategy/detail/v1_backed_memory.hpp"
+#include "umpire/strategy/fixed_pool.hpp"
+#endif
 
 namespace umpire {
 namespace strategy {
@@ -86,6 +93,31 @@ class FixedPool : public AllocationStrategy {
   // NOTE: struct Pool lacks a non-trivial destructor. If m_pool is
   // ever reduced in size, then .data and .avail have to be manually
   // deallocated to avoid a memory leak.
+
+#if defined(UMPIRE_V1_DELEGATE_TO_V2)
+  // Compile-time-only layout difference (see QuickPool.hpp for the shared
+  // rationale). The members above remain constructed (unused bookkeeping:
+  // m_pool stays empty since newPool()/allocInPool() are never called in
+  // this branch) so the class layout difference stays minimal.
+  //
+  // v2's fixed_pool<Memory> has no equivalent to v1's getHighWatermark()
+  // (its public surface only exposes object/pool/free/allocated counts), so
+  // the high watermark is tracked natively here, updated after each
+  // successful delegated allocate() the same way v1's allocate() updates
+  // m_highwatermark (max of running current-bytes).
+  //
+  // v2's fixed_pool<Memory> also has no equivalent of v1's
+  // getActualSize()'s bitmap-overhead accounting (v1's m_actual_bytes sums
+  // a `m_avail_bytes` malloc'd availability-bitmap per pool in addition to
+  // object storage; v2 has no such bitmap since it uses a std::vector free
+  // list instead). getActualSize() is therefore computed natively from
+  // m_delegate's pool/object counts using v1's exact formula, rather than
+  // delegated directly, so it keeps returning a value reflecting the
+  // (documented) v1-specific bitmap overhead.
+  std::unique_ptr<detail::v1_backed_memory> m_v1_backed_parent;
+  std::unique_ptr<fixed_pool<detail::v1_backed_memory>> m_delegate;
+  std::size_t m_native_highwatermark{0};
+#endif
 };
 
 } // end namespace strategy

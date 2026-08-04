@@ -14,10 +14,30 @@
 
 #include <cstddef>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 namespace umpire {
 namespace strategy {
+
+namespace detail {
+
+// SFINAE helper mirroring strategy::detail::thread_safe_platform (see
+// thread_safe.hpp): tolerates a `Memory` type without a `platform` member
+// alias (e.g. a runtime-typed bridge such as
+// strategy::detail::v1_backed_memory), defaulting to `void` instead of a
+// hard compile error.
+template <typename Memory, typename = void>
+struct fixed_pool_platform {
+  using type = void;
+};
+
+template <typename Memory>
+struct fixed_pool_platform<Memory, std::void_t<typename Memory::platform>> {
+  using type = typename Memory::platform;
+};
+
+} // namespace detail
 
 //! @brief Fixed-size object pool for high-frequency same-size allocations
 //!
@@ -61,8 +81,8 @@ namespace strategy {
 template<typename Memory>
 class fixed_pool : public allocation_strategy {
 public:
-  //! @brief Platform type propagated from wrapped memory source
-  using platform = typename Memory::platform;
+  //! @brief Platform type propagated from wrapped memory source when available
+  using platform = typename detail::fixed_pool_platform<Memory>::type;
 
 private:
   std::size_t object_size_;         //!< Size of each object in bytes
@@ -283,6 +303,30 @@ public:
   //! @brief Get the number of pool blocks allocated
   //! @return Number of pools
   std::size_t get_pool_count() const { return pools_.size(); }
+
+  //! @brief Check whether a pointer falls within any currently allocated
+  //! pool block's address range.
+  //!
+  //! Mirrors the same address-range partitioning `release()` uses
+  //! internally (see `pool_index_of` above), exposed here so that callers
+  //! wrapping this pool (e.g. a v1-compatibility bridge that needs to
+  //! answer "does this pointer belong to me") can identify pool membership
+  //! without needing direct access to the private `pools_` list.
+  //!
+  //! @param ptr Pointer to test
+  //! @return true if ptr lies within [pool_base, pool_base + pool_bytes)
+  //! for any currently allocated pool block
+  bool owns(void* ptr) const {
+    const char* addr = static_cast<const char*>(ptr);
+    const std::size_t pool_bytes = object_size_ * objects_per_pool_;
+    for (void* pool : pools_) {
+      const char* base = static_cast<const char*>(pool);
+      if (addr >= base && static_cast<std::size_t>(addr - base) < pool_bytes) {
+        return true;
+      }
+    }
+    return false;
+  }
 };
 
 } // namespace strategy
