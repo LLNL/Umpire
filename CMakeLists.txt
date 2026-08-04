@@ -203,7 +203,7 @@ install(
   NAMESPACE umpire::
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/umpire)
 
-if (UMPIRE_ENABLE_ALIAS_TARGETS)
+if (UMPIRE_ENABLE_LEGACY_CMAKE_TARGETS)
   install(
     EXPORT umpire-targets
     FILE umpire-non-namespaced-targets.cmake
