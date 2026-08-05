@@ -64,7 +64,6 @@ include("${CMAKE_CURRENT_LIST_DIR}/umpire-targets.cmake")
 if (@UMPIRE_ENABLE_LEGACY_CMAKE_TARGETS@)
   add_library(umpire INTERFACE)
   target_link_libraries(umpire INTERFACE umpire::umpire)
-
   set_target_properties(umpire PROPERTIES
     DEPRECATION "Target 'umpire' is deprecated. Please use 'umpire::umpire' instead. To disable this warning and backwards-compatible targets, set UMPIRE_ENABLE_LEGACY_CMAKE_TARGETS=OFF when configuring Umpire.")
 
