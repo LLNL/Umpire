@@ -12,6 +12,7 @@
 #include <list>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -76,6 +77,14 @@ class ResourceManager {
    * \brief Get the Allocator with the given name.
    */
   Allocator getAllocator(const std::string& name);
+
+  /*!
+   * \brief Try to get the Allocator with the given name.
+   *
+   * This function returns an empty optional if the allocator does not exist
+   * or cannot be created, instead of throwing an exception.
+   */
+  std::optional<Allocator> tryGetAllocator(const std::string& name);
 
   Allocator getAllocator(const char* name);
 
@@ -170,6 +179,48 @@ class ResourceManager {
    * \param allocator Allocator to deregister.
    */
   void removeAlias(const std::string& name, Allocator allocator);
+
+  /*!
+   * \brief Destroy an allocator by name.
+   *
+   * Removes the allocator from the ResourceManager and frees associated
+   * resources. Core resource allocators (HOST, DEVICE, etc.) cannot be
+   * destroyed.
+   *
+   * Behavior is controlled by the UMPIRE_STRICT_DESTRUCTION environment variable:
+   *
+   * If UMPIRE_STRICT_DESTRUCTION is set (to any value):
+   * - Throws error if allocator has active allocations and free_allocations=false
+   * - Throws error if allocator is a parent of other allocators
+   *
+   * If UMPIRE_STRICT_DESTRUCTION is not set (default):
+   * - Logs warning but proceeds if allocator has active allocations
+   * - Logs warning but proceeds if allocator is a parent
+   *
+   * Example:
+   *   export UMPIRE_STRICT_DESTRUCTION=1  // Enable strict mode
+   *   unset UMPIRE_STRICT_DESTRUCTION     // Disable strict mode (default)
+   *
+   * \param name Name of the allocator to destroy
+   * \param free_allocations If true, deallocates all active allocations
+   *                         before destroying. Defaults to false.
+   *
+   * \throw runtime_error if allocator is a core resource or not found
+   */
+  void destroyAllocator(const std::string& name, bool free_allocations = false);
+
+  /*!
+   * \brief Destroy an allocator by ID.
+   *
+   * See destroyAllocator(const std::string&, bool) for detailed behavior.
+   *
+   * \param id ID of the allocator to destroy
+   * \param free_allocations If true, deallocates all active allocations
+   *                         before destroying. Defaults to false.
+   *
+   * \throw runtime_error if allocator is a core resource or not found
+   */
+  void destroyAllocator(int id, bool free_allocations = false);
 
   /*!
    * \brief Get the Allocator used to allocate ptr.
@@ -357,6 +408,19 @@ class ResourceManager {
   strategy::AllocationStrategy* findAllocatorForPointer(void* ptr);
   strategy::AllocationStrategy* findAllocatorForId(int id);
   strategy::AllocationStrategy* getAllocationStrategy(const std::string& name);
+
+  bool isBuiltinAllocator(strategy::AllocationStrategy* strategy);
+
+  /*!
+   * \brief Check if strict destruction mode is enabled via environment variable.
+   *
+   * Checks the UMPIRE_STRICT_DESTRUCTION environment variable. If set to any
+   * value, strict mode is enabled (errors thrown). If unset, non-strict mode
+   * is used (warnings logged). The check is cached on first call.
+   *
+   * \return true if UMPIRE_STRICT_DESTRUCTION is set, false otherwise
+   */
+  bool isStrictDestructionMode() const noexcept;
 
   int getNextId() noexcept;
 

@@ -310,6 +310,7 @@ if (UMPIRE_ENABLE_API_V2)
 endif ()
 
 add_subdirectory(alloc)
+add_subdirectory(event)
 add_subdirectory(op)
 add_subdirectory(resource)
 add_subdirectory(util)

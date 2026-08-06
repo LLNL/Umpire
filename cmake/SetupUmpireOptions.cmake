@@ -43,6 +43,7 @@ option(UMPIRE_ENABLE_SQLITE_EXPERIMENTAL "Build with sqlite event integration (e
 option(UMPIRE_DISABLE_ALLOCATIONMAP_DEBUG "Disable verbose output from AllocationMap during debug builds" Off)
 option(UMPIRE_RM_USE_NEW_OPS "Enable new template-based memory operations" On)
 option(UMPIRE_V1_DELEGATE_TO_V2 "Delegate select v1 strategy::AllocationStrategy implementations to API v2 umpire::memory equivalents" Off)
+option(UMPIRE_ENABLE_LEGACY_CMAKE_TARGETS "Enable legacy non-namespaced targets (e.g., umpire) for backwards compatibility" On)
 set(UMPIRE_FMT_TARGET fmt::fmt-header-only CACHE STRING "Name of fmt target to use")
 
 if (UMPIRE_ENABLE_INACCESSIBILITY_TESTS)

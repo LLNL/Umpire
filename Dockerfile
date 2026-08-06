@@ -53,7 +53,7 @@ RUN cmake -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DCMAKE_CXX_COMPILER=clang++ -DC
     make -j 2 api_v2_registry_threading_tests api_v2_memory_threading_tests api_v2_thread_safe_stress_tests thread_sanitizer_tests && \
     ctest -R "api_v2_registry_threading_tests|api_v2_memory_threading_tests|api_v2_thread_safe_stress_tests|thread_sanitizer_tests" --output-on-failure
 
-FROM ghcr.io/llnl/radiuss:ubuntu-22.04-cuda-12-3 AS cuda
+FROM ghcr.io/llnl/radiuss:cuda-12-9-ubuntu-24.04 AS cuda
 ENV GTEST_COLOR=1
 COPY . /home/umpire/workspace
 WORKDIR /home/umpire/workspace/build
@@ -93,29 +93,27 @@ WORKDIR /home/umpire/workspace/build
 RUN cmake -DENABLE_WARNINGS_AS_ERRORS=Off -DCMAKE_CXX_COMPILER=/opt/rocm-6.4.3/bin/amdclang++ -DROCM_PATH=/opt/rocm-6.4.3 -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DENABLE_HIP=On .. && \
     make -j 16 VERBOSE=1
 
-FROM ghcr.io/llnl/radiuss:intel-2024.0-ubuntu-20.04 AS sycl
+FROM ghcr.io/llnl/radiuss:ubuntu-24.04-intel-2024.2 AS sycl
 ENV GTEST_COLOR=1
 COPY . /home/umpire/workspace
 WORKDIR /home/umpire/workspace/build
-RUN /bin/bash -c "source /opt/intel/oneapi/setvars.sh 2>&1 > /dev/null && \
-    cmake -DCMAKE_CXX_COMPILER=icpx -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_FLAGS=-fsycl -DENABLE_WARNINGS_AS_ERRORS=Off -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DUMPIRE_ENABLE_SYCL=On .. && \
+RUN /bin/bash -c "source /opt/intel/oneapi/setvars.sh 2>&1 && export PATH=/opt/intel/oneapi/compiler/2024.2/bin/:\$PATH && export LD_LIBRARY_PATH=/opt/intel/oneapi/2024.2/lib:\$LD_LIBRARY_PATH && cmake -DCMAKE_CXX_COMPILER=icpx -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_FLAGS=\"-fsycl -fsycl-unnamed-lambda\" -DENABLE_WARNINGS_AS_ERRORS=Off -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DUMPIRE_ENABLE_SYCL=On -DBLT_CXX_STD=c++20 .. && \
     make -j 16"
 
-FROM ghcr.io/llnl/radiuss:intel-2024.0-ubuntu-20.04 AS api_v2_sycl_validate
+FROM ghcr.io/llnl/radiuss:ubuntu-24.04-intel-2024.2 AS api_v2_sycl_validate
 ENV GTEST_COLOR=1
 COPY . /home/umpire/workspace
 WORKDIR /home/umpire/workspace/build
-RUN /bin/bash -c "source /opt/intel/oneapi/setvars.sh 2>&1 > /dev/null && \
-    cmake -DCMAKE_CXX_COMPILER=icpx -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_FLAGS=-fsycl \
+RUN /bin/bash -c "source /opt/intel/oneapi/setvars.sh 2>&1 && export PATH=/opt/intel/oneapi/compiler/2024.2/bin/:\$PATH && export LD_LIBRARY_PATH=/opt/intel/oneapi/2024.2/lib:\$LD_LIBRARY_PATH && \
+    cmake -DCMAKE_CXX_COMPILER=icpx -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_FLAGS=\"-fsycl -fsycl-unnamed-lambda\" \
     -DENABLE_WARNINGS_AS_ERRORS=Off -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DUMPIRE_ENABLE_TESTS=On \
-    -DUMPIRE_ENABLE_SYCL=On .. && \
+    -DUMPIRE_ENABLE_SYCL=On -DBLT_CXX_STD=c++20 .. && \
     make -j 16 api_v2_sycl_device_memory_tests api_v2_operations_tests"
 
-FROM ghcr.io/llnl/radiuss:intel-2024.0-ubuntu-20.04 AS intel
+FROM ghcr.io/llnl/radiuss:ubuntu-24.04-intel-2024.2 AS intel
 ENV GTEST_COLOR=1
 COPY . /home/umpire/workspace
 WORKDIR /home/umpire/workspace/build
-RUN /bin/bash -c "source /opt/intel/oneapi/setvars.sh 2>&1 > /dev/null && \
-    cmake -DCMAKE_CXX_COMPILER=icpx -DCMAKE_C_COMPILER=icx -DENABLE_WARNINGS_AS_ERRORS=Off -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On .. && \
-    make -j 16 && \
+RUN /bin/bash -c "source /opt/intel/oneapi/setvars.sh 2>&1 && export PATH=/opt/intel/oneapi/compiler/2024.2/bin/:\$PATH && cmake -DCMAKE_CXX_COMPILER=icpx -DCMAKE_C_COMPILER=icx -DENABLE_WARNINGS_AS_ERRORS=Off -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DBLT_CXX_STD=c++20 .. && \
+    make -j 16 &&\
     ctest -T test --output-on-failure"

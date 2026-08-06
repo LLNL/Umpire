@@ -60,8 +60,8 @@ variables:
 stages:
   - prerequisites           # Required: machine availability checks
   - build-and-test          # Required: build and test jobs
-  - multi-project           #TODO unused so far
-  - radiuss-spack-testing   #TODO unused so far
+  - multi-project           # Manual: trigger testing in dependent project (e.g., CHAI)
+  - radiuss-spack-testing   # TODO unused so far
 
 ###############################################################################
 # INCLUDES
@@ -73,11 +73,20 @@ include:
     file: 'id_tokens.yml'
 
   # Base pipeline templates and utilities
-  - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/base-pipeline@v2025.12.0
+  - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/base-pipeline@2026.6.0
     inputs:
       github_project_name: $GITHUB_PROJECT_NAME
       github_project_org: $GITHUB_PROJECT_ORG
-      github_token: $GITHUB_TOKEN
+      github_token: $RSCI_GITHUB_STATUS_TOKEN
+
+  # Job override checker
+  - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/utility-job-override-check@woptim/ci-job-override-check
+    inputs:
+      submodule_path: "scripts/radiuss-spack-configs"
+      shared_jobs_path: "gitlab/radiuss-jobs"
+      local_jobs_path: ".gitlab/jobs"
+      machine_files: "dane.yml matrix.yml corona.yml tioga.yml tuolumne.yml"
+      ref_branch: "develop"
 
   # Local custom variables (used for component inputs and forwarded to child pipelines)
   - local: '.gitlab/custom-variables.yml'
@@ -117,13 +126,15 @@ generate-job-lists:
 # DANE
 dane-up-check:
   extends: [.dane, .machine-check]
+  variables:
+    ASSOCIATED_CHILD_PIPELINE: "dane-build-and-test"
 
 dane-build-and-test:
   extends: [.dane, .build-and-test]
   needs: [dane-up-check, generate-job-lists]
   trigger:
     include:
-      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/dane-pipeline@v2025.12.0
+      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/dane-pipeline@2026.6.0
         inputs:
           job_cmd: $JOB_CMD
           shared_alloc: $DANE_SHARED_ALLOC
@@ -137,13 +148,15 @@ dane-build-and-test:
 # MATRIX
 matrix-up-check:
   extends: [.matrix, .machine-check]
+  variables:
+    ASSOCIATED_CHILD_PIPELINE: "matrix-build-and-test"
 
 matrix-build-and-test:
   extends: [.matrix, .build-and-test]
   needs: [matrix-up-check, generate-job-lists]
   trigger:
     include:
-      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/matrix-pipeline@v2025.12.0
+      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/matrix-pipeline@2026.6.0
         inputs:
           job_cmd: $JOB_CMD
           shared_alloc: $MATRIX_SHARED_ALLOC
@@ -157,13 +170,15 @@ matrix-build-and-test:
 # CORONA
 corona-up-check:
   extends: [.corona, .machine-check]
+  variables:
+    ASSOCIATED_CHILD_PIPELINE: "corona-build-and-test"
 
 corona-build-and-test:
   extends: [.corona, .build-and-test]
   needs: [corona-up-check, generate-job-lists]
   trigger:
     include:
-      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/corona-pipeline@v2025.12.0
+      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/corona-pipeline@2026.6.0
         inputs:
           job_cmd: $JOB_CMD
           shared_alloc: $CORONA_SHARED_ALLOC
@@ -177,13 +192,15 @@ corona-build-and-test:
 # TIOGA
 tioga-up-check:
   extends: [.tioga, .machine-check]
+  variables:
+    ASSOCIATED_CHILD_PIPELINE: "tioga-build-and-test"
 
 tioga-build-and-test:
   extends: [.tioga, .build-and-test]
   needs: [tioga-up-check, generate-job-lists]
   trigger:
     include:
-      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/tioga-pipeline@v2025.12.0
+      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/tioga-pipeline@2026.6.0
         inputs:
           job_cmd: $JOB_CMD
           shared_alloc: $TIOGA_SHARED_ALLOC
@@ -197,13 +214,15 @@ tioga-build-and-test:
 # TUOLUMNE
 tuolumne-up-check:
   extends: [.tuolumne, .machine-check]
+  variables:
+    ASSOCIATED_CHILD_PIPELINE: "tuolumne-build-and-test"
 
 tuolumne-build-and-test:
   extends: [.tuolumne, .build-and-test]
   needs: [tuolumne-up-check, generate-job-lists]
   trigger:
     include:
-      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/tuolumne-pipeline@v2025.12.0
+      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/tuolumne-pipeline@2026.6.0
         inputs:
           job_cmd: $JOB_CMD
           shared_alloc: $TUOLUMNE_SHARED_ALLOC
@@ -214,16 +233,18 @@ tuolumne-build-and-test:
       - artifact: 'tuolumne-jobs.yml'
         job: 'generate-job-lists'
 
-## If testing develop branch, trigger CHAI pipeline with this version of Umpire.
-## TODO: Once Spack allows to clone a specific commit on demand, then point to
-## the exact commit. This will prevent from sticking to a branch (here develop).
-# trigger-chai:
-#  stage: multi-project
-#  rules:
-#    - if: '$CI_COMMIT_BRANCH == "develop" || $MULTI_PROJECT == "ON"' #run only if ...
-#  variables:
-#    UPDATE_UMPIRE: develop
-#  trigger:
-#    project: radiuss/chai
-#    branch: develop
-#    strategy: depend
+# MULTI-PROJECT PIPELINE
+trigger-chai:
+  stage: multi-project
+  rules:
+    - if: $MULTI_PROJECT != "OFF"
+      when: manual
+    - when: never
+  allow_failure: true
+  inherit:
+    variables: false
+  variables:
+    UPDATE_UMPIRE: ${CI_COMMIT_SHA}
+  trigger:
+    project: radiuss/multi-project/chai-trigger
+    branch: develop
