@@ -2,7 +2,7 @@
 
 ## Changes Impacting Builds
 
-- Creating an INTERFACE library, "umpire", linked to "umpire::umpire" to resolve exporting target errors from tpl's.
+- Resolved errors related to exporting the legacy umpire CMake target.
 
 # v2026.07.0
 
