@@ -1,3 +1,9 @@
+# v2026.07.1
+
+## Changes Impacting Builds
+
+- Creating an INTERFACE library, "umpire", linked to "umpire::umpire" to resolve exporting target errors from tpl's.
+
 # v2026.07.0
 
 ## Improvements
