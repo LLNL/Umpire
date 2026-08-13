@@ -52,6 +52,6 @@ rocmcc_6.4.3_hip_deviceconst:
 
 rocmcc_7_2_1_hip_memleak:
   variables:
-    SPEC: "~shared ~fortran +asan +sanitizer_tests +tools +rocm tests=basic amdgpu_target=gfx90a:xnack+ cxxflags==\"-fsanitize=address\" %rocmcc@7.2.1 ^hip@7.2.1"
+    SPEC: "~shared +asan +sanitizer_tests +tools +rocm tests=basic amdgpu_target=gfx90a:xnack+ cxxflags==\"-fsanitize=address\" %rocmcc@7.2.1 ^hip@7.2.1"
     ASAN_OPTIONS: "detect_leaks=1"
   extends: .job_on_tioga
