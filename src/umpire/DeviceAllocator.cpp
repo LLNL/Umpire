@@ -11,6 +11,7 @@
 
 #include "umpire/ResourceManager.hpp"
 #include "umpire/device_allocator_helper.hpp"
+#include "umpire/op.hpp"
 #include "umpire/resource/MemoryResourceTypes.hpp"
 #include "umpire/util/Macros.hpp"
 

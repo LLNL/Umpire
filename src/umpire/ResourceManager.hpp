@@ -282,7 +282,7 @@ class ResourceManager {
    *          it does not auto-detect the size from the allocation the way
    *          this method does when size == 0.
    */
-  [[deprecated("Use umpire::copy(src, dst, size) instead — NOTE: argument order is REVERSED (src, dst) vs this method's (dst, src)")]]
+  [[deprecated("Use umpire::copy(src, dst, size) instead -- NOTE: argument order is REVERSED (src, dst) vs this method's (dst, src)")]]
   void copy(void* dst_ptr, void* src_ptr, std::size_t size = 0);
 
   /*!
@@ -298,7 +298,7 @@ class ResourceManager {
    *          explicit, non-zero size -- it does not auto-detect the size
    *          from the allocation the way this method does when size == 0.
    */
-  [[deprecated("Use umpire::copy(src, dst, size, ctx) instead — NOTE: argument order is REVERSED (src, dst) vs this method's (dst, src)")]]
+  [[deprecated("Use umpire::copy(src, dst, size, ctx) instead -- NOTE: argument order is REVERSED (src, dst) vs this method's (dst, src)")]]
   camp::resources::EventProxy<camp::resources::Resource> copy(void* dst_ptr, void* src_ptr,
                                                               camp::resources::Resource& ctx, std::size_t size = 0);
 
