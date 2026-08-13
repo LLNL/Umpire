@@ -5,7 +5,7 @@ Repo:
 
   check_name: gitlab-ci
 
-  check_types: [child-pipelines, jobs]
+  check_types: [pipeline, child-pipelines]
 
   delete_closed: true
 
