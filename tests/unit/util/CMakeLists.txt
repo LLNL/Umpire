@@ -73,6 +73,15 @@ blt_add_test(
   NAME node_memory_tests
   COMMAND node_memory_tests)
 
+blt_add_executable(
+  NAME fixed_malloc_pool_tests
+  SOURCES fixed_malloc_pool_tests.cpp
+  DEPENDS_ON umpire gtest)
+
+blt_add_test(
+  NAME fixed_malloc_pool_tests
+  COMMAND fixed_malloc_pool_tests)
+
 if (UMPIRE_ENABLE_LOGGING)
   blt_add_executable(
     NAME logger_tests
