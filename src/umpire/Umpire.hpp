@@ -220,6 +220,20 @@ MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm);
 void cleanup_cached_communicators();
 #endif
 
+#if defined(UMPIRE_ENABLE_MPI)
+/*!
+ * \brief Collective preflight check for socket-scoped MPI3 shared memory.
+ *
+ * All ranks in \p comm must call this function.
+ *
+ * \param comm MPI communicator to check.
+ * \param reason Failure reason when the check returns false.
+ *
+ * \return true when every rank in \p comm is bound to one socket.
+ */
+bool can_use_socket_scoped_mpi3_shared_memory(MPI_Comm comm, std::string& reason);
+#endif
+
 void register_external_allocation(void* ptr, util::AllocationRecord record);
 util::AllocationRecord deregister_external_allocation(void* ptr);
 
