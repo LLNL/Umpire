@@ -64,6 +64,25 @@ if (UMPIRE_ENABLE_SYCL)
    endif()
 endif()
 
+# BLT HIP executables may link CXX-built gtest archives, so ASAN needs to be a link flag too.
+if (UMPIRE_ENABLE_ASAN)
+  separate_arguments(_umpire_cxx_flags NATIVE_COMMAND "${CMAKE_CXX_FLAGS}")
+  foreach(_umpire_cxx_flag IN LISTS _umpire_cxx_flags)
+    if (_umpire_cxx_flag MATCHES "^-fsanitize=.*address")
+      foreach(_umpire_linker_flags_var IN ITEMS
+          CMAKE_EXE_LINKER_FLAGS
+          CMAKE_SHARED_LINKER_FLAGS
+          CMAKE_MODULE_LINKER_FLAGS)
+        string(FIND " ${${_umpire_linker_flags_var}} " " ${_umpire_cxx_flag} " _umpire_linker_flag_pos)
+        if (_umpire_linker_flag_pos EQUAL -1)
+          string(APPEND ${_umpire_linker_flags_var} " ${_umpire_cxx_flag}")
+          set(${_umpire_linker_flags_var} "${${_umpire_linker_flags_var}}" CACHE STRING "" FORCE)
+        endif()
+      endforeach()
+    endif()
+  endforeach()
+endif()
+
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "PGI")
   message(STATUS "Setting CMAKE_CXX_EXTENSIONS to ON for PGI Compiler")
   set( CMAKE_CXX_EXTENSIONS ON )
