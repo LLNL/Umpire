@@ -139,18 +139,19 @@ The following environment variables control Umpire's logging behavior:
 * ``UMPIRE_LOG_TO_CONSOLE``
 
   Controls whether log messages are written to the console (stderr) in addition
-  to the log file. Default is ``on`` for backward compatibility.
+  to the log file. Default is ``off``: log messages are written to the log
+  file only, matching the behavior of previous Umpire versions.
 
   Valid values (case-insensitive):
 
-  - ``1``, ``true``, ``on`` - Enable console output (default)
-  - ``0``, ``false``, ``off`` - Disable console output (file only)
+  - ``1``, ``true``, ``on`` - Enable console output
+  - ``0``, ``false``, ``off`` - Disable console output (file only, default)
 
-  Example to disable console output:
+  Example to enable console output:
 
   .. code-block:: bash
 
-      export UMPIRE_LOG_TO_CONSOLE=off
+      export UMPIRE_LOG_TO_CONSOLE=on
 
 * ``UMPIRE_LOG_ASYNC``
 
@@ -186,7 +187,11 @@ The following environment variables control Umpire's logging behavior:
 * ``UMPIRE_OUTPUT_DIR``
 
   Directory where log files will be written. Defaults to the current directory (``./``).
-  The directory must exist or be created before running the application.
+  If the directory does not exist, Umpire creates it; under MPI, only rank 0
+  creates the directory and all ranks synchronize before opening their log
+  files. When MPI is enabled but not yet initialized, Umpire cannot create the
+  directory and will report an error, so ensure the directory exists (or MPI
+  is initialized) before the first Umpire call.
 
   Example:
 
@@ -209,18 +214,18 @@ The following environment variables control Umpire's logging behavior:
 Example Logging Configurations
 -------------------------------
 
-**Basic debugging (console and file):**
+**Basic debugging (file only, the default):**
 
 .. code-block:: bash
 
     export UMPIRE_LOG_LEVEL=INFO
 
-**Production logging (file only, no console spam):**
+**Interactive debugging (messages also echoed to stderr):**
 
 .. code-block:: bash
 
-    export UMPIRE_LOG_LEVEL=ERROR
-    export UMPIRE_LOG_TO_CONSOLE=off
+    export UMPIRE_LOG_LEVEL=INFO
+    export UMPIRE_LOG_TO_CONSOLE=on
 
 **High-performance async logging:**
 
@@ -229,13 +234,11 @@ Example Logging Configurations
     export UMPIRE_LOG_LEVEL=DEBUG
     export UMPIRE_LOG_ASYNC=on
     export UMPIRE_LOG_QUEUE_SIZE=16384
-    export UMPIRE_LOG_TO_CONSOLE=off
 
 **Custom log location:**
 
 .. code-block:: bash
 
-    mkdir -p /scratch/logs
     export UMPIRE_LOG_LEVEL=INFO
     export UMPIRE_OUTPUT_DIR=/scratch/logs
     export UMPIRE_OUTPUT_BASENAME=umpire_run1

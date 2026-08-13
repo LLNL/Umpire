@@ -11,6 +11,11 @@
 #include <fstream>
 #include <string>
 
+#include "umpire/config.hpp"
+#include "umpire/util/MPI.hpp"
+#include "umpire/util/Macros.hpp"
+#include "umpire/util/error.hpp"
+
 #if defined(UMPIRE_ENABLE_FILESYSTEM)
 #include <filesystem>
 #else
@@ -23,6 +28,7 @@
 #else
 #include <process.h>
 #define getpid _getpid
+#include <direct.h>
 #endif
 
 namespace umpire {
@@ -64,6 +70,45 @@ bool directory_exists(const std::string& path)
 #endif
   }
 #endif
+}
+
+void make_io_dir(const std::string& io_dir)
+{
+  if (directory_exists(io_dir)) {
+    return;
+  }
+
+  if (MPI::isInitialized()) {
+    if (MPI::getRank() == 0) {
+#if defined(UMPIRE_ENABLE_FILESYSTEM)
+      std::filesystem::path io_dir_path{io_dir};
+
+      if (!std::filesystem::exists(io_dir_path)) {
+        std::filesystem::create_directories(io_dir_path);
+      }
+#else
+      struct stat info;
+      if (stat(io_dir.c_str(), &info)) {
+#ifndef WIN32
+        if (mkdir(io_dir.c_str(), S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH)) {
+          UMPIRE_ERROR(runtime_error, fmt::format("mkdir({}) failed", io_dir));
+        }
+#else
+        if (_mkdir(io_dir.c_str())) {
+          UMPIRE_ERROR(runtime_error, fmt::format("mkdir( \"{}\" ) failed", io_dir));
+        }
+#endif
+      } else if (!(S_ISDIR(info.st_mode))) {
+        UMPIRE_ERROR(runtime_error, fmt::format("{} exists and is not a directory", io_dir));
+      }
+#endif
+    }
+    MPI::sync();
+  } else {
+    UMPIRE_ERROR(runtime_error,
+                 "Cannot create output directory before MPI has been initialized. Please unset UMPIRE_OUTPUT_DIR in "
+                 "your environment");
+  }
 }
 
 const std::string& get_io_output_dir()

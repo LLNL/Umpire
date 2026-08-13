@@ -22,15 +22,16 @@
 
 #include "umpire/util/Logger.hpp"
 
-#define UMPIRE_LOG(lvl, msg)                                                    \
-  do {                                                                          \
-    if (umpire::util::Logger::shouldLog(umpire::util::message::lvl)) {         \
-      std::ostringstream umpire_log_stream;                                    \
-      umpire_log_stream << " " << __func__ << " " << msg;                      \
-      umpire::util::Logger::log(umpire::util::message::lvl,                    \
-                                umpire_log_stream.str(),                        \
-                                std::string(__FILE__), __LINE__);               \
-    }                                                                           \
+// __FILE__ is passed as a const char* (static storage duration) rather than
+// a std::string: asynchronous logging reads the filename from a background
+// thread after this macro has returned.
+#define UMPIRE_LOG(lvl, msg)                                                                              \
+  do {                                                                                                    \
+    if (umpire::util::Logger::shouldLog(umpire::util::message::lvl)) {                                    \
+      std::ostringstream umpire_log_stream;                                                               \
+      umpire_log_stream << " " << __func__ << " " << msg;                                                 \
+      umpire::util::Logger::log(umpire::util::message::lvl, umpire_log_stream.str(), __FILE__, __LINE__); \
+    }                                                                                                     \
   } while (0)
 
 #else

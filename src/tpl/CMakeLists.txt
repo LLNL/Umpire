@@ -155,24 +155,23 @@ if (NOT TARGET ${UMPIRE_FMT_TARGET})
       set(UMPIRE_CONFIG_fmt_DIR ${CMAKE_INSTALL_PREFIX} CACHE PATH "")
       set(FMT_INSTALL ON)
       set(FMT_SYSTEM_HEADERS ON)
-      # Force header-only mode to avoid linking issues on Windows with static libraries
-      set(FMT_HEADER_ONLY ON CACHE BOOL "Use header-only fmt")
       add_subdirectory(umpire/fmt)
     endif ()
   endif ()
 endif ()
 
 ##############################################################################
-# spdlog
+# spdlog (only required when logging is enabled)
 ##############################################################################
-if (NOT TARGET spdlog::spdlog)
+if (UMPIRE_ENABLE_LOGGING AND NOT TARGET spdlog::spdlog)
   # Try to find external spdlog installation
   if (DEFINED spdlog_DIR)
     find_package(spdlog REQUIRED
       NO_DEFAULT_PATH
       PATHS
         ${spdlog_DIR}
-        ${spdlog_DIR}/lib/cmake/spdlog)
+        ${spdlog_DIR}/lib/cmake/spdlog
+        ${spdlog_DIR}/lib64/cmake/spdlog)
 
     set_target_properties(spdlog::spdlog PROPERTIES IMPORTED_GLOBAL TRUE)
     blt_convert_to_system_includes(TARGET spdlog::spdlog)
@@ -208,8 +207,8 @@ if (NOT TARGET spdlog::spdlog)
             endif()
           endif()
         else ()
-          # Submodule fmt case - point to build directory where fmt exports its config
-          # We built fmt as header-only (FMT_HEADER_ONLY=ON above), so use SPDLOG_FMT_EXTERNAL_HO
+          # Submodule fmt case - point to build directory where fmt exports its config.
+          # Umpire uses the fmt::fmt-header-only target from the submodule, so use SPDLOG_FMT_EXTERNAL_HO
           message(STATUS "Using Umpire's bundled fmt submodule (header-only mode)")
           set(SPDLOG_FMT_EXTERNAL_HO ON CACHE BOOL "Use external fmt header-only library")
           set(SPDLOG_FMT_EXTERNAL OFF CACHE BOOL "Use external fmt library")

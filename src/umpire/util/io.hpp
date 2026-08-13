@@ -30,6 +30,18 @@ bool file_exists(const std::string& file);
 bool directory_exists(const std::string& file);
 
 /*!
+ * \brief Create the given output directory if it does not exist.
+ *
+ * Under MPI, only rank 0 creates the directory and all ranks synchronize
+ * before returning, so shared-filesystem creation is coordinated.
+ *
+ * \throw umpire::runtime_error if the directory cannot be created, if the
+ *        path exists but is not a directory, or if called before MPI has
+ *        been initialized.
+ */
+void make_io_dir(const std::string& io_dir);
+
+/*!
  * \brief Get the output directory from UMPIRE_OUTPUT_DIR environment variable
  * Returns "./" if not set
  */
