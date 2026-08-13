@@ -102,9 +102,21 @@ inline cudaStream_t get_stream(camp::resources::Resource& resource)
 template <typename T>
 inline void advise(T* ptr, std::size_t count, int device, cudaMemoryAdvise advice)
 {
+  // device may be cudaCpuDeviceId (-1, e.g. preferred-location-host); that is
+  // not a valid argument to cudaGetDeviceProperties, so check managed-memory
+  // support against the current device instead (mirrors the prefetch path).
+  int gpu = device;
+  if (device == cudaCpuDeviceId) {
+    cudaError_t get_dev_err = cudaGetDevice(&gpu);
+    if (get_dev_err != cudaSuccess) {
+      UMPIRE_ERROR(runtime_error, fmt::format("cudaGetDevice failed: {} ({})", cudaGetErrorString(get_dev_err),
+                                              static_cast<int>(get_dev_err)));
+    }
+  }
+
   // Skip if device doesn't support managed memory
-  if (!supports_managed_memory(device)) {
-    UMPIRE_LOG(Warning, "cudaMemAdvise skipped: device " << device << " does not support managed memory");
+  if (!supports_managed_memory(gpu)) {
+    UMPIRE_LOG(Warning, "cudaMemAdvise skipped: device " << gpu << " does not support managed memory");
     return;
   }
 

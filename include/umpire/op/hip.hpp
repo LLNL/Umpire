@@ -99,9 +99,20 @@ inline hipStream_t get_stream(camp::resources::Resource& resource)
 template <typename T>
 inline void advise(T* ptr, std::size_t count, int device, hipMemoryAdvise advice)
 {
+  // device may be hipCpuDeviceId (-1, e.g. preferred-location-host); that is
+  // not a valid argument to hipGetDeviceProperties, so check managed-memory
+  // support against the current device instead (mirrors the prefetch path).
+  int gpu = device;
+  if (device == hipCpuDeviceId) {
+    hipError_t get_dev_err = hipGetDevice(&gpu);
+    if (get_dev_err != hipSuccess) {
+      UMPIRE_ERROR(runtime_error, fmt::format("hipGetDevice failed with error: {}", hipGetErrorString(get_dev_err)));
+    }
+  }
+
   // Skip if device doesn't support managed memory
-  if (!supports_managed_memory(device)) {
-    UMPIRE_LOG(Warning, "hipMemAdvise skipped: device " << device << " does not support managed memory");
+  if (!supports_managed_memory(gpu)) {
+    UMPIRE_LOG(Warning, "hipMemAdvise skipped: device " << gpu << " does not support managed memory");
     return;
   }
 
