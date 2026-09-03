@@ -19,10 +19,11 @@
 
 # ROCm 6.4.3's Clang otherwise discovers GCC 13 on Corona while this job's
 # Intel classic Fortran compiler uses GCC 10 runtime libraries.  Keep the C,
-# C++, and Fortran link environment ABI-compatible.
+# C++, HIP, and Fortran link environment ABI-compatible.
 rocmcc_6_4_3_hip:
   variables:
     SPEC: "${PROJECT_CORONA_VARIANTS} +rocm amdgpu_target=gfx906 cflags==\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-10.3.1\" cxxflags==\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-10.3.1\" %llvm-amdgpu@=6.4.3 ^hip@6.4.3 ${PROJECT_CORONA_DEPS}"
+    HIPFLAGS: "--gcc-toolchain=/usr/tce/packages/gcc/gcc-10.3.1"
     MODULE_LIST: "rocm/6.4.3"
   extends: .job_on_corona
 
