@@ -4,11 +4,19 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
+set (sanitizer_depends umpire)
+
+if (UMPIRE_ENABLE_HIP)
+  set (sanitizer_depends
+      ${sanitizer_depends}
+      blt::hip
+      blt::hip_runtime)
+endif ()
 
 blt_add_executable(
   NAME sanitizer_tests
   SOURCES sanitizer_tests.cpp
-  DEPENDS_ON umpire)
+  DEPENDS_ON ${sanitizer_depends})
 
 include(FindPythonInterp)
 

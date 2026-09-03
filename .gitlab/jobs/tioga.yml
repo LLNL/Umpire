@@ -49,3 +49,17 @@ rocmcc_6.4.3_hip_deviceconst:
   variables:
     SPEC: "~shared +fortran +deviceconst +rocm tests=basic amdgpu_target=gfx90a %llvm-amdgpu@=6.4.3 ^hip@6.4.3"
   extends: .job_on_tioga
+
+rocmcc_7_2_1_hip_memleak:
+  variables:
+    SPEC: "~shared +asan +sanitizer_tests +tools +rocm tests=basic amdgpu_target=gfx90a:xnack+ cxxflags==\"-fsanitize=address\" %rocmcc@7.2.1 ^hip@7.2.1"
+    ASAN_OPTIONS: "detect_leaks=1"
+    # ROCm's HSA runtime retains internal process-lifetime allocations.
+    # Expand CI_PROJECT_DIR so every CTest child, including BLT HIP tests,
+    # receives the same narrowly scoped LeakSanitizer suppression.
+    LSAN_OPTIONS: "suppressions=${CI_PROJECT_DIR}/tests/tools/sanitizers/hip_lsan.supp"
+    # ROCm 7.2.1's HIP runtime is incompatible with host ASan in these tests.
+    # Keep the remaining Umpire tests under LeakSanitizer; skip only known
+    # HIP-runtime crashes and intentional test-owned leaks for this job.
+    UMPIRE_CTEST_EXCLUDE_REGEX: "^(blt_hip_smoke|blt_hip_runtime_c_smoke|blt_hip_gtest_smoke|allocator_accessibility_tests|resource_aware_pool_tests|destroy_allocator_tests|allocator_fortran_tests|op_fortran_tests|introspection_fortran_tests|aligned_pool_fortran_tests|sanitizer_tests)$"
+  extends: .job_on_tioga

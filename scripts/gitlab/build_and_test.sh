@@ -428,7 +428,11 @@ then
     cd ${build_dir}
 
     section_start "tests" "Running Tests" "collapsed"
-    ctest --output-on-failure --no-compress-output -T test -VV 2>&1 | tee tests_output.txt
+    ctest_args=(--output-on-failure --no-compress-output -T test -VV)
+    if [[ -n "${UMPIRE_CTEST_EXCLUDE_REGEX:-}" ]]; then
+        ctest_args+=(-E "${UMPIRE_CTEST_EXCLUDE_REGEX}")
+    fi
+    ctest "${ctest_args[@]}" 2>&1 | tee tests_output.txt
     ctest_status=${PIPESTATUS[0]}
 
     # If Developer benchmarks enabled, run the no-op benchmark and show output
