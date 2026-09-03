@@ -1,0 +1,6 @@
+# ROCm 7.2's HSA runtime retains process-lifetime bookkeeping allocations.
+#
+# Keep LeakSanitizer enabled for Umpire allocations.  This rule is deliberately
+# limited to allocation stacks containing the HSA runtime library so that it
+# suppresses only the external HIP/HSA runtime leaks seen in HIP test jobs.
+leak:libhsa-runtime64.so.1

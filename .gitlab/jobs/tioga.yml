@@ -54,4 +54,8 @@ rocmcc_7_2_1_hip_memleak:
   variables:
     SPEC: "~shared +asan +sanitizer_tests +tools +rocm tests=basic amdgpu_target=gfx90a:xnack+ cxxflags==\"-fsanitize=address\" %rocmcc@7.2.1 ^hip@7.2.1"
     ASAN_OPTIONS: "detect_leaks=1"
+    # ROCm's HSA runtime retains internal process-lifetime allocations.
+    # Expand CI_PROJECT_DIR so every CTest child, including BLT HIP tests,
+    # receives the same narrowly scoped LeakSanitizer suppression.
+    LSAN_OPTIONS: "suppressions=${CI_PROJECT_DIR}/tests/tools/sanitizers/hip_lsan.supp"
   extends: .job_on_tioga
