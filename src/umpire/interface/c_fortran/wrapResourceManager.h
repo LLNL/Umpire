@@ -76,6 +76,36 @@ umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_resource_awar
     umpire_allocator allocator, size_t initial_size, size_t block,
     umpire_allocator * SHC_rv);
 
+umpire_allocator * umpire_resourcemanager_make_allocator_list_pool_aligned(
+    umpire_resourcemanager * self, const char * name,
+    umpire_allocator allocator, size_t initial_size, size_t block,
+    size_t alignment, umpire_allocator * SHC_rv);
+
+umpire_allocator * umpire_resourcemanager_make_allocator_list_pool_aligned_bufferify(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    umpire_allocator allocator, size_t initial_size, size_t block,
+    size_t alignment, umpire_allocator * SHC_rv);
+
+umpire_allocator * umpire_resourcemanager_make_allocator_quick_pool_aligned(
+    umpire_resourcemanager * self, const char * name,
+    umpire_allocator allocator, size_t initial_size, size_t block,
+    size_t alignment, umpire_allocator * SHC_rv);
+
+umpire_allocator * umpire_resourcemanager_make_allocator_quick_pool_aligned_bufferify(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    umpire_allocator allocator, size_t initial_size, size_t block,
+    size_t alignment, umpire_allocator * SHC_rv);
+
+umpire_allocator * umpire_resourcemanager_make_allocator_resource_aware_pool_aligned(
+    umpire_resourcemanager * self, const char * name,
+    umpire_allocator allocator, size_t initial_size, size_t block,
+    size_t alignment, umpire_allocator * SHC_rv);
+
+umpire_allocator * umpire_resourcemanager_make_allocator_resource_aware_pool_aligned_bufferify(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    umpire_allocator allocator, size_t initial_size, size_t block,
+    size_t alignment, umpire_allocator * SHC_rv);
+
 umpire_allocator * umpire_resourcemanager_make_allocator_advisor(
     umpire_resourcemanager * self, const char * name,
     umpire_allocator allocator, const char * advice_op, int device_id,
@@ -215,6 +245,36 @@ umpire_allocator * umpire_resourcemanager_make_allocator_resource_aware_pool_unt
     umpire_resourcemanager * self, const char * name, int Lname,
     umpire_allocator allocator, size_t initial_size, size_t block,
     umpire_allocator * SHC_rv);
+
+umpire_allocator * umpire_resourcemanager_make_allocator_list_pool_aligned_untracked(
+    umpire_resourcemanager * self, const char * name,
+    umpire_allocator allocator, size_t initial_size, size_t block,
+    size_t alignment, umpire_allocator * SHC_rv);
+
+umpire_allocator * umpire_resourcemanager_make_allocator_list_pool_aligned_untracked_bufferify(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    umpire_allocator allocator, size_t initial_size, size_t block,
+    size_t alignment, umpire_allocator * SHC_rv);
+
+umpire_allocator * umpire_resourcemanager_make_allocator_quick_pool_aligned_untracked(
+    umpire_resourcemanager * self, const char * name,
+    umpire_allocator allocator, size_t initial_size, size_t block,
+    size_t alignment, umpire_allocator * SHC_rv);
+
+umpire_allocator * umpire_resourcemanager_make_allocator_quick_pool_aligned_untracked_bufferify(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    umpire_allocator allocator, size_t initial_size, size_t block,
+    size_t alignment, umpire_allocator * SHC_rv);
+
+umpire_allocator * umpire_resourcemanager_make_allocator_resource_aware_pool_aligned_untracked(
+    umpire_resourcemanager * self, const char * name,
+    umpire_allocator allocator, size_t initial_size, size_t block,
+    size_t alignment, umpire_allocator * SHC_rv);
+
+umpire_allocator * umpire_resourcemanager_make_allocator_resource_aware_pool_aligned_untracked_bufferify(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    umpire_allocator allocator, size_t initial_size, size_t block,
+    size_t alignment, umpire_allocator * SHC_rv);
 
 umpire_allocator * umpire_resourcemanager_make_allocator_fixed_pool_untracked(
     umpire_resourcemanager * self, const char * name,
