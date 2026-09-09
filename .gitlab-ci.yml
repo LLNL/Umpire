@@ -244,7 +244,7 @@ trigger-chai:
   inherit:
     variables: false
   variables:
-    UPDATE_UMPIRE: ${CI_COMMIT_SHA}
+    UMPIRE_REFERENCE: ${CI_COMMIT_SHA}
   trigger:
     project: radiuss/multi-project/chai-trigger
     branch: develop
