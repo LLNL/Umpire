@@ -19,6 +19,9 @@
 
 #include "umpire/ResourceManager.hpp"
 #include "umpire/config.hpp"
+#if defined(UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
+#include "umpire/resource/HostMpi3SharedMemoryResource.hpp"
+#endif
 #if defined(UMPIRE_ENABLE_IPC_SHARED_MEMORY)
 #include "umpire/resource/HostSharedMemoryResource.hpp"
 #endif
@@ -361,6 +364,10 @@ MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm)
   if (auto alloc = dynamic_cast<strategy::DeviceIpcAllocator*>(a.getAllocationStrategy()))
     return alloc->get_scope_communicator();
 #endif
+#if defined(UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
+  if (auto resource = dynamic_cast<resource::HostMpi3SharedMemoryResource*>(a.getAllocationStrategy()))
+    return resource->getSharedCommunicator();
+#endif
 
   std::map<int, MPI_Comm>& cached_communicators = get_cached_communicators();
 
@@ -388,10 +395,39 @@ void cleanup_cached_communicators()
   std::map<int, MPI_Comm>& comm = get_cached_communicators();
 
   for (auto c : comm) {
-    MPI_Comm_free(&c.second);
+    if (c.second != MPI_COMM_NULL) {
+      MPI_Comm_free(&c.second);
+    }
   }
 
   comm.clear();
+}
+#endif
+
+#if defined(UMPIRE_ENABLE_MPI)
+bool can_use_socket_scoped_mpi3_shared_memory(MPI_Comm comm, std::string& reason)
+{
+#if defined(UMPIRE_ENABLE_MPI3_SHARED_MEMORY)
+  const int local_affinity_valid = resource::affinity_maps_to_single_socket(reason) ? 1 : 0;
+  int all_affinity_valid{0};
+  const int status = MPI_Allreduce(&local_affinity_valid, &all_affinity_valid, 1, MPI_INT, MPI_MIN, comm);
+
+  if (status != MPI_SUCCESS) {
+    reason = fmt::format("MPI_Allreduce failed while checking socket affinity: {}",
+                         util::get_mpi_error_message(status));
+    return false;
+  }
+
+  if (!all_affinity_valid && local_affinity_valid) {
+    reason = "Another rank in the communicator does not map to a single socket";
+  }
+
+  return all_affinity_valid != 0;
+#else
+  UMPIRE_USE_VAR(comm);
+  reason = "MPI3 shared memory support is disabled";
+  return false;
+#endif
 }
 #endif
 
