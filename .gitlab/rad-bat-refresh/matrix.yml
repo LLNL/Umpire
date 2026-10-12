@@ -2,6 +2,7 @@ rad-bat-refresh-matrix-clang-18-cuda-12-6:
   extends: .job_on_matrix
   rules:
     - if: '$RAD_BAT_REFRESH_TARGET == null || $RAD_BAT_REFRESH_TARGET == "" || $RAD_BAT_REFRESH_TARGET == "matrix/clang_18_1_8_gcc_13_cuda_12_6_0"'
+      when: on_success
     - when: never
   variables:
     SPEC: "${PROJECT_MATRIX_VARIANTS} +deviceconst %clang-18-gcc-13 ^cmake@3.25.2 ^cuda@12.6.0+allow-unsupported-compilers ${PROJECT_MATRIX_DEPS}"

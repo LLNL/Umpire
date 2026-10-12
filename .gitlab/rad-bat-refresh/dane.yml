@@ -2,6 +2,7 @@ rad-bat-refresh-dane-gcc-11-2-1-numa:
   extends: .job_on_dane
   rules:
     - if: '$RAD_BAT_REFRESH_TARGET == null || $RAD_BAT_REFRESH_TARGET == "" || $RAD_BAT_REFRESH_TARGET == "dane/gcc_11_2_1_numa"'
+      when: on_success
     - when: never
   variables:
     SPEC: "~shared +fortran +numa +tools tests=basic %gcc@=11.2.1"
