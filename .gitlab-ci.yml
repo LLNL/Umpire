@@ -110,11 +110,21 @@ generate-job-lists:
     RADIUSS_JOBS_PATH: "scripts/radiuss-spack-configs/gitlab/radiuss-jobs"
     LOCAL_JOBS_PATH: ".gitlab/jobs"
   script:
-    - cat ${RADIUSS_JOBS_PATH}/dane.yml ${LOCAL_JOBS_PATH}/dane.yml > dane-jobs.yml
-    - cat ${RADIUSS_JOBS_PATH}/matrix.yml ${LOCAL_JOBS_PATH}/matrix.yml > matrix-jobs.yml
-    - cat ${RADIUSS_JOBS_PATH}/corona.yml ${LOCAL_JOBS_PATH}/corona.yml > corona-jobs.yml
-    - cat ${RADIUSS_JOBS_PATH}/tioga.yml ${LOCAL_JOBS_PATH}/tioga.yml > tioga-jobs.yml
-    - cat ${RADIUSS_JOBS_PATH}/tuolumne.yml ${LOCAL_JOBS_PATH}/tuolumne.yml > tuolumne-jobs.yml
+    - |
+      if [[ "${RAD_BAT_CI_WORKFLOW:-host-config}" == "refresh" ]]
+      then
+        cp .gitlab/rad-bat-refresh/dane.yml dane-jobs.yml
+        cp .gitlab/rad-bat-refresh/matrix.yml matrix-jobs.yml
+        cp .gitlab/rad-bat-refresh/corona.yml corona-jobs.yml
+        cp .gitlab/rad-bat-refresh/tioga.yml tioga-jobs.yml
+        cp .gitlab/rad-bat-refresh/tuolumne.yml tuolumne-jobs.yml
+      else
+        cat ${RADIUSS_JOBS_PATH}/dane.yml ${LOCAL_JOBS_PATH}/dane.yml > dane-jobs.yml
+        cat ${RADIUSS_JOBS_PATH}/matrix.yml ${LOCAL_JOBS_PATH}/matrix.yml > matrix-jobs.yml
+        cat ${RADIUSS_JOBS_PATH}/corona.yml ${LOCAL_JOBS_PATH}/corona.yml > corona-jobs.yml
+        cat ${RADIUSS_JOBS_PATH}/tioga.yml ${LOCAL_JOBS_PATH}/tioga.yml > tioga-jobs.yml
+        cat ${RADIUSS_JOBS_PATH}/tuolumne.yml ${LOCAL_JOBS_PATH}/tuolumne.yml > tuolumne-jobs.yml
+      fi
   artifacts:
     paths:
       - dane-jobs.yml
@@ -133,8 +143,10 @@ dane-build-and-test:
   extends: [.dane, .build-and-test]
   needs: [dane-up-check, generate-job-lists]
   trigger:
+    forward:
+      pipeline_variables: true
     include:
-      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/dane-pipeline@2026.6.0
+      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/dane-pipeline@woptim/rad-bat-module-loading
         inputs:
           job_cmd: $JOB_CMD
           shared_alloc: $DANE_SHARED_ALLOC
@@ -155,8 +167,10 @@ matrix-build-and-test:
   extends: [.matrix, .build-and-test]
   needs: [matrix-up-check, generate-job-lists]
   trigger:
+    forward:
+      pipeline_variables: true
     include:
-      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/matrix-pipeline@2026.6.0
+      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/matrix-pipeline@woptim/rad-bat-module-loading
         inputs:
           job_cmd: $JOB_CMD
           shared_alloc: $MATRIX_SHARED_ALLOC
@@ -177,8 +191,10 @@ corona-build-and-test:
   extends: [.corona, .build-and-test]
   needs: [corona-up-check, generate-job-lists]
   trigger:
+    forward:
+      pipeline_variables: true
     include:
-      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/corona-pipeline@2026.6.0
+      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/corona-pipeline@woptim/rad-bat-module-loading
         inputs:
           job_cmd: $JOB_CMD
           shared_alloc: $CORONA_SHARED_ALLOC
@@ -199,8 +215,10 @@ tioga-build-and-test:
   extends: [.tioga, .build-and-test]
   needs: [tioga-up-check, generate-job-lists]
   trigger:
+    forward:
+      pipeline_variables: true
     include:
-      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/tioga-pipeline@2026.6.0
+      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/tioga-pipeline@woptim/rad-bat-module-loading
         inputs:
           job_cmd: $JOB_CMD
           shared_alloc: $TIOGA_SHARED_ALLOC
@@ -221,8 +239,10 @@ tuolumne-build-and-test:
   extends: [.tuolumne, .build-and-test]
   needs: [tuolumne-up-check, generate-job-lists]
   trigger:
+    forward:
+      pipeline_variables: true
     include:
-      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/tuolumne-pipeline@2026.6.0
+      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/tuolumne-pipeline@woptim/rad-bat-module-loading
         inputs:
           job_cmd: $JOB_CMD
           shared_alloc: $TUOLUMNE_SHARED_ALLOC

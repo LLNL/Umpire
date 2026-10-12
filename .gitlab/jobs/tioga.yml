@@ -48,4 +48,4 @@ rocmcc_6.4.3_hip_openmp_device_alloc:
 rocmcc_6.4.3_hip_deviceconst:
   variables:
     SPEC: "~shared +fortran +deviceconst +rocm tests=basic amdgpu_target=gfx90a %llvm-amdgpu@=6.4.3 ^hip@6.4.3"
-  extends: [.job_on_tioga, .rad_bat_spack_canary]
+  extends: .job_on_tioga

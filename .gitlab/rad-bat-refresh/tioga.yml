@@ -1,0 +1,13 @@
+rad-bat-refresh-tioga-rocm-6-4-deviceconst:
+  extends: .job_on_tioga
+  rules:
+    - if: '$RAD_BAT_REFRESH_TARGET == null || $RAD_BAT_REFRESH_TARGET == "" || $RAD_BAT_REFRESH_TARGET == "tioga/rocmcc_6_4_3_hip_deviceconst"'
+    - when: never
+  variables:
+    SPEC: "~shared +fortran +deviceconst +rocm tests=basic amdgpu_target=gfx90a %llvm-amdgpu@=6.4.3 ^hip@6.4.3"
+    RSCI_JOB_CMD: "./scripts/radiuss-spack-configs/bin/rad-bat ci"
+    RAD_BAT_MODE: "spack"
+    RAD_BAT_DEST: "/dev/shm/rad-bat-${CI_JOB_ID}"
+    RAD_BAT_INSTALL_TREE: "/usr/workspace/umdev/rad-bat/umpire/tioga/${CI_PIPELINE_ID}/install"
+    RAD_BAT_OUTPUT_DIR: "${CI_PROJECT_DIR}/.rad-bat-artifacts/host-configs"
+    RAD_BAT_HOST_CONFIG_NAME: "tioga-rocm-6-4-deviceconst.cmake"

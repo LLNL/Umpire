@@ -1,0 +1,4 @@
+# No maintained Tuolumne host-config refresh target in the initial canary set.
+.rad_bat_no_tuolumne_refresh_targets:
+  variables:
+    RAD_BAT_REFRESH_TARGETS: ""
