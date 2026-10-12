@@ -34,7 +34,7 @@
       export SPEC=\"${SPEC//\"/\\\"}\" \n
       export RAD_BAT_MODE=\"${RAD_BAT_MODE:-}\" \n
       export RAD_BAT_JOBS=\"${RAD_BAT_JOBS:-}\" \n
-      export RAD_BAT_DEST=\"${RAD_BAT_DEST:-}\" \n
+      export RAD_BAT_WORK_DIR=\"${RAD_BAT_WORK_DIR:-}\" \n
       export RAD_BAT_INSTALL_TREE=\"${RAD_BAT_INSTALL_TREE:-}\" \n
       export RAD_BAT_OUTPUT_DIR=\"${RAD_BAT_OUTPUT_DIR:-}\" \n
       export RAD_BAT_BUILDCACHE=\"${RAD_BAT_BUILDCACHE:-}\" \n

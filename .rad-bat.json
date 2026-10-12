@@ -6,7 +6,7 @@
       "python3",
       "scripts/gitlab/build_and_test.py",
       "--host-config", "{host_config}",
-      "--dest", "{dest}",
+      "--work-dir", "{work_dir}",
       "--source", "{source}",
       "--jobs", "{jobs}"
     ]

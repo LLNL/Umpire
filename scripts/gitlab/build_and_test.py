@@ -122,7 +122,7 @@ def test_installed_example(cmake, install):
 def parse_args(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--host-config", required=True)
-    parser.add_argument("--dest", required=True)
+    parser.add_argument("--work-dir", required=True)
     parser.add_argument("--source", default=".")
     parser.add_argument("--jobs", type=int, default=os.cpu_count() or 1)
     phase = parser.add_mutually_exclusive_group()
@@ -138,13 +138,13 @@ def main(argv=None):
     args = parse_args(argv)
     try:
         source = Path(args.source).expanduser().resolve()
-        destination = Path(args.dest).expanduser().resolve()
+        work_dir = Path(args.work_dir).expanduser().resolve()
         host_config = Path(args.host_config).expanduser().resolve()
         if not source.is_dir() or not host_config.is_file():
             raise BuildError("source or host-config does not exist")
-        destination.mkdir(parents=True, exist_ok=True)
-        build_dir = destination / "build_{}".format(host_config.stem)
-        install_dir = destination / "install_{}".format(host_config.stem)
+        work_dir.mkdir(parents=True, exist_ok=True)
+        build_dir = work_dir / "build_{}".format(host_config.stem)
+        install_dir = work_dir / "install_{}".format(host_config.stem)
         cmake = cmake_from_host_config(host_config)
         if not args.test_only:
             with logs.sections.section("clean", "Cleaning working directories"):

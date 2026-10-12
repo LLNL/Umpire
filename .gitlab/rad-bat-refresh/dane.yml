@@ -9,7 +9,7 @@ rad-bat-refresh-dane-gcc-11-2-1-numa:
     RSCI_JOB_CMD: "./scripts/radiuss-spack-configs/bin/rad-bat ci"
     RAD_BAT_MODE: "spack"
     RAD_BAT_JOBS: "28"
-    RAD_BAT_DEST: "/dev/shm/rad-bat-${CI_JOB_ID}"
+    RAD_BAT_WORK_DIR: "/dev/shm/rad-bat-${CI_JOB_ID}"
     RAD_BAT_INSTALL_TREE: "/usr/workspace/umdev/rad-bat/umpire/dane/${CI_PIPELINE_ID}/install"
     RAD_BAT_OUTPUT_DIR: "${CI_PROJECT_DIR}/.rad-bat-artifacts/host-configs"
     RAD_BAT_BUILDCACHE: "oci://${CI_REGISTRY_IMAGE}"
