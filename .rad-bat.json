@@ -2,7 +2,14 @@
   "schema_version": 1,
   "project": {
     "package": "umpire",
-    "command": ["python3", "scripts/gitlab/build_and_test.py", "--host-config", "{host_config}", "--dest", "{dest}", "--source", "{source}", "--jobs", "{jobs}"]
+    "command": [
+      "python3",
+      "scripts/gitlab/build_and_test.py",
+      "--host-config", "{host_config}",
+      "--dest", "{dest}",
+      "--source", "{source}",
+      "--jobs", "{jobs}"
+    ]
   },
   "spack": {
     "url": "https://github.com/spack/spack.git",
