@@ -10,3 +10,4 @@ CMakeFiles
 .spack_env/*/.spack-env
 *.orig
 .rad-bat-work/
+.rad-bat-artifacts/
