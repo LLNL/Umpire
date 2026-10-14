@@ -47,6 +47,10 @@ variables:
 # Project-wide default. Override with RAD_BAT_MODE=spack in a manually started
 # pipeline to regenerate every maintained host-config.
   RAD_BAT_MODE: "host-config"
+# Flux copies the job command to its spool directory before executing it.
+# Keep the source checkout on Python's import path so the relocated launcher
+# can import the rad_bat package from the radiuss-spack-configs submodule.
+  PYTHONPATH: "${CI_PROJECT_DIR}/scripts/radiuss-spack-configs"
 # Set the build-and-test command.
 # Nested variables are allowed and useful to customize the job command. We
 # prevent variable expansion so that you can define them at job level.
