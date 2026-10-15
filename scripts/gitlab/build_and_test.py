@@ -16,6 +16,7 @@ RSC_ROOT = PROJECT_ROOT / "scripts" / "radiuss-spack-configs"
 sys.path.insert(0, str(RSC_ROOT))
 
 from rad_bat import logs
+from rad_bat.runner import scheduler_pass_fds
 
 
 class BuildError(Exception):
@@ -31,7 +32,12 @@ class CommandError(BuildError):
 def run(command, cwd, check=True):
     logs.command(command)
     try:
-        result = subprocess.run(command, cwd=str(cwd), check=False)
+        result = subprocess.run(
+            command,
+            cwd=str(cwd),
+            check=False,
+            pass_fds=scheduler_pass_fds(),
+        )
     except FileNotFoundError:
         raise BuildError("command not found: {}".format(command[0]))
     if check and result.returncode:
@@ -82,7 +88,14 @@ def run_ctest(build_dir):
     command = ["ctest", "--output-on-failure", "--no-compress-output", "-T", "test", "-VV"]
     logs.command(command)
     try:
-        process = subprocess.Popen(command, cwd=str(build_dir), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
+        process = subprocess.Popen(
+            command,
+            cwd=str(build_dir),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            pass_fds=scheduler_pass_fds(),
+            universal_newlines=True,
+        )
     except FileNotFoundError:
         raise BuildError("command not found: ctest")
     lines = []
