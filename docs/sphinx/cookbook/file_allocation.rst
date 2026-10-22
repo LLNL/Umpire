@@ -50,7 +50,7 @@ The complete example is included below:
 
    .. code-block:: bash
 
-     $ c++ -std=c++17 recipe_filesystem_memory_allocation.cpp \
+     $ c++ -std=c++20 recipe_filesystem_memory_allocation.cpp \
            -I<umpire-install>/include -L<umpire-install>/lib \
            -lumpire -lcamp -o file_example
 
